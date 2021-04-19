@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node>
+    <DrawEllipse toolClassNames="FlowNodeRelation,DisPlayName"></DrawEllipse>
+	<TimeScaleFrame toolClassNames="FlowNodeRelation"></TimeScaleFrame>
+	<FlowTextGrid toolClassNames="FlowNodeRelation"></FlowTextGrid>
+	<DisPlayRange toolClassNames="FlowNodeRelation"></DisPlayRange>
+</node>

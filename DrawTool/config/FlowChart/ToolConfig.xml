@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node>
+    <ZRotaryTool></ZRotaryTool><!--旋转-->
+    <EditBoundItemTool></EditBoundItemTool><!--编辑大小-->
+    <DisPlayName></DisPlayName><!--显示和编辑文字-->
+    <EditFoldLine></EditFoldLine><!--创建和修改折现-->
+    <ItemFoldRegard></ItemFoldRegard><!--图元之间的折线的关系-->
+    <BoundChanged></BoundChanged><!--大小改变-->
+    <ColldingZValue></ColldingZValue><!--绘画顺序改变-->
+	<AlignmentTool></AlignmentTool><!--对齐方式-->
+	<SelectBound></SelectBound><!--选中加矩形-->
+</node>

@@ -1,0 +1,1 @@
+#include "../charts/legend/qcandlesticklegendmarker_p.h"

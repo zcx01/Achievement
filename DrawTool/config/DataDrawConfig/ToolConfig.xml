@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node>
+    <DisPlayName></DisPlayName><!--显示和编辑文字-->
+	<FlowNodeRelation></FlowNodeRelation><!--流程节点关系-->
+</node>

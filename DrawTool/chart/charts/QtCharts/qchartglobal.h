@@ -1,0 +1,1 @@
+#include "../charts/qchartglobal.h"

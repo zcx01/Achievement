@@ -1,0 +1,1 @@
+#include "../charts/animations/splineanimation_p.h"

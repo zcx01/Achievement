@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node>
+    <DrawEllipse toolClassNames="EditBoundItemTool,DisPlayName,ItemFoldRegard,BoundChanged,ColldingZValue,SelectBound"></DrawEllipse>
+    <AssistLine toolClassNames="BoundChanged"></AssistLine>
+    <DrawDiamond toolClassNames="EditBoundItemTool,DisPlayName,ItemFoldRegard,BoundChanged,ColldingZValue,SelectBound"></DrawDiamond>
+    <FoldLine toolClassNames="EditFoldLine,ItemFoldRegard"></FoldLine>
+    <DrawSvg toolClassNames="ZRotaryTool"></DrawSvg>
+    <ZRotaryItem toolClassNames="ZRotaryTool"></ZRotaryItem>
+    <DrawRect toolClassNames="ZRotaryTool,EditBoundItemTool,DisPlayName,ItemFoldRegard,BoundChanged,ColldingZValue,SelectBound"></DrawRect>
+</node>

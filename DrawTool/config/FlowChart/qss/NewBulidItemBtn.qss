@@ -1,0 +1,8 @@
+
+CButton
+{
+    background-color:rgb(30,30,30,0);
+    qproperty-textColor:"0,178,240";
+    qproperty-textFont:"18,Î¢ÈíÑÅºÚ,50";
+	min-height:30px;
+}

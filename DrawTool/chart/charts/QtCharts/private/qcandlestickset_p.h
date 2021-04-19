@@ -1,0 +1,1 @@
+#include "../charts/candlestickchart/qcandlestickset_p.h"

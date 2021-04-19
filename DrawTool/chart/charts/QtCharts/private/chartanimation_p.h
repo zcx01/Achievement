@@ -1,0 +1,1 @@
+#include "../charts/animations/chartanimation_p.h"

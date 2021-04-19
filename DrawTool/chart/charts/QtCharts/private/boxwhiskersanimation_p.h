@@ -1,0 +1,1 @@
+#include "../charts/animations/boxwhiskersanimation_p.h"

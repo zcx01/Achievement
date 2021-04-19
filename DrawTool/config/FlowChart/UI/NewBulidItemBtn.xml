@@ -1,0 +1,26 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<!--xmlConfig:整体布局
+    GropName:其中一个布局，同级节点位于同一个布局
+    vorh:是否是垂直布局
+    Stretch:在布局中所占比例
+    Margins:边距（左，上，右，下）
+	Spacing:空间之间的间距
+    CButton:CButton控件，可以随便命名
+    TextScale:文本占据本控件的比例
+    ClickWay:点击方式
+    TextPositiontType:文字出现的位置
+    Checkable:能否被选中
+    TextAlignmen:文本对齐的方式
+    ImageAlignmen:图片的对齐的方式
+    Text:文本
+    objectName:按钮的objectName，一定不同
+	GroupName:互斥按钮组的名字
+	Alignment:窗体(或者布局)的对齐方式
+-->
+<xmlConfig vorh="0" >
+   <GropName vorh="1" Margins="0,0,0,0">
+    	<CButton TextScale="1" TextPositiontType="0" ClickWay="0" Checkable="0" TextAlignmen="132" ImageAlignmen="0"  Text="矩形"  objectName="DrawRect"></CButton>
+	  	<CButton TextScale="1" TextPositiontType="0" ClickWay="0" Checkable="0" TextAlignmen="132" ImageAlignmen="0"  Text="椭圆"  objectName="DrawEllipse"></CButton>
+		<CButton TextScale="1" TextPositiontType="0" ClickWay="0" Checkable="0" TextAlignmen="132" ImageAlignmen="0"  Text="菱形"  objectName="DrawDiamond"></CButton>
+  </GropName>
+</xmlConfig>

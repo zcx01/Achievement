@@ -1,0 +1,1 @@
+#include "../charts/animations/boxplotanimation_p.h"

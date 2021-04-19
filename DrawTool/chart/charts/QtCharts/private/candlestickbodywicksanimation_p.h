@@ -1,0 +1,1 @@
+#include "../charts/animations/candlestickbodywicksanimation_p.h"

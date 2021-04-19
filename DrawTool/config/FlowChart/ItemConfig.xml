@@ -1,0 +1,14 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<root CanZoom="1" CanTranslate="1" SceneSize="0,0,1920,1080">
+	<!--DrawSvg Posx="200" Posy="200" Scale="1"  Flags="1" SvgeLementId="" SvgFileName="C:/Users/lenovo/Desktop/back.svg"></DrawSvg-->
+        <DrawRect Posx="300" Posy="300" Scale="1" BoundRect="0,0,100,100" Id="00001" Flags="2055" ItemName="矩形" NamePos="4" NamePen="2|255,0,0|0" NameFont="20" JoinPoints="LeftTop,TopCenter,RightTop,LeftCenter,Center,RightCenter,LeftDown,DownCenter,RightDown"
+	Pens="2|255,0,0|1" Brushs="255,255,0|1"></DrawRect>
+	<DrawRect Posx="200" Posy="100" Scale="1" BoundRect="0,0,10,10" Id="ZRotaryTool" Flags="1" WithChaged="1" PosType="8" Distance="0,20" AxisPosType="8"
+	ItemId="" Itemtype="ZRotaryItem" ></DrawRect>
+        <DrawEllipse Scale="1" BoundRect="0,0,100,100"  Flags="2055" ItemName="圆" NamePos="4" NameFont="20"
+	JoinPoints="LeftCenter,TopCenter,RightCenter,DownCenter" ></DrawEllipse>
+        <DrawDiamond Posx="100" Posy="100" Scale="1" BoundRect="0,0,100,100"  Flags="2055" ItemName="菱形" NamePos="4" NameFont="20"
+	JoinPoints="LeftCenter,TopCenter,RightCenter,DownCenter"></DrawDiamond>
+	<AssistLine Posx="00" Posy="200" Scale="1" Pens="1|0,0,0|4" Id="VAssistLine" ></AssistLine>
+	<AssistLine Posx="00" Posy="200" Scale="1" Pens="1|0,0,0|4" Id="HAssistLine" ></AssistLine>
+</root>

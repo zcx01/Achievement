@@ -1,0 +1,1 @@
+#include "../charts/animations/scatteranimation_p.h"
