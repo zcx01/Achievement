@@ -1,0 +1,56 @@
+------------------使用C++加载QML对象
+QQmlEngine e;
+QQmlComponent comonent(&e,QUrl(QStringLiteral("qrc:/main.qml")));
+QObject* object = comonent.create();
+
+------------------使用C++访问QML对象成员
+1.使用QObject::setProperty()或者QQmlProperty()类进行修改属性
+object->setProperty("width",500);
+QQmlProperty(object,"width").write(1000);
+
+2.使用QQuickItem类型
+QQuickItem *item = qobject_cast<QQuickItem*>(object);
+item->setWidth(1000);
+
+3.使用QQuickView()创建实例,用rootObject()获取实例
+
+4.访问子项目的属性
+在QMl中设置objectName属性为"rect"
+
+在C++使用
+如果是QQmlComponent
+QObject* object = comonent.create();
+
+如果是QQmlApplicationEngine
+QObject* object = engine.rootObjects().value(0);
+
+QObject* rect = object->findChild<QObject*>("rect");
+if(rect){
+    rect->setProperty("width",1000);
+}
+
+------------------调用QML函数
+QML有如下函数
+function text(msg){
+    console.log(msg)
+    return "some retrun value";
+}
+
+在C++调用
+QVariant g = "hello from C++";
+QVariant returnValue;
+QMetaObject::invokeMethod(object,"text",Q_RETURN_ARG(QVariant,returnValue),Q_ARG(QVariant,g));
+object 同上,Q_RETURN_ARG和Q_ARG参数必须是QVariant
+
+
+------------------连接QML信号
+QML有如下信号:
+signal qmlSignal(string msg)
+在C++使用
+QObject::connect(object,SIGNAL(qmlSignal(QString)),&msg,SLOT(cppSlot(QString)));
+注:
+1.当使用QML对象作为信号参数时,QML需要使用var,C++中使用QVariant
+可以转化成obj,用property获取属性,如
+    QObject* obj = msg.value<QObject*>();
+    qDebug()<<obj->property("width");
+2.不能使用Qt5的连接方式

@@ -1,0 +1,54 @@
+var text = '{ "employees" : [' +
+'{ "firstName":"Bill" , "lastName":"Gates" },' +
+'{ "firstName":"Steve" , "lastName":"Jobs" },' +
+'{ "firstName":"Alan" , "lastName":"Turing" } ]}';
+规则:
+JSON 对象被花括号 {} 包围。
+
+JSON 对象以键/值对书写。
+
+键必须是字符串，值必须是有效的 JSON 数据类型（字符串、数字、对象、数组、布尔或 null）。
+
+键和值由冒号分隔。
+
+每个键/值对由逗号分隔。
+
+---------把JSON文本转化成JavaScript对象---------
+var obj = JSON.parse(text);
+
+函数的第二个参数，被称为 reviver。
+这个 reviver 参数是函数，在返回值之前，它会检查每个属性
+var obj = JSON.parse(text, function (key, value) {
+    if  (key == "birth") {
+        return new Date(value);
+    } else {
+         return value;
+   }});
+
+eval() 能把字符串转化成函数
+
+---------对 JavaScript 对象进行字符串化----------
+var myJSON = JSON.stringify(obj);
+
+
+--------------------操作数据----------------------
+通过使用点号（.）来访问对象值
+myObj =  { "name":"Bill Gates", "age":62, "car":null };
+x = myObj.name;
+
+使用方括号（[]）来访问对象值：
+x = myObj["name"];
+
+遍历对象,括号标记法来访问属性值
+for (x in myObj) {
+    myObj[x]
+    ......
+}
+
+修改属性、没有就是添加对象
+myObj.name="xxx"
+myObj["name"]="xxx"
+
+删除对象
+delete myObj.name
+

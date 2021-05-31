@@ -1,0 +1,55 @@
+1.MouseArea 鼠标点击区域
+---pressed:是否按下
+***onClicked:点击
+***onDoubleClicked:双击
+***onPressed:按下
+***onReleased:松开
+***onPressAndHold:按下不放
+***onWheel:滚轮
+
+---hoverEnabled:划过是否启动 默认是false
+设置了true,以下信号才生效
+***onPositionChanged()
+***onEntered()
+***onExited()
+***containsMouse() 可以在没有鼠标下的情况下检查光标
+
+多个MouseArea模块重叠时
+---propagateComposedEvents是否传播
+如果处理事件了，就要把accepted设置成false才能继续传播
+
+2.MouseEvent 鼠标事件
+MouseArea的信号包含一个MouseEvent对象mouse
+---button(buttons):获取按键
+---modifiers:获取按下的键盘修饰键
+
+3.WheelEvent 滚轮事件
+MouseArea包含一个WheelEvent对象wheel
+---angleDelta：获取滚动的距离(滚动一下是15度)
+
+4.DragEvent 拖放事件
+实现简单的拖动(即可以移动项目)使用MouseArea中的分组属性drag
+
+实现复杂的拖放操作，就应该使用DragEvent，一般使用Drag附加属性和DropArea
+---x、y:拖放的位置
+---keys:数据类型或源的键列表
+---hasColor、hasHtml、hasText、hasUrls：拖动的类型
+---colorData、html、text、urls：获取具体的数据
+---formats：获取MIME类型格式的列表
+---source:获取源
+---onEntered:拖拽进入
+
+5.keyEvent 键盘事件
+所有的Item都是通过Keys附加属性来处理按键
+***onPressed:按下信号
+***onReleased:松开信号
+---key获取按键类型
+KeyNavigation附加属性实现使用方向键或者Tab键进行项目导航-把焦点转移到制定的item上
+---backtab(Shift+Tab)
+---dowm
+---left
+---priority(改变接受导航键的顺序)
+---right
+---tab
+---up
+

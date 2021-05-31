@@ -1,0 +1,86 @@
+--------------------绘制矩形--------------------
+fillRect(x,y,width,height) 以填充方式绘画矩形
+clearRect(x,y,width,height) 清空指定区域
+strokeRect(x,y,width,height) 描边区域
+
+--------------------状态--------------------
+save() 保存状态
+restore() 恢复状态
+
+--------------------绘制文本--------------------
+fillText(text,x,y) 以填充的方式绘制文本
+strokeText(text,x,y) 以描边的方式绘制文本
+measureText(string) 获取字符串绘制的宽度，使用.width获取
+
+---font字体
+---textAlign 当前文本对齐方式（字符串）
+值有
+start(默认)、end、left、right、center
+---textBaseline 当前基线对齐方式（字符串）top hanging middle alphabetic ideographic bottom
+
+--------------------绘制路径--------------------
+beginPath() 开始绘制路径 
+closePath() 关闭路径 如果在beginPath()之前没有调用closePath(),会自动调用，会闭合路径
+moveTo(x,y) 改变了当前的Context2D坐标，之后的坐标都会以当前的坐标为基础
+lineTo(x,y) 将当前的坐标移动到（x,y）出，并且在两点出绘制直线
+arc(x,y,radius,startAngle,enbAngle,anticlockwise) 将一段圆弧添加到当前路径 anticlockwise角度方向，为true是为逆时针
+arcTo(x1,y1,x2,y2,radius) 添加一个与点（x1,y1）和点（x2,y2）相切的圆弧
+elipse(x,y,w,h) 添加一个椭圆
+rect(x,y,w,h) 添加一个矩形
+roundedRect(x,y,w,h,xRadius,yRadius) 添加一个圆角矩形
+text(text,x,y) 添加一个文本
+fill() 填充方式绘制路径
+stroke() 描边方式添加路径
+
+-------------------绘制图像-------------------
+drawImage(image,dx,dy) 将图像在绘制以（dx,dy）为左上角位置
+drawImage(image,dx,dy,dw,dh) 将图像绘制到矩形（dx,dy,dw,dh）中
+drawImage(image,sx,sy,sw,sh,dx,dy,dw,dh) 将图像的矩形（sx,sy,sw,sh）绘制到矩形（dx,dy,dw,dh）中
+image:可以是Image项目，也可以是URL，也可以是CanvasImageData对象
+如果是Image项目，如果Imgae图像没有完全加载，drawImage不会绘制图像
+如果是URL，那么这个图像需要使用Canvas::loadImage()函数进行加载
+
+Canvas{
+    id:canvas
+	property var imageURL : "http://www.baidu.com/img/bdlogo.gif"
+	onImageLoaded: {
+	if(canvas.isImageError(imageURL)){
+	  console.log("Image failed to loaded!")
+	}
+	var vtx = getContext("2d");
+	vtx.drawImage(imageURL,0,0,)
+	canvas.requestPaint() //立即重绘
+	}
+	Component.onCompleted: {
+	canvas.loadImage(imageURL)
+	}
+}
+
+-------------------截图-------------------
+CanvasImageData getImageData(sx,sy,sw,sh);将画布上的矩形的数据保存到CanvasImageData对象中
+putImageData(CanvasImageData imageData,dx,dy,dirtyX,dirtyY,dirtyWidth,dirtyHeight) 把图像画到指定的位置
+
+CanvasImageData属性
+---data:图形数据
+---height:图形的高度
+---width:图形的宽度
+
+-------------------渐变-------------------
+1.创建渐变
+var linear = createLinearGradient(x0,y0,x1,y1) 函数在点（x0,y0）和点（x1,x2）点之间创建渐变
+var radial = createRadialGradient(x0,y0,r0,x1,y1,r1) 在两个圆之间创建辐射渐变
+var conical = createConicalGradient(x,y,angle) 以(x,y)点为中心，角度angle处开始按照逆时针方向创建锥形渐变
+
+2.添加渐变点
+addColorStop(offsetof,color)
+offsetof:颜色偏移比例（0.0-1.0）
+color:偏移点颜色
+
+3.把渐变色赋值给fillStyle或者strokeStyle
+
+-------------------阴影-------------------
+---shadowBlur:阴影的像素模糊值，相当于阴影的“宽度”
+---shadowColor:阴影颜色
+---shadowOffsetX:阴影在x轴方向的偏移
+---shadowOffsetY:阴影在y轴方向的偏移
+

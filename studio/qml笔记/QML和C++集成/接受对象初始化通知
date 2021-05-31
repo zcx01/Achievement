@@ -1,0 +1,5 @@
+---------------当对象创建完成之后进行其数据的延迟初始化
+用于提高性能
+1.同时继承QObject和QQmlParserStatus
+2.使用Q_INTERFACES(QQmlParserStatus)
+3.在classBegin()进行延迟初始化

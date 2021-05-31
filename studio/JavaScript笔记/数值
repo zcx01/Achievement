@@ -1,0 +1,31 @@
+NaN 指示某个数不是合法数
+
+isNaN(x) 确定某个值是否是数
+
+Infinity （或 -Infinity）是 JavaScript 在计算数时超出最大可能数范围时返回的值
+
+除以 0（零）也会生成 Infinity
+
+toString(16) 方法把数输出为十六进制（八进制或二进制）
+
+toString() 以字符串返回数值
+特殊写法
+(123).toString();  
+
+toExponential(2) 使用指数计数法的数字返回字符串值，并且保留2位小数
+
+toFixed(2) 返回字符串值，它包含了指定位数小数的数字
+
+toPrecision(2) 返回字符串值，它包含了指定长度的数字
+
+valueOf() 以数值返回数值,将 Number 对象转换为原始值
+(123).valueOf();   
+
+Number() 可用于把 JavaScript 变量转换为数值,失败返回NaN
+
+parseInt() 解析一段字符串并返回整数数值。允许空格,只返回首个数字
+
+parseFloat() 解析一段字符串并返回小数数值。允许空格,只返回首个数字
+
+
+https://www.w3school.com.cn/js/js_number_methods.asp

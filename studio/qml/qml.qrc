@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>TitleText.qml</file>
+        <file>TitlePage.qml</file>
+        <file>MyItem.qml</file>
+        <file>MyTextInput.qml</file>
+        <file>MyColumn.qml</file>
+        <file>MyRepeater.qml</file>
+        <file>MyPosition.qml</file>
+        <file>MyAnchors.qml</file>
+        <file>MyDrag.qml</file>
+        <file>MyDrag2.qml</file>
+        <file>MyKeyNavigation.qml</file>
+        <file>MyTimer.qml</file>
+        <file>MyStates.qml</file>
+        <file>MyPropertyAnimation.qml</file>
+        <file>image/sendpix0.jpg</file>
+        <file>image/sendpix1.jpg</file>
+        <file>MyListView.qml</file>
+        <file>MySingleton.qml</file>
+        <file>MyBehavior.qml</file>
+        <file>MyFlickable.qml</file>
+        <file>MyCanvas.qml</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,46 @@
+------------------------------属性---------------------
+length:长度
+
+
+------------------------------方法---------------------
+indexOf(str,pos) 方法返回字符串中指定文本首次出现的索引（位置），没有找到返回返回 -1
+
+lastIndexOf(str,pos) 方法返回指定文本在字符串中最后一次出现的索引，没有找到返回返回 -1
+
+search(str,pos) 方法搜索特定值的字符串，并返回匹配的位置
+
+slice(start, end) 提取字符串的某个部分并在新字符串中返回被提取的部分,可以使用负索引
+
+substring(start, end) 提取字符串的某个部分并在新字符串中返回被提取的部分，无法使用负索引
+
+substr(start, length) 从start开始提取 length 长度的字符串
+
+replace(ori,aim) 方法用另一个值替换在字符串中指定的值
+默认只替换首个匹配
+需替换所有匹配，请使用正则表达式的 g 标志
+str = "Please visit Microsoft and Microsoft!";
+var n = str.replace(/Microsoft/g, "W3School");
+
+默认地对大小写敏感
+取消大小写敏感
+str = "Please visit Microsoft!";
+var n = str.replace(/MICROSOFT/i, "W3School");
+
+toUpperCase() 把字符串转换为大写
+
+toLowerCase() 把字符串转换为小写
+
+trim() 删除字符串两端的空白符
+
+charAt(index) 返回字符串中index位置的字符串
+
+charCodeAt() 返回字符串中index位置的 unicode 编码
+
+[] 可以返回字符串，但是不能修改字符串
+
+split(str) 以str分割字符串，并且返回数组
+如果str="",会将str按照单个字符的方式返回数组
+
+数组对象.join(str) 方法也可将所有数组元素结合为一个用str连接的字符串
+
+https://www.w3school.com.cn/js/js_string_methods.asp

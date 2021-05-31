@@ -1,0 +1,7 @@
+真正需要的时候创建
+---soure:加载一个QML文档
+---soureComponent:加载一个对象
+---item :返回加载的定成对象
+如果在Loader设置了大小和宽高，组件会按照Loader设置的适配
+通过Connections对象，可以接受Loader加载的对象，target绑定成Loaderid.item
+

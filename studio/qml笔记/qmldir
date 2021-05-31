@@ -1,0 +1,5 @@
+module MegaIC  	//模块的路径（也就是文件夹的名称）
+plugin megaic_plugin	//插件的名称
+typeinfo plugins.qmltypes//插件的调试信息
+singleton DrivingMode 1.0 qrc:/qmls/enums/DrivingMode.qml //singleton qml中单例的声明 DrivingMode. 访问属性
+DrivingMode 1.0 qrc:/qmls/enums/DrivingMode.qml //正常声明

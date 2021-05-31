@@ -1,0 +1,6 @@
+python 命令行
+在终端中输入：python
+进入 python 编辑模式
+退出 exit()
+
+运行脚本 python xxxxx.py

@@ -1,0 +1,117 @@
+首先我们安装xlrd库，执行下面的命令
+pip install xlrd==1.2.0
+
+xlrd 新版本只支持 xls 格式，所以我们这里指定安装 1.2.0 老版本，可以支持xlsx格式。\
+
+#打开Excel文件，返回一个Book对象
+book=open_workbook(fileName);
+
+-------------------------Book-------------------------
+print(f"包含表单数量{book.nsheets}")
+print(f"表单的名分别为：{book.sheet_names()}")
+
+#获取表单对象sheet
+根据索引获取
+book.sheet_by_index(0)
+
+根据名称获取
+book.sheet_by_name('2018')
+
+获取所用的对象
+book.sheets()
+
+-------------------------sheet-------------------------
+nrows 行数
+ncols 列数
+name 表单名
+number 表单索引
+
+#获取单元格的内容
+sheet.cell_value(0,0)
+
+#获取指定行的内容
+sheet.row_values(0)
+
+#获取指定列的内容
+sheet.col_values(0)
+
+-------------------------写入数据-------------------------
+写入数据要使用openpyxl
+pip install openpyxl
+
+#创建一个 Excel workbook 对象
+book = openpyxl.Workbook()
+
+#获取表单对象sheet
+sh = book.active
+
+#修改当前 sheet 标题
+sh.title = 'xxx'
+
+#保存文件
+book.save(fileName)
+
+#增加一个sheet
+sh = book.create_sheet("xxxxx",index)
+
+#获取表单对象sheet
+sh = book["xxx"]
+
+#给第一个单元格写入内容
+sh['A1'] = "xxx"
+
+#获取某个单元格的内容
+sh['A1'].value
+
+#根据行号和列号，写入内容（注 从1开始）
+sh.cell(1,1).value == "xxx"
+
+#根据行号和列号，获取内容
+sh.cell(1,1).value
+
+
+-------------------------修改excel数据-------------------------
+#1)加载excel文件
+wb = openpyxl.load_workbook(fileName)
+
+#2)得到sh对象
+sh = wb['2017']
+
+#3)修改
+sh['A1']="xxx"
+
+#4)保存
+wb.save(fileName)
+
+-------------------------插入行、插入列-------------------------
+#在第2行的位置插入2行
+sheet.insert_rows(2,2)
+
+#在第2行的位置插入3列
+sheet.insert_cols(2,3)
+
+
+-------------------------删除行、删除列-------------------------
+#在第2行的位置删除2行
+sheet.delete_rows(2,2)
+
+#在第2行的位置删除1列
+sheet.delete_cols(2,1)
+
+#文字 颜色、字体、大小
+# 导入Font对象 和 colors 颜色常量
+from openpyxl.styles import Font,colors
+# 指定单元格字体颜色，
+sheet['A1'].font = Font(color=colors.RED, #使用预置的颜色常量
+                        size=15,    # 设定文字大小
+                        bold=True,  # 设定为粗体
+                        italic=True # 设定为斜体
+                        )
+
+#背景色
+# 导入Font对象 和 colors 颜色常量
+from openpyxl.styles import PatternFill
+
+# 指定 某个单元格背景色
+sheet['A1'].fill = PatternFill("solid", "E39191")
+

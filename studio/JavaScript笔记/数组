@@ -1,0 +1,132 @@
+语法：
+var array-name = [item1, item2, ...];
+
+-------------------------属性------------------------
+length 属性返回数组的长度
+
+
+-------------------------遍历数组元素------------------
+for (i = 0; i < fruits.length; i++) {
+     fruits[i];
+} 
+
+-------------------------方法------------------------
+Array.isArray(fruits);  //判断是否是数组
+
+toString() 把数组转换为数组值（逗号分隔）的字符串
+
+join(str) 方法也可将所有数组元素结合为一个用str连接的字符串
+
+concat(array2,array3) 合并数组array2,array3
+
+slice(start,end) 方法用数组的某个片段切出新数组
+
+[index] 返回index对应的元素
+
+[index] = "xxx" 修改index元素
+
+push(item) 添加数组元素,并且返回新数组的长度
+
+fruits[fruits.length] = "Lemon"; 添加数组元素
+
+pop() 方法从数组中删除最后一个元素
+
+shift() 方法会删除首个数组元素，并且返回被“位移出”的字符串
+
+unshift(item) 方法（在开头）向数组添加新元素，且返回新数组的长度
+
+delete fruits[0]; 把 fruits 中的首个元素改为 undefined
+
+indexOf(item, start) 返回从start开始找到item第一个索引
+
+lastIndexOf(item, start) 返回从结尾开始start开始找到item第一个索引
+-------------------------拼接数组--------------------
+splice() 
+第一个参数：操作开始的位置
+第二个参数：要删除元素的个数
+其余参数是要添加的新元素
+
+删除index上的元素，并数组大小改变
+splice(index,1)
+
+在index上添加元素，并数组大小改变
+splice(index,0,item)
+
+-------------------------数组排序-----------------------
+sort() 方法以字母顺序对数组进行排序
+此函数会有一个函数地址的参数，可以自定义排序 如:
+points.sort(function(a, b){return a - b}); 
+
+reverse() 方法反转数组中的元素
+
+Math.max.apply(null,txts); 返回txts中的最大值，并且txts必须是数字
+
+Math.min.apply(null,txts); 返回txts中的最小值，并且txts必须是数字
+
+-------------------------数组迭代(原子操作)-----------------
+以下函数第一个参数都是函数地址
+
+foreach() 遍历数组元素，参数为函数地址
+fruits.forEach(myFunction);
+function myFunction(value) {
+  text += "<li>" + value + "</li>";
+}
+注*myFunction函数最多接受 3 个参数：
+项目值
+项目索引
+数组本身
+
+map() 
+1.对每个数组元素执行函数来创建新数组
+2.不会对没有值的数组元素执行函数
+3.不会更改原始数组
+
+如:
+var numbers1 = [45, 4, 9, 16, 25];
+var numbers2 = numbers1.map(myFunction);
+
+function myFunction(value, index, array) {
+  return value * 2;
+}
+注*myFunction函数最多接受 3 个参数：
+项目值
+项目索引
+数组本身
+
+filter() 过滤数组中的元素返回一个新数组
+如:
+var numbers = [45, 4, 9, 16, 25];
+var over18 = numbers.filter(myFunction);
+
+function myFunction(value, index, array) {
+  return value > 18;
+}
+
+注*myFunction函数最多接受 3 个参数：
+项目值
+项目索引
+数组本身
+
+reduce() 在每个数组元素上运行函数 从左到右工作
+var numbers1 = [45, 4, 9, 16, 25];
+var sum = numbers1.reduce(myFunction);
+
+function myFunction(total, value, index, array) {
+  return total + value;
+}
+
+此函数接受 4 个参数：
+总数 上一次执行myFunction的返回值 reduce的第一个参数可以设置初始值
+项目值
+项目索引
+数组本身
+
+reduceRight() 从从右到左工作
+
+every() 方法检查所有数组值是否通过测试，类是filter()
+
+some() 方法检查某些数组值是否通过了测试
+
+find() 方法返回通过测试函数的第一个数组元素的值
+
+findIndex() 方法返回通过测试函数的第一个数组元素的索引

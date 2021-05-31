@@ -1,0 +1,36 @@
+Canvas
+画布，可以渲染画出的图形
+坐标三笛卡尔坐标系统
+
+获取绘制对象 Context2D
+var vtx = getContext("2d");
+
+Context2D中的属性
+---fillStyle 填充样式 接受一个颜色值，默认为#000000
+---strokeStyle 描边样式
+---Pattern 纹理模式 
+使用函数createPattern()创建Pattern赋值给fillStyle或strokeStyle
+第一个参数：颜色值
+第二个参数：枚举
+
+也可以使用图片进行平铺
+第一个参数：Image类型
+第二个参数：字符串
+repeat:向水平和垂直两个方向平埔
+repeat-x:水平方向平铺
+repeat-y:垂直方向平埔
+no-repeat:不平埔
+
+如：
+cx.fillStyle = ctx.createPattern("red",Qt.Dense1Pattern)
+
+---lineWidth:线宽
+---lineJoin:线的连接方式  
+---lineCap:线端点的方式（是字符串）
+值有
+butt:端点与线段方向垂直的平面（默认）
+round:在线段端点添加一个半圆
+square:在线段端点添加一个矩形
+
+---globalAlpha 全局Alpha值（范围0.0-1.0）
+

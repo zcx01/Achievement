@@ -1,0 +1,61 @@
+------------对象类型的属性
+1）创建对象类型
+class MessageBody : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString text READ Text WRITE setText NOTIFY textChanged)
+public:
+    MessageBody(QObject* parent=NULL);
+    virtual ~MessageBody() {}
+
+    QString Text() const;
+    void setText(const QString &Text);
+
+signals:
+    void textChanged();
+
+private:
+    QString m_Text;
+};
+
+class Message : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(MessageBody* body READ Body WRITE setBody NOTIFY bodyChanged)
+public:
+    explicit Message(QObject *parent = nullptr);
+
+    MessageBody *Body() const;
+    void setBody(MessageBody *Body);
+signals:
+    void bodyChanged();
+private:
+    MessageBody* m_Body;
+};
+
+2）注册
+qmlRegisterType<Message>("TEST.messging",1,0,"Message");
+qmlRegisterType<MessageBody>("TEST.messging",1,0,"MessageBody");
+
+3）使用
+import TEST.messging 1.0
+
+Message{
+    id:ms
+    body:MessageBody{
+        text: "hello"
+    }
+}
+Text {
+    width: 100;height: 200
+    text:ms.body.text
+}
+
+------------对象列表属性
+如果是QObject子类列表，就必须使用QQmlListProerty<T>
+
+------------分组属性
+如果MessageBody有text和font两个属性
+可以使用分组属性语法访问
+body.text
+body.font

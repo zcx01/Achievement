@@ -1,0 +1,11 @@
+状态（State）
+作用：根据状态不同，显示不同的界面
+可以进行的操作
+1.PropertyChanges 修改属性值 
+2.StateChangeScript 运行脚本
+3.PropertyChanges 重写处理器
+4.ParentChange 重定义项目的父项目
+5.AnchorChanges 修改锚的值
+
+---when:绑定一个表达式，结果为true时，切换到相应的状态
+如：when:mouseArea.pressed

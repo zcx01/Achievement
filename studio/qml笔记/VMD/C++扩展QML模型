@@ -1,0 +1,32 @@
+1.QStringList
+在视图中使用modelData角色读取模型中的数据
+1)在C++中创建QStringList对象
+2)使用setContextProperty注册到QML
+3)在QML使用指定model为注册到QML中的名称
+4)使用modelData读取数据
+
+更新需要重新调用setContextProperty
+
+2.QObjectList
+
+QObjectList objectList;
+objectList.append(new Message("Item 1","red"));
+objectList.append(new Message("Item 1","green"));
+objectList.append(new Message("Item 1","blue"));
+content->setContextProperty("objectListModel",QVariant::fromValue(objectList));
+
+ListView{
+    anchors.left: rect.right
+    width: 100
+    height: 100
+    model: objectListModel
+    delegate: Rectangle{
+        height: 25;width: 100
+        Text {
+            anchors.fill: parent
+            text: model.color;
+        }
+    }
+}
+
+3.QAbstractItemModel

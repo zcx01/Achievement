@@ -1,0 +1,18 @@
+Math.PI;            //返回 3.141592653589793
+Math.round(x)       //返回值是 x 四舍五入为最接近的整数
+Math.pow()          //Math.pow(x, y) 的返回值是 x 的 y 次幂
+Math.sqrt(x)        //返回 x 的平方根
+Math.abs(x)         //返回 x 的绝对（正）值
+Math.ceil(x)        //返回值是 x 上舍入最接近的整数
+Math.floor(x)       //返回值是 x 下舍入最接近的整数
+Math.sin(x)         //返回角 x（以弧度计）的正弦 Math.sin(90 * Math.PI / 180); 
+Math.cos(x)         //返回角 x（以弧度计）的余弦
+Math.min(array)     //查找参数列表中的最低值
+Math.max(array)     //查找参数列表中的最高值
+Math.random()       //返回介于 0（包括） 与 1（不包括） 之间的随机数
+Math.floor(Math.random() * 10);//返回随机整数  返回 0 至 9 之间的数
+Math.floor(Math.random() * (max - min)) + min; //返回max到min之间的随机数
+
+
+参考地址
+https://www.w3school.com.cn/jsref/jsref_obj_math.asp

@@ -1,0 +1,39 @@
+//数值
+var carName=34
+file:///./数值
+
+//字符串
+var carName='xxx'
+var carName="xxx"
+file:///./字符串
+
+//布尔值
+var x = true
+var y = false
+
+//数组
+var cars=["1","2","3"]
+file:///./数组
+
+//对象、或者键-值
+var person = {fileName:"Bill",lastName:"Gates"};
+file:///./对象
+
+//日期
+new Date()
+file:///./日期
+
+//对象
+file:///./对象
+
+//函数
+file:///./函数
+
+//获取变量类型
+typeof(person)
+
+//判断变量是否定义
+person = undefined
+
+//清空对象
+person = undefined

@@ -1,0 +1,40 @@
+附加对象实例会被QML引擎自动创建
+附加对象能被所有的项目使用
+在C++中实现附加对象
+1）创建一个匿名的附加对象类型
+class MessageBoardAttachedType : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString expried READ Expried WRITE setExpried NOTIFY expriedChanged)
+public:
+    MessageBoardAttachedType(QObject *obj=NULL);
+    virtual ~MessageBoardAttachedType() {}
+
+    QString Expried() const;
+    void setExpried(const QString &Expried);
+
+signals:
+    void expriedChanged();
+
+private:
+    QString m_Expried;
+};
+
+2）创建一个附加对象
+class MessageBoard : public QObject
+{
+    Q_OBJECT
+public:
+    static MessageBoardAttachedType* qmlAttachedProperties(QObject* obj);
+};
+QML_DECLARE_TYPEINFO(MessageBoard,QML_HAS_ATTACHED_PROPERTIES)
+
+3）把附加对象注册到QML中
+ qmlRegisterType<MessageBoard>("TEST.messging",1,0,"MessageBoard");
+ 
+ 4）使用
+ Text {
+    width: 100;height: 200
+    MessageBoard.expried: "true"
+    text: MessageBoard.expried
+}

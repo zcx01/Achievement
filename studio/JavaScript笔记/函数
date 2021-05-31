@@ -1,0 +1,55 @@
+自调用函数,只运行一次
+(function () {
+    var x = "Hello!!";      //我会调用我自己
+})();
+
+
+typeof 类型是：function
+
+toString() 方法以字符串返回函数
+
+------------------------arguments------------------
+参数太多可以使用 arguments 对象
+arguments.length    会返回函数被调用时收到的参数数目
+arguments[i]        获取第i个参数
+
+------------------------call()---------------------
+用对象作为参数来调用函数
+
+var person = {
+    fullName: function() {
+        return this.firstName + " " + this.lastName;
+    }
+}
+var person1 = {
+    firstName:"Bill",
+    lastName: "Gates",
+}
+var person2 = {
+    firstName:"Steve",
+    lastName: "Jobs",
+}
+person.fullName.call(person1);  // 将返回 "Bill Gates"
+
+call() 方法可接受参数
+
+https://www.w3school.com.cn/js/js_function_call.asp
+
+--------------------apply()--------------------------
+方法与 call() 方法非常相似
+
+不同之处是：
+call()  方法分别接受参数。
+apply() 方法接受数组形式的参数。
+
+--------------------JavaScript 闭包-------------------
+使函数拥有“私有”变量成为可能
+
+var add = (function () {
+    var counter = 0;//只运行一次
+    return function () {return counter += 1;}
+})();
+
+add();
+add();
+add();

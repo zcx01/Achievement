@@ -1,0 +1,105 @@
+1.PropertyAnimation 属性动画
+
+PropertyAnimation{
+    id:animateOpacity
+    target: fengcheg
+    properties: "opacity"
+    to: 1.0
+    duration: 2000
+}
+
+2.NumberAnimation 数值动画
+
+NumberAnimation{
+    id:animateRotation
+    target: fengcheg
+    loops: Animation.Infinite
+    properties: "rotation"
+    from: 0
+    to:360
+    duration: 3000
+    easing {type: Easing.OutBack}
+}
+
+3.ColorNumberAnimation 颜色动画
+
+4.Vector3Animation 改变Vector3d动画
+
+5.RotationAnimation 旋转动画
+---direction:指定旋转方向
+RotationAnimation.Numerical(默认):向数字改变的方向旋转
+RotationAnimation.Clockwise:在两个数值顺时针旋转
+RotationAnimation.Counterclockwise:在两个值之间逆时针旋转
+RotationAnimation.Shortest:最短路径旋转
+
+6.如果不使用target和properties属性可以使用
+<Animation> on <Property>
+PropertyAnimation on x {
+    to:100
+}
+会立即执行
+也可以用在组合动画中
+SequentialAnimation on color {
+    ColorAnimation{to:"yellow";duration: 1000}
+    ColorAnimation{to:"blue";duration: 1000}
+}
+
+7.状态过渡动画
+transitions:[
+    Transition {
+        from: "PRESSED"
+        to: "RELEASED"
+        ColorAnimation{target: button;duration: 100}
+    },
+    Transition {
+        from: "RELEASED"
+        to: "PRESSED"
+        ColorAnimation{target: button;duration: 100}
+    }
+]
+---from:开始状态的名称
+---to:结束状态的名称
+如果所有的动画都使用这个动画，可以使用to:"*"
+
+8.Behavior 默认的行为动画
+当属性使用了该动画，当这个属性改变时都会应用该动画
+---animation:可以指定其他动画的id，共享该动画
+
+9.ParallelAnimation(并行动画)和SequentialAnimation(顺序动画)
+
+10.控制动画
+---start 开始
+---stop 停止
+---resume 恢复
+---pause 暂停
+---restart 重新开始
+---complete 完毕
+
+11.easing 缓和曲线
+---type 类型
+---amplitude 振幅
+---overshoot 过冲
+---period	周期
+---bezierCurve 贝塞尔曲线
+
+12.Flickable 弹动效果(滚动区域)
+---contentWidth、contentHeight 拖拽部分的大小
+---clip 设置超出区域的内容部分隐藏
+---visibleArea（只读）可视区域的位置大小，可以实现滚动条
+值有
+xPosition，yPosition 位置，范围【0.0-1.0-widthRaton】，【0.0-1.0-heightRatio】
+widthRaton,heightRatio 大小百分比
+例如：
+Rectangle{
+    id: scrollbar
+    anchors.right: flickable.right
+    y:flickable.visibleArea.yPosition * flickable.height
+    width: 10
+    height: flickable.visibleArea.heightRatio * flickable.height
+    color: "black"
+}
+
+13.Flipable 反转效果
+---front 正面项目
+---back  反面项目
+

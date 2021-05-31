@@ -1,0 +1,80 @@
+#------------------导入 os 库------------------
+from genericpath import isdir, isfile
+import os
+from posixpath import join
+
+#递归创建目录  exist_ok 不报错
+os.makedirs("xx/x/xx",exist_ok=True)
+
+#删除文件或者目录
+os.remove("xx.py")
+
+#修改文件名、目录名
+os.remove(soure,aim)
+
+#------------------对目录的操作------------------
+import shutil
+
+#递归删除目录
+shutil.rmtree("tmp")
+
+#拷贝文件
+shutil.copyfile(soure,aim)
+
+#拷贝目录 目标目录必须不存在
+shutil.copytree(soure,aim)
+
+
+
+#------------------对文件路径名的操作，使用os.path------------------
+path="/1/2/3/tmp.txt"
+
+#获取路径中的文件名部分
+os.path.basename(path)
+'tmp.txt'
+
+#获取路径中的目录部分
+os.path.dirname(path)
+'/1/2/3'
+
+#文件路径的拼接
+os.path,join("4","5",os.path.basename(path))
+'4/5/tmp.txt'
+
+#判断文件、目录是否存在
+exist = os.path.exists("xxx")
+
+#是否是文件
+isfile = os.path.isfile("xxx.txt")
+
+#是否是目录
+isdir = os.path.isdir("xxx")
+
+#获取文件大小
+os.path.getsize('xxx')
+
+#获取修改日期 单位（秒）
+os.path.getmtime('xxx')
+
+#获取当前工作目录
+cwd = os.getcwd()
+
+#设置当前工作目录
+os.chdir("xxx")
+
+#递归的遍历目录下面所有的文件
+#dirpath 代表当前遍历到的目录名
+#dirnames 是列表对象，存放当前dirpath中的所有子目录名
+#filenames 是列表对象，存放当前dirpath中的所有文件名
+for (dirpath,dirnames,filenames) in os.walk(os.path.dirname(__file__)):
+    print(dirpath)
+    print(dirnames)
+    print(filenames)
+
+#得到目录中所有的文件和子目录名
+os.listdir('xxx')
+
+#得到目录中指定扩展名的文件和子目录
+#导入 glob
+import glob
+exes = glob.glob("/1/2*.txt")

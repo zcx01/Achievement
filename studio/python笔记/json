@@ -1,0 +1,18 @@
+
+序列化:
+程序的各种类型数据对象变成字节串
+
+反序列化
+字节串转化为程序中的数据对象
+
+使用JSON
+import json
+
+# dumps 方法将数据对象序列化为 json格式的字符串
+jsonstr = json.dumps(str)
+第一个参数是：数据对象
+ensure_ascii:是否转转化为字符的unicode数字来表示
+indent:缩进
+
+#把json格式的字符串变为 Python中的数据对象 
+translist = json.loads(jsonstr)

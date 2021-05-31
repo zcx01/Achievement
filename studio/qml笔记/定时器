@@ -1,0 +1,5 @@
+Timer 定时器
+---interval:间隔
+---repeat:是否重复
+--running:是否运行
+***onTriggered信号处理器

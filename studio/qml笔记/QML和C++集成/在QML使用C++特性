@@ -1,0 +1,81 @@
+1.QQmlEngine:提供一个QML引擎，用于管理QML文档的对象层次结构
+
+2.QQmlContext:提供对象实例化和表达式执行所需要的上下文
+
+------------------在QML使用C++特性-------------------------
+************1.枚举类型
+要使用Q_ENUMS(enumName)注册
+
+************2.使用C++创建的实例
+第1步）注册类属性
+ Q_PROPERTY(QString author READ Author WRITE setAuthor NOTIFY authorChanged)
+
+第2步）把实例给QMl
+QQmlContext * content = engine.rootContext();
+Message msg;
+content->setContextProperty("msg",&msg);
+
+第3步）在QMl中使用
+import TEST.messging 1.0
+Text {
+    width: 100;height: 200
+    text: msg.author;
+    Component.onCompleted: {
+        msg.author = "Jonah"
+    }
+}
+
+************3.使用C++的自定义的类
+1、注册可实例化的对象类型
+qmlRegisterType<类名>("命名空间",版本号1，版本号2，"QML数据类型")；
+如:
+qmlRegisterType<Message>("TEST.messging",1,0,"Message");
+
+2、注册不可实例化对象类型
+1-无参数的qmlRegisterType，该类是一个接口类型
+2-qmlRegisterInterface,是个基类
+3-qmlRegisterUncreatableType,仅提供枚举
+4-qmlRegisterSingletonType,单例（注册了单例，QML就不能使用对象类型）
+
+3、注册单例
+qmlRegisterSingletonType<类名>("命名空间",版本号1，版本号2，"QML数据类型",单例接口)；
+对单例接口的要求：
+static QObject* singleton_provider(QQmlEngine* engine, QJSEngine* scriptEngine)
+engine->setObjectOwnership(Instance(),QQmlEngine::CppOwnership);//设置对象由C++代码拥有，QML永远不会删除它。否则会崩溃
+只有singleton_provider可以自定义
+如:
+qmlRegisterSingletonType<Message>("TEST.messging",1,0,"Message",&Message::singleton_provider);
+
+使用:
+import TEST.messging 1.0
+Message.author
+
+信号的使用
+第一种方式:
+Connections{
+    target: Message
+    function onAuthorChanged(){
+        console.log(Message.author)
+    }
+}
+第二种方式:
+function onAuthorChanged(){
+    console.log(Message.author)
+}
+Component.onCompleted: {
+    Message.authorChanged.connect(onAuthorChanged)
+}
+
+
+************4.使用函数
+1-函数是槽，可以直接使用
+2-函数是public,要在函数前加Q_INVOKABLE宏
+
+************5.使用信号
+如果Message有一个authorChanged信号
+在QML信号处理器是OnAuthorChanged
+注*：信号不支持重载
+
+************6.版本的修订
+在变量,函数等前面加上Q_REVISION(版本号) 宏
+再重新注册新的版本号就可以使用新的类型     

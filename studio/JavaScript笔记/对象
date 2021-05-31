@@ -1,0 +1,50 @@
+var person = {
+  firstName: "Bill",
+  lastName : "Gates",
+  id       : 678,
+  fullName : function() {
+    return this.firstName + " " + this.lastName;
+  }
+};
+
+-----------------------属性---------------------------
+firstName、lastName、id被称为属性
+"Bill"、"Gates"、678被称为属性值
+//访问属性
+person.firstName 
+person["firstName"]
+
+//遍历对象的属性
+for (x in person) {
+    txt += person[x];
+}
+
+//删除属性
+delete person.firstName 
+
+//添加属性
+person.firstName = "xxxxx"
+
+-----------------------方法-----------------------
+fullName被称为函数
+
+//访问函数
+person.fullName()
+
+
+----------------对象构造器(自定义类)--------------------
+function Person(first, last, age, eye) {
+    this.firstName = first;
+    this.lastName = last;
+    this.age = age;
+    this.eyeColor = eye;
+    this.name = function() {return this.firstName + " " + this.lastName;};
+}
+
+var myFather = new Person("Bill", "Gates", 62, "blue");
+var myMother = new Person("Steve", "Jobs", 56, "green");
+
+
+向所有给定类型的已有对象添加新属性（或方法）
+使用 prototype 属性
+Person.prototype.nationality = "English";

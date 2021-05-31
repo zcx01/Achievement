@@ -1,0 +1,44 @@
+1.Column 列布局-（即纵向布局）
+---spacing设置间距
+
+2.Row	行布局(即横向布局)
+
+3.Grid 网格布局
+---rows:指定行数
+---columns:指定列数
+---rowSpacing:行距
+---columnSpacing:列局
+
+4.Flow 流布局（超出边界自动换行）
+
+5.Transition （过渡动画）
+在add、move、populate(第一次创建)是使用动画
+
+6.Positioner 定位器
+Column、Row、Grid、Flow每一个布局都会自动附加一个Positioner,来为子项目提供索引信息
+---index:子项目的索引
+
+7.Repeater类型用来创建大量相似的项目，包含在一个定位器Positioner
+---model:模型（可以指定个数）
+---delegate:委托（可视化）
+---index:索引
+---count:项目数量
+
+8.anchors 锚布局
+根据线来布局
+特殊:
+---fill:充满
+---centerIn：居中
+---margin:边距
+---offset:相对于中心的偏移
+
+AnchorChanges 运行改变锚
+AnchorChanges需要在states:State进行，并且不能修改边距，要在PropertyChanges属性完成
+
+9.Layouts布局管理器
+和Qt Widgets相似，会自适应
+
+10.LayoutMirroring 镜像布局
+---enabled：是否启用镜像布局
+---childerInherit:是否应用到子项目中
+

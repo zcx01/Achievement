@@ -1,0 +1,31 @@
+setTransform(a,b,c,d,e,f) 设置当前变换矩阵
+transform(a,b,c,d,e,f) 当前矩阵乘以变换矩阵
+resetTransform() 重置变换矩阵
+a:x轴缩放
+b:x轴斜切
+c:y轴斜切
+d:y轴缩放
+e:向x方向平移
+f:向y方向平移
+
+[
+a	c 	e
+b	d	f
+0	0	1
+]
+
+---------------------平移--------------------------
+translate(x,y) 平移到指定的点
+相当于transform(1,0,0,1,70,60)
+
+---------------------缩放--------------------------
+scale(x,y) 缩放
+相当于transform(0.5,0,0,0.5,0,0)
+
+---------------------旋转--------------------------
+rotate(angle) 将画布按照顺时针旋转
+相当于transform(Math.cos(angle),Math.sin(angle),-Math.sin(angle),Math.cos(angle),0,0)
+
+--------------------扭曲---------------------------
+shear(sh,sv) 将画布x轴方向乘以因子sh,y轴方向乘以因子sv
+相当于transform(1,0.5,0.5,1,0,0)
