@@ -1,0 +1,24 @@
+uint8_t *buffer_pointer = /* the data you just read */;
+auto monster = GetMonster(buffer_pointer);
+
+//-------------------------------读------------------------
+//获取成员的数据
+auto hp monster->hp();
+//获取字符串
+auto name = monster->name()->c_str();
+//获取结构体的数据
+auto pos = monster->pos();
+auto x = pos->x();
+//获取容器的数据
+auto inv = monster->inventory(); 
+auto inv_len = inv->size();
+auto third_item = inv->Get(2);
+
+//根据表格数据
+auto union_type = monster.equipped_type();
+ 
+if (union_type == Equipment_Weapon) {
+  auto weapon = static_cast<const Weapon*>(monster->equipped()); 
+  auto weapon_name = weapon->name()->str(); // "Axe"
+  auto weapon_damage = weapon->damage();    // 5
+}

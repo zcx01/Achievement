@@ -1,0 +1,8 @@
+修改得到的flatbuffers
+auto monster = GetMutableMonster(buffer_pointer);  // non-const
+monster->mutate_hp(10);                      // Set the table `hp` field.
+monster->mutable_pos()->mutate_z(4);         // Set struct field.
+monster->mutable_inventory()->Mutate(0, 1);  // Set vector element.
+
+//返回是否设置成功
+//如果原来设置这个值，就会设置失败

@@ -62,6 +62,12 @@ cwd = os.getcwd()
 #设置当前工作目录
 os.chdir("xxx")
 
+#获取后缀名
+os.path.splitext(xxx)[1]
+
+#获取文件名
+os.path.splitext(xxx)[0]
+
 #递归的遍历目录下面所有的文件
 #dirpath 代表当前遍历到的目录名
 #dirnames 是列表对象，存放当前dirpath中的所有子目录名

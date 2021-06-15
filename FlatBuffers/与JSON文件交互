@@ -1,0 +1,6 @@
+生成二进制
+./../flatc --binary monster.fbs monsterdata.json
+会生成monster.bin的二进制文件
+
+二进制生成JSON
+./../flatc --json --raw-binary monster.fbs -- monsterdata.bin

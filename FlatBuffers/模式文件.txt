@@ -1,0 +1,36 @@
+namespace MyGame.Sample; //命名空间
+ 
+enum Color:byte { Red = 0, Green, Blue = 2 }
+ 
+//可以判断类型
+union Equipment { Weapon } // Optionally add more tables.
+ 
+ //结构体
+struct Vec3 {
+  x:float;
+  y:float;
+  z:float;
+}
+ 
+ //表类型 变量名在前 类型在后
+table Monster {
+  pos:Vec3; // Struct.
+  mana:short = 150;
+  hp:short = 100;
+  name:string;
+  friendly:bool = false (deprecated);
+  inventory:[ubyte];  // Vector of scalars.
+  color:Color = Blue; // Enum.
+  weapons:[Weapon];   // Vector of tables.
+  equipped:Equipment; // Union.
+  path:[Vec3];        // Vector of structs.
+}
+ 
+//表类型
+table Weapon {
+  name:string;
+  damage:short;
+}
+ 
+root_type Monster; //生成序列化根类型
+
