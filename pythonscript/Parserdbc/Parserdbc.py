@@ -1,13 +1,18 @@
 from subprocess import *
 import threading
+import os
 from time import sleep
 
-
 proc = Popen(
-        args='docker exec -it kiara_build_18 bash ',
+        args='ssh chengxiongzhu@10.25.7.196',
+        stdin=PIPE,
+        stdout=PIPE,
         shell=True,
-        stdin=PIPE
+        universal_newlines = True
     )
-sleep(1)
-cmd="cd  ~/Works/Repos/tool_parser;make"
-proc.communicate(cmd.encode())
+# proc.wait()
+# proc.stdin.write("ls")
+
+# print(proc.stdin.readable())
+#proc.stdin.write(("print('subp_popen.stdin.write3'+1)").encode())
+#proc.stdin.close()
