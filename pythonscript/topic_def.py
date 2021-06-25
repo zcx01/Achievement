@@ -28,6 +28,7 @@ if __name__ == "__main__":
     for item in content:
         print('//' + content[item]['desc'])
         line = 'TOPIC_' + get_upper_case_name(out_file_name.split('_')[0]) + '_' + get_upper_case_name(item)
-        print(f'vehctrl_status->addSignalAndTop((struct veh_signal *)&CANSIG_GW_5F1__{item}_g, {line});'+ '\n')
+        print(f'python monitor.py -s  BcmPwrStsFb  -v 3 -s {item} -v 10')
+        # print(f'vehctrl_status->addSignalAndTop((struct veh_signal *)&CANSIG_GW_5F1__{item}_g, {line});'+ '\n')
 
 
