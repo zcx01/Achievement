@@ -18,15 +18,15 @@ using namespace megaipc;
     }
     else
     {
-        if (signal == eCANSIG__GW_1F7__FccuH2EmgyLamp_No_error_0)
+        if (signal == eCANSIG__{1}_No_error_0)
         {
             result = LAMP_OFF;
         }
-        else if (signal == eCANSIG__GW_1F7__FccuH2EmgyLamp_Yellow_light_on_1)
+        else if (signal == eCANSIG__{1}_Yellow_light_on_1)
         {
             result = LAMP_YELLOW;
         }
-        else if (signal == eCANSIG__GW_1F7__FccuH2EmgyLamp_Red_light_on_2)
+        else if (signal == eCANSIG__{1}_Red_light_on_2)
         {
             result = LAMP_YELLOW;
         }
@@ -54,7 +54,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
         power = raw_value.val_uint32_t;
     }
 
-    status = CANSIG_GW_1F7__FccuH2EmgyLamp_g.GetValue.fpGetter(nullptr, &raw_value);
+    status = CANSIG_{1}_g.GetValue.fpGetter(nullptr, &raw_value);
     if (status != eSigStatus_Ok)
     {
         TB_LOG_ERROR("signal get error.");
@@ -67,7 +67,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
 
     
     result=normal_logic(power,leakage);
-    fds::TimeOutHandle(&result,&CANSIG_GW_1F7__FccuH2EmgyLamp_g,power,(int)LAMP_OFF,(int)LAMP_RED);
+    fds::TimeOutHandle(&result,&CANSIG_{1}_g,power,(int)LAMP_OFF,(int)LAMP_RED);
 
     TB_LOG_DEBUG("{classname}: %d", result);
 

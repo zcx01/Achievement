@@ -1,0 +1,15 @@
+{
+
+    "M":[
+        {
+            "content":[
+                "    //{3}",
+                "    energy_consumption->addSignalAndTop((struct veh_signal *)&CANSIG_{1}_g, {2});"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_module.cpp",
+            "pos":"link_signal_item"
+        }
+    ],
+    "desc":"驾驶信息"
+}
+ 

@@ -1,0 +1,46 @@
+------------------------修改dbc文件问题------------------------
+1、要添加message，如
+BO_ 503 GW_1F7: 64 GW
+ SG_ FccuH2MLeft : 111|10@0+ (0.01,0) [0|6] "kg"  CDC
+ SG_ FccuH2EmgyLamp : 211|2@0+ (1,0) [0|3] ""  CDC
+ SG_ FccuH2LowDispReq : 212|1@0+ (1,0) [0|1] ""  CDC
+ SG_ FccuErrDispReq : 214|2@0+ (1,0) [0|3] ""  CDC
+ SG_ FccuStackOverTLamp : 215|1@0+ (1,0) [0|1] ""  CDC
+ SG_ FccuH2TankP : 335|14@0+ (0.1,0) [0|1638.3] "Bar"  CDC
+ SG_ FccuStsDisPReq : 399|3@0+ (1,0) [0|7] ""  CDC
+ SG_ FccuH2RateDispReq : 391|8@0+ (1,0) [0|100] "%"  CDC
+ 
+ 2、添加message周期
+ BA_ "GenMsgCycleTime" BO_ 503 50;
+BA_ "VFrameFormat" BO_ 503 14;
+
+3、添加注释
+CM_ SG_ 503 FccuH2MLeft "Hydrogen mass calculated from current hydrogen pressure
+SendCDC";
+CM_ SG_ 503 FccuH2EmgyLamp "TransferCDC";
+CM_ SG_ 503 FccuH2LowDispReq "TransferCDC";
+CM_ SG_ 503 FccuErrDispReq "TransferCDC";
+CM_ SG_ 503 FccuStackOverTLamp "TransferCDC";
+CM_ SG_ 503 FccuStsDisPReq "TransferCDC";
+CM_ SG_ 503 FccuH2TankP "National standard inspection signal
+
+4、添加枚举
+VAL_ 503 FccuH2EmgyLamp 0 "No error" 1 "Yellow light on" 2 "Red light on" ;
+VAL_ 503 FccuH2LowDispReq 0 "Off" 1 "ON" ;
+VAL_ 503 FccuErrDispReq 0 "No error" 1 "Yellow light on" 2 "Red light on" ;
+VAL_ 503 FccuStackOverTLamp 0 "Off" 1 "ON" ;
+VAL_ 503 FccuStsDisPReq 0 "Off" 1 "ON" 2 "Flash" 3 "Low";
+
+5、修改can_parse_whitelist.txt文件
+GW_1F7			  [message]		[all]
+
+
+----------------------------------------------------------
+GW_1F7__FccuH2EmgyLamp            [signal]		[get, change_handle]
+GW_1F7__FccuH2LowDispReq          [signal]		[get, change_handle]
+GW_1F7__FccuErrDispReq            [signal]		[get, change_handle]
+GW_1F7__FccuStackOverTLamp        [signal]		[get, change_handle]
+GW_1F7__FccuStsDisPReq            [signal]		[get, change_handle]
+GW_1F7__FccuH2RateDispReq         [signal]		[get, change_handle]
+
+

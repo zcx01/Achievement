@@ -1,0 +1,75 @@
+********************************语句********************************
+# 注释
+
+set 显示定义及赋值
+使用定义的变量 ${name} 
+在if语句中直接使用
+set(var a)                          定义一个变量var,并且赋值为a
+set(var a,b,c) <=> set(var a b c)   定义一个变量var,并且赋值为a,b,c
+
+command(args...) 命令
+
+-------------------if-----------------
+if(var) # NOT 非
+    ...
+elseif(var)
+    ...
+else()
+    ...
+endif(var)
+
+------------------for-----------------
+set(VAR a b c)
+foreach(f ${VAR})
+    message(${f})    
+endforeach(f)
+
+------------------while循环-----------------
+while(condition)
+  COMMAND1(ARGS ...)
+  COMMAND2(ARGS ...)
+  ...
+endwhile(condition)
+
+
+
+********************************内部变量********************************
+CMAKE_C_COMPILER        :   指定C编译器
+CMAKE_C_FLAGS           :   编译C文件时的选项，如-g；也可以通过 add_definitions 添加编译选项
+EXECUTABLE_OUTPUT_PATH  :   可执行文件的存放路径
+LIBRARY_OUTPUT_PATH     :   库文件路径
+CMAKE_BUILD_TYPE        :   build 类型(Debug, Release, ...)，CMAKE_BUILD_TYPE=Debug
+BUILD_SHARED_LIBS       :   共享库或者静态库
+
+********************************命令********************************
+project(xxx)                    #指定项目名称
+${xxx_SOURCE_DIR}               #表示项目根目录
+include_directories(xx/xx)      #添加包含目录
+link_directories(xx/xx)         #添加库目录
+add_subdirectory(./xx)          #添加子目录
+add_executable()                #编译可执行程序，指定编译，好像也可以添加.o文件 即包含的源文件
+>>如:add_executable (helloDemo demo.cxx demo_b.cxx)   #将cxx编译成可执行文件
+
+add_definitions                 #添加编译参数 如:
+>> add_definitions(-DDEBUG)将在gcc命令行添加DEBUG宏定义；
+>> add_definitions( “-Wall -ansi –pedantic –g”)
+
+target_link_libraries：添加链接库,相同于指定-l参数 
+也可以
+>> target_link_libraries(demo Hello) #将可执行文件与Hello连接成最终文件demo
+
+add_library:
+>> add_library(Hello hello.cxx)  #将hello.cxx编译成静态库如libHello.a
+
+？怎样获得一个目录下的所有源文件
+aux_source_directory(<dir> <variable>)
+>> 将dir中所有源文件（不包括头文件）保存到变量variable中，然后可以 add_executable (${PROJECT_NAME} ${variable})这样使用。
+
+？怎样添加编译依赖项
+add_dependencies    #用于确保编译目标项目前依赖项必须先构建好
+
+？IF语句中使用字串或数字比较
+数字比较LESS、GREATER、EQUAL，字串比STRLESS、STRGREATER、STREQUAL
+
+参考:
+https://www.cnblogs.com/lidabo/p/7359422.html

@@ -1,0 +1,24 @@
+委托构造 (file:///./../code/delegation_structure.cpp)
+使得构造函数可以在同一个类中调用另一个构造函数
+
+继承构造  (file:///./../code/sequent_strcture.cpp)
+使用 using 不同将参数一一传递下去
+
+显示虚函数重载 (file:///./../code/override_final.cpp)
+override : 显示告诉编译器进行重载，如果基类中不存在这样的虚函数，就会报错
+final : 终止继承和重载
+
+显示禁用默认函数 (file:///./../code/fun_default_delete.cpp)
+允许显示的声明采用（default）或拒绝（delete）编译器自带的函数
+
+强类型枚举-枚举类 (file:///./../code/enum_class.cpp)
+实现了类型安全
+1.不能被隐式的转化为整数
+2.不能将其与整数数字进行比较
+3.不能将不同的枚举类型的枚举值比较
+is_enum<T>::value : 判断是否枚举类型
+std::underlying_type<T>::type ： 把枚举类型转化为基础类型（int）
+
+enable_if<condition,T>::type 
+当 condition 为真时，返回 T 的类型
+但 condition 为假时，丢弃

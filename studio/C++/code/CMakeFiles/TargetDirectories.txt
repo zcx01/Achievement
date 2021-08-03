@@ -1,0 +1,3 @@
+/home/chengxiongzhu/Achievement/studio/C++/code/CMakeFiles/rebuild_cache.dir
+/home/chengxiongzhu/Achievement/studio/C++/code/CMakeFiles/edit_cache.dir
+/home/chengxiongzhu/Achievement/studio/C++/code/CMakeFiles/main.dir

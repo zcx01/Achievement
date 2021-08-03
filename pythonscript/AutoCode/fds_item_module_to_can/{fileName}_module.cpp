@@ -81,7 +81,6 @@ void {ClassName}Module::onConnectStateChanged(const string &nodeId, const Connec
 
 void {ClassName}Module::link_signal_item()
 {
-    air_conditioner = std::make_shared<AirConditioner>(shared_from_this());
-    air_conditioner->subscribe(TOPIC_VEHCTRL_CDC_FRNT_WIND_LVL_SET);
+
 
 }

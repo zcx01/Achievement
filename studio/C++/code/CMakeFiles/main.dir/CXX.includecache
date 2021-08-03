@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/chengxiongzhu/Achievement/studio/C++/code/ObjectFactory.h
+typeinfo
+-
+unordered_map
+-
+string
+-
+list
+-
+
+/home/chengxiongzhu/Achievement/studio/C++/code/commondefine.hpp
+iostream
+-
+vector
+-
+list
+-
+
+/home/chengxiongzhu/Achievement/studio/C++/code/tuple.cpp
+tuple.hpp
+/home/chengxiongzhu/Achievement/studio/C++/code/tuple.hpp
+ObjectFactory.h
+/home/chengxiongzhu/Achievement/studio/C++/code/ObjectFactory.h
+commondefine.hpp
+/home/chengxiongzhu/Achievement/studio/C++/code/commondefine.hpp
+iostream
+-
+
+/home/chengxiongzhu/Achievement/studio/C++/code/tuple.hpp
+string
+-
+

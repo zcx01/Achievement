@@ -2,7 +2,7 @@
 pip install xlrd==1.2.0
 
 xlrd 新版本只支持 xls 格式，所以我们这里指定安装 1.2.0 老版本，可以支持xlsx格式。\
-
+import xlrd
 #打开Excel文件，返回一个Book对象
 book=open_workbook(fileName);
 
@@ -15,7 +15,7 @@ print(f"表单的名分别为：{book.sheet_names()}")
 book.sheet_by_index(0)
 
 根据名称获取
-book.sheet_by_name('2018')
+sheet=book.sheet_by_name('2018')
 
 获取所用的对象
 book.sheets()

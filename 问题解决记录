@@ -1,0 +1,50 @@
+1.编译出现logger的license问题
+mkdir ~/.qnx
+cp -r ./sdk/files/qnx_lic/license ~/.qnx
+
+2.安装paho-mqtt
+1)下载 git clone https://github.com/eclipse/paho.mqtt.python.git
+
+2)sudo python3 setup.py install
+如果出现“ImportError: No module named setuptools”错误
+执行sudo apt-get install python3-setuptools
+
+3)执行脚本出现“ImportError: No module named paho.mqtt” 安装paho-mqtt
+
+4)出现连接拒绝，可能是没有安装服务器
+a) sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
+b）sudo apt-get update
+c) sudo apt-get install mosquitto 
+
+4.在文本中参加链接
+file:///./../cre.txt  
+(注* 相对路径必须要先加./)
+
+5.重装系统(ThinkPadT480s)
+1)插入U盘
+2)不停按F12调出启动菜单。如果没有反应，则在启动过程中，先按住Fn，再不停按F12，调出启动菜单，在Boot Menu中选择USB HDD项，按回车键即可进入U盘启动；
+
+6.新装系统问题
+file:///./新环境.txt
+
+7.安装显卡
+https://blog.csdn.net/qq_30468723/article/details/107531062
+
+8.win10专业版
+W269N-WFGWX-YVC9B-4J6C9-T83GX
+
+9.Synergy获取激活码
+http://cpp.sh/3mjw3
+7B76313B70726F3B7A63783B3130303B7878783B7A3B303B307D 
+
+10.微信不能发图片
+sudo apt-get install libjpeg62:i386
+
+11.挂载问题
+1)安装 cifs
+sudo apt-get install cifs
+2)在 /etc/fstab 中添加挂载的信息，如：
+//10.25.11.25/zcx_t480s/ /mnt/zcx cifs dir_mode=0777,file_mode=0777,username=root,password=123456 0 0
+
+12.安装CANdb++
+https://blog.csdn.net/daihuibing389/article/details/84920332

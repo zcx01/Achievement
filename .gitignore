@@ -28,6 +28,7 @@
 *.exe
 *.out
 *.app
+*.pdf
 
 # Qt-es
 object_script.*.Release

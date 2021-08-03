@@ -4,7 +4,6 @@
 #include <map>
 #include <set>
 #include "base_fds_module.hpp"
-#include "air_conditioner.hpp"
 #include "charger.hpp"
 #include "interface/listener/pubsub_listener_interface.h"
 #include "{fileName}_item.hpp"
@@ -47,7 +46,6 @@ public:
 private:
     void link_signal_item();
 
-    std::shared_ptr<AirConditioner> air_conditioner = nullptr;
 };
 
 #endif // !{FILENAME}_MODULE_HPP

@@ -1,5 +1,17 @@
 {
     ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/",
     ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/",
-    "desc":"item and module"
+    "desc":"item and module",
+    "M":[
+        {
+            "content":[
+                "    ",
+                "    auto {fileName} = std::make_shared<{ClassName}Module>();",
+                "    {fileName}->link_topic_item_module();",
+                "    {fileName}->start();"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/init_signal_process.cpp",
+            "pos":"init_signal_process()"
+        }
+    ]
 }

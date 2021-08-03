@@ -1,0 +1,153 @@
+{
+    "newSig": "/home/chengxiongzhu/Works/newsig/newsig.txt",
+    "can_parse_whitelist": "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/can_parse_whitelist.txt",
+    "dbcfile": [
+        "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210713.dbc"
+    ],
+    "CDC_2D2": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_config.json",
+        "type": "vehctrl",
+        "suffx": "vehctrl"
+    },
+    "CDC_2D2.a": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_config.json",
+        "type": "air",
+        "suffx": "vehctrl"
+    },
+    "CDC_2D2.s": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "air_sts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_352": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_2A5": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "CDC_2F2": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_config.json",
+        "type": "air",
+        "suffx": "vehctrl"
+    },
+    "GW_2A8": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "VCU_309": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/icdriving_config.json",
+        "type": "EnergyConsumption",
+        "suffx": "icdriving"
+    },
+    "VCU_2A1.d": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/icdriving_config.json",
+        "type": "EnergyConsumption",
+        "suffx": "icdriving",
+        "desc": "1表示驾驶 2 表示反馈"
+    },
+    "VCU_2A1.s": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "CDC_2E2": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_config.json",
+        "type": "vehctrl",
+        "suffx": "vehctrl"
+    },
+    "GW_1A5": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_3B4": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "CDC_583": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_config.json",
+        "type": "vehctrl",
+        "suffx": "vehctrl"
+    },
+    "GW_593": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "CDC_507.v": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_config.json",
+        "type": "vehctrl",
+        "suffx": "vehctrl"
+    },
+    "GW_266": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_39A.v": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_39A": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "drive_assist_sts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_3B1.s": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_3B1.d": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/icdriving_config.json",
+        "type": "icdriving",
+        "suffx": "icdriving"
+    },
+    "VCU_1C1": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_5FF": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "vehctrlSts",
+        "suffx": "vehctrlSts"
+    },
+    "CDC_507": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/drive_assist.json",
+        "type": "drive_assist",
+        "suffx": "assist"
+    },
+    "CDC_3BD": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/drive_assist.json",
+        "type": "drive_assist",
+        "suffx": "assist"
+    },
+    "GW_307": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "drive_assist_sts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_2A4": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "drive_assist_sts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_2AD": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "drive_assist_sts",
+        "suffx": "vehctrlSts"
+    },
+    "GW_31A": {
+        "filePath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/scripts/../config/vehctrl_status_config.json",
+        "type": "drive_assist_sts",
+        "suffx": "vehctrlSts"
+    }
+}

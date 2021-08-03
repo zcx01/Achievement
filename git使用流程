@@ -1,0 +1,100 @@
+----------------------初始化操作----------------------
+1.初始化repo
+repo init xxxxx
+
+2.同步代码
+repo sync
+
+3.查看所有分支
+git branch -a
+
+4.创建并切换自己的分支
+git checkout -b xxx
+
+5.跟踪远端分支
+git branch --set-upstream-to=mega/master xxx
+
+----------------------拉取代码----------------------
+1.拉取代码
+git pull
+
+如果有冲突解决冲突，在重新提交
+
+----------------------上传代码----------------------
+1.查看状态
+git status
+
+2.添加要上传的文件
+git add filePath
+.:表示添加所有
+
+3.提交代码
+git commit -s
+填入提交信息
+
+4.拉取代码，上传之前避免冲突
+git pull --rebase
+
+5.上传到远端
+git push mega HEAD:refs/for/master
+
+如果遇到错误提示就按照提示操作一遍，在重新提交
+
+----------------------修改建议后重新上传代码----------------------
+1.查看状态
+git status
+
+2.添加要上传的文件
+git add filePath
+.:表示添加所有
+
+3.在上次提交的后面追加提交
+git commit --amend
+
+4.上传到远端
+git push mega HEAD:refs/for/master
+
+----------------------解决远端冲突-----------------------------
+#拉取代码
+git fetch mega
+
+#合并代码，解决冲突
+git rebase mega/master  
+
+#添加代码
+git add dev/controller/web/index.php 
+
+#提交代码
+git rebase --continue  
+git push mega HEAD:refs/for/master    #OK了  
+
+----------------------解决远端冲突(无修改)-------------------------
+从网站上还原代码
+repo download xxxxxx
+
+执行
+git rebase --skip
+
+提交
+git push mega HEAD:refs/for/master 
+
+----------------------git commit后，如何撤销commit----------
+git reset --soft HEAD^
+这样就成功撤销了commit，如果想要连着add也撤销的话，--soft改为--hard（删除工作空间的改动代码）。
+两次的commit，想要都撤回，可以使用HEAD~2
+
+---------------------还原所有修改-----------------------
+repo forall -c "git checkout ."
+
+---------------------关联jira--------------------------
+在commit添加注释附加jira-Id时要有空格，就jira-Id: BGS-xxx
+
+
+---------------------在提交的时候关联其他人的提交--------------------------
+git stash
+git fetch "ssh://xxxxxxx"(在网站上的 Dowmload patch -> ssh -> Cherry Pick)中获取
+git stash pop
+//解决冲突,后提交代码
+git add -A
+git commit -s
+git push mega HEAD:refs/for/master  

@@ -1,0 +1,16 @@
+{
+
+    "M":[
+        {
+            "content":[
+                "",
+                "    //{3}",
+                "    vehctrl_status_{4}->addSignalAndTop((struct veh_signal *)&CANSIG_{1}_g, {2});"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp",
+            "pos":"link_signal_drive_assist"
+        }
+    ],
+    "desc":"反馈信号添加文件"
+}
+ 

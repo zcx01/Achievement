@@ -1,0 +1,22 @@
+#!/bin/bash
+
+filename=`basename $1`
+echo $filename
+files=`locate $filename`
+for file in $files
+do
+    echo "找到的文件 $file"
+done
+
+read -p "是否都替换(y/n)?" yesoron
+if [ $yesoron == "n" ]; then
+    exit 0
+fi
+
+for file in $files
+do
+    if [ $file != $1 ]; then
+        cp -r $1 $file
+        echo "替换 $file"
+    fi
+done

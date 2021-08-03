@@ -1,0 +1,7 @@
+project (main) 
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+AUX_SOURCE_DIRECTORY(. DIR_SRCS)
+set(CMAKE_BUILD_TYPE "Debug")
+add_executable(${PROJECT_NAME} ${DIR_SRCS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a") 
+

@@ -1,0 +1,36 @@
+nullptr (file:///./../code/nullptr.cpp)
+表示指针为空，代替NULL，消除重载混乱
+
+初始化列表  (file:///./../code/initializer_list.cpp)
+std::initializer_list
+为类对象的初始化与普通数组和POD的初始化方法提供的统一的桥梁
+std::initializer_list也可以用于普通函数
+{}来初始化任意的对象
+
+结构化绑定  (file:///./../code/tuple.cpp)
+std::tuple
+提供的多返回值的功能
+
+类型推导
+auto
+1.推导返回值
+2.推导声明 （auto i=5;//i被推导成int）
+3.在C++14后可以用作返回值类型推导
+4.在C++17后可以模板的参数  (file:///./../code/template_var_parameter.cpp)
+5.lambda可以使用 auto 作为类型  (file:///./../code/lambda.cpp)
+注*：不能用于参数，可以使用模板。不能推导数组
+
+decltype
+判断是否是同一类型,用法和typeof相似
+std::is_same<decltype(NULL), decltype(0)>::value
+
+decltype(auto) (file:///./../code/decltype_auto.cpp)
+对转发函数或封装的返回类型进行推导 
+只能放在静态函数中使用
+
+if constexpr
+让代码在编译时就完成分支判断
+
+using 
+作为模板和类型的别名，同时支持 typedef 功能 (file:///./../code/template_using.cpp)
+继承构造 (file:///./../code/sequent_strcture.cpp)

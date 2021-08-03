@@ -1,0 +1,18 @@
+外部模板
+能够显式的通知编译器何时进行模板实例化
+template class std::vector<bool>;           //强行实例化
+extern template class std::vector<double>;  //不在当前编译文件中实例化模板
+
+>>
+在C++11可以用来嵌套模板，在C++11之前一律被当做右移运算符来进行处理
+
+类型别名模板    (file:///./../code/template_using.cpp)
+使用 using 给模板起别名，同时支持 typedef 功能
+
+变长参数模板    (file:///./../code/template_var_parameter.cpp)
+template<typename... Ts> class Magic;
+允许任意个数、任意类别的模板参数，同时也不需要在定义时将参数的个数固定
+
+非类型模板参数推导  (file:///./../code/template_var_parameter.cpp)
+让不同字面量成为模板参数，使用 auto 完成类型推导
+

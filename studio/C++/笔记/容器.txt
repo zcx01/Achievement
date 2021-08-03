@@ -1,0 +1,18 @@
+std::vector 
+是自动扩容的，当存入大量的数据后，并且对容器进行了删除操作， 容器并不会自动归还被删除元素相应的内存，这时候就需要使用 shrink_to_fit() 释放这部分内存
+capacity() 可以看实际的容量
+
+std::array (file:///./../code/array.cpp)
+相当于数组，要指定大小和类型
+std::array<int, 4> arr = {1, 2, 3, 4};
+
+std::forward_list
+使用单向链表进行实现,不提供 size() 方法的容器,具有比 std::list 更高的空间利用率
+
+无序容器
+std::unordered_map/std::unordered_multimap 和 std::unordered_set/std::unordered_multiset
+
+元组 (file:///./../code/tuple.cpp)
+std::make_tuple: 构造元组
+std::get: 获得元组某个位置的值
+std::tie: 元组拆包
