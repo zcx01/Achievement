@@ -1,0 +1,46 @@
+﻿元对象
+1、Q_OBJECT
+定义元对象，就可以使用Qt的元对象系统。例如信号和槽
+
+2、Q_PROPERTY(type name READ name WRITE setname NOTIFY nameChanged)
+1)自定义样式的关键字qproperty-name
+2)通过setProperty("name",arg)调用setname
+3)通过property()调用name函数获取到值
+4)把函数暴露给qml
+
+3、Q_INVOKABLE void MyFun();
+1)把此宏放到函数，注册函数，可以反射此函数
+使用:
+QMetaObject::invokeMethod(p,"MyFun")。
+
+4、Q_DECLARE_METATYPE(类型)
+把自定义类型注册到QVariant中
+
+5、qRegisterMetaType<MyClass>("MyClass");
+注册元对象数据类型,跨线程的时要使用
+
+6、Q_PLUGIN_METADATA(IID "H.MODULE.{modelName}") Q_INTERFACES(父类名称)
+插件宏，在Qt5中在.h的private区域定义，就可以通过插件的形式调用此模块
+Qt4要使用Q_EXPORT_PLUGIN2(类名,类名)，在.cpp定义
+
+7、枚举反射
+Q_DECLARE_FLAGS(MyEnums,MyEnum)//在定义枚举后定义，支持组合运算
+Q_ENUMS(MyEnum);//在类最后定义，注册反射
+Q_DECLARE_OPERATORS_FOR_FLAGS(MyClass::MyEnums)//在类最后定义，注册反射
+使用通过字符串得到枚举值
+
+template<typename T> inline static int StringToEnum(const QString &enumName,
+                                                    const QString &keys,const bool &isMulti,int defaultValue =-1)
+{
+    if(keys=="0" || keys.toInt() !=0)
+    {
+        return keys.toInt();
+    }
+    QMetaObject mo = T::staticMetaObject;
+    QMetaEnum metaEnum = mo.enumerator(mo.indexOfEnumerator(enumName.toLocal8Bit().constData()));
+    int enumValue = isMulti ? metaEnum.keysToValue(keys.toLocal8Bit().constData()) :
+                          metaEnum.keyToValue(keys.toLocal8Bit().constData());
+    return enumValue ==-1 ? defaultValue :enumValue;
+}
+//
+StringToEnum<MyClass>("MyEnums"),"enumName",true,0);
