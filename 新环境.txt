@@ -19,3 +19,5 @@ sudo apt-get install libgl1-mesa-dev
 点击任务栏中的图标隐藏
 gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize-or-previews'
 https://ywnz.com/linuxjc/5554.html
+
+xxxxxx
