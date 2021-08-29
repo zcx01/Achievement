@@ -1,4 +1,5 @@
 # from typing import List
+import json
 class EesyStr():
     @staticmethod
     def removeAt(s,index):
@@ -31,4 +32,19 @@ class EesyStr():
             print("删除失败，字符串为空")
         return "".join(temp)
 
+
+def getJScontent(configJson):
+    with open(configJson, "r") as cr:
+        return json.load(cr)
+
+def writeJs(configJson,jsContent):
+    cr = open(configJson, "w")
+    cr.write(json.dumps(jsContent,ensure_ascii=False,indent=4))
+    cr.close()
+
+def wirteFileDicts(file,data):
+    cr = open(file, "w")
+    for d in data:
+        cr.write(str(d).replace("\'","\"")+"\n")
+    cr.close()
 

@@ -48,21 +48,11 @@ void {ClassName}::signalChange(float value,std::string topic)
 void {ClassName}::publishValue(float value,std::string topic)
 {
     TB_LOG_INFO("{ClassName} %s[%d]",topic, value);
-    bool isValid = true;
-    nlohmann::json jsValue;
-    jsValue = megaipc::DrivingInfo{(float)value, 0, isValid};
-    std::string msg = jsValue.dump();
-    IpcMessage message = {(uint32_t)msg.length(), (uint8_t *)msg.data(), true};
-    megaipc::MegaIpcApi::instance().publish(topic, message);      //TDB
+    SendDriveInfo(topic, megaipc::DrivingInfo{(float)value, 0, true});
 }
 
 void {ClassName}::publishInvalid(std::string topic)
 {
     TB_LOG_INFO("{ClassName} %s 无效",topic);
-    bool isValid = false;
-    nlohmann::json jsValue;
-    jsValue = megaipc::DrivingInfo{(float)0, 0, isValid};
-    std::string msg = jsValue.dump();
-    IpcMessage message = {(uint32_t)msg.length(), (uint8_t *)msg.data(), true};
-    megaipc::MegaIpcApi::instance().publish(topic, message);      //TDB
+    SendDriveInfo(topic, megaipc::DrivingInfo{(float)0, 0, false});
 }

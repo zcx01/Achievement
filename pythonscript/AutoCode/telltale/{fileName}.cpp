@@ -18,17 +18,13 @@ using namespace megaipc;
     }
     else
     {
-        if (signal == eCANSIG__{1}_No_error_0)
+        if (signal == eCANSIG__{1}_off_0)
         {
             result = LAMP_OFF;
         }
-        else if (signal == eCANSIG__{1}_Yellow_light_on_1)
+        else if (signal == eCANSIG__{1}_on_1)
         {
-            result = LAMP_YELLOW;
-        }
-        else if (signal == eCANSIG__{1}_Red_light_on_2)
-        {
-            result = LAMP_YELLOW;
+            result = LAMP_ON;
         }
     }
     return result;
@@ -37,8 +33,8 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
 {
     TB_LOG_DEBUG("{classname}");
 
-    int power;
-    int leakage;
+    int power=0;
+    int leakage=0;
     union veh_signal_value raw_value;
     result_type result;
     signal_status status;
@@ -67,7 +63,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
 
     
     result=normal_logic(power,leakage);
-    fds::TimeOutHandle(&result,&CANSIG_{1}_g,power,(int)LAMP_OFF,(int)LAMP_RED);
+    fds::TimeOutHandle(&result,&CANSIG_{1}_g,(int)LAMP_OFF);
 
     TB_LOG_DEBUG("{classname}: %d", result);
 
@@ -76,15 +72,16 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     switch (result)
     {
     case LAMP_OFF:
-
         j = TelltaleInfo{LampState::TELLTALE_OFF};
         break;
-    case LAMP_YELLOW:
-        j = TelltaleInfo{LampState::TELLTALE_ON,LampColor::YELLOW};
+    case LAMP_ON:
+        j = TelltaleInfo{LampState::TELLTALE_ON};
+    case LAMP_FLASH:
+        j = TelltaleInfo{LampState::TELLTALE_ON, LampColor::DEFAULT, 1000, 0.5};
         break;
     }
 
     std::string msg = j.dump();
-    IpcMessage message = {"", (uint32_t)msg.length(), (uint8_t *)msg.data(), 0, true};
-    MegaIpcApi::instance().publish(TOPIC_ICTELLTALE_AUTO_HOLD, message);
+    IpcMessage message = {(uint32_t)msg.length(), (uint8_t *)msg.data(), true};
+    MegaIpcApi::instance().publish({2}, message);
 }

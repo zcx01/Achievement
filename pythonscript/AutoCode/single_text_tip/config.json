@@ -1,0 +1,16 @@
+{
+
+    "M":[
+        {
+            "content":[
+                "",
+                "    //{3}",
+                "    single_text_tip->addSignalAndTop((struct veh_signal *)&CANSIG_{1}_g, {2});"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip_module.cpp",
+            "pos":"link_single_signal"
+        }
+    ],
+    "desc":"单个信号控制的文本文件"
+}
+ 

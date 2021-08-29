@@ -1,5 +1,27 @@
 {
     ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/telltale",
     ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/telltale",
+    "M":[
+        {
+            "content":"#include \"{fileName}.hpp\"",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/telltale/te_item_def.hpp",
+            "pos":""
+        },
+        {
+            "content":"    std::shared_ptr<{ClassName}> {fileName} = nullptr;",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/telltale_module.hpp",
+            "pos":"TelltaleModule"
+        },
+        {
+            "content":[
+                "",
+                "    {fileName}= std::make_shared<{ClassName}>(shared_from_this());",
+                "    {fileName}->subscribe((struct veh_signal *)&CANSIG_GW_288__BcmPwrStsFb_g);",
+                "    {fileName}->subscribe((struct veh_signal *)&CANSIG_{1}_g);"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/telltale_module.cpp",
+            "pos":"link_signal_item"
+        }
+    ],
     "desc":"C385指示灯  1:信号名称"
 }

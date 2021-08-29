@@ -15,6 +15,7 @@ def findValue(text,signal,filePath,*other):
 def findsignalInfile(signal,filePath):
     try:
         f=open(filePath,'r')
+        print(filePath)
         content=f.readlines()
         for text in content:
             if(findValue(text,signal,filePath)):
@@ -51,7 +52,7 @@ def findSignal(signal,path):
     else:
         findOneSignal(signal,path)
 
-findSignal("CdcTrlrModSet","/home/chengxiongzhu/Works/1625/qnx1625")
+findSignal("vehctrl/","/home/chengxiongzhu/11/dltlogs")
 # if __name__ == "__main__":
 #     if len(sys.argv) == 3 :
 #         findSignal(sys.argv[1], sys.argv[2])

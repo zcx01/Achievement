@@ -1,0 +1,26 @@
+{
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/text_tip",
+    "M":[
+        {
+            "content":"#include \"{fileName}.hpp\"",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/text_tip/tx_item_def.hpp",
+            "pos":""
+        },
+        {
+            "content":"    std::shared_ptr<{ClassName}> {fileName} = nullptr;",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/text_tip_module.hpp",
+            "pos":"TextTipModule"
+        },
+        {
+            "content":[
+                "",
+                "    {fileName}= std::make_shared<{ClassName}>(shared_from_this());",
+                "    {fileName}->subscribe((struct veh_signal *)&CANSIG_{1}_g);"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip_module.cpp",
+            "pos":"link_signal_item"
+        }
+    ],
+    "desc":"C385文字提示  1:信号名称"
+}
