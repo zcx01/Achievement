@@ -48,3 +48,24 @@ def wirteFileDicts(file,data):
         cr.write(str(d).replace("\'","\"")+"\n")
     cr.close()
 
+def readFileLine(file):
+    with open(file, "r") as cr:
+        return cr.readline()
+
+def getValueByIndex(names,index,defaultValue=""):
+    try:
+        return names[index]
+    except:
+        return defaultValue
+
+def splitSpace(text):
+    # text=str(text)
+    texts=text.split(" ")
+    contents=[]
+    for t in texts:
+        if len(t) != 0:
+            contents.append(t)
+    return contents
+
+def splitSpaceGetValueByIndex(text,index,defaultValue=""):
+    return getValueByIndex(splitSpace(text),index,defaultValue)

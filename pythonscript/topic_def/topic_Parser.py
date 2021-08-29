@@ -4,6 +4,7 @@ import sys
 import os
 import xlrd
 from Analyzedbc import Analyze, DataType
+from commonfun import *
 
 pyFileDir = os.path.dirname(os.path.abspath(__file__))
 
@@ -17,15 +18,6 @@ def get_upper_case_name(text):
         last_char = char
     result = "".join(lst).upper()
     return result
-
-def getJScontent(configJson):
-    with open(configJson, "r") as cr:
-        return json.load(cr)
-
-def writeJs(configJson,jsContent):
-    cr = open(configJson, "w")
-    cr.write(json.dumps(jsContent,ensure_ascii=False,indent=4))
-    cr.close()
 
 def getSigJson(jsConfig,msg,sig):
     filePath=jsConfig.get(msg,{}).get("filePath","")
@@ -53,16 +45,6 @@ def getSigType(jsConfig,msg):
 
 def getSigSuffx(jsConfig,msg):
     return jsConfig.get(msg,{}).get("suffx","")
-
-def getClassName(sigName):
-    print(f'请输入{sigName}的类名：')
-    className=""
-    while True:
-        className=input()
-        if len(className) !=0 :
-            return className
-        else:
-            print("类名不能为空！")
 
 def addEscape(s):
     temp = str(s).replace("(","\(")
@@ -95,11 +77,52 @@ def getSignalDescInexcel(signal,filePath):
             return str(sheel.cell_value(row,3))
     return ""
 
+def getFullPath(path,jsConfig):
+    # path=str(path)
+    if path.startswith("/"):
+        return path
+    else:
+        projectPath=jsConfig.get("projectPath","")
+        return projectPath+path
+
+def getKeyPath(key,jsConfig):
+    return getFullPath(jsConfig.get(key,""),jsConfig)
+
+def getTopic(jsConfig,desc,sig):
+    try:
+        jsGenerals=getJScontent(jsConfig["general_topics_define"])
+        level=""
+        for jsGeneral in jsGenerals:
+            Comments=jsGeneral["Comments"]
+            lev=jsGeneral["Topic Level 1"]
+            if len(lev) != 0: level=lev
+            if Comments.find(desc) or desc.find(Comments):
+                return level+jsGeneral["Topic Level 2"]
+    except:
+        pass
+    jsCustoms=getJScontent(jsConfig["custom_topics_define"])
+    jsCustom={}
+    jsCustom["Topic Level 1"]=""
+    jsCustom["Topic Level 2"]=sig
+    jsCustom["HasSet"]=""
+    jsCustom["Comments"]=desc
+    jsCustoms.append(jsCustom)
+    return sig
+
+def getDefine(jsConfig,topic):
+    definefile=getKeyPath("definefile",jsConfig)
+    texts=readFileLine(definefile)
+    for text in texts:
+        if text.find(topic) != -1:
+            return splitSpaceGetValueByIndex(text,1)
+    print("没有找到"+topic)
+    sys.exit()
+
 def dealnewSig():
     jsConfig=getJScontent(pyFileDir+"/config.json")
-    analy=Analyze(jsConfig["dbcfile"])
+    analy=Analyze(getKeyPath("dbcfile",jsConfig))
 
-    newSigFile=open(jsConfig["newSig"],"r")
+    newSigFile=open(getKeyPath("newSig",jsConfig),"r")
     content=newSigFile.read().splitlines()
     newSigFile.close()
     isContinue = "n"
@@ -108,58 +131,39 @@ def dealnewSig():
             continue
         text=text.replace("\t"," ")
         names=text.split(" ")
-        sig=names[0]
+        sig=getValueByIndex(names,0)
 
         #通过 CAN matrix 表格获取中文描述
         if len(names) < 2 or len(names[1]) == 0 or names[1] == "d":
-            desc=getSignalDescInexcel(sig,jsConfig["canmatrix"])
+            desc=getSignalDescInexcel(sig,getKeyPath("canmatrix",jsConfig))
         else:
-            desc=names[1]
+            desc=getValueByIndex(names,1)
 
-        try:
-            className=names[2]
-        except:
-            className="x"
+        className=getValueByIndex(names,2,"x")
 
-        messagesuffix="."
-        try:
-            messagesuffix+=names[3]
-        except:
-            messagesuffix=""
+        messagesuffix=getValueByIndex(names,3)
+        if len(message) == 0:
+            messagesuffix="."+messagesuffix
 
         message=analy.getMessageBySig(sig)
         if len(message)==0:
             print(f'{sig}对应的message不存在')
             continue
-        jsConfigPath=getSigJson(jsConfig,message+messagesuffix,sig)
-        jsSig=getJScontent(jsConfigPath)
-        if sig in jsSig:
-            if isContinue=="y" or isContinue=="n":
-                print(f'{sig} 已经存在,是否强执行(y-是，n-否，dy-总是，dn-总否)？')
-                isContinue=input()
-            if "n" in isContinue:
-                continue
-            
-            #写入 json 文件const
-            jsSig[sig]["desc"]=desc
-        else:
-            jsSig[sig]={"desc":desc}
 
-        print(f'写入 {jsConfigPath} 文件')
-        writeJs(jsConfigPath,jsSig)
-
+        getSigJson(jsConfig,message+messagesuffix,sig)
+        topic=getTopic(jsConfig,desc,sig)
+        messagesig=message+"__"+sig
         #写入 can_parse_whitelist 文件
-        can_parse_whitelistPath=jsConfig["can_parse_whitelist"]
-        if judgeCommad("-bc",names) or findsignalInfile(f'{message}__{sig}',can_parse_whitelistPath):
+        can_parse_whitelistPath=getKeyPath("can_parse_whitelist",jsConfig)
+        if judgeCommad("-bc",names) or findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
             pass
         else:
             print(f"写入 {can_parse_whitelistPath} 文件")
             can_parse_whitelist=open(can_parse_whitelistPath,"a")
-            can_parse_whitelist.write(f'{message}__{sig:<30}       [signal]		[get, change_handle]\n')
+            can_parse_whitelist.write(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
             can_parse_whitelist.close()
 
-        suffx= getSigSuffx(jsConfig,message+messagesuffix)
-        line = 'TOPIC_' + get_upper_case_name(suffx) + '_' + get_upper_case_name(sig)
+        define = getDefine(jsConfig,topic)
 
         #写入 cpp 文件 #创建 .h .cpp 文件
         sigType=getSigType(jsConfig,message+messagesuffix)
@@ -167,7 +171,6 @@ def dealnewSig():
         dataTypeStr="int"
         if dataType == DataType.VFLOAT:
             dataTypeStr="float"
-        messagesig=message+"__"+sig
         if judgeCommad("-A",names):
             continue
         elif judgeCommad("-m",names):
@@ -176,11 +179,11 @@ def dealnewSig():
         else if (topicId == %s) \n\
 	{\n\
         sig=&CANSIG_%s_g;\n\
-	}'% (desc,line,messagesig))
+	}'% (desc,define,messagesig))
         else:
             desc=addEscape(desc)
-            print(f'AutoCode {sigType} {className} {messagesig} {line} {desc} {dataTypeStr}')
-            os.system(f'AutoCode {sigType} {className} {messagesig} {line} {desc} {dataTypeStr}')
+            print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
+            os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
     os.system("Parser")
 
 if __name__ == "__main__":
