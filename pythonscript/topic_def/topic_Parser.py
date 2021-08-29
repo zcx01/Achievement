@@ -4,20 +4,10 @@ import sys
 import os
 import xlrd
 from Analyzedbc import Analyze, DataType
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
+sys.path.append(pyFileDir+"..")
 from commonfun import *
 
-pyFileDir = os.path.dirname(os.path.abspath(__file__))
-
-def get_upper_case_name(text):
-    lst = []
-    last_char = ''
-    for index, char in enumerate(text):
-        if char.isupper() and index != 0 and last_char.islower():
-            lst.append("_")
-        lst.append(char)
-        last_char = char
-    result = "".join(lst).upper()
-    return result
 
 def getSigJson(jsConfig,msg,sig):
     filePath=jsConfig.get(msg,{}).get("filePath","")
@@ -38,13 +28,19 @@ def getSigJson(jsConfig,msg,sig):
                 print(f'{filePath}不存在')
             else:
                 jsConfig[msg]={"filePath":filePath,"type":type,"suffx":suffx}
-                writeJs(pyFileDir+"/config.json",jsConfig)
+                writeJs(pyFileDir+"config.json",jsConfig)
 
-def getSigType(jsConfig,msg):
-    return jsConfig.get(msg,{}).get("type","")
-
-def getSigSuffx(jsConfig,msg):
-    return jsConfig.get(msg,{}).get("suffx","")
+def WriteType(jsConfig,msg):
+    type=jsConfig.get(msg,{}).get("type","")
+    while True:
+        if len(type) != 0:
+            return type
+        else:
+            print(f'请输入{msg}类型')
+            type=input()
+            if len(type) != 0:
+                jsConfig[msg]={"filePath":"","type":type,"suffx":""}
+                writeJs(pyFileDir+"config.json",jsConfig)
 
 def addEscape(s):
     temp = str(s).replace("(","\(")
@@ -119,13 +115,12 @@ def getDefine(jsConfig,topic):
     sys.exit()
 
 def dealnewSig():
-    jsConfig=getJScontent(pyFileDir+"/config.json")
+    jsConfig=getJScontent(pyFileDir+"config.json")
     analy=Analyze(getKeyPath("dbcfile",jsConfig))
 
     newSigFile=open(getKeyPath("newSig",jsConfig),"r")
     content=newSigFile.read().splitlines()
     newSigFile.close()
-    isContinue = "n"
     for text in content:
         if text.strip().startswith("#") or len(text) == 0:
             continue
@@ -150,7 +145,6 @@ def dealnewSig():
             print(f'{sig}对应的message不存在')
             continue
 
-        getSigJson(jsConfig,message+messagesuffix,sig)
         topic=getTopic(jsConfig,desc,sig)
         messagesig=message+"__"+sig
         #写入 can_parse_whitelist 文件
@@ -166,7 +160,7 @@ def dealnewSig():
         define = getDefine(jsConfig,topic)
 
         #写入 cpp 文件 #创建 .h .cpp 文件
-        sigType=getSigType(jsConfig,message+messagesuffix)
+        sigType=WriteType(jsConfig,message+messagesuffix)
         dataType=analy.getSigDataType(sig)
         dataTypeStr="int"
         if dataType == DataType.VFLOAT:
