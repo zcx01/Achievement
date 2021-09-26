@@ -1,0 +1,27 @@
+函数:
+
+//生成一个对象
+GLuint VBO;
+glGenBuffers(1, &VBO);
+
+//绑定缓冲
+glBindBuffer(GL_ARRAY_BUFFER, VBO);  
+GL_ARRAY_BUFFER:顶点缓冲对象的缓冲类型
+
+//设置缓冲内存的数据
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+参数1:目标缓冲的类型
+参数2:指定传输数据的大小(以字节为单位)；用一个简单的sizeof计算出顶点数据大小就行
+参数3:参数是我们希望发送的实际数据
+
+参数4:指定了我们希望显卡如何管理给定的数据。它有三种形式：
+GL_STATIC_DRAW ：数据不会或几乎不会改变。
+GL_DYNAMIC_DRAW：数据会被改变很多。
+GL_STREAM_DRAW ：数据每次绘制时都会改变。
+
+//创建顶点着色器
+GLuint vertexShader;
+vertexShader = glCreateShader(GL_VERTEX_SHADER);
+GL_VERTEX_SHADER:创建一个顶点着色器
+
+//把这个着色器源码附加到着色器对象上

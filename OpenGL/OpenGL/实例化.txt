@@ -1,0 +1,22 @@
+﻿实例化:把数据一次发给GPU,使用绘制函数让OpenGL按照这些数据绘制物体。
+节省每次绘制物体时CPU -> GPU的通信，它只需要一次即可。
+
+每个物体都是完全相同的，而且还在同一个位置。我们只能看见一个物体！
+处于这个原因，GLSL在顶点着色器中嵌入了另一个内建变量，gl_InstanceID。
+
+使用glDrawArraysInstanced和glDrawElementsInstanced来画物体。
+
+----------------------实例化数组---------------------------------
+定义为一个顶点数组，仅在顶点着色器渲染一个新的实例时才会更新
+#version 330 core
+layout (location = 0) in vec2 aPos;
+layout (location = 1) in vec3 aColor;
+layout (location = 2) in vec2 aOffset;//
+
+out vec3 fColor;
+
+void main()
+{
+    gl_Position = vec4(aPos + aOffset, 0.0, 1.0);
+    fColor = aColor;
+}

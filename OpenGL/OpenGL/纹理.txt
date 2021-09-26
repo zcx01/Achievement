@@ -1,0 +1,100 @@
+----------------------------------------------纹理坐标----------------------------------------------
+是一个图片，可以用来添加物体的细节
+
+纹理坐标
+使用纹理坐标获取颜色叫做采样
+
+
+(0,1)					(1,1)
+|
+|
+|
+|
+(0,0)
+------------------------(1,0)
+
+-------------------------------------------加载与创建纹理------------------------------------------
+//生成纹理
+glGenTextures(1,&texture);
+
+//绑定纹理
+glBindTexture(GL_TEXTURE_2D,texture);
+
+----------------------------------------------纹理的环绕方式----------------------------------------------
+处理超出范围之外的纹理坐标
+
+//参数1:指定纹理目标					GL_TEXTURE_2D表示2D纹理
+//参数2:设置的选项与应用的纹理轴		配置了WRAP选项，并且指定了S和T (S、T、R等价于x、y、z)
+//参数3:激活指定的纹理环绕方式			处理超出范围之外的纹理坐标
+//			方式							描述
+//		GL_REPEAT						重复纹理图像(默认)
+//		GL_MIRRORED_REPEAT				重复纹理图形，不过是镜像放置
+//		GL_CLAMP_TO_EDGE				拉伸纹理边缘
+//		GL_CLAMP_TO_BORDER				超出的坐标为用户指定的边缘颜色
+glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT)
+glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT)
+
+如果是GL_CLAMP_TO_BORDER还要设置边缘颜色
+如:
+float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+//GL_TEXTURE_BORDER_COLOR 边缘类型
+glTexParameterfv(GL_TEXTURE_2D,GL_TEXTURE_BORDER_COLOR,borderColor);
+
+----------------------------------------------纹理过滤----------------------------------------------
+纹理坐标不依赖于分辨率(Resolution)，它可以是任意浮点值。主要处理图片放大后的效果
+GL_NEAREST					邻近过滤(默认)	选择中心点最接近纹理坐标的那个像素	会产生颗粒状的图案		更加真实
+GL_LINEAR					线性过滤		纹理坐标附近的纹理像素				产生更平滑的图案
+	
+//以下在切换级别的时候使用	--（用于缩小操作，放大设置没有效果，使用会产生GL_INVALID_ENUM错误）
+GL_NEAREST_MIPMAP_NEAREST	使用最邻近的多级渐远纹理来匹配像素大小，并使用邻近插值进行纹理采样	
+GL_LINEAR_MIPMAP_NEAREST	使用最邻近的多级渐远纹理级别，并使用线性插值进行采样
+GL_NEAREST_MIPMAP_LINEAR	在两个最匹配像素大小的多级渐远纹理之间进行线性插值，使用邻近插值进行采样
+GL_LINEAR_MIPMAP_LINEAR		在两个邻近的多级渐远纹理之间使用线性插值，并使用线性插值进行采样
+函数:
+//参数1:指定纹理目标
+//参数2:操作类型		GL_TEXTURE_MIN_FILTER（缩小）	GL_TEXTURE_MAG_FILTER（放大）
+//参数3:过滤类型
+glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST)
+
+---------------------------------------------多级渐远纹理-------------------------------------------
+处理远处的物体的纹理
+一系列的纹理图像，后一个纹理图像是前一个的二分之一，距观察者的距离超过一定的阈值，OpenGL会使用不同的多级渐远纹理
+
+函数:
+glGenerateMipmaps
+在不同级别切换要设置过滤方式glTexParameteri
+
+
+---------------------------------------------生成图片纹理-------------------------------------------
+//参数1:纹理目标
+//参数2:纹理指定多级渐远纹理的级别 0 (基本基本)
+//参数3:纹理存储格式
+//参数4:纹理的宽度
+//参数5:纹理的高度
+//参数6:总是设置0
+//参数7:源图的格式GL_BGRA(要判断大小端，此电脑是little-endian 系统)
+//参数8:数据类型 
+//参数9:真正的图形数据
+glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, image.width(), image.height(), 0,
+        GL_BGRA, GL_UNSIGNED_BYTE, image.bits());
+glGenerateMipmap(GL_TEXTURE_2D);
+
+---------------------------------------------画纹理-------------------------------------------
+glBindTexture(GL_TEXTURE_2D,texture);
+
+glBindVertexArray(VAO);
+glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
+
+-------------------------------------------纹理单元-------------------------------------------
+一个纹理的位置，GL_TEXTURE0是默认被激活的单元
+主要目的是让我们在着色器中使用多个纹理
+这需要在片段着色器中来编写另一个采样器
+
+//激活纹理单元
+//纹理单元	可以使用GL_TEXTURE0 + 8的方式获得GL_TEXTURE8
+glActiveTexture(GL_TEXTURE0);
+//绑定纹理
+glBindTexture(GL_TEXTURE_2D, texture);
+
+//设置值
+glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);

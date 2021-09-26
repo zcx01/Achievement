@@ -1,0 +1,73 @@
+﻿环境映射
+通过使用环境的立方体贴图，我们可以给物体反射和折射的属性
+
+---------------------------------------------反射---------------------------------------------
+我们根据观察方向向量I和物体的法向量N，来计算反射向量R。
+
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
+
+out vec3 Normal;
+out vec3 Position;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main()
+{
+	//使用inverse和transpose函数自己生成这个法线矩阵,移除对法向量错误缩放的影响
+    Normal = mat3(transpose(inverse(model))) * aNormal;
+    Position = vec3(model * vec4(aPos, 1.0));
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+}
+
+
+#version 330 core
+out vec4 FragColor;
+
+in vec3 Normal;
+in vec3 Position;
+
+uniform vec3 cameraPos;
+uniform samplerCube skybox;
+
+void main()
+{             
+	//计算了观察/摄像机方向向量I
+    vec3 I = normalize(Position - cameraPos);
+	
+	//它来计算反射向量R
+    vec3 R = reflect(I, normalize(Normal));
+	
+	//使用R来从天空盒立方体贴图中采样
+    FragColor = vec4(texture(skybox, R).rgb, 1.0);
+}
+
+//在渲染箱子之前先绑定立方体贴图纹理
+glBindVertexArray(cubeVAO);
+glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);          
+glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+---------------------------------------------折射---------------------------------------------
+折射是通过斯涅尔定律(Snell’s Law)来描述的。
+我们有一个观察向量I，一个法向量N，而这次是折射向量R。
+折射可以使用GLSL的内建refract函数来轻松实现，它需要一个法向量、一个观察方向和两个材质之间的折射率(Refractive Index)。
+我们使用这些折射率来计算光传播的两种材质间的比值。在我们的例子中，光线/视线从空气进入玻璃（如果我们假设箱子是玻璃制的），所以比值为1.00/1.52=0.658。
+
+void main()
+{         
+	//光线/视线从空气进入玻璃
+    //1.00是空气的折射率，1.52是玻璃的折射率
+    float ratio = 1.00 / 1.52;
+    vec3 I = normalize(Position - cameraPos);
+    vec3 R = refract(I, normalize(Normal), ratio);
+    FragColor = vec4(texture(skybox, R).rgb, 1.0);
+}
+
+---------------------------------------------动态环境贴图---------------------------------------------
+通过使用帧缓冲，我们能够为物体的6个不同角度创建出场景的纹理，并在每个渲染迭代中将它们储存到一个立方体贴图中。之后我们就可以使用这个（动态生成的）立方体贴图来创建出更真实的，包含其它物体的，反射和折射表面了。这就叫做动态环境映射(Dynamic Environment Mapping)，因为我们动态创建了物体周围的立方体贴图，并将其用作环境贴图。
+
+虽然它看起来很棒，但它有一个很大的缺点：我们需要为使用环境贴图的物体渲染场景6次，这是对程序是非常大的性能开销。现代的程序通常会尽可能使用天空盒，并在可能的时候使用预编译的立方体贴图，只要它们能产生一点动态环境贴图的效果。虽然动态环境贴图是一个很棒的技术，但是要想在不降低性能的情况下让它工作还是需要非常多的技巧的。

@@ -1,0 +1,63 @@
+﻿阴影映射
+阴影映射(Shadow Mapping)：以光的位置为视角进行渲染，能看到的东西都将被点亮，看不见的一定是在阴影之中了。
+
+原理:把从摄像机视角下变成从光源的透视图来渲染场景，我们就能对光源的透视图所见的最近的深度值进行采样。最终，深度值就会显示从光源的透视图下见到的第一个片段了。
+
+深度贴图（depthmap）或阴影贴图:储存在纹理中的所有这些深度值。
+阴影映射由两个步骤组成：首先，我们渲染深度贴图，然后我们像往常一样渲染场景，使用生成的深度贴图来计算片段是否在阴影之中。
+
+--------------------------------深度贴图----------------------------------------
+第一步：生成一张深度贴图(Depth Map)。
+1、首先，我们要为渲染的深度贴图创建一个帧缓冲对象
+GLuint depthMapFBO;
+glGenFramebuffers(1, &depthMapFBO);
+
+2、然后，创建一个2D纹理，提供给帧缓冲的深度缓冲使用
+
+const GLuint SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+GLuint depthMap;
+glGenTextures(1, &depthMap);
+glBindTexture(GL_TEXTURE_2D, depthMap);
+glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 
+             SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+//因为我们只关心深度值，我们要把纹理格式指定为GL_DEPTH_COMPONENT。我们还要把纹理的高宽设置为1024：这是深度贴图的分辨率。
+
+3、把我们把生成的深度纹理作为帧缓冲的深度缓冲：
+glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+
+//需要显式告诉OpenGL我们不适用任何颜色数据进行渲染
+glDrawBuffer(GL_NONE);
+glReadBuffer(GL_NONE);
+
+glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+第二步：光源空间的变换
+因为我们使用的是一个所有光线都平行的定向光。出于这个原因，我们将为光源使用正交投影矩阵，透视图将没有任何变形：
+GLfloat near_plane = 1.0f, far_plane = 7.5f;
+glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+
+使用glm::lookAt函数；这次从光源的位置看向场景中央。
+glm::mat4 lightView = glm::lookAt(glm::vec(-2.0f, 4.0f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+二者相结合为我们提供了一个光空间的变换矩阵，它将每个世界空间坐标变换到光源处所见到的那个空间
+glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+第三步：渲染至深度贴图
+
+#version 330 core
+layout (location = 0) in vec3 position;
+
+uniform mat4 lightSpaceMatrix;
+uniform mat4 model;
+
+void main()
+{
+	//把顶点变换到光空间
+    gl_Position = lightSpaceMatrix * model * vec4(position, 1.0f);
+}

@@ -1,0 +1,61 @@
+﻿高级数据
+
+OpenGL中的缓冲只是一个管理特定内存块的对象，没有其它更多的功能了。在我们将它绑定到一个缓冲目标(Buffer Target)时，我们才赋予了其意义。
+缓冲目标可以是GL_ARRAY_BUFFER、GL_ELEMENT_ARRAY_BUFFER。
+
+glBufferData
+//填充缓冲对象所管理的内存，这个函数会分配一块内存，并将数据添加到这块内存中。
+//如果我们将它的data参数设置为NULL，那么这个函数将只会分配内存，但不进行填充。
+
+glBufferSubData(GL_ARRAY_BUFFER, 24, sizeof(data), &data); // 范围： [24, 24 + sizeof(data)]
+//填充缓冲的特定区域
+//参数含义:缓冲目标、一个偏移量、数据的大小和数据
+//对一个缓冲调用glBufferSubData之前必须要先调用glBufferData
+
+glMapBuffer
+//请求缓冲内存的指针，直接将数据复制到缓冲当中
+
+float data[] = {
+  0.5f, 1.0f, -0.35f
+  ...
+};
+glBindBuffer(GL_ARRAY_BUFFER, buffer);
+// 获取指针
+void *ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+// 复制数据到内存
+memcpy(ptr, data, sizeof(data));
+// 记得告诉OpenGL我们不再需要这个指针了
+// 如果OpenGL能够成功将您的数据映射到缓冲中，这个函数将会返回GL_TRUE。
+glUnmapBuffer(GL_ARRAY_BUFFER);
+
+---------------------------------------------分批顶点属性---------------------------------------------
+
+float positions[] = { ... };
+float normals[] = { ... };
+float tex[] = { ... };
+// 填充缓冲
+glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(positions), &positions);
+glBufferSubData(GL_ARRAY_BUFFER, sizeof(positions), sizeof(normals), &normals);
+glBufferSubData(GL_ARRAY_BUFFER, sizeof(positions) + sizeof(normals), sizeof(tex), &tex);
+
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);  
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(positions)));  
+glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(sizeof(positions) + sizeof(normals)));
+
+---------------------------------------------复制缓冲---------------------------------------------
+void glCopyBufferSubData(GLenum readtarget, GLenum writetarget, GLintptr readoffset, GLintptr writeoffset, GLsizeiptr size);
+
+readtarget： 复制源的缓冲目标
+writetarget：复制目标的缓冲目标
+
+//[例1]
+float vertexData[] = { ... };
+glBindBuffer(GL_COPY_READ_BUFFER, vbo1);
+glBindBuffer(GL_COPY_WRITE_BUFFER, vbo2);
+glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, sizeof(vertexData));
+
+//[例2]只将writetarget缓冲绑定为新的缓冲目标类型之一
+float vertexData[] = { ... };
+glBindBuffer(GL_ARRAY_BUFFER, vbo1);
+glBindBuffer(GL_COPY_WRITE_BUFFER, vbo2);
+glCopyBufferSubData(GL_ARRAY_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, sizeof(vertexData));

@@ -1,0 +1,26 @@
+﻿光照贴图
+
+允许我们对物体的漫反射分量（以及间接地对环境光分量，它们几乎总是一样的）和镜面光分量有着更精确的控制
+
+------------------------------漫反射贴图------------------------------
+将材质Material中的漫反射修改成 sampler2D diffuse;
+片段代码修改成:
+vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
+
+将环境光得材质颜色设置为漫反射材质颜色同样的值
+vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+
+
+代码中使用
+
+将要用的纹理单元赋值到material.diffuse这个uniform采样器，并绑定箱子的纹理到这个纹理单元：
+lightingShader.setInt("material.diffuse", 0);
+
+
+------------------------------镜面光贴图------------------------------
+将材质Material中的镜面反射修改成 sampler2D specular;
+
+vec3 ambient  = light.ambient  * vec3(texture(material.diffuse, TexCoords));
+vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuse, TexCoords));  
+vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+FragColor = vec4(ambient + diffuse + specular, 1.0);

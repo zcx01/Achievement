@@ -1,0 +1,76 @@
+光照
+所有的光照都在片段着色器里进行。
+
+冯氏光照:分为环境光照、漫反射光照
+
+-----------------------------------------环境光照-----------------------------------------
+多光源的反射
+
+把环境光照加入到场景中
+
+光的颜色*很小的常量环境因子*物体的颜色
+lightColor * ambientStrength * objectColor
+
+float ambientStrength = 0.1;
+vec3 ambient = ambientStrength * lightColor;
+
+vec3 result = ambient * objectColor;
+FragColor = vec4(result, 1.0);
+
+
+-----------------------------------------漫反射光照-----------------------------------------
+漫反射需要测量光线和角度，即需要法向量和定向的光线
+
+法向量:垂直于片段表面的一个向量。
+定向的光线:光源的位置和片段位置向量差的方向向量。
+
+
+1.给顶点着色器中赋值
+
+2.顶点着色器传递给片段着色器
+layout (location = 0) in vec3 position;	//顶点的位置
+layout (location = 1) in vec3 aNormal;  //法向量---（传递给片段着色器）
+out vec3 FragPos;   					//顶点在世界坐标上的位置
+uniform mat4 model;         			//模型矩阵-----(从局部坐标转换到世界坐标)
+main()
+{
+	Normal = aNormal;
+	FragPos =vec3(model * vec4(position,1.0f));
+}
+
+3.在片段着色器中计算漫反射
+
+//-------------计算漫反射---（法向量 * 光的方向向量）
+//[1]、计算光源和片段位置之间的的方向向量（单位向量）
+vec3 norm = normalize(Normal);
+vec3 lightDir = normalize(lightPos - FragPos);//光的方向向量（定向光线） lightPos（光源的位置），顶点和光的连线
+
+//[2]、对法向量（norm）和定向光线（lightDir）进行点乘
+float diff = max(dot(norm,lightDir),0.0);//max保证不能为负数，求出光线和法向量的夹角
+
+//[3]、得到漫反射的分量
+vec3  diffuse = diff * lightColor;
+
+//----------将漫反射分量+环境关照分量相加
+vec3 result = (ambient+diffuse) * objectColor;
+FragColor = vec4(result, 1.0);
+
+-----------------------------------------镜面反射（光的方向经过物体的反射 * 视线的方向）-----------------------------------------
+float specularStrength = 0.5;//镜面强度
+
+//[1]、观察者的方向向量
+vec3 viewDir = normalize(viewPos - FragPos);
+
+//[2]、以法向量为轴，把光线的向量对称翻转
+vec3 reflectDir = reflect(-lightDir, norm);
+
+//[3]、求翻转后的项目和观察者的方向向量点乘；32是高光的反光度、一个物体的反光度越高，反射光的能力越强，散射得越少，高光点就会越小
+float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+vec3 specular = specularStrength * spec * lightColor;
+
+
+
+//----------将漫反射分量+环境关照分量相加
+vec3 result = (ambient+diffuse+specular) * objectColor;
+
+color = vec4(result,1.0);

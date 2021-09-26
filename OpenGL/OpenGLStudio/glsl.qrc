@@ -1,0 +1,82 @@
+<RCC>
+    <qresource prefix="/">
+        <file>config/Textrue/fragment.glsl</file>
+        <file>config/Textrue/vertex.glsl</file>
+        <file>config/Textrue/container.jpg</file>
+        <file>config/Trans/vertex.glsl</file>
+        <file>config/Coordinate/vertex.glsl</file>
+        <file>config/Lighting/1/fragment.glsl</file>
+        <file>config/Lighting/1/lightfragment .glsl</file>
+        <file>config/Lighting/1/vertex.glsl</file>
+        <file>config/Lighting/2/fragment.glsl</file>
+        <file>config/Lighting/2/lightfragment .glsl</file>
+        <file>config/Lighting/2/vertex.glsl</file>
+        <file>config/Lighting/2/lightvertex.glsl</file>
+        <file>config/Textrue/awesomeface.jpg</file>
+        <file>config/Lighting/3/fragment.glsl</file>
+        <file>config/Lighting/3/lightfragment .glsl</file>
+        <file>config/Lighting/3/lightvertex.glsl</file>
+        <file>config/Lighting/3/vertex.glsl</file>
+        <file>config/Textrue/awesomeface.png</file>
+        <file>config/Lighting/4/container2.png</file>
+        <file>config/Lighting/4/fragment.glsl</file>
+        <file>config/Lighting/4/lightfragment .glsl</file>
+        <file>config/Lighting/4/lightvertex.glsl</file>
+        <file>config/Lighting/4/vertex.glsl</file>
+        <file>config/Lighting/4/container2_specular.png</file>
+        <file>config/Lighting/5/container2.png</file>
+        <file>config/Lighting/5/container2_specular.png</file>
+        <file>config/Lighting/5/fragment.glsl</file>
+        <file>config/Lighting/5/lightfragment .glsl</file>
+        <file>config/Lighting/5/lightvertex.glsl</file>
+        <file>config/Lighting/5/vertex.glsl</file>
+        <file>config/Lighting/6/container2.png</file>
+        <file>config/Lighting/6/container2_specular.png</file>
+        <file>config/Lighting/6/fragment.glsl</file>
+        <file>config/Lighting/6/lightfragment .glsl</file>
+        <file>config/Lighting/6/lightvertex.glsl</file>
+        <file>config/Lighting/6/vertex.glsl</file>
+        <file>config/Lighting/7/container2.png</file>
+        <file>config/Lighting/7/container2_specular.png</file>
+        <file>config/Lighting/7/fragment.glsl</file>
+        <file>config/Lighting/7/lightfragment .glsl</file>
+        <file>config/Lighting/7/lightvertex.glsl</file>
+        <file>config/Lighting/7/vertex.glsl</file>
+        <file>config/Lighting/8/container2.png</file>
+        <file>config/Lighting/8/container2_specular.png</file>
+        <file>config/Lighting/8/fragment.glsl</file>
+        <file>config/Lighting/8/lightfragment .glsl</file>
+        <file>config/Lighting/8/lightvertex.glsl</file>
+        <file>config/Lighting/8/vertex.glsl</file>
+        <file>config/AssimpModel/vertex.glsl</file>
+        <file>config/AssimpModel/fragment.glsl</file>
+        <file>config/HighOPenGL/marble.jpg</file>
+        <file>config/HighOPenGL/metal.png</file>
+        <file>config/HighOPenGL/templatetest/fragment.glsl</file>
+        <file>config/HighOPenGL/templatetest/sfragment.glsl</file>
+        <file>config/HighOPenGL/templatetest/vertex.glsl</file>
+        <file>config/HighOPenGL/Blending/fragment.glsl</file>
+        <file>config/HighOPenGL/Blending/vertex.glsl</file>
+        <file>config/HighOPenGL/grass.png</file>
+        <file>config/HighOPenGL/Blending/fragment2.glsl</file>
+        <file>config/HighOPenGL/window.png</file>
+        <file>config/HighOPenGL/frametexture/fragment.glsl</file>
+        <file>config/HighOPenGL/frametexture/vertex.glsl</file>
+        <file>config/HighOPenGL/frametexture/fragmentscreen.glsl</file>
+        <file>config/HighOPenGL/frametexture/vertexscreen.glsl</file>
+        <file>config/HighOPenGL/frametexture/fragmentsopposition.glsl</file>
+        <file>config/HighOPenGL/frametexture/fragmentgrayscale.glsl</file>
+        <file>config/HighOPenGL/frametexture/fragmentkernel.glsl</file>
+        <file>config/HighOPenGL/frametexture/fragmentBlur.glsl</file>
+        <file>config/HighOPenGL/frametexture/fragmentedge-detection.glsl</file>
+        <file>config/qss/MainNavigationWidget.qss</file>
+        <file>config/HighOPenGL/skybox/fragment.glsl</file>
+        <file>config/HighOPenGL/skybox/vertex.glsl</file>
+        <file>config/HighOPenGL/skybox/back.jpg</file>
+        <file>config/HighOPenGL/skybox/bottom.jpg</file>
+        <file>config/HighOPenGL/skybox/front.jpg</file>
+        <file>config/HighOPenGL/skybox/left.jpg</file>
+        <file>config/HighOPenGL/skybox/right.jpg</file>
+        <file>config/HighOPenGL/skybox/top.jpg</file>
+    </qresource>
+</RCC>

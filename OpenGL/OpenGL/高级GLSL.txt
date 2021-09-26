@@ -1,0 +1,182 @@
+﻿高级GLSL
+好处:
+ * 第一，一次设置很多uniform会比一个一个设置多个uniform要快很多。
+ * 第二，比起在多个着色器中修改同样的uniform，在Uniform缓冲中修改一次会更容易一些。
+ * 第三，可以在着色器中使用更多的uniform
+ 
+---------------------------------------------顶点着色器变量---------------------------------------------
+gl_Position
+//它是顶点着色器的裁剪空间输出位置
+
+gl_PointSize
+//一个图元是GL_POINTS、glPointSize函数来设置渲染出来的点的大小
+//设置点的宽高（像素）、float变量
+//在顶点着色器中修改点大小的功能默认是禁用的,启用它的需要设置glEnable(GL_PROGRAM_POINT_SIZE);
+
+void main()
+{
+    gl_Position = projection * view * model * vec4(aPos, 1.0); 
+	//点的大小会随着观察者距顶点距离变远而增大
+    gl_PointSize = gl_Position.z;    
+}
+
+gl_VertexID
+//返回正在绘制顶点的当前ID
+//当（使用glDrawElements）进行索引渲染的时候，这个变量会存储正在绘制顶点的当前索引
+//当（使用glDrawArrays）不使用索引进行绘制的时候，这个变量会储存从渲染调用开始的已处理顶点数量。
+
+
+---------------------------------------------片段着色器变量---------------------------------------------
+gl_FragCoord
+//z分量等于对应片段的深度值
+//x和y分量是片段的窗口空间(Window-space)坐标，其原点为窗口的左下角
+
+gl_FrontFacing
+//返回一个bool，如果当前片段是正向面的一部分那么就是true，否则就是false
+//能够根据顶点的环绕顺序来决定一个面是正向还是背向面
+
+gl_FragDepth
+//设置片段的深度值
+//直接写入一个0.0到1.0之间的float
+//如果着色器没有写入值到gl_FragDepth，它会自动取用gl_FragCoord.z的值。
+//对gl_FragDepth进行写入，OpenGL就会禁用所有的提前深度测试(Early Depth Testing)
+
+//从OpenGL 4.2起
+layout (depth_<condition>) out float gl_FragDepth;
+
+condition可以为下面的值：
+条件			描述
+any	默认值。	提前深度测试是禁用的，你会损失很多性能
+greater			你只能让深度值比gl_FragCoord.z更大
+less			你只能让深度值比gl_FragCoord.z更小
+unchanged		如果你要写入gl_FragDepth，你将只能写入gl_FragCoord.z的值
+
+---------------------------------------------接口块---------------------------------------------
+接口块的声明和struct的声明有点相像，不同的是，现在根据它是一个输入还是输出块(Block)，使用in或out关键字来定义的。
+
+在顶点着色器中定义输出
+layout (location = 1) in vec2 aTexCoords;
+out VS_OUT
+{
+    vec2 TexCoords;
+} vs_out;
+
+void main()
+{  
+    vs_out.TexCoords = aTexCoords;
+}  
+
+在片段着色器中定义输入
+in VS_OUT
+{
+    vec2 TexCoords;
+} fs_in;
+
+uniform sampler2D texture;
+
+void main()
+{             
+    FragColor = texture(texture, fs_in.TexCoords);   
+}
+
+---------------------------------------------Uniform缓冲对象---------------------------------------------
+是一个缓冲，我们可以使用glGenBuffers来创建它，将它绑定到GL_UNIFORM_BUFFER缓冲目标，并将所有相关的uniform数据存入缓冲。
+
+#version 330 core
+layout (location = 0) in vec3 aPos;
+
+//声明了一个叫做Matrices的Uniform块，它储存了两个4x4矩阵。Uniform块中的变量可以直接访问，不需要加块名作为前缀
+//layout (std140)：当前定义的Uniform块对它的内容使用一个特定的内存布局，这个语句设置了Uniform块布局。
+layout (std140) uniform Matrices
+{
+    mat4 projection;
+    mat4 view;
+};
+
+uniform mat4 model;
+
+void main()
+{
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+}
+
+---------------------------------------------Uniform块布局---------------------------------------------
+Uniform块的内容是储存在一个缓冲对象中的，它实际上只是一块预留内存。
+GLSL会使用一个叫做共享(Shared)布局的Uniform内存布局，GLSL是可以为了优化而对uniform变量的位置进行变动，需要使用
+glGetUniformIndices这样的函数来查询这个信息。这个布局节省空间，但是增加工作量
+
+通常的做法是，不使用共享布局，而是使用std140布局。
+std140布局声明了每个变量的偏移量都是由一系列规则所决定的，这显式地声明了每个变量类型的内存布局。
+
+基准对齐量(Base Alignment)，它等于一个变量在Uniform块中所占据的空间（包括填充量(Padding)），这个基准对齐量是使用std140布局的规则计算出来的。
+
+对齐偏移量(Aligned Offset)，它是一个变量从块起始位置的字节偏移量。一个变量的对齐字节偏移量必须等于基准对齐量的倍数。
+
+常见的布局规则
+
+类型				布局规则
+标量				比如int和bool	每个标量的基准对齐量为N。
+向量				2N或者4N。这意味着vec3的基准对齐量为4N。
+标量或向量的数组	每个元素的基准对齐量与vec4的相同。
+矩阵				储存为列向量的数组，每个向量的基准对齐量与vec4的相同。
+结构体				等于所有元素根据规则计算后的大小，但会填充到vec4大小的倍数。
+
+举例
+
+layout (std140) uniform ExampleBlock
+{
+                     // 基准对齐量       // 对齐偏移量
+    float value;     // 4               // 0 
+    vec3 vector;     // 16              // 16  (必须是16的倍数，所以 4->16)
+    mat4 matrix;     // 16              // 32  (列 0)
+                     // 16              // 48  (列 1)
+                     // 16              // 64  (列 2)
+                     // 16              // 80  (列 3)
+    float values[3]; // 16              // 96  (values[0])
+                     // 16              // 112 (values[1])
+                     // 16              // 128 (values[2])
+    bool boolean;    // 4               // 144
+    int integer;     // 4               // 148
+}; 
+
+---------------------------------------------使用Uniform缓冲---------------------------------------------
+[1]、创建一个Uniform缓冲对象
+unsigned int uboExampleBlock;
+glGenBuffers(1, &uboExampleBlock);
+glBindBuffer(GL_UNIFORM_BUFFER, uboExampleBlock);
+glBufferData(GL_UNIFORM_BUFFER, 152, NULL, GL_STATIC_DRAW); // 分配152字节的内存
+glBindBuffer(GL_UNIFORM_BUFFER, 0);
+//我们需要调用glGenBuffers，创建一个Uniform缓冲对象,将它绑定到GL_UNIFORM_BUFFER目标，并调用glBufferData，分配足够的内存
+//现在，每当我们需要对缓冲更新或者插入数据，我们都会绑定到uboExampleBlock，并使用glBufferSubData来更新它的内存。
+
+[2]、确定Uniform块:
+unsigned int lights_index = glGetUniformBlockIndex(shaderA.ID, "Lights");   
+glUniformBlockBinding(shaderA.ID, lights_index, 2);
+//通过glUniformBlockBinding函数将Uniform缓冲链接至它
+
+glUniformBlockBinding(shaderA.ID, lights_index, 2);
+//参数1:
+一个程序对象
+
+//参数2:
+Uniform块索引(着色器中已定义Uniform块的位置值索引),可以通过glGetUniformBlockIndex(shaderA.ID, "Lights")[接受一个程序对象和Uniform块的名称]获取
+
+//参数3:
+//链接到的绑定点
+
+注意我们需要对每个着色器重复这一步骤。
+
+[3]、绑定Uniform缓冲对象到相同的绑定点上
+glBindBufferBase(GL_UNIFORM_BUFFER, 2, uboExampleBlock); 
+//需要一个目标，一个绑定点索引和一个Uniform缓冲对象作为它的参数。
+//这个函数将uboExampleBlock链接到绑定点2上，自此，绑定点的两端都链接上了。
+
+// 或
+glBindBufferRange(GL_UNIFORM_BUFFER, 2, uboExampleBlock, 0, 152);
+//一个附加的偏移量和大小参数，这样子你可以绑定Uniform缓冲的特定一部分到绑定点中。
+
+[4]、向Uniform缓冲中添加数据了
+glBindBuffer(GL_UNIFORM_BUFFER, uboExampleBlock);
+int b = true; // GLSL中的bool是4字节的，所以我们将它存为一个integer
+glBufferSubData(GL_UNIFORM_BUFFER, 144, 4, &b); 
+glBindBuffer(GL_UNIFORM_BUFFER, 0);

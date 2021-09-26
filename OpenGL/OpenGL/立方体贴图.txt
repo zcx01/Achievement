@@ -1,0 +1,57 @@
+﻿立方体贴图
+将多个纹理组合起来映射到一张纹理上的一种纹理类型
+特性:它可以通过一个方向向量来进行索引/采样。
+
+unsigned int textureID;
+glGenTextures(1, &textureID);
+//创建立方体贴图
+
+glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+//这次要绑定到GL_TEXTURE_CUBE_MAP
+
+
+//为当前绑定的立方体贴图中的每个面生成一个纹理
+for(int i =0; i <fileNames.size();i++)
+{
+    QImage  image(fileNames.at(i));
+    image = image.convertToFormat(QImage::Format_ARGB32);
+    //-------------------------------------生成图片纹理------------------------
+    //参数1:纹理目标
+    //GL_TEXTURE_CUBE_MAP_POSITIVE_X	右
+    //GL_TEXTURE_CUBE_MAP_NEGATIVE_X	左
+    //GL_TEXTURE_CUBE_MAP_POSITIVE_Y	上
+    //GL_TEXTURE_CUBE_MAP_NEGATIVE_Y	下
+    //GL_TEXTURE_CUBE_MAP_POSITIVE_Z	后
+    //GL_TEXTURE_CUBE_MAP_NEGATIVE_Z	前
+    //参数2:纹理指定多级渐远纹理的级别 0 (基本基本)
+    //参数3:纹理存储格式
+    //参数4:纹理的宽度
+    //参数5:纹理的高度
+    //参数6:总是设置0
+    //参数7:源图的格式  GL_BGRA(要判断大小端，此电脑是little-endian 系统)
+    //参数8:数据类型
+    //参数9:真正的图形数据
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, GL_BGRA, image.width(), image.height(), 0,
+                 GL_BGRA, GL_UNSIGNED_BYTE, image.bits());
+}
+
+
+//设定它的环绕和过滤方式
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+//天空盒是以玩家为中心的，这样不论玩家移动了多远，天空盒都不会变近，让玩家产生周围环境非常大的印象。
+//移除任何的位移，但保留旋转变换，让玩家仍然能够环顾场景。
+//通过取4x4矩阵左上角的3x3矩阵来移除变换矩阵的位移部分。我们可以将观察矩阵转换为3x3矩阵（移除位移），再将其转换回4x4矩阵，来达到类似的效果。
+
+---------------------------------------------优化---------------------------------------------
+可以将输出位置的z分量等于它的w分量，让z分量永远等于1.0，这样子的话，当透视除法执行之后，z分量会变为w / w = 1.0。
+gl_Position = pos.xyww;
+
+最终的标准化设备坐标将永远会有一个等于1.0的z值：最大的深度值。结果就是天空盒只会在没有可见物体的地方渲染了（只有这样才能通过深度测试，其它所有的东西都在天空盒前面）。
+
+我们还要改变一下深度函数，将它从默认的GL_LESS改为GL_LEQUAL
+glDepthFunc(GL_LEQUAL);

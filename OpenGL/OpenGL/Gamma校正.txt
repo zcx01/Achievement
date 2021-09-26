@@ -1,0 +1,36 @@
+﻿Gamma（灰度系数）校正
+
+CRT:是阴极射线管显示器
+监视器Gamma：输入电压产生约为输入电压的2.2次幂的亮度。
+1、等于1是一种理想的线性状态。
+2、CRT亮度是是电压的2.2次幂而人眼相当于2次幂，因此CRT这个缺陷正好能满足人的需要。
+
+Gamma校正(Gamma Correction)的思路是在最终的颜色输出上应用监视器Gamma的倒数。
+Gamma校正后的暗红色就会成为(0.5,0.0,0.0)1/2.2=(0.5,0.0,0.0)0.45=(0.73,0.0,0.0)。校正后的颜色接着被发送给监视器，最终显示出来的颜色是(0.73,0.0,0.0)2.2=(0.5,0.0,0.0)。
+但是光照都是基于线性Gamma，即Gamma1。
+
+//应用gamma校正的方式1:每次像素着色器运行后续帧缓冲，OpenGL将自动执行gamma校正
+glEnable(GL_FRAMEBUFFER_SRGB);
+
+//应用gamma校正的方式2:在每个相关像素着色器运行的最后应用gamma校正。
+void main()
+{
+    // do super fancy lighting 
+    [...]
+    // apply gamma correction
+    float gamma = 2.2;
+    fragColor.rgb = pow(fragColor.rgb, vec3(1.0/gamma));
+}
+
+//应用gamma校正的方式3:一个更简单的方案是在你的渲染循环中引入后处理阶段，在后处理四边形上应用gamma校正，这样你只要做一次就好了。
+
+-------------------------------------------sRGB纹理-------------------------------------------
+原因:纹理工作者把图片进行了gamma校正，由于我们在渲染中又进行了一次gamma校正，图片就实在太亮了。
+
+//使用GL_SRGB和GL_SRGB_ALPHA内部纹理格式。OpenGL将自动把颜色校正到线性空间中，这样我们所使用的所有颜色值都是在线性空间中的了。
+//alpha元素，必究必须将纹理的内部格式指定为GL_SRGB_ALPHA。
+glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+注*:不是所有纹理都是在sRGB空间
+
+---------------------衰减---------------------
+使用gamma校正后由float attenuation = 1.0 / (distance * distance);变成float attenuation = 1.0 / distance;

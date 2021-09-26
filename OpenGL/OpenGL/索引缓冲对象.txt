@@ -1,0 +1,6 @@
+索引缓冲对象
+专门存储索引，OPenGL调用这些顶点的索引来决定该绘制那个顶点
+
+//创建索引缓冲对象
+GLuint EBO;
+glGenBuffers(1, &EBO);

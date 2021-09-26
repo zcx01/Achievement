@@ -1,0 +1,68 @@
+﻿几何着色器
+
+输入:
+图元的一组顶点
+
+输出:
+对这组顶点进行随意变换，再给下一个着色器。
+生成顶点可以比原来的顶点更多
+
+例子:
+#version 330 core
+
+layout (points) in;
+//声明从顶点着色器输入的图元类型
+//这需要在in关键字前声明一个布局修饰符(Layout Qualifier)
+
+//Qualifier值有以下选择
+//points：绘制GL_POINTS图元时（1）。
+//lines：绘制GL_LINES或GL_LINE_STRIP时（2）
+//lines_adjacency：GL_LINES_ADJACENCY或GL_LINE_STRIP_ADJACENCY（4）
+//triangles：GL_TRIANGLES、GL_TRIANGLE_STRIP或GL_TRIANGLE_FAN（3）
+//triangles_adjacency：GL_TRIANGLES_ADJACENCY或GL_TRIANGLE_STRIP_ADJACENCY（6）
+//这个值和glDrawArrays函数的参数有关，顶点绘制为GL_TRIANGLES，修饰符设置为triangles
+//括号内的数字表示的是一个图元所包含的最小顶点数
+
+layout (line_strip, max_vertices = 2) out;
+//第一个参数
+//指定几何着色器输出的图元类型
+//需要在out关键字前面加一个布局修饰符
+
+//Qualifier值有以下选择
+//points
+//line_strip
+//triangle_strip  
+
+//第二个参数
+//max_vertices
+//最大输出的顶点个数
+
+void main() {    
+	//gl_in[]前一个着色器的输出、内部是一个接口块。
+	//内部的构造
+	//in gl_Vertext
+	//{
+	//	vec4  gl_Position;
+	//	float gl_PointSize;
+	//	float gl_ClipDistance[];
+	// }gl_in[];
+    gl_Position = gl_in[0].gl_Position + vec4(-0.1, 0.0, 0.0, 0.0); 
+	
+	//gl_Position中的向量会被添加到图元中来,一个或多个EmitVertex调用之后重复调用EndPrimitive能够生成多个图元
+    EmitVertex();
+
+    gl_Position = gl_in[0].gl_Position + vec4( 0.1, 0.0, 0.0, 0.0);
+    EmitVertex();
+
+	//所有发射出的(Emitted)顶点都会合成为指定的输出渲染图元
+    EndPrimitive();
+	
+	//发射了两个顶点，它们从原始顶点位置平移了一段距离，之后调用了EndPrimitive，将这两个顶点合成为一个包含两个顶点的线条。
+}
+
+调用glDrawArrays(GL_POINTS, 0, 4);函数生成的
+
+
+//-----------------------使用几何着色器
+生成源码和顶点着色器唯一不同的是使用GL_GEOMETRY_SHADER枚举
+

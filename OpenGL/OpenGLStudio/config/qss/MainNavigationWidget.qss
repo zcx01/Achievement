@@ -1,0 +1,11 @@
+
+/******************************QTreeView******************************/
+QTreeView {
+     alternate-background-color: yellow;
+ }
+
+QTreeView::item
+{
+    min-height:30px;
+    font: 20px "微软雅黑"  rgb(0,0,0);
+}

@@ -1,0 +1,82 @@
+﻿混合
+混合(Blending)通常是实现物体透明度(Transparency)的一种技术。
+
+-----------------------------------------使用alpha通道-----------------------------------------
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+片段着色器中获取了纹理的全部4个颜色分量，而不仅仅是RGB分量
+vec4 texColor = texture(texture1, TexCoords);
+if(texColor.a < 0.1)
+	discard;//丢弃这个片段
+FragColor = texColor;
+
+注意，当采样纹理的边缘的时候，OpenGL会对边缘的值和纹理下一个重复的值进行插值（因为我们将它的环绕方式设置为了GL_REPEAT。这通常是没问题的，但是由于我们使用了透明值，纹理图像的顶部将会与底部边缘的纯色值进行插值。这样的结果是一个半透明的有色边框，你可能会看见它环绕着你的纹理四边形。
+要想避免这个，每当你alpha纹理的时候，请将纹理的环绕方式设置为GL_CLAMP_TO_EDGE：
+glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+-----------------------------------------混合-----------------------------------------
+如:玻璃上颜色和物体的颜色的混合
+glEnable(GL_BLEND);
+//启用了混合
+
+Cr=Cs*Fs+Cd*Fd
+//Cr:源颜色向量。这是源自纹理的颜色向量。
+//Cs:目标颜色向量。这是当前储存在颜色缓冲中的颜色向量。
+//Fs:源因子值。指定了alpha值对源颜色的影响。
+//Fd:目标因子值。指定了alpha值对目标颜色的影响。
+
+glBlendFunc(GLenum sfactor, GLenum dfactor)
+//设置源和目标因子
+参数1、2:
+GL_ZERO						因子等于0
+GL_ONE						因子等于1
+GL_SRC_COLOR				因子等于源颜色向量Cs
+GL_ONE_MINUS_SRC_COLOR		因子等于1−Cs
+GL_DST_COLOR				因子等于目标颜色向量Cd
+GL_ONE_MINUS_DST_COLOR		因子等于1−Cd
+GL_SRC_ALPHA				因子等于Cs的alpha分量
+GL_ONE_MINUS_SRC_ALPHA		因子等于1− Cs的alpha分量
+GL_DST_ALPHA				因子等于Cd的alpha分量
+GL_ONE_MINUS_DST_ALPHA		因子等于1− Cd的alpha分量
+GL_CONSTANT_COLOR			因子等于常数颜色向量Cc
+GL_ONE_MINUS_CONSTANT_COLOR	因子等于1−Cc
+GL_CONSTANT_ALPHA			因子等于Cc的alpha分量
+GL_ONE_MINUS_CONSTANT_ALPHA	因子等于1− Cc的alpha分量
+
+//Cc可以通过glBlendColor函数来另外设置
+
+
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//设置为之前两个方形的混合结果
+
+//也可以使用glBlendFuncSeparate为RGB和alpha通道分别设置不同的选项
+glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+
+glBlendEquation(GLenum mode)
+//允许我们改变方程中源和目标部分的运算符
+GL_FUNC_ADD					默认选项，将两个分量相加：	Cr=Cs*Fs+Cd*Fd(默认)
+GL_FUNC_SUBTRACT			将两个分量相减： 			Cr=Cs*Fs-Cd*Fd
+GL_FUNC_REVERSE_SUBTRACT	将两个分量相减，但顺序相反：Cr=Cd*Fd-Cs*Fs
+
+-----------------------------------------渲染半透明纹理------------------------------------
+glEnable(GL_BLEND);
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+?解决最前面窗户的透明部分遮蔽了背后的窗户
+一般的解决方法:
+1.先绘制所有不透明的物体。
+2.对所有透明的物体排序。
+3.按顺序绘制所有透明的物体。
+  排序透明物体的一种方法是:通过摄像机位置向量和物体的位置向量之间的距离进行排序(从远到近)
+  
+//vegetations是存储的窗户的偏移量
+QMap<float,QVector3D> tempV3;
+for(int i=0; i< vegetations.size();i++)
+{
+    tempV3.insert(camera->GetPosition().distanceToPoint(vegetations.at(i)),vegetations.at(i));
+}
+vegetations = tempV3.values();
+std::reverse(vegetations.begin(),vegetations.end());
+
+更高级的技术还有次序无关透明度

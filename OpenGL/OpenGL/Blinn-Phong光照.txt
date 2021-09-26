@@ -1,0 +1,25 @@
+﻿Blinn-Phong光照
+使用半程分量代替镜面反射，使之没有断层，让光照更加真实。
+
+
+void main()
+{    
+	//镜面反射
+	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
+	
+	float spec = 0.0;
+	if(blinn)
+	{
+		//Blinn-Phong 半程向量（即光源向量 + 视角向量）
+		vec3 halfwayDir = normalize(lightDir + viewDir);
+		spec = pow(max(dot(normal,halfwayDir),0.0),32.0);
+	}
+	else
+	{
+		vec3 reflectDir = reflect(-lightDir,normal);
+		spec = pow(max(dot(viewDir,reflectDir),0.0),8.0);
+	}
+	//设置反光强度为0.3
+	vec3 specular = vec3(0.3) * spec;
+	
+}

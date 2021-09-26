@@ -1,0 +1,59 @@
+﻿模板测试
+
+一个模板缓冲中，（通常）每个模板值(StencilValue)是8位的。所以每个像素/片段一共能有256种不同的模板值。
+我们可以将这些模板值设置为我们想要的值，然后当某一个片段有某一个模板值的时候，我们就可以选择丢弃或是保留这个片段了。
+
+大体的步骤如下
+1.启用模板缓冲的写入。
+2.渲染物体，更新模板缓冲的内容。
+3.禁用模板缓冲的写入。
+4.渲染（其它）物体，这次根据模板缓冲的内容丢弃特定的片段
+
+glEnable(GL_STENCIL_TEST);
+//启用模板测试
+
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+//GL_STENCIL_BUFFER_BIT  清除模板缓冲
+
+glStencilMask
+//设置一个位掩码(Bitmask)，它会与将要写入缓冲的模板值进行与(AND)运算。
+//默认下设置的位掩码所有位都为1，不影响输出，但如果我们将它设置为0x00，写入缓冲的所有模板值最后都会变成0.这与深度测试中的glDepthMask(GL_FALSE)是等价的。
+//大部分情况下你都只会使用0x00或者0xFF作为模板掩码(Stencil Mask)
+
+glStencilFunc(GLenum func, GLint ref, GLuint mask)
+//描述了OpenGL应该对模板缓冲内容做什么
+func 	已储存的模板值上和glStencilFunc函数的ref值进行比较。
+		可用的选项有:GL_NEVER、GL_LESS、GL_LEQUAL、GL_GREATER、GL_GEQUAL、GL_EQUAL、GL_NOTEQUAL和GL_ALWAYS。它们的语义和深度缓冲的函数类似。	
+ref		设置了模板测试的参考值(Reference Value)。模板缓冲的内容将会与这个值进行比较。
+mask	设置一个掩码，它将会与参考值和储存的模板值在测试比较它们之前进行与(AND)运算。初始情况下所有位都为1。
+
+如:
+glStencilFunc(GL_EQUAL, 1, 0xFF);
+//只要一个片段的模板值等于(GL_EQUAL)参考值1，片段将会通过测试并被绘制，否则会被丢弃
+
+glStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass)
+//描述了OpenGL应该如何更新缓冲
+sfail：	模板测试失败时采取的行为。
+dpfail：模板测试通过，但深度测试失败时采取的行为。
+dppass：模板测试和深度测试都通过时采取的行为。
+
+行为选项:
+GL_KEEP			保持当前储存的模板值(默认)
+GL_ZERO			将模板值设置为0
+GL_REPLACE		将模板值设置为glStencilFunc函数设置的ref值
+GL_INCR			如果模板值小于最大值则将模板值加1
+GL_INCR_WRAP	与GL_INCR一样，但如果模板值超过了最大值则归零
+GL_DECR			如果模板值大于最小值则将模板值减1
+GL_DECR_WRAP	与GL_DECR一样，但如果模板值小于0则将其设置为最大值
+GL_INVERT		按位翻转当前的模板缓冲值
+
+-----------------------------------------物体轮廓-----------------------------------------
+作用:在物体的周围创建一个很小的有色边框
+步骤:
+1.在绘制（需要添加轮廓的）物体之前，将模板函数设置为GL_ALWAYS，每当物体的片段被渲染时，将模板缓冲更新为1。
+2.渲染物体。
+3.禁用模板写入以及深度测试。
+4.将每个物体缩放一点点。
+5.使用一个不同的片段着色器，输出一个单独的（边框）颜色。
+6.再次绘制物体，但只在它们片段的模板值不等于1时才绘制。
+7.再次启用模板写入和深度测试。

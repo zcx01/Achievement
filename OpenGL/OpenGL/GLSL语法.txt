@@ -1,0 +1,114 @@
+GLSL
+着色器语法
+
+
+构成:
+版本声明
+输入变量
+输出变量
+uniform
+main函数
+
+如:
+#version version_number
+int type in_variable_name;
+int type in_variable_name;
+
+out type out_variable_name;
+
+uniform tyoe uniform_name;
+
+int mian()
+{
+	//处理图形
+	
+	//输出变量
+	out_variable_name = weird_stuff_we_processed
+}
+
+输入变量:
+也叫顶点属性，有上限，由硬件决定，至少有16个包含4分量的顶点属性可用
+
+查询上限:
+GLint nrAttributes;
+glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+
+基础数据类型:
+int、float、double、uint、bool
+两种容器类型:
+Vector(向量)、Matrix(矩阵)
+
+----------------------------------------------向量---------------------------------------
+向量是一个可以包含1、2、3、或者4个分量的容器，分量的类型可以是前面默认类型基础类型的任意一个。主要要下面形式:
+类型			含义
+vecn			包含n个float分量的默认向量
+bvecn			包含n个bool分量的默认向量
+ivecn			包含n个int分量的默认向量
+uvecn			包含n个unsigned int分量的默认向量
+dvecn			包含n个double分量的默认向量
+
+一个向量的分量可以通过vec.x获取，分别使用.x、.y、.z和.w来获取它们的第1、2、3、4个分量
+允许你对颜色使用rgba，或是对纹理坐标使用stpq访问相同的分量
+
+重组:允许一些有趣而灵活的分量选择方式
+如:
+vec2 someVec;
+vec4 differentVec = someVec.xyxx;
+
+----------------------------------------------顶点着色器----------------------------------------------
+使用location这一元数据指定输入变量，还需要提供一个额外的layout标识，这样才能把它链接到顶点
+layout (location = 0)
+如果不设置，也可以使用glGetAttribLocation()查询属性位置值
+如:
+#version 300 core
+layout (location = 0) in vec3 position;	//定义position变量的属性位置值为0
+
+out vec4 vertexColor;	//为片段着色器指定一个颜色输出
+
+void main()
+{
+	gl_Position = vec4(position,1.0);		// 注意我们如何把一个vec3作为vec4的构造器的参数
+	vertexColor = vec4(0.5f,0.0f,0.0f,1.0); // 把输出变量设置为暗红色
+}
+
+----------------------------------------------片段着色器----------------------------------------------
+需要一个vec4颜色输出变量。
+如:
+#version 330 color
+
+in vec4 vertexColor;// 从顶点着色器传来的输入变量（名称相同、类型相同）
+out vec4 color;		// 片段着色器输出的变量名可以任意命名，类型必须是vec4
+void mian()
+{
+	color = vertexColor
+}
+
+----------------------------------------------Uniform----------------------------------------------
+uniform是一种从CPU中的应用想GPU的着色器发送数据的方式。
+特性:
+1.uniform是全局的，必须在每一着色器程序对象中都是独一无二的。可以被着色器程序在任意阶段访问
+2.uniform会一直保存它们的数据，直到他们被重置或更新
+如:
+#version 330 color
+
+uniform vec4 ourColor;	// 在OpenGL程序代码中设定这个变量
+out vec4 color;			// 片段着色器输出的变量名可以任意命名，类型必须是vec4
+void mian()
+{
+	color = ourColor
+}
+
+注:如果你声明了一个uniform却在GLSL代码中没用过，编译器会静默移除这个变量，导致最后编译出的版本中并不会包含它，这可能导致几个非常麻烦的错误，记住这点！
+
+给uniform传值
+GLfloat greenValue = 0.5f;
+GLint vertexColorLocation = glGetUniformLocation(shaderProgram,"ourColor");//	查询uniform ourColor的位置值
+glUseProgram(shaderProgram);//激活着色器程序
+glUniform4f(vertexColorLocation,0.0f,greenValue,0.0f,1.0f);//设置uniform值,也可以使用fv版本
+
+glUniform给uniform设置根据后缀类型设置uniform类型
+f 	函数需要一个float作为它的值
+i 	函数需要一个int作为它的值
+ui	函数需要一个unsigned int作为它的值
+3f 	函数需要3个float作为它的值
+fv	函数需要一个float向量/数组作为它的值
