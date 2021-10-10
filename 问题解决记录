@@ -95,3 +95,24 @@ exit
 
 7)传到本地
 adb pull /sdcard/ic_service.core ./
+
+16.把liunx上的代码在win上编译(win上配置C++环境)
+1)大概就是安装mingw，cmake，VS code，然后安装VS code中的插件
+
+2)把.vscode文件夹删除，再把cmake生成的文件删除，不然不会自动生成build
+
+3)用vsode打开，自动生成build文件
+
+4)打开终端（可以是powershell，也可以是vscode中的终端），进入到build中，使用
+cmake -G "MinGW Makefiles" ..
+
+5)配置cmake kit
+在vscode命令行中输入Cmake: Select a Kit
+在下拉框中选择其中的一个kit
+
+6)执行mingw32-make
+
+//环境配置
+https://www.cnblogs.com/bpf-1024/p/11597000.html
+//执行命令
+https://blog.csdn.net/qq_42973562/article/details/101986353
