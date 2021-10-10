@@ -8,25 +8,25 @@ class DataType(Enum):
     VFLOAT=2
 
 class Analyze(object):
-    def __init__(self,dbc_files=None) :
-        if len(dbc_files) ==0:
+    def __init__(self,dbc_file=None) :
+        if len(dbc_file) ==0:
             return
         self.sigForMessage={}
         self.dataType={}
-        for dbc_file in dbc_files:
-            with open(dbc_file,"r") as f:
-                linelist=f.readlines()
-                message=""
-                for text in linelist:
-                    text=text.strip()
-                    if len(text) == 0:
-                        continue
-                    if text.startswith("BO_") :
-                        message= self.analyline(text)
-                    elif text.startswith("SG_"):
-                        sigNams=self.analyline(text)
-                        self.sigForMessage[sigNams] = message
-                        self.dataType[sigNams]=self.analyDataType(text)                
+        
+        with open(dbc_file,"r") as f:
+            linelist=f.readlines()
+            message=""
+            for text in linelist:
+                text=text.strip()
+                if len(text) == 0:
+                    continue
+                if text.startswith("BO_") :
+                    message= self.analyline(text)
+                elif text.startswith("SG_"):
+                    sigNams=self.analyline(text)
+                    self.sigForMessage[sigNams] = message
+                    self.dataType[sigNams]=self.analyDataType(text)                
 
     def getMessageBySig(self,sig):
         return self.sigForMessage.get(sig,"")

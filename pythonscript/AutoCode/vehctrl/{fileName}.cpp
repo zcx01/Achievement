@@ -1,6 +1,7 @@
 #include "{fileName}.hpp"
-#include "structs/vehctrl_info.h"
+#include "structs/payload_info.h"
 #include "fds_common_codes.hpp"
+#include "topic/ipc_topic_new_def.h"
 
 namespace vehctrl
 {

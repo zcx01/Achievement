@@ -1,0 +1,68 @@
+{
+    "common": {
+        "space": 8,
+        "configjsonPath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/ictelltale_config.json",
+        "commit": "如果信号在同一个位置用,分割",
+        "imageWith":48
+    },
+    "position": [
+        [
+            {
+                "x": 72,
+                "y": 24
+            },
+            "Ready",
+            "MotorFault",
+            "PowerBatteryFault,PowerBatteryLowYellow,FuelCellSystemFailure_yellow",
+            "LVBatteryFault",
+            "BrakeSystemFault",
+            "PowerSystemFault",
+            "ChargeState,HydrogenLeakage_yellow",
+            "ChargeConnect",
+            "RearFogLamp",
+            "PositionLamp",
+            "TurnLeft"
+        ],
+        [
+            {
+                "x": 1232,
+                "y": 24
+            },
+            "TurnRight",
+            "LowBeam",
+            "HighBeam",
+            "AutoHighBeam",
+            "FatigueDrivingLamp,FatigueDetectionOff",
+            "TPMS",
+            "LimitPower",
+            "ParkingBrakeFault",
+            "ABS",
+            "AirBagFault",
+            "EPS"
+        ],
+        [
+            {
+                "x": 296,
+                "y": 80
+            },
+            "EngineOil",
+            "EngineFault",
+            "SteeringWheelHead_yellow",
+            "DischargeActive",
+            "PowerBatteryHeating",
+            "RearSeatBelt",
+            "DriverSeatBelt"
+        ],
+        [
+            {
+                "x": 1232,
+                "y": 80
+            },
+            "ParkingBrakeActive",
+            "AutoHold",
+            "ESCOFF",
+            "ESCFault,ESCActive",
+            "WaterTempWarn,HighStackTemperature"
+        ]
+    ]
+}

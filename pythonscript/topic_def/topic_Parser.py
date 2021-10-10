@@ -3,6 +3,7 @@ import json
 import sys
 import os
 import xlrd
+import subprocess
 from Analyzedbc import Analyze, DataType
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 sys.path.append(pyFileDir+"..")
@@ -36,10 +37,13 @@ def WriteType(jsConfig,msg):
         if len(type) != 0:
             return type
         else:
-            print(f'请输入{msg}类型')
-            type=input()
+            print(f'请输入{msg}类型、前缀(用空格分开):')
+            temp=input()
+            temps=temp.split(" ")
+            type=temps[0]
+            suffx=temps[1]
             if len(type) != 0:
-                jsConfig[msg]={"filePath":"","type":type,"suffx":""}
+                jsConfig[msg]={"filePath":"","type":type,"suffx":suffx}
                 writeJs(pyFileDir+"config.json",jsConfig)
 
 def addEscape(s):
@@ -84,30 +88,61 @@ def getFullPath(path,jsConfig):
 def getKeyPath(key,jsConfig):
     return getFullPath(jsConfig.get(key,""),jsConfig)
 
-def getTopic(jsConfig,desc,sig):
+def getTopic_P(jsContents,desc):
+    level=""
+    for jsGeneral in jsContents:
+        Comments=jsGeneral["Comments"]
+        if len(Comments)==0: continue
+        lev=jsGeneral["Topic Level 1"]
+        if len(lev) != 0: level=lev
+        if Comments.find(desc)!=-1 or desc.find(Comments)!=-1:
+            levelCount=2
+            while(1):
+                levelStr="Topic Level "+str(levelCount)
+                if len(jsGeneral.get(levelStr,"")) ==0:
+                    return level
+                else:
+                    level=level+jsGeneral[levelStr]
+                levelCount+=1
+    return level
+
+def getTopic(jsConfig,desc,sig,suffx):
+    topic=""
     try:
-        jsGenerals=getJScontent(jsConfig["general_topics_define"])
-        level=""
-        for jsGeneral in jsGenerals:
-            Comments=jsGeneral["Comments"]
-            lev=jsGeneral["Topic Level 1"]
-            if len(lev) != 0: level=lev
-            if Comments.find(desc) or desc.find(Comments):
-                return level+jsGeneral["Topic Level 2"]
+        jsGenerals=getJScontent(getKeyPath("topics_define",jsConfig))
+        topic=getTopic_P(jsGenerals,desc)
+        if len(topic) !=0:
+            return topic
     except:
         pass
-    jsCustoms=getJScontent(jsConfig["custom_topics_define"])
+    print(f"没有找到{desc},请输入topic?")
+    topic=input()
+    if len(topic) != 0:
+        return topic
+    print(f"输入的{desc}为空,是否生成自定义topic(y/n)?")
+    cmd=input()
+    if "n" in cmd:
+        return
+    custom_topics_definePath=getKeyPath("topics_define",jsConfig)
+    jsCustoms=getJScontent(custom_topics_definePath)
+    topic=getTopic_P(jsCustoms,desc)
+    if len(topic) !=0:
+        return topic
     jsCustom={}
-    jsCustom["Topic Level 1"]=""
+    jsCustom["Topic Level 1"]=suffx
     jsCustom["Topic Level 2"]=sig
     jsCustom["HasSet"]=""
     jsCustom["Comments"]=desc
     jsCustoms.append(jsCustom)
-    return sig
+    writeJs(custom_topics_definePath,jsCustoms)
+    ex = subprocess.Popen("bash "+getKeyPath("generate_topic",jsConfig),stdout=subprocess.PIPE,shell=True)
+    ex.communicate()
+    ex.wait()
+    return suffx+sig
 
 def getDefine(jsConfig,topic):
     definefile=getKeyPath("definefile",jsConfig)
-    texts=readFileLine(definefile)
+    texts=readFileLines(definefile)
     for text in texts:
         if text.find(topic) != -1:
             return splitSpaceGetValueByIndex(text,1)
@@ -121,31 +156,34 @@ def dealnewSig():
     newSigFile=open(getKeyPath("newSig",jsConfig),"r")
     content=newSigFile.read().splitlines()
     newSigFile.close()
+    alreadyText=[]
     for text in content:
-        if text.strip().startswith("#") or len(text) == 0:
+        if text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n"):
             continue
         text=text.replace("\t"," ")
         names=text.split(" ")
         sig=getValueByIndex(names,0)
+        sigType = getValueByIndex(names, 1)
 
         #通过 CAN matrix 表格获取中文描述
-        if len(names) < 2 or len(names[1]) == 0 or names[1] == "d":
+        if len(names) < 2 or len(names[2]) == 0 or names[1] == "d":
             desc=getSignalDescInexcel(sig,getKeyPath("canmatrix",jsConfig))
         else:
-            desc=getValueByIndex(names,1)
+            desc=getValueByIndex(names,2)
 
-        className=getValueByIndex(names,2,"x")
+        className=getValueByIndex(names,3,"x")
 
-        messagesuffix=getValueByIndex(names,3)
-        if len(message) == 0:
-            messagesuffix="."+messagesuffix
+        # messagesuffix=getValueByIndex(names,3)
+        # if len(messagesuffix) != 0:
+        #     messagesuffix="."+messagesuffix
+
+        topic=getValueByIndex(names,4)
 
         message=analy.getMessageBySig(sig)
         if len(message)==0:
             print(f'{sig}对应的message不存在')
             continue
 
-        topic=getTopic(jsConfig,desc,sig)
         messagesig=message+"__"+sig
         #写入 can_parse_whitelist 文件
         can_parse_whitelistPath=getKeyPath("can_parse_whitelist",jsConfig)
@@ -157,10 +195,13 @@ def dealnewSig():
             can_parse_whitelist.write(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
             can_parse_whitelist.close()
 
+        # sigType = WriteType(jsConfig, message+messagesuffix)
+        # suffx=jsConfig.get(message+messagesuffix,{}).get("suffx","")
+        if len(topic)==0 or topic == "x":
+            topic = getTopic(jsConfig, desc, sig, "")
         define = getDefine(jsConfig,topic)
 
         #写入 cpp 文件 #创建 .h .cpp 文件
-        sigType=WriteType(jsConfig,message+messagesuffix)
         dataType=analy.getSigDataType(sig)
         dataTypeStr="int"
         if dataType == DataType.VFLOAT:
@@ -178,8 +219,28 @@ def dealnewSig():
             desc=addEscape(desc)
             print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
             os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
+        alreadyText.append(text)
     os.system("Parser")
 
+def xlsToTxt():
+    jsConfig=getJScontent(pyFileDir+"config.json")
+    book=xlrd.open_workbook(getKeyPath("xlsNewSigPath",jsConfig))
+    sheel=book.sheet_by_index(0)
+    rowDatas=[]
+    newSigFile = open(getKeyPath("newSig", jsConfig), "r")
+    oldRowDatas=newSigFile.read().splitlines()
+    for oldRowData in oldRowDatas:
+        if oldRowData.strip().startswith("#"):
+            rowDatas.append(oldRowData)
+
+    for row in range(sheel.nrows):
+        if row == 0 :
+            continue
+        rowDatas.append(" ".join(sheel.row_values(row)))
+    wirteFileDicts(getKeyPath("newSig", jsConfig),rowDatas)
+
 if __name__ == "__main__":
+    if(judgeCommad("-x","")):
+        xlsToTxt()
     dealnewSig()
 

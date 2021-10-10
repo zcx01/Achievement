@@ -1,6 +1,6 @@
-#!/usr/bin/expect
+#!/bin/bash
 
-# spawn ssh chengxiongzhu@10.25.7.196 \
+# spawn ssh chengxiongzhu@10.25.11.197 \
 # "ls\n"\
 # "cd Works\n"\
 # "ls\n"\
@@ -14,14 +14,7 @@
 # }
 # interact
 
-spawn ./delopyvm385.sh -f
-expect {
-    "*password*" {
-        send "qnxuser\r" 
-        exp_continue
-    }
-    "*qnxuser*" {
-        send "qnxuser\r" 
-        exp_continue
-    }
-}
+ssh chengxiongzhu@10.25.11.197 
+<<EOF 
+adb shell 
+EOF

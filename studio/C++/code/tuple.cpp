@@ -3,6 +3,7 @@
 #include "ObjectFactory.h"
 #include "commondefine.hpp"
 #include <iostream>
+#include <variant>
 
 auto get_student(int id)
 {
@@ -16,9 +17,35 @@ auto get_student(int id)
     return std::make_tuple(0.0,'D',"null");
 }
 
+//运行时的索引
+template <size_t n, typename ...T> 
+constexpr std::variant<T...> _tuple_index(const std::tuple<T ...> &tpl,size_t i)
+{
+    if constexpr ( n > sizeof ...(T))
+        throw std::out_of_range("out of range");
+    
+    if (i == n)
+         return std::variant<T...>{ std::in_place_index<n>, std::get<n>(tpl) };
+    
+    return _tuple_index< (n <sizeof ...(T)-1 ? n+1:0) >(tpl,i);
+}
+
+template <typename... T>
+constexpr std::variant<T...> tuple_index(const std::tuple<T...>& tpl, size_t i) {
+    return _tuple_index<0>(tpl, i);
+}
+
+template <typename T0, typename ... Ts>
+std::ostream & operator<< (std::ostream & s, std::variant<T0, Ts...> const & v) { 
+    std::visit([&](auto && x){ s << x;}, v); 
+    return s;
+}
+
 TupleTest::TupleTest(/* args */) 
 {
     auto student = get_student(0);
+
+    
     COUT("ID:0"
          << " "
          << "GPA:" << std::get<0>(student) << ","
@@ -43,6 +70,17 @@ TupleTest::TupleTest(/* args */)
          << "GPA:" << gpa_ << ","
          << "成绩:" << grade_ << ","
          << "姓名:" << name_);
+
+    std::tuple<std::string,double,double,int> t("123",4.5,6.7,8);
+    COUT(std::get<std::string>(t))
+    // COUT(std::get<double>(t)) // 非法, 引发编译期错误
+    COUT(std::get<3>(t))
+
+    int i=1;
+    COUT(tuple_index(t,i))
+    
+    int i_count = std::tuple_size<decltype(t)>::value;
+    COUT("元组的个数"<<i_count)
 }
 
 CUSTOMEGISTER(Tuple,TupleTest)

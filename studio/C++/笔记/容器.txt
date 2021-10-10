@@ -14,5 +14,5 @@ std::unordered_map/std::unordered_multimap 和 std::unordered_set/std::unordered
 
 元组 (file:///./../code/tuple.cpp)
 std::make_tuple: 构造元组
-std::get: 获得元组某个位置的值
+std::get: 获得元组某个位置的值,使用类型来获取元组中的对象(C++14)
 std::tie: 元组拆包

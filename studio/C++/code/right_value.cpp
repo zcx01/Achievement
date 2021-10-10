@@ -2,6 +2,7 @@
 #include "ObjectFactory.h"
 #include "commondefine.hpp"
 #include <iostream>
+#include <vector>
 
 std::vector<int> foo()
 {
@@ -37,6 +38,28 @@ RightValueTest::RightValueTest(/* args */)
     COUT(rv2)
 
     reference(rv2);//虽然引用了一个右值，但由于它是一个引用，所以 rv2 依然是一个左值
+
+    std::vector<int> t;
+    t.push_back(1);
+    t.push_back(2);
+
+    std::vector<int> t1;
+    t1 = std::move(t);
+    COUTI(t1);
+    COUTI(t);
+    std::string topic="dasas/dssddsd";
+    try
+    {
+       std::string topicStr = topic.substr(topic.find("/")+1);
+       COUT(topicStr)
+    }
+    catch(...)
+    {
+        
+    }
+    
+    
+
 }
 
 CUSTOMEGISTER(RightValue,RightValueTest)

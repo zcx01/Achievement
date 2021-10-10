@@ -2,7 +2,7 @@
 
 filename=`basename $1`
 echo $filename
-files=`locate $filename`
+files=`locate /$filename`
 for file in $files
 do
     echo "找到的文件 $file"

@@ -1,6 +1,6 @@
 #include "{fileName}.hpp"
 #include <iostream>
-#include "structs/telltale_info.h"
+#include "structs/payload_info.h"
 #include "structs/ipc_message.h"
 #include "ipc/megaipc_api.h"
 #include "topic/ipc_topic_def.h"
@@ -31,7 +31,7 @@ using namespace megaipc;
 }
 void {ClassName}::state_process(const SignalMsg &sig_msg)
 {
-    TB_LOG_DEBUG("{classname}");
+    TB_LOG_INFO("{classname}");
 
     int power=0;
     int leakage=0;
@@ -65,19 +65,19 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     result=normal_logic(power,leakage);
     fds::TimeOutHandle(&result,&CANSIG_{1}_g,(int)LAMP_OFF);
 
-    TB_LOG_DEBUG("{classname}: %d", result);
+    TB_LOG_INFO("{classname}: %d", result);
 
     nlohmann::json j;
 
     switch (result)
     {
     case LAMP_OFF:
-        j = TelltaleInfo{LampState::TELLTALE_OFF};
+        j = PayloadInfo{LampState::TELLTALE_OFF};
         break;
     case LAMP_ON:
-        j = TelltaleInfo{LampState::TELLTALE_ON};
+        j = PayloadInfo{LampState::TELLTALE_ON};
     case LAMP_FLASH:
-        j = TelltaleInfo{LampState::TELLTALE_ON, LampColor::DEFAULT, 1000, 0.5};
+        j = PayloadInfo{LampState::TELLTALE_ON, LampColor::DEFAULT, 1000, 0.5};
         break;
     }
 

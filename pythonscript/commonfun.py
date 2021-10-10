@@ -13,8 +13,9 @@ class EesyStr():
     @staticmethod
     def removeOne(s,r):
         temp=list(s)
+        tempr=list(r)
         try:
-            temp.remove(r)
+            temp.remove(tempr)
         except:
             print("移除失败")
         return "".join(temp)
@@ -48,9 +49,9 @@ def wirteFileDicts(file,data):
         cr.write(str(d).replace("\'","\"")+"\n")
     cr.close()
 
-def readFileLine(file):
+def readFileLines(file):
     with open(file, "r") as cr:
-        return cr.readline()
+        return cr.readlines()
 
 def getValueByIndex(names,index,defaultValue=""):
     try:

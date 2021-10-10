@@ -3,23 +3,13 @@
 
 void {ClassName}::state_process(const SignalMsg &sig_msg)
 {
-    if (sig_msg.is_timeout)
+    if (fds::judgePowerAndSigTimeOut(&CANSIG_{1}_g,std::bind(&{ClassName}::publishInvalid, this, std::placeholders::_1), {2}))
     {
-        if (sig_msg.signal_addr == &CANSIG_GW_288__BcmPwrStsFb_g)
-        {
-            TB_LOG_INFO("CANSIG_GW_288__BcmPwrStsFb_g Timeout");
-        }
-        
-        else if (sig_msg.signal_addr == &CANSIG_{1}_g)
-        {
-            TB_LOG_INFO("{ClassName} {2} Timeout");
-        }
-        publishInvalid({2});
     }
     else
     {
         union veh_signal_value raw_value;
-        if (!GetCommonSigValue(raw_value, sig_msg.signal_addr))
+        if (!GetCommonSigPhysicalValue(raw_value, sig_msg.signal_addr))
         {
             TB_LOG_ERROR("get siginal value error. return");
             return;
@@ -48,11 +38,11 @@ void {ClassName}::signalChange(float value,std::string topic)
 void {ClassName}::publishValue(float value,std::string topic)
 {
     TB_LOG_INFO("{ClassName} %s[%d]",topic, value);
-    SendDriveInfo(topic, megaipc::DrivingInfo{(float)value, 0, true});
+    SendDriveInfo(topic, PayloadInfo{value, true});
 }
 
 void {ClassName}::publishInvalid(std::string topic)
 {
     TB_LOG_INFO("{ClassName} %s 无效",topic);
-    SendDriveInfo(topic, megaipc::DrivingInfo{(float)0, 0, false});
+    SendDriveInfo(topic, PayloadInfo{0, false});
 }

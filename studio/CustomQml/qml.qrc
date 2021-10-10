@@ -2,5 +2,11 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>ArcText.qml</file>
+        <file>TrapezoidProgressBar.qml</file>
+        <file>OilElectricityInfo.qml</file>
+        <file>DrivingInformation.qml</file>
+        <file>DrivingInfoText.qml</file>
+        <file>MileageTemperatureTime.qml</file>
+        <file>IpcTopicDef.qml</file>
     </qresource>
 </RCC>

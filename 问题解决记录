@@ -48,3 +48,50 @@ sudo apt-get install cifs
 
 12.安装CANdb++
 https://blog.csdn.net/daihuibing389/article/details/84920332
+
+12.vscode 添加C++17支持
+修改  c_cpp_properties.json 中的 cppStandard 选项
+
+13.ubuntu 查看当前目录下的各文件的大小(清理垃圾)
+sudo du --max-depth=1 -h
+
+14.查看code文件-----------------------------
+把.code文件放入到ic(程序所在目录)文件下,方便查找
+1)配置环境变量
+source set_env.sh 
+
+2)进入程序所在目录
+cd prebuilts/ic/
+
+3)执行gdb ntoaarch64-gdb 二进制程序 .code
+ntoaarch64-gdb bin/ic_service ic_service.core
+
+4)设置路径搜索库的路径
+set solib-search-path lib/
+
+5)查看
+bt
+
+15.拷贝qnx上的.code-----------------------------
+1)进入qnx
+ adb shell
+ telnet cdc-qnx
+ root
+ 
+2)进入.code所在目录
+ cd /var/log/
+ 
+3)复制.code文件到dltlog
+cp ic_service.core ./dltlogs/
+
+4)退出qnx
+exit
+
+5)传到安卓上
+curl -u root:root "ftp://cdc-qnx/var/log/dltlogs/ic_service.core" -o /sdcard/ic_service.core
+
+6)推出安卓
+exit
+
+7)传到本地
+adb pull /sdcard/ic_service.core ./

@@ -10,21 +10,22 @@ def analyze(xlsPath,jsonPath):
     for row in range(sheel.nrows) :
         desc=str(sheel.cell_value(row,0))
         try:
-            sig =str(sheel.cell_value(row,1))
+            topic =str(sheel.cell_value(row,1))
             value = int(sheel.cell_value(row,2),16)
+            sig=str(sheel.cell_value(row,1))
         except:
             continue
         t_content={}
         descs=desc.split(":")
         desc=descs[0]
         grade=descs[1]
-        if len(jsContent) != 0 and sig in jsContent:
-            jsContent[sig][str(value)] = desc
+        if len(jsContent) != 0 and topic in jsContent:
+            jsContent[topic][str(value)] = desc
         else:
             t_content["grade"] =grade
             t_content[str(value)] = desc
-            jsContent[sig] = t_content
-            print(sig+" "+"d"+" "+"x"+" "+"tx")
+            jsContent[topic] = t_content
+            print(topic+" "+"d"+" "+"x"+" "+"tx")
         
     cr = open(jsonPath, "w")
     cr.write(json.dumps(jsContent,ensure_ascii=False,indent=4))

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include <list>
+#include <iostream>
 
 #define MYRESISCOPY(ClassName) ObjectFactory::registerClass<ClassName>(#ClassName);
 
