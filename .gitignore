@@ -74,3 +74,8 @@ compile_commands.json
 
 #vscode
 *build*
+
+#cmake
+CMakeFiles*
+*.cmake
+CMakeCache*

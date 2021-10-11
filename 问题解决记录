@@ -96,7 +96,7 @@ exit
 7)传到本地
 adb pull /sdcard/ic_service.core ./
 
-16.把liunx上的代码在win上编译(win上配置C++环境)
+16.把liunx上的代码在win上编译(win上配置C++环境)---------------------------------
 1)大概就是安装mingw，cmake，VS code，然后安装VS code中的插件
 
 2)把.vscode文件夹删除，再把cmake生成的文件删除，不然不会自动生成build
@@ -115,6 +115,9 @@ cmake -G "MinGW Makefiles" ..
 //环境配置
 https://www.cnblogs.com/bpf-1024/p/11597000.html
 //执行命令
+
+17.在liunx上git clone拉不下代码
+如果安装了加速就用加速下载通道
 https://blog.csdn.net/qq_42973562/article/details/101986353
 
 
