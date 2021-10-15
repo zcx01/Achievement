@@ -9,24 +9,15 @@
 # print(hex(int("111111",2)))
 
 import os
+import sys
 from commonfun import*
-def findValue(text,signal,filePath,*other):
-    texts= splitSpace(text)
-    if signal in texts:
-        out=EesyStr.removeAll(text,texts[0])
-        print(f'{out:<30}')
-        return True
-    return False
+temp=[999,9,999]
+index=0
+for t in temp:
+    if(t == 9):
+        temp.insert(index+1,"dd")
+    if(t == "dd"):
+        temp.insert(index+1,"ssss")
+    index+=1
 
-def findsignalInfile(signal,filePath):
-    try:
-        f=open(filePath,'r')
-        print(filePath)
-        content=f.readlines()
-        for text in content:
-            if(findValue(text,signal,filePath)):
-                pass
-    except:
-        pass
-
-findsignalInfile("288","/home/chengxiongzhu/下载/Converted_0828.asc")
+print(temp)

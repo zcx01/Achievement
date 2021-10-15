@@ -15,6 +15,7 @@
         {
             "content":[
                 "",
+                "    //{3}",
                 "    {fileName}= std::make_shared<{ClassName}>(shared_from_this());",
                 "    {fileName}->subscribe((struct veh_signal *)&CANSIG_{1}_g);"
             ],

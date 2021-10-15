@@ -1,10 +1,19 @@
 #pragma once
-
 #include "vehctrl_status_item.hpp"
-//{2}
-class  {ClassName} : public VehctrlStatusItem
+#include <map>
+
+
+class  DriverSeatSldfrontStatus : public VehctrlStatusItem
 {
 public:
     using VehctrlStatusItem::VehctrlStatusItem;
     void state_process(const SignalMsg &);
+    void addSignalAndTop(struct veh_signal* s,const std::string &t);
+    
+
+private:
+
+    void publish_status(const std::string &topic, float value);
+    std::string topic;
+    struct veh_signal * signal=nullptr;
 };

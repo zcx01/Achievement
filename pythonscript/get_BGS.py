@@ -34,9 +34,11 @@ def getBugInfo(bugId):
         else:
             case = ReMatchStr(comment.body)
         useCases.append(case)
+    if len(useCases) == 0:
+        return
+    pyperclip.copy(useCases[0].Out())
     displayInfo(useCases)
 
 if __name__ == "__main__":
-    if "-b" in sys.argv:
-        getBugInfo(sys.argv[2])
-    # getBugInfo("BGS-1921")
+    getBugInfo(sys.argv[1])
+    # getBugInfo("BGS-2216")

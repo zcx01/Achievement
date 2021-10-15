@@ -51,7 +51,7 @@ def wirteFileDicts(file,data):
 
 def readFileLines(file):
     with open(file, "r") as cr:
-        return cr.readlines()
+        return cr.read().splitlines()
 
 def getValueByIndex(names,index,defaultValue=""):
     try:

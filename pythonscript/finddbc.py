@@ -1,3 +1,4 @@
+#!/bin/python
 import os
 from posixpath import dirname
 import re

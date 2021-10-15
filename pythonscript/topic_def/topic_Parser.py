@@ -70,7 +70,7 @@ def findsignalInfile(signal,filePath):
 
 def getSignalDescInexcel(signal,filePath):
     book=xlrd.open_workbook(filePath)
-    sheel=book.sheet_by_index(0)
+    sheel=book.sheet_by_name("5_Matrix")
     for row in range(sheel.nrows):
         text=sheel.cell_value(row,2)
         if str(text).find(signal)!=-1:

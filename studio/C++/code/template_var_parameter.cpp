@@ -26,6 +26,12 @@ auto printf3(T value,Ts ... args){
     };
 }
 
+template<typename T0, typename... T>
+void printf2(T0 t0, T... t) {
+    std::cout << t0 << std::endl;
+    if constexpr (sizeof...(t) > 0) printf2(t...);
+}
+
 //折叠表达式
 template<typename ... Ts>
 auto sum(Ts ... args){
@@ -41,6 +47,7 @@ template <auto value> void foo()
 TemplateVarParameterTest::TemplateVarParameterTest(/* args */) 
 {
     magic("s",1,2,"s");
+    printf2("dssa","dsds","dsdghghh");
     printf3("sdddd",1,2,"seeee");
     std::cout<<sum(12,14,25,35,14,25,356,1)<<std::endl;
     foo<10>();
