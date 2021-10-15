@@ -23,14 +23,19 @@ def getValueKong(src,row,col):
     value = str(src.cell_value(row,col))
     if value == r"/" or len(value)==0:
         return "\"\""
-    return value
+    return f'\"{value}\"'
 
-def getValueInt(src,row,col):
-    value = str(float(src.cell_value(row,col)))
-    values = value.split(".")
-    if int(values[1]) != 0:
-        return float(value)
-    return int(values[0])
+def getValueInt(src,row,col,lenght=-1):
+    try:
+        value = str(float(src.cell_value(row,col)))
+        values = value.split(".")
+        if int(values[1]) != 0:
+            return float(value)
+        return int(values[0])
+    except:
+        if(lenght==-1):
+            return 0
+        return pow(2,lenght)
 
 def conversion(configPath,wirteSigName):
     print(configPath)
@@ -47,7 +52,7 @@ def conversion(configPath,wirteSigName):
             sig = SigInfo()
             sig.name = sigName
             sig.Sender = getValue(sheel,row,1)
-            sig.messageId = getValue(sheel,row,4)
+            sig.messageId = str(getValue(sheel,row,4)).split(".")[0]
             sig.cycle =  getValueInt(sheel,row,5)
             sig.startBit = getValueInt(sheel,row,6)
             sig.length = getValueInt(sheel,row,7)
@@ -55,10 +60,11 @@ def conversion(configPath,wirteSigName):
             sig.factor = getValueInt(sheel,row,8)
             sig.Offset = getValueInt(sheel,row,9)
             sig.min = getValueInt(sheel,row,10)
-            sig.max = getValueInt(sheel,row,11)
+            sig.max = getValueInt(sheel,row,11,sig.length)
             sig.Unit = getValueKong(sheel,row,13)
             sig.enum = str(getValue(sheel,row,14)).replace("\n"," ")
-            sig.initValue = int(getValue(sheel,row,15),16)  # 十进制
+            if str(getValue(sheel,row,15)) != 'nan':
+                sig.initValue = int(getValue(sheel,row,15),16)  # 十进制
             sig.invalidValue = getValue(sheel,row,17)
             sig.Recevier = getValue(sheel,row,20)
             # print(sig.getSG(),sig.initValue)
@@ -67,4 +73,8 @@ def conversion(configPath,wirteSigName):
     print("没有找到信号")
 
 if __name__ == "__main__":
-    conversion(pyFileDir+"config.json",sys.argv[1])
+    sigNames = sys.argv
+    del sigNames[0]
+    for sigName in sigNames:
+        conversion(pyFileDir+"config.json", sigName)
+    # conversion(pyFileDir+"config.json", "CdcLaneInfo")

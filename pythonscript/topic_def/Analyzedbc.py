@@ -47,6 +47,9 @@ class SigInfo(object):
                 enumMs=enumM.split(":")
                 enumStrA.append(f'{int(enumMs[0],16)} \"{enumMs[1]}\"')
             enumStr=" ".join(enumStrA)
+        
+        if len(enumStr) == 0:
+            return ""
         return f'VAL_ {self.getMId()} {self.name} {enumStr};'
 
     def getStartValue(self):
@@ -139,7 +142,7 @@ class Analyze(object):
                     self.dbcSigs[sigNams] = ds
                     self.maxSigRow = rowIndex
                     try:
-                        self.dbcMessage[message].sigMaxRow=rowIndex         
+                        self.dbcMessage[message].sigMaxRow=rowIndex+1         
                     except:
                         pass
 
@@ -173,9 +176,9 @@ class Analyze(object):
             return
         try:
             dm = self.dbcMessage.get(sig.getMessageId())
-            startRow=dm.Row
+            startRow=dm.Row+1
             insertRowIndex=-1
-            while(startRow < dm.sigMaxRow):
+            while(startRow <= dm.sigMaxRow):
                 lineSig = SigInfo.analySG(linelist[startRow])
                 if(lineSig.startBit > sig.startBit):
                     insertRowIndex = startRow
@@ -183,16 +186,20 @@ class Analyze(object):
                 startRow+=1
             if insertRowIndex == -1:
                 insertRowIndex = dm.sigMaxRow
-            
             linelist.insert(insertRowIndex,sig.getSG())
             linelistSize=len(linelist)
             for row in range(linelistSize):
                 if "GenSigStartValue" in str(linelist[linelistSize-1-row]):
                     linelist.insert(linelistSize-row,sig.getStartValue())
                     break
-            linelist.append(sig.getEnum())
+            try:
+                enumStr=sig.getEnum()
+                if len(enumStr) != 0:
+                    linelist.append(enumStr)
+            except:
+                pass
             wirteFileDicts(self.dbcPath,linelist)
-            print("写入完成")
+            print(f"{sig.name} 写入完成")
         except:
             print(f'{sig.name} 正在写入message')
             if not self.writeMessage(sig,linelist):
