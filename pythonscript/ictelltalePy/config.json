@@ -2,7 +2,7 @@
     "common": {
         "space": 8,
         "configjsonPath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/ictelltale_config.json",
-        "commit": "如果信号在同一个位置用,分割",
+        "commit": ["如果信号在同一个位置用,分割","position的名称是图片的名字，要配置位置比在configjsonPath文件存在这个配置项"],
         "imageWith":48
     },
     "position": [
@@ -62,7 +62,8 @@
             "AutoHold",
             "ESCOFF",
             "ESCFault,ESCActive",
-            "WaterTempWarn,HighStackTemperature"
+            "WaterTempWarn,HighStackTemperature",
+            "Cruise"
         ]
     ]
 }

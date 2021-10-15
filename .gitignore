@@ -74,8 +74,13 @@ compile_commands.json
 
 #vscode
 *build*
+*.vscode*
 
 #cmake
 CMakeFiles*
 *.cmake
 CMakeCache*
+
+#python
+*.pyc
+

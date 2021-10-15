@@ -48,7 +48,7 @@ class SigInfo(object):
                 enumStrA.append(f'{int(enumMs[0],16)} \"{enumMs[1]}\"')
             enumStr=" ".join(enumStrA)
         
-        if len(enumStr) == 0:
+        if len(enumStr) == 0 or "~" in enumStr:
             return ""
         return f'VAL_ {self.getMId()} {self.name} {enumStr};'
 
