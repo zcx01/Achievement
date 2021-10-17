@@ -115,6 +115,7 @@ cmake -G "MinGW Makefiles" ..
 //环境配置
 https://www.cnblogs.com/bpf-1024/p/11597000.html
 //执行命令
+https://blog.csdn.net/qq_42973562/article/details/101986353
 
 17.在liunx上git clone拉不下代码
 如果安装了加速就用加速下载通道

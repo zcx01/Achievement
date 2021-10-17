@@ -1,5 +1,6 @@
 # from typing import List
 import json
+import re
 class EesyStr():
     @staticmethod
     def removeAt(s,index):
@@ -70,3 +71,15 @@ def splitSpace(text):
 
 def splitSpaceGetValueByIndex(text,index,defaultValue=""):
     return getValueByIndex(splitSpace(text),index,defaultValue)
+
+def getWordAndNum(text):
+    e_i = r"\b[a-zA-Z0x0-9]+\b"
+    return re.findall(e_i, text, re.A)
+
+def getWord(text):
+    e_i = r"\b[a-zA-Z]+\b"
+    return re.findall(e_i, text, re.A)
+
+def getNum(text):
+    e_i = r"\b[0-9]+\b"
+    return re.findall(e_i, text, re.A)
