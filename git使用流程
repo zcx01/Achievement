@@ -98,3 +98,6 @@ git stash pop
 git add -A
 git commit -s
 git push mega HEAD:refs/for/master  
+
+---------------------更新文件索引-----------------------
+git update-index --assume-unchanged fileName
