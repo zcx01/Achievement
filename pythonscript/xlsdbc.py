@@ -54,7 +54,7 @@ def conversion(configPath,wirteSigName):
             sig.Sender = getValue(sheel,row,1)
             sig.messageId = str(getValue(sheel,row,4)).split(".")[0]
             sig.cycle =  getValueInt(sheel,row,5)
-            sig.startBit = getValueInt(sheel,row,6)
+            sig.endBit = getValueInt(sheel,row,6)
             sig.length = getValueInt(sheel,row,7)
             sig.dataType = "+"
             sig.factor = getValueInt(sheel,row,8)
@@ -68,6 +68,7 @@ def conversion(configPath,wirteSigName):
             sig.invalidValue = getValue(sheel,row,17)
             sig.Recevier = getValue(sheel,row,20)
             # print(sig.getSG(),sig.initValue)
+            sig.getStartBit()
             dbc.writeSig(sig)
             return
     print("没有找到信号")

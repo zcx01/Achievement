@@ -4,6 +4,7 @@ import os
 import sys
 import re
 from enum import Enum
+from time import sleep
 
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 sys.path.append(pyFileDir+"..")
@@ -17,6 +18,7 @@ class SigInfo(object):
         self.messageId = ""
         self.name=""
         self.startBit=0
+        self.endBit=0
         self.length=0
         self.dataType="+"
         self.factor=0
@@ -29,8 +31,8 @@ class SigInfo(object):
         self.invalidValue=0
         self.Recevier=""
         self.Sender=""
-        
         self.cycle=0
+        self.useBit=[]
     
     def getMId(self):
         return int(self.messageId,16)
@@ -68,8 +70,39 @@ class SigInfo(object):
         return f'BA_ \"VFrameFormat\" BO_ {int(self.messageId,16)} 14;'
 
     #endBit+(length - length%8)+(8-length)+1=startBit
-    def getendBit(self):
-        return self.startBit+self.length%8-9
+    def getStartBit(self):
+        self.useBit.clear()
+        startIndex=self.endBit
+        self.useBit.append(startIndex)
+        leg=1
+        while(leg < self.length):
+            nextIndex = startIndex+1
+            mSb=startIndex//8*8+7
+            if nextIndex > mSb:
+                startIndex = (startIndex//8*8)-8
+            else:
+                startIndex=nextIndex
+            leg+=1
+            self.useBit.append(startIndex)
+        self.startBit = startIndex
+        return startIndex
+
+    def getEndBit(self):
+        self.useBit.clear()
+        endIndex=self.startBit
+        self.useBit.append(endIndex)
+        leg=1
+        while(leg < self.length):
+            nextIndex = endIndex-1
+            mSb=endIndex//8*8
+            if nextIndex < mSb:
+                endIndex = (endIndex//8*8)+15
+            else:
+                endIndex=nextIndex
+            leg+=1
+            self.useBit.append(endIndex)
+        self.endBit = endIndex
+        return endIndex
 
     @staticmethod
     def analySG(text):
@@ -86,6 +119,7 @@ class SigInfo(object):
             sig.Offset=signals[5]
         except:
             pass
+        sig.getEndBit()
         return sig
 
 class dbcSig(object):
@@ -178,16 +212,28 @@ class Analyze(object):
             dm = self.dbcMessage.get(sig.getMessageId())
             startRow=dm.Row+1
             insertRowIndex=-1
+            linelistSize=len(linelist)
+            userIndex=[]
             while(startRow <= dm.sigMaxRow):
                 lineSig = SigInfo.analySG(linelist[startRow])
-                if(lineSig.startBit > sig.startBit):
-                    insertRowIndex = startRow
-                    break
+                for us in lineSig.useBit:
+                    userIndex.append(us)
+                if lineSig.startBit > sig.startBit and insertRowIndex == -1:
+                    insertRowIndex = startRow 
+                    print(insertRowIndex) 
                 startRow+=1
+
             if insertRowIndex == -1:
                 insertRowIndex = dm.sigMaxRow
+            else:
+                #判断信号是否合理
+                sigUsrIndexs=sig.useBit
+                for sigUsrIndex in sigUsrIndexs:
+                    if sigUsrIndex in userIndex:
+                        print(f"{sig.name} 信号有覆盖")
+                        return
+
             linelist.insert(insertRowIndex,sig.getSG())
-            linelistSize=len(linelist)
             for row in range(linelistSize):
                 if "GenSigStartValue" in str(linelist[linelistSize-1-row]):
                     linelist.insert(linelistSize-row,sig.getStartValue())
@@ -233,3 +279,7 @@ class Analyze(object):
 
 # a=Analyze("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210318.dbc")
 # print(a.getMessageBySig("CdcDtc1HiByte"))
+# sig=SigInfo()
+# sig.endBit=104
+# sig.length=13
+# print(sig.getStartBit())
