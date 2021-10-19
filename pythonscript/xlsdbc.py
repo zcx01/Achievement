@@ -56,11 +56,12 @@ def conversion(configPath,wirteSigName):
             sig.cycle =  getValueInt(sheel,row,5)
             sig.endBit = getValueInt(sheel,row,6)
             sig.length = getValueInt(sheel,row,7)
-            sig.dataType = "+"
             sig.factor = getValueInt(sheel,row,8)
             sig.Offset = getValueInt(sheel,row,9)
             sig.min = getValueInt(sheel,row,10)
             sig.max = getValueInt(sheel,row,11,sig.length)
+            if getValue(sheel,row,12) == "Signed":
+                sig.dataType = "-"
             sig.Unit = getValueKong(sheel,row,13)
             sig.enum = str(getValue(sheel,row,14)).replace("\n"," ")
             if str(getValue(sheel,row,15)) != 'nan':

@@ -1,0 +1,28 @@
+{
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/adas_info",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/adas_info",
+    "M":[
+        {
+            "content":"#include \"{fileName}.hpp\"",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/adas_info/adas_item_define.hpp",
+            "pos":""
+        },
+        {
+            "content":"    std::shared_ptr<{ClassName}> {fileName} = nullptr;",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/adas_info_module.hpp",
+            "pos":"AdasInfoModule"
+        },
+        {
+            "content":[
+                "",
+                "    //{3}",
+                "    {fileName} = std::make_shared<{ClassName}>(shared_from_this());",
+                "    {fileName}->subscribe((struct veh_signal *)(struct veh_signal *)&CANSIG_{1}_g);"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/adas_info_module.cpp",
+            "pos":"link_signal_item"
+        }
+    ],
+    "desc":"车控 1:信号名 2:top 3:注释"
+}
+ 
