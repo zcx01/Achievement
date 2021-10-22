@@ -1,5 +1,6 @@
 #include "{fileName}.hpp"
 #include "adas_info_common.hpp"
+#include "adas_info_define.hpp"
 
 using namespace fds;
 void {ClassName}::state_process(const SignalMsg &sig_msg)
@@ -11,5 +12,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
         return;
     }
 
+    PayloadInfo loadPlay;
+    SendAdasInfo({2},loadPlay);
 }
 

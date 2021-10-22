@@ -42,6 +42,20 @@ def getClassName(fileName):
             className += c
     return className
 
+def getFileName(className):
+    fileName=""
+    index=0
+    for c in className:
+        if str(c).isupper():
+            temp =""
+            if index !=0:
+                temp = "_"
+            fileName+=temp + str(c).lower()
+        else:
+            fileName+=c
+        index+=1
+    return fileName
+
 def getJScontent(dirPath):
     configJson = f'{dirPath}/config.json'
     cr = open(configJson, "r")
@@ -186,7 +200,11 @@ def createfile(fileName,type,replaceList):
     if not(os.path.isdir(configDir)):
         print("没有此类型！")
         return
-    className = getClassName(fileName)
+    if "_" in fileName:
+        className = getClassName(fileName)
+    else:
+        className=fileName
+        fileName=getFileName(className)
     print(f'class {className}')
     for (dirpath,dirnames,filenames) in os.walk(configDir):
         jsConfig = getJScontent(dirpath)
@@ -228,7 +246,10 @@ def createfile(fileName,type,replaceList):
                 w.write(newContent)
             w.flush()
             w.close()
-            print("生成  "+aimPath+'    文件')
+            if(suffix.find("cpp ") !=-1 ):
+                print("python3 filedbc.py "+aimPath)
+            else:
+                print("生成  "+aimPath+'    文件')
 
     #通过 config 修改文件
     modifyFile(jsConfig,replaceList,className,fileName)

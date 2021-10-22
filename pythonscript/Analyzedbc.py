@@ -4,7 +4,6 @@ import os
 import sys
 import re
 from enum import Enum
-from time import sleep
 
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 sys.path.append(pyFileDir+"..")
@@ -206,21 +205,19 @@ class Analyze(object):
         linelist=readFileLines(self.dbcPath)
         # sig=SigInfo(sig)
         if sig.name in self.dbcSigs:
-            print("信号已经存在")
+            print(f"{sig.name}信号已经存在")
             return
         try:
             dm = self.dbcMessage.get(sig.getMessageId())
             startRow=dm.Row+1
             insertRowIndex=-1
             linelistSize=len(linelist)
-            userIndex=[]
-            while(startRow <= dm.sigMaxRow):
+            userIndex={}
+            while(startRow < dm.sigMaxRow):
                 lineSig = SigInfo.analySG(linelist[startRow])
-                for us in lineSig.useBit:
-                    userIndex.append(us)
+                userIndex[lineSig.name] = lineSig.useBit
                 if lineSig.startBit > sig.startBit and insertRowIndex == -1:
                     insertRowIndex = startRow 
-                    print(insertRowIndex) 
                 startRow+=1
 
             if insertRowIndex == -1:
@@ -228,10 +225,11 @@ class Analyze(object):
             else:
                 #判断信号是否合理
                 sigUsrIndexs=sig.useBit
-                for sigUsrIndex in sigUsrIndexs:
-                    if sigUsrIndex in userIndex:
-                        print(f"{sig.name} 信号有覆盖")
-                        return
+                for user in userIndex:
+                    for sigUsrIndex in sigUsrIndexs:
+                        if sigUsrIndex in userIndex[user]:
+                            print(f"{sig.name} 信号有覆盖:开始字节{sig.startBit},结束的字节{sig.endBit}，占用的字节{sigUsrIndexs},与{user}覆盖字节")
+                            return
 
             linelist.insert(insertRowIndex,sig.getSG())
             for row in range(linelistSize):
