@@ -100,9 +100,10 @@ def getTopic_P(jsContents,desc):
             while(1):
                 levelStr="Topic Level "+str(levelCount)
                 if len(jsGeneral.get(levelStr,"")) ==0:
+                    level=EesyStr.removeAt(level,len(level)-1)
                     return level
                 else:
-                    level=level+jsGeneral[levelStr]
+                    level=level+jsGeneral[levelStr]+"/"
                 levelCount+=1
     return level
 
@@ -181,9 +182,9 @@ def dealnewSig():
 
         message=analy.getMessageBySig(sig)
         if len(message)==0:
-            print(f'{sig}对应的message不存在')
+            print(f'{sig} {desc} 对应的message不存在')
             continue
-
+        
         messagesig=message+"__"+sig
         #写入 can_parse_whitelist 文件
         can_parse_whitelistPath=getKeyPath("can_parse_whitelist",jsConfig)

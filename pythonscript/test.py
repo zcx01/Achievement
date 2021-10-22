@@ -1,3 +1,9 @@
+#!/bin/python
+import os
+import sys
+from commonfun import*
+
+
 # temp=0x1ff
 # tmp=0xffffffffffffffff
 # uselenght=0
@@ -8,16 +14,20 @@
 # print(hex(int(temp)>>uselenght & (0xffffffffffffffff>>64-size)))
 # print(hex(int("111111",2)))
 
-import os
-import sys
-from commonfun import*
-temp=[999,9,999]
-index=0
-for t in temp:
-    if(t == 9):
-        temp.insert(index+1,"dd")
-    if(t == "dd"):
-        temp.insert(index+1,"ssss")
-    index+=1
+def getFileName(className):
+    fileName=""
+    index=0
+    for c in className:
+        if str(c).isupper():
+            temp =""
+            if index !=0:
+                temp = "_"
+            fileName+=temp + str(c).lower()
+        else:
+            fileName+=c
+        index+=1
+    return fileName
 
-print(temp)
+fileName = "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210713.dbc"
+lines = readFileLines(fileName)
+wirteFileDicts(fileName,lines,False)

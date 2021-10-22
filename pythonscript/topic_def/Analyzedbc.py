@@ -17,6 +17,7 @@ class SigInfo(object):
         self.messageId = ""
         self.name=""
         self.startBit=0
+        self.endBit=0
         self.length=0
         self.dataType="+"
         self.factor=0
@@ -29,8 +30,8 @@ class SigInfo(object):
         self.invalidValue=0
         self.Recevier=""
         self.Sender=""
-        
         self.cycle=0
+        self.useBit=[]
     
     def getMId(self):
         return int(self.messageId,16)
@@ -39,18 +40,21 @@ class SigInfo(object):
         return f' SG_ {self.name} : {self.startBit}|{self.length}@0{self.dataType} ({self.factor},{self.Offset}) [{self.min}|{self.max}] {self.Unit}  {self.Recevier}'
     
     def getEnum(self):
-        enumStr=self.enum
-        if ":" in self.enum:
-            enumStrA=[]
-            enumS=self.enum.split(" ")
-            for enumM in enumS:
-                enumMs=enumM.split(":")
-                enumStrA.append(f'{int(enumMs[0],16)} \"{enumMs[1]}\"')
-            enumStr=" ".join(enumStrA)
-        
-        if len(enumStr) == 0 or "~" in enumStr:
+        try:
+            enumStr=self.enum
+            if ":" in self.enum:
+                enumStrA=[]
+                enumS=self.enum.split(" ")
+                for enumM in enumS:
+                    enumMs=enumM.split(":")
+                    enumStrA.append(f'{int(enumMs[0],16)} \"{enumMs[1]}\"')
+                enumStr=" ".join(enumStrA)
+            
+            if len(enumStr) == 0 or "~" in enumStr:
+                return ""
+            return f'VAL_ {self.getMId()} {self.name} {enumStr};'
+        except:
             return ""
-        return f'VAL_ {self.getMId()} {self.name} {enumStr};'
 
     def getStartValue(self):
         return f'BA_ \"GenSigStartValue\" SG_  {self.getMId()} {self.name} {self.initValue};'
@@ -68,8 +72,39 @@ class SigInfo(object):
         return f'BA_ \"VFrameFormat\" BO_ {int(self.messageId,16)} 14;'
 
     #endBit+(length - length%8)+(8-length)+1=startBit
-    def getendBit(self):
-        return self.startBit+self.length%8-9
+    def getStartBit(self):
+        self.useBit.clear()
+        startIndex=self.endBit
+        self.useBit.append(startIndex)
+        leg=1
+        while(leg < self.length):
+            nextIndex = startIndex+1
+            mSb=startIndex//8*8+7
+            if nextIndex > mSb:
+                startIndex = (startIndex//8*8)-8
+            else:
+                startIndex=nextIndex
+            leg+=1
+            self.useBit.append(startIndex)
+        self.startBit = startIndex
+        return startIndex
+
+    def getEndBit(self):
+        self.useBit.clear()
+        endIndex=self.startBit
+        self.useBit.append(endIndex)
+        leg=1
+        while(leg < self.length):
+            nextIndex = endIndex-1
+            mSb=endIndex//8*8
+            if nextIndex < mSb:
+                endIndex = (endIndex//8*8)+15
+            else:
+                endIndex=nextIndex
+            leg+=1
+            self.useBit.append(endIndex)
+        self.endBit = endIndex
+        return endIndex
 
     @staticmethod
     def analySG(text):
@@ -86,6 +121,7 @@ class SigInfo(object):
             sig.Offset=signals[5]
         except:
             pass
+        sig.getEndBit()
         return sig
 
 class dbcSig(object):
@@ -111,6 +147,7 @@ class Analyze(object):
         self.dbcMessage={}
         self.dbcPath=dbc_file
         self.maxSigRow=0
+        self.control=[]
         self.analy()
         
     def analy(self):
@@ -133,6 +170,11 @@ class Analyze(object):
                     dm.Row=rowIndex
                     dm.sigMaxRow=dm.Row+1
                     self.dbcMessage[message]=dm
+                elif text.startswith("BU_:"):
+                    try:
+                        self.control = splitSpace(text.split(":")[1])
+                    except:
+                        pass
                 elif text.startswith("SG_"):
                     sigNams=self.analyline(text)
                     ds=dbcSig()
@@ -147,15 +189,26 @@ class Analyze(object):
                         pass
 
     def getMessageBySig(self,sig):
-        return self.dbcSigs.get(sig).message
+        try:
+            return self.dbcSigs.get(sig).message
+        except:
+            # print(f'{sig}没有找到message')
+            return ""
+            # sys.exit()
 
     def getSigDataType(self,sig):
-        return self.dbcSigs.get(sig).dataType
+        try:
+            return self.dbcSigs.get(sig).dataType
+        except:
+            return DataType.VINT
 
     def analyline(self,msg):
         contents=msg.split(":")
         contents=contents[0].strip().split(" ")
         return contents[len(contents)-1]
+
+    def getBU(self):
+        return f'BU_: {" ".join(self.control)}'
 
     def analyDataType(self,lineContent):
         contents=lineContent.split(" ")
@@ -169,37 +222,60 @@ class Analyze(object):
 
 
     def writeSig(self,sig):
-        linelist=readFileLines(self.dbcPath)
         # sig=SigInfo(sig)
+        linelist=readFileLines(self.dbcPath)
+        linelistSize=len(linelist)
         if sig.name in self.dbcSigs:
-            print("信号已经存在")
+            print(f"{sig.name}信号已经存在")
             return
+
         try:
             dm = self.dbcMessage.get(sig.getMessageId())
-            startRow=dm.Row+1
+            startRow = dm.Row+1
             insertRowIndex=-1
-            while(startRow <= dm.sigMaxRow):
-                lineSig = SigInfo.analySG(linelist[startRow])
-                if(lineSig.startBit > sig.startBit):
-                    insertRowIndex = startRow
-                    break
-                startRow+=1
-            if insertRowIndex == -1:
-                insertRowIndex = dm.sigMaxRow
-            linelist.insert(insertRowIndex,sig.getSG())
-            linelistSize=len(linelist)
-            for row in range(linelistSize):
-                if "GenSigStartValue" in str(linelist[linelistSize-1-row]):
-                    linelist.insert(linelistSize-row,sig.getStartValue())
-                    break
             try:
+                userIndex={}
+                while(startRow < dm.sigMaxRow):
+                    lineSig = SigInfo.analySG(linelist[startRow])
+                    userIndex[lineSig.name] = lineSig.useBit
+                    if lineSig.startBit > sig.startBit and insertRowIndex == -1:
+                        insertRowIndex = startRow 
+                    startRow+=1
+
+                if insertRowIndex == -1:
+                    insertRowIndex = dm.sigMaxRow
+                else:
+                    #判断信号是否合理
+                    sigUsrIndexs=sig.useBit
+                    for user in userIndex:
+                        for sigUsrIndex in sigUsrIndexs:
+                            if sigUsrIndex in userIndex[user]:
+                                print(f"{sig.name} 信号有覆盖:开始字节{sig.startBit},结束的字节{sig.endBit}，占用的字节{sigUsrIndexs},与{user}覆盖字节")
+                                return
+
+                linelist.insert(insertRowIndex,sig.getSG())
+                for row in range(linelistSize):
+                    if "GenSigStartValue" in str(linelist[linelistSize-1-row]):
+                        linelist.insert(linelistSize-row,sig.getStartValue())
+                        break
+                #写入枚举
                 enumStr=sig.getEnum()
                 if len(enumStr) != 0:
-                    linelist.append(enumStr)
-            except:
-                pass
-            wirteFileDicts(self.dbcPath,linelist)
-            print(f"{sig.name} 写入完成")
+                    linelist.append(enumStr) 
+ 
+                #写入BU
+                if sig.Sender not in self.control:
+                    self.control.append(sig.Sender)
+                    for row in range(linelistSize):
+                        if linelist[row].startswith("BU_:"):
+                            linelist[row]=linelist[row].replace(linelist[row],self.getBU())
+                            break
+                 
+                wirteFileDicts(self.dbcPath,linelist)
+                print(f"{sig.name} 写入完成")
+            except Exception as e:
+                print()
+                print(f"{sig.name} 写入失败:{str(e)}")
         except:
             print(f'{sig.name} 正在写入message')
             if not self.writeMessage(sig,linelist):
@@ -225,7 +301,7 @@ class Analyze(object):
             if "VFrameFormat" in str(linelist[linelistSize-1-row]):
                 linelist.insert(linelistSize-row,sig.getMessageVFrameFormat())
                 break
-        wirteFileDicts(self.dbcPath,linelist)
+        wirteFileDicts(self.dbcPath,linelist,False)
         return True
          
 
@@ -233,3 +309,7 @@ class Analyze(object):
 
 # a=Analyze("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210318.dbc")
 # print(a.getMessageBySig("CdcDtc1HiByte"))
+# sig=SigInfo()
+# sig.endBit=104
+# sig.length=13
+# print(sig.getStartBit())

@@ -44,10 +44,13 @@ def writeJs(configJson,jsContent):
     cr.write(json.dumps(jsContent,ensure_ascii=False,indent=4))
     cr.close()
 
-def wirteFileDicts(file,data):
+def wirteFileDicts(file,data,replace=True):
     cr = open(file, "w")
-    for d in data:
-        cr.write(str(d).replace("\'","\"")+"\n")
+    if replace:
+        for d in data:
+            cr.write(str(d).replace("\'","\"")+"\n")
+    else:
+        cr.writelines('\n'.join(data))
     cr.close()
 
 def readFileLines(file):

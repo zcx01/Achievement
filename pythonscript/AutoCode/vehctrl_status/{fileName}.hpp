@@ -3,7 +3,7 @@
 #include <map>
 
 
-class  DriverSeatSldfrontStatus : public VehctrlStatusItem
+class  {ClassName} : public VehctrlStatusItem
 {
 public:
     using VehctrlStatusItem::VehctrlStatusItem;
