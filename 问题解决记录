@@ -121,4 +121,11 @@ https://blog.csdn.net/qq_42973562/article/details/101986353
 如果安装了加速就用加速下载通道
 https://blog.csdn.net/qq_42973562/article/details/101986353
 
+18.VScode通过remote-ssh连不上远程服务器
+原因:
+查资料后发现可能是因为win10内置的SSH的问题，由于装了Git，且自带ssh，因此可以在环境变量中将win10内置ssh的路径替换为git的
+解决:
+1)将原本环境变量PATH中路径中的 %SYSTEMROOT%\System32\OpenSSH\ 删除
+
+2)在PATH添加上git中ssh的路径 C:\Program Files\Git\usr\bin(即 ssh.exe 的目录)，重启
 
