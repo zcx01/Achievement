@@ -1,6 +1,6 @@
 QT       += core gui concurrent
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets charts
 
 CONFIG += c++11
 
@@ -9,10 +9,15 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    analydbc.cpp \
+    lineview.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    adcdefine.h \
+    analydbc.h \
+    lineview.h \
     mainwindow.h
 
 FORMS += \

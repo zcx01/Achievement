@@ -40,7 +40,13 @@ MainWindow::MainWindow(QWidget *parent)
         configData["dbcPath"]="";
         configData["pyPath"]="";
         writeConfigFile(jsonFile,configData);
-        sendPyCmd(QString("xdg-open %1").arg(jsonFile));
+        QString openFileCmd;
+#ifdef linux
+        openFileCmd = "xdg-open";
+#else
+        openFileCmd="explorer";
+#endif
+        sendPyCmd(QString("%1 %2").arg(openFileCmd).arg(jsonFile));
         QApplication::exit(0);
     }
     analydbc();
