@@ -271,7 +271,7 @@ class Analyze(object):
                             linelist[row]=linelist[row].replace(linelist[row],self.getBU())
                             break
                  
-                wirteFileDicts(self.dbcPath,linelist)
+                wirteFileDicts(self.dbcPath,linelist,False)
                 print(f"{sig.name} 写入完成")
             except Exception as e:
                 print()

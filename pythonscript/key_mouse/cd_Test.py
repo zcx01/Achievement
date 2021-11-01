@@ -15,7 +15,8 @@ click = PyMouse
 for i in range(3):
     print(i)
     time.sleep(1)
-keyStr("ssh chengxiongzhu@10.25.11.197")
-keyStr("123456")
+if "-s" not in sys.argv:
+    keyStr("ssh chengxiongzhu@10.25.11.197")
+    keyStr("123456")
 keyStr("cd ~/Works/Repos/Test/mega_cantools/mega_cantools_lib/mega_cantools_lib")
 # 

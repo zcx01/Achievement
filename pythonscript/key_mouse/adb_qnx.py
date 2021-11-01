@@ -20,5 +20,7 @@ keyStr("123456")
 keyStr("adb shell")
 keyStr("telnet cdc-qnx")
 keyStr("root")
-keyStr("mosquitto_sub -h cdc-qnx -v -t \"#\" ")
+
+if "-m" in sys.argv:
+    keyStr("mosquitto_sub -h cdc-qnx -v -t \"#\" ")
 # 

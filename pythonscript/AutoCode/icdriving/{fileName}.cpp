@@ -9,17 +9,14 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     else
     {
         union veh_signal_value raw_value;
-        if (!GetCommonSigPhysicalValue(raw_value, sig_msg.signal_addr))
+        if (!GetCommonSigPhysicalValue(raw_value, &CANSIG_{1}_g))
         {
             TB_LOG_ERROR("get siginal value error. return");
             return;
         }
 
-        if (sig_msg.signal_addr == &CANSIG_{1}_g)
-        {
-            TB_LOG_INFO("{1} Value %u", raw_value.val_uint32_t);
-            signalChange(raw_value.val_uint32_t,{2});
-        }
+        TB_LOG_INFO("{1} Value %u", raw_value.val_uint32_t);
+        signalChange(raw_value.val_uint32_t, {2});
     }
 }
 
@@ -37,12 +34,12 @@ void {ClassName}::signalChange(float value,std::string topic)
 
 void {ClassName}::publishValue(float value,std::string topic)
 {
-    TB_LOG_INFO("{ClassName} %s[%d]",topic, value);
+    TB_LOG_INFO("ControlScreenAngleRange %s[%f]",topic.c_str(), value);
     SendDriveInfo(topic, PayloadInfo{value, true});
 }
 
 void {ClassName}::publishInvalid(std::string topic)
 {
-    TB_LOG_INFO("{ClassName} %s 无效",topic);
+    TB_LOG_INFO("{ClassName} %s Invalid",topic.c_str());
     SendDriveInfo(topic, PayloadInfo{0, false});
 }

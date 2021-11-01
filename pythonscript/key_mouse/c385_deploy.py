@@ -18,45 +18,43 @@ click = PyMouse
 for i in range(3):
     print(i)
     time.sleep(1)
+
+timeSpace = 10
+for parIndex in range(len(sys.argv)):
+    if sys.argv[parIndex] == "-t":
+        timeSpace = int(sys.argv[parIndex+1])
+
 if "-s" not in sys.argv:
     keyStr("ssh chengxiongzhu@10.25.11.197")
     keyStr("123456")
-
-if "-i" in sys.argv:
-    keyStr("cd ~/Works/Repos/changan_c835/prebuilts")
-    keyStr("rm -rf ic",1)
-    keyStr("scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/changan_c835/prebuilts/ic ./")
-    keyStr("123456")
-    time.sleep(2.5)
-    keyStr("adb push ic/bin/ic_service /sdcard",2)
-    keyStr("adb shell")
-    keyStr("curl -u root:root \"ftp://192.168.1.1/data/ic_service\" -T /sdcard/ic_service",1)
-    keyStr("telnet cdc-qnx",1)
-    keyStr("root")
-    keyStr("slay -f slm",2)
-    keyStr("cp /data/ic_service /usr/bin/",1)
-    keyStr("chmod +x /usr/bin/ic_service",1)
-    sys.exit()
 
 if "-c" in sys.argv:
     proceesNames= sys.argv
     del proceesNames[0]
     del proceesNames[0]
+    timeSpace = 2
+    for parIndex in range(len(proceesNames)):
+        if proceesNames[parIndex] == "-t":
+            timeSpace = int(proceesNames[parIndex+1])
+            del proceesNames[parIndex]
+            del proceesNames[parIndex]
+            break
+
     if len(proceesNames) == 0:
         sys.exit()
     keyStr("cd ~/Works/Repos/changan_c835/prebuilts")
     keyStr("rm -rf ic",1)
     keyStr("scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/changan_c835/prebuilts/ic ./")
     keyStr("123456")
-    time.sleep(2.5)
+    time.sleep(4)
     for proceesName in proceesNames:
         keyStr(f"adb push ic/bin/{proceesName} /sdcard",0)
         
-    time.sleep(2)
+    time.sleep(timeSpace*1.5)
     keyStr("adb shell")
     for proceesName in proceesNames:
         keyStr(f"curl -u root:root \"ftp://192.168.1.1/data/{proceesName}\" -T /sdcard/{proceesName}",0)
-    time.sleep(2)
+    time.sleep(timeSpace)
 
     keyStr("telnet cdc-qnx",1)
     keyStr("root")
@@ -76,7 +74,7 @@ if "-q" not in sys.argv:
     keyStr("rm -rf ic",1)
     keyStr("scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/changan_c835/prebuilts/ic ./")
     keyStr("123456")
-    time.sleep(2.5)
+    time.sleep(4)
     keyStr("adb push ic/bin/ic_chime /sdcard",0)
     keyStr("adb push ic/bin/ic_service /sdcard",0)
     keyStr("adb push ic/bin/mcu_service  /sdcard",0)
@@ -87,13 +85,14 @@ if "-q" not in sys.argv:
     keyStr("adb push ic/qt/qml/MegaIC/libmega_ic_plugin.so  /sdcard",0)
     keyStr("adb push ic/qt/qml/Resources/libresources_plugin.so  /sdcard",0)
 
+
     keyStr("adb push ic/qt/config/screen_layout_config.json /sdcard",0)
     keyStr("adb push ic/qt/config/icadas_config.json /sdcard",0)
     keyStr("adb push ic/qt/config/icdriving_config.json /sdcard",0)
     keyStr("adb push ic/qt/config/icscreencast_config.json /sdcard",0)
     keyStr("adb push ic/qt/config/ictelltale_config.json /sdcard",0)
     keyStr("adb push ic/qt/config/icwarning_config.json /sdcard",0)
-    time.sleep(10)
+    time.sleep(timeSpace*1.5)
 
     keyStr("adb shell")
     keyStr("curl -u root:root \"ftp://192.168.1.1/data/ic_chime\" -T /sdcard/ic_chime",0)
@@ -111,7 +110,7 @@ if "-q" not in sys.argv:
     keyStr("curl -u root:root \"ftp://192.168.1.1/data/icscreencast_config.json\" -T /sdcard/icscreencast_config.json",0)
     keyStr("curl -u root:root \"ftp://192.168.1.1/data/ictelltale_config.json\" -T /sdcard/ictelltale_config.json",0)
     keyStr("curl -u root:root \"ftp://192.168.1.1/data/icwarning_config.json\" -T /sdcard/icwarning_config.json",0)
-    time.sleep(10)
+    time.sleep(timeSpace)
 
     keyStr("telnet cdc-qnx",1)
     keyStr("root")

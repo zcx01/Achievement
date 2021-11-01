@@ -31,3 +31,6 @@ def getFileName(className):
 fileName = "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210713.dbc"
 lines = readFileLines(fileName)
 wirteFileDicts(fileName,lines,False)
+
+if __name__ == "__main__":
+    pass

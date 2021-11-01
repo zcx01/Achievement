@@ -41,6 +41,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
         TB_LOG_ERROR("VehctrlStatus signal get error.");
         return;
     }    
+    value = raw_value.val_u{4}32_t;
     publish_status(topic,value);
 }
 
