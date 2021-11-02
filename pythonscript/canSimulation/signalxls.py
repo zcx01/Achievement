@@ -36,8 +36,11 @@ class useCase(object):
     def SendCan(self):
         sendSig={}
         for sigName in self.signals:
-            print(f'{sigName}索引')
-            index = int(input())
+            if len(self.signals[sigName]) > 1:
+                print(f'{sigName}索引')
+                index = int(input())
+            else:
+                index=0
             sendSig[sigName] = self.signals[sigName][index]
         Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
         time.sleep(5)
@@ -133,9 +136,14 @@ def displayInfo(useCases):
             tmp.append(case)
     print(f"总大小为{len(tmp)}")
     useCases=tmp
-    while(True):
-        print("请输入索引或者关键字:")
-        in_s=input()
+    isloop = True
+    while(isloop):
+        if len(tmp) > 1:
+            print("请输入索引或者关键字:")
+            in_s=input()
+        else:
+            in_s=0
+            isloop=False
         index=0
         for case in useCases:
             try:
