@@ -8,5 +8,6 @@
     "definefile": "src/ic_chime/include/topic/ipc_topic_new_def.h",
     "custom_topics_define": "qt/ic_qt/resources/scripts/topic_gentools/custom_topics_define.json",
     "topics_define": "qt/ic_qt/resources/scripts/topic_gentools/topics_define.json",
-    "generate_topic": "qt/ic_qt/resources/scripts/generate_topic.sh"
+    "generate_topic": "qt/ic_qt/resources/scripts/generate_topic.sh",
+    "casePath": "/home/chengxiongzhu/Works/case"
 }

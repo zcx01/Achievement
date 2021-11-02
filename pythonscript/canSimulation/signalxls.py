@@ -8,21 +8,67 @@ import pyperclip
 #sudo apt-get install xsel xclip 
 import xlrd
 import re
+import time
 from commonfun import *
+from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
+from threading import Thread
 
+PC_PWD="123456"
+PROJECT_ID='c385ev'
+CHANNEL =0
+ignore_init_send =False
 class useCase(object):
     def __init__(self):
         self.index=0
         self.key=""
         self.signals={}
         self.py=""
+        self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
 
     def Out(self):
         "python3 monitor.py -s BcmPwrStsFb -v 1"
-        premise="python3 monitor.py"
+        premise = "python3 monitor.py"
         for signal in self.signals:
-            premise+=" -s "+signal+" -v "+self.signals[signal]
+            for value in self.signals[signal]:
+                premise+=" -s "+signal+" -v "+value
         return premise
+
+    def SendCan(self):
+        sendSig={}
+        for sigName in self.signals:
+            print(f'{sigName}索引')
+            index = int(input())
+            sendSig[sigName] = self.signals[sigName][index]
+        Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
+        time.sleep(5)
+        print('-s：停止发送')
+        print('-h：打印可选的信号')
+        print('信号名 值：修改信号值和增加信号值')
+        print('输入信号名:停止发送')
+        isStop = False
+        while(True):
+            cmd=input().split(" ")
+            if len(cmd) == 0:
+                continue
+            if '-s' in cmd:
+                self.sim.stop()
+                return
+            elif '-h' in cmd:
+                print(sendSig)
+            elif len(cmd) == 1:
+                self.sim.stop_task(cmd[0])
+                isStop = True
+            elif len(cmd) == 2:
+                if cmd[0] in sendSig and isStop:
+                    self.sim.stop()
+                    time.sleep(2)
+                    modifySendSig = dict(sendSig)
+                    modifySendSig[cmd[0]]=cmd[1]
+                    isStop=False
+                    Thread(target=self.sim.begin_sending, args=(modifySendSig,)).start()
+                    time.sleep(5)
+                else:
+                    self.sim.add_task({cmd[0]:cmd[1]})
     
     def find(self,name):
         try:
@@ -51,6 +97,7 @@ def ReMatchStr(text):
         return case
     index=0
     while(index < len(signals)):
+        values=[]
         try:
             sig=signals[index]
             while(re.search(word,signals[index+1],re.A) != None):
@@ -58,18 +105,20 @@ def ReMatchStr(text):
                 sig = signals[index]
                 if re.search(in_i, signals[index+1], re.A) != None:
                     index+=1
-                    value=signals[index]
+                    values.append(signals[index])
                     break
             try:
                 while(re.search(in_i,signals[index+1],re.A) != None):
                     index += 1
-                    value = signals[index]
+                    values.append(signals[index])
                     if re.search(word,signals[index+1],re.A) != None:
                         break
             except:
                 pass
-            if re.search(word,sig,re.A) != None and re.search(in_i,value,re.A) != None:
-                case.signals[sig]=str(value).replace("0x","")
+            case.signals[sig] = []
+            for value in values:
+                if re.search(word,sig,re.A) != None and re.search(in_i,value,re.A) != None:
+                    case.signals[sig].append(str(value).replace("0x",""))
         except:
             pass
         index += 1
@@ -94,6 +143,7 @@ def displayInfo(useCases):
                     outString=''
                     if len(case.signals)!=0:
                         outString=case.Out()
+                        case.SendCan()
                     else:
                         outString=case.py
                     print(outString)

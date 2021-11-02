@@ -72,6 +72,18 @@ def splitSpace(text):
             contents.append(t)
     return contents
 
+def getFullPath(path,jsConfig):
+    # path=str(path)
+    if path.startswith("/"):
+        return path
+    else:
+        projectPath=jsConfig.get("projectPath","")
+        return projectPath+path
+
+def getKeyPath(key,jsConfig):
+    return getFullPath(jsConfig.get(key,""),jsConfig)
+
+
 def splitSpaceGetValueByIndex(text,index,defaultValue=""):
     return getValueByIndex(splitSpace(text),index,defaultValue)
 

@@ -4,9 +4,7 @@ import os
 import sys
 import re
 from enum import Enum
-
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
-sys.path.append(pyFileDir+"..")
 from commonfun import*
 
 class DataType(Enum):

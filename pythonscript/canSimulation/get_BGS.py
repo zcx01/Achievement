@@ -1,7 +1,5 @@
 #!/bin/python
 import sys
-import requests
-import chardet
 from commonfun import *
 from jira import JIRA
 from signalxls import *
@@ -41,4 +39,4 @@ def getBugInfo(bugId):
 
 if __name__ == "__main__":
     getBugInfo(sys.argv[1])
-    # getBugInfo("BGS-2216")
+    # getBugInfo("BGS-3771")

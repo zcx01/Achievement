@@ -37,6 +37,30 @@ def getValueInt(src,row,col,lenght=-1):
             return 0
         return pow(2,lenght)
 
+def getSigInfo(sheel,row):
+    sig = SigInfo()
+    isFind = True
+    sig.name = str(getValue(sheel,row,2))
+    sig.Sender = str(getValue(sheel,row,1)).upper()
+    sig.messageId = str(getValue(sheel,row,4)).split(".")[0]
+    sig.cycle =  getValueInt(sheel,row,5)
+    sig.endBit = getValueInt(sheel,row,6)
+    sig.length = getValueInt(sheel,row,7)
+    sig.factor = getValueInt(sheel,row,8)
+    sig.Offset = getValueInt(sheel,row,9)
+    sig.min = getValueInt(sheel,row,10)
+    sig.max = getValueInt(sheel,row,11,sig.length)
+    if getValue(sheel,row,12) == "Signed":
+        sig.dataType = "-"
+    sig.Unit = getValueKong(sheel,row,13)
+    sig.enum = str(getValue(sheel,row,14)).replace("\n"," ")
+    if str(getValue(sheel,row,15)) != 'nan':
+        sig.initValue = int(getValue(sheel,row,15),16)  # 十进制
+    sig.invalidValue = getValue(sheel,row,17)
+    sig.Recevier = getValue(sheel,row,20)
+    sig.getStartBit()
+    return sig
+
 def conversion(configPath,wirteSigName,canmatrix=""):
     print(configPath)
     jsConfig=getJScontent(configPath)
@@ -54,27 +78,7 @@ def conversion(configPath,wirteSigName,canmatrix=""):
         if isAllAdd and row == 0:
             continue
         if sigName.strip() == wirteSigName or isAllAdd:
-            sig = SigInfo()
-            isFind = True
-            sig.name = sigName
-            sig.Sender = str(getValue(sheel,row,1)).upper()
-            sig.messageId = str(getValue(sheel,row,4)).split(".")[0]
-            sig.cycle =  getValueInt(sheel,row,5)
-            sig.endBit = getValueInt(sheel,row,6)
-            sig.length = getValueInt(sheel,row,7)
-            sig.factor = getValueInt(sheel,row,8)
-            sig.Offset = getValueInt(sheel,row,9)
-            sig.min = getValueInt(sheel,row,10)
-            sig.max = getValueInt(sheel,row,11,sig.length)
-            if getValue(sheel,row,12) == "Signed":
-                sig.dataType = "-"
-            sig.Unit = getValueKong(sheel,row,13)
-            sig.enum = str(getValue(sheel,row,14)).replace("\n"," ")
-            if str(getValue(sheel,row,15)) != 'nan':
-                sig.initValue = int(getValue(sheel,row,15),16)  # 十进制
-            sig.invalidValue = getValue(sheel,row,17)
-            sig.Recevier = getValue(sheel,row,20)
-            sig.getStartBit()
+            sig = getSigInfo(sheel,row)
             dbc=Analyze(dbcfile)
             dbc.writeSig(sig)
 

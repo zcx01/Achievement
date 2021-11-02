@@ -1,7 +1,6 @@
 import os
 import sys
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
-sys.path.append(pyFileDir+"..")
 from commonfun import*
 
 def otherTelltale(jsTelltale,modifytopic,imageWith,space):

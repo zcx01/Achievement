@@ -4,29 +4,13 @@ from pymouse import *
 import subprocess
 import time
 import sys
+from key_mouse import *
 
-def keyStr(cmd,t=0.3):
-    k.type_string(cmd)
-    # if(t != 0):
-    #     k.tap_key(k.enter_key)
-    # else:
-    k.tap_key(k.enter_key)
-    time.sleep(t)
-
-k = PyKeyboard()
-click = PyMouse
-for i in range(3):
-    print(i)
-    time.sleep(1)
 
 timeSpace = 10
 for parIndex in range(len(sys.argv)):
     if sys.argv[parIndex] == "-t":
         timeSpace = int(sys.argv[parIndex+1])
-
-if "-s" not in sys.argv:
-    keyStr("ssh chengxiongzhu@10.25.11.197")
-    keyStr("123456")
 
 if "-c" in sys.argv:
     proceesNames= sys.argv
@@ -43,10 +27,12 @@ if "-c" in sys.argv:
     if len(proceesNames) == 0:
         sys.exit()
     keyStr("cd ~/Works/Repos/changan_c835/prebuilts")
-    keyStr("rm -rf ic",1)
-    keyStr("scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/changan_c835/prebuilts/ic ./")
-    keyStr("123456")
-    time.sleep(4)
+
+    if is_ssh:
+        keyStr("rm -rf ic",1)
+        keyStr("scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/changan_c835/prebuilts/ic ./")
+        keyStr("123456")
+        time.sleep(4)
     for proceesName in proceesNames:
         keyStr(f"adb push ic/bin/{proceesName} /sdcard",0)
         
@@ -71,10 +57,11 @@ if "-c" in sys.argv:
 
 if "-q" not in sys.argv:
     keyStr("cd ~/Works/Repos/changan_c835/prebuilts")
-    keyStr("rm -rf ic",1)
-    keyStr("scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/changan_c835/prebuilts/ic ./")
-    keyStr("123456")
-    time.sleep(4)
+    if is_ssh:
+        keyStr("rm -rf ic",1)
+        keyStr("scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/changan_c835/prebuilts/ic ./")
+        keyStr("123456")
+        time.sleep(4)
     keyStr("adb push ic/bin/ic_chime /sdcard",0)
     keyStr("adb push ic/bin/ic_service /sdcard",0)
     keyStr("adb push ic/bin/mcu_service  /sdcard",0)
