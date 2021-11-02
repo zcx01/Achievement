@@ -241,7 +241,7 @@ TimeChangeResult B1TextWarnRule::timeChange()
 {
     if(alreadyTime >= showMinTime())
     {
-        if(warns.size() > 1)
+        if(warns.size() >= 1)
             removeFirst();
         return TimeChangeResult::MinTime;
     }

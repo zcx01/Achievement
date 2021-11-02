@@ -35,6 +35,7 @@ class useCase(object):
 
     def SendCan(self):
         sendSig={}
+        print(self.signals)
         for sigName in self.signals:
             if len(self.signals[sigName]) > 1:
                 print(f'{sigName}索引')
@@ -95,6 +96,13 @@ def ReMatchStr(text):
     in_i=r"\b[0x0-9]+\b"
     e_i=r"\b[a-zA-Z0x0-9]+\b"
     signals=re.findall(e_i,text,re.A)
+
+    #去除不可能是信号的字符
+    tempSignals=[]
+    for signal in signals:
+        if len(signal) > 3 or re.search(in_i,signal,re.A) != None:
+            tempSignals.append(signal)
+    signals = tempSignals
     # print(signals)
     if signals== None:
         return case
@@ -146,19 +154,16 @@ def displayInfo(useCases):
             isloop=False
         index=0
         for case in useCases:
-            try:
-                if case.find(in_s) or int(in_s) == index:
-                    outString=''
-                    if len(case.signals)!=0:
-                        outString=case.Out()
-                        case.SendCan()
-                    else:
-                        outString=case.py
-                    print(outString)
-                    pyperclip.copy(outString)
-                    break
-            except:
-                continue
+            if case.find(in_s) or int(in_s) == index:
+                outString=''
+                if len(case.signals)!=0:
+                    outString=case.Out()
+                    case.SendCan()
+                else:
+                    outString=case.py
+                print(outString)
+                pyperclip.copy(outString)
+                break
             index += 1
 
 def dealTest(dataPath,keyIndex=1,signalIndex=4):
