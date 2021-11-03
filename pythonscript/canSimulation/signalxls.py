@@ -12,6 +12,7 @@ import time
 from commonfun import *
 from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
 from threading import Thread
+import argparse
 
 PC_PWD="123456"
 PROJECT_ID='c385ev'
@@ -93,8 +94,8 @@ def dealBug(dataPath):
 def ReMatchStr(text):
     case = useCase()
     word=r"\b[a-zA-Z]+\b"
-    in_i=r"\b[0x0-9]+\b"
-    e_i=r"\b[a-zA-Z0x0-9]+\b"
+    in_i=r"-?\b[0x0-9]+\b"
+    e_i=r"-?\b[a-zA-Z0x0-9]+\b"
     signals=re.findall(e_i,text,re.A)
 
     #去除不可能是信号的字符
@@ -133,28 +134,30 @@ def ReMatchStr(text):
         except:
             pass
         index += 1
-    if len(case.signals) !=0:
-        print(case.Out())
+    # if len(case.signals) !=0:
+    #     print(case.Out())
     return case
 
-def displayInfo(useCases):
+def displayInfo(usecases):
     tmp=[]
-    for case in useCases:
+    for case in usecases:
         if len(case.signals)!=0 or len(case.py)!=0:
             tmp.append(case)
-    print(f"总大小为{len(tmp)}")
     useCases=tmp
     isloop = True
     while(isloop):
-        if len(tmp) > 1:
+        if len(useCases) > 1:
+            for case in useCases:
+                print(f'{case.index:<5}'+f'{case.key:<10}'+case.Out())
             print("请输入索引或者关键字:")
-            in_s=input()
+            in_s= input()
         else:
             in_s=0
             isloop=False
         index=0
         for case in useCases:
-            if case.find(in_s) or int(in_s) == index:
+            if case.find(in_s):
+                print(case.index,case.Out())
                 outString=''
                 if len(case.signals)!=0:
                     outString=case.Out()
@@ -175,12 +178,23 @@ def dealTest(dataPath,keyIndex=1,signalIndex=4):
         if len(case.signals) == 0: 
             continue
         case.key = sheel.cell_value(row, keyIndex)
-        case.index = row
+        case.index = row+1
         useCases.append(case)
     displayInfo(useCases)
         
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+    description='这个脚本是生成测试的case')
+    
+    #这个是要解析 -f 后面的参数
+    parser.add_argument('-b','--bugxlsx',help="jira xlsx file",default="text")
+    parser.add_argument('-c','--casexlsx',help="jira xlsx file",default="text")
+
+    arg=parser.parse_args()
     if "-b" in sys.argv:
-        dealTest(sys.argv[2],1,26)
+        dealTest(arg.bugxlsx,1,26)
+    if '-c' in sys.argv:
+        dealTest(arg.casexlsx,0,1)
     else:
         dealTest("/home/chengxiongzhu/Works/文档/测试信号.xls")
+

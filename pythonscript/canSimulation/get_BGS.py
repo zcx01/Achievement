@@ -25,13 +25,16 @@ def getBugInfo(bugId):
         case = ReMatchStr(description)
     useCases.append(case)
         
+    index = 1
     for comment in issue.fields.comment.comments:
         if MoniKey in comment.body:
             print(comment.body)
             case.py=comment.body
         else:
             case = ReMatchStr(comment.body)
+        case.index = index
         useCases.append(case)
+        index+=1
     if len(useCases) == 0:
         return
     pyperclip.copy(useCases[0].Out())

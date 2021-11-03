@@ -34,3 +34,7 @@ wirteFileDicts(fileName,lines,False)
 
 if __name__ == "__main__":
     pass
+BcmPwrStsFb:2
+MotorScreenNegAgCtrl:-10
+MotorScreenPosAgCtrl:20
+MotorScreenPrecisionCtrl:10

@@ -13,7 +13,7 @@ public:
 
 private:
 
-    void publish_status(const std::string &topic, float value);
+    void publish_status(const std::string &topic, float value,bool isVaild);
     std::string topic;
     struct veh_signal * signal=nullptr;
 };

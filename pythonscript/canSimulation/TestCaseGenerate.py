@@ -7,7 +7,9 @@ import xlrd
 import argparse
 
 from commonfun import*
-from xlsdbc import*
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
+sys.path.append(pyFileDir+"..")
+from xlsdbc import *
 
 def getSig(text):
     e_i = r"CANSIG_.*_g"
@@ -41,6 +43,12 @@ def getTopic(lineContents,define):
         if splitSpaceGetValueByIndex(lineContent,1) ==  define:
             return splitSpaceGetValueByIndex(lineContent,2)
 
+def getDesc(lineContents,define):
+    lineContentsSize = len(lineContents)
+    for index in range(lineContentsSize):
+        if splitSpaceGetValueByIndex(lineContents[index],1) ==  define:
+            return str(lineContents[index-1]).replace("//",'')
+
 def sendMqtt(topic,value):
     return f'mosquitto_pub -h cdc-qnx -t  \'{topic}\'  -m \''+'{'+f'\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":{value}'+'}\''
 
@@ -48,7 +56,7 @@ def subMqtt(topic):
     return f'mosquitto_sub -h cdc-qnx -v -t \"{topic}\"'
 
 def lCan(sigNames):
-    return f'python monitor.py -l{sigNames}'
+    return f'python monitor.py -l {sigNames}'
 
 def initCombination(value):
     sigCombination=[]
@@ -73,7 +81,7 @@ def generateTest(cppFile,xlsFileName,jsConfigPath):
         sh['A1'] = '用例描述'
         sh['B1'] = '测试消息'
         sh['C1'] = '验证结果命令'
-        sh['D1'] = '测试是否通过'
+        sh['D1'] = '验证结果'
         sh['E1'] = '备注'
 
     cppFileContets = readFileLines(cppFile) 
@@ -88,10 +96,20 @@ def generateTest(cppFile,xlsFileName,jsConfigPath):
         sigNames = getSig(cppContents)
         expectedResults=[]
         topicDefines = getDefineStr(cppContents)
+        desc=''
+        if len(topicDefines) > 0:
+            desc =getDesc(defineContents,topicDefines[len(topicDefines)-1])
         if isSendCan:
             sigInfos = []
+            if len(sigNames) == 0:
+                print('没有检测到信号')
+                return
             for sigName in sigNames:
-                sigInfos.append(getSigValue(sigName,sheel))
+                info = getSigValue(sigName,sheel)
+                if len(info.name) == 0:
+                    print(f'{getKeyPath("canmatrix",jsConfig)} 中没有 {sigName}信号')
+                    continue
+                sigInfos.append(info)
             
             sigCombinations=[]
             for info in sigInfos:
@@ -119,7 +137,7 @@ def generateTest(cppFile,xlsFileName,jsConfigPath):
             
             for sigCombination in sigCombinations:
                 rowContent=[]
-                rowContent.append(cppFile)
+                rowContent.append(desc)
                 rowContent.append('\n'.join(sigCombination))
                 rowContent.append('\n'.join(expectedResults))
                 sh.append(rowContent)
@@ -130,9 +148,9 @@ def generateTest(cppFile,xlsFileName,jsConfigPath):
                 expectedResults.append(sendMqtt(topicStr,1))
             for expectedResult in expectedResults:
                 rowContent=[]
-                rowContent.append(cppFile)
+                rowContent.append(desc)
                 rowContent.append(expectedResult)
-                rowContent.append(lCan(' '.join(sigNames)))
+                rowContent.append(lCan(' -l '.join(sigNames)))
                 sh.append(rowContent)
                 
     book.save(casePath)

@@ -8,11 +8,13 @@
 
 using namespace megaipc;
 
+//{1} {2}
 void {ClassName}::addSignalAndTop(struct veh_signal * s, const std::string &t)
 {
     subscribe(s);
     signal=s;
     topic = t;
+    subscribe((struct veh_signal *)&CANSIG_GW_288__BcmPwrStsFb_g);
 }
 
 
@@ -28,26 +30,39 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
 
     if (1 != fds::GetBcmPwrStsFbValue(bcmPwrStsFbValue))
     {
-        TB_LOG_INFO("VehctrlStatus powerSts: %d", bcmPwrStsFbValue);
+        TB_LOG_INFO("{ClassName} powerSts: %d", bcmPwrStsFbValue);
         return;
     }
     if(signal == nullptr)
     {
         return;
     }
+    if (signal->is_timeout)
+    {
+        return;
+    }
+
+    if(signal->is_timeout)
+    {
+        publish_status(topic,value,false);
+        TB_LOG_ERROR("{1} time out.");
+        return;
+    }
+    
     status = signal->GetValue.fpGetter(&raw_value,nullptr);
     if (status != eSigStatus_Ok)
     {
-        TB_LOG_ERROR("VehctrlStatus signal get error.");
+        TB_LOG_ERROR("{1} signal get error.");
         return;
     }    
-    value = raw_value.val_u{4}32_t;
-    publish_status(topic,value);
+    value = raw_value.val_uint32_t;
+    
+    publish_status(topic,value,true);
 }
 
-void {ClassName}::publish_status(const std::string &topic, float value)
+void {ClassName}::publish_status(const std::string &topic, float value,bool isVaild)
 {
-    nlohmann::json j = PayloadInfo{ value, true, "", false, ValueType::FLOAT};
+    nlohmann::json j = PayloadInfo{ value, isVaild, "", false, ValueType::FLOAT};
 
     std::string msg = j.dump();
     TB_LOG_INFO("{ClassName} msg: %s %s %f", msg.data(), topic.data(), value);
