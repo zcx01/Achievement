@@ -15,6 +15,7 @@ if __name__ == "__main__":
     parser.add_argument('-t','--timeSpace',help="sleep time",default=10)
     parser.add_argument('-c','--customfile',help='adb push custom file list',default=[], nargs='+',type=str)
     parser.add_argument('-s','--slm',help='slay slm',default=True)
+    parser.add_argument('-q','--qnx',help='cp for qnx')
     args = parser.parse_args()
     timeSpace = int(args.timeSpace)
 

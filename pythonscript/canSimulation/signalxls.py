@@ -13,30 +13,32 @@ from commonfun import *
 from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
 from threading import Thread
 import argparse
-
+from Analyzedbc import *
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/../topic_def/"
 PC_PWD="123456"
 PROJECT_ID='c385ev'
 CHANNEL =0
-ignore_init_send =False
+ignore_init_send =True
+jsConfig = getJScontent(pyFileDir+"config.json",)
+dbc=Analyze(getKeyPath("dbcfile",jsConfig))
 class useCase(object):
     def __init__(self):
         self.index=0
         self.key=""
         self.signals={}
-        self.py=""
-        self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
+        self.sim = None
 
     def Out(self):
         "python3 monitor.py -s BcmPwrStsFb -v 1"
-        premise = "python3 monitor.py"
+        '''premise = "python3 monitor.py"
         for signal in self.signals:
             for value in self.signals[signal]:
                 premise+=" -s "+signal+" -v "+value
-        return premise
+        return premise'''
+        return str(self.signals)
 
     def SendCan(self):
         sendSig={}
-        print(self.signals)
         for sigName in self.signals:
             if len(self.signals[sigName]) > 1:
                 print(f'{sigName}索引')
@@ -44,6 +46,8 @@ class useCase(object):
             else:
                 index=0
             sendSig[sigName] = self.signals[sigName][index]
+        if self.sim == None:
+            self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
         Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
         time.sleep(5)
         print('-s：停止发送')
@@ -59,7 +63,7 @@ class useCase(object):
                 self.sim.stop()
                 return
             elif '-h' in cmd:
-                print(sendSig)
+                print(self.signals)
             elif len(cmd) == 1:
                 self.sim.stop_task(cmd[0])
                 isStop = True
@@ -73,7 +77,12 @@ class useCase(object):
                     Thread(target=self.sim.begin_sending, args=(modifySendSig,)).start()
                     time.sleep(5)
                 else:
-                    self.sim.add_task({cmd[0]:cmd[1]})
+                    if  not dbc.sigExist(cmd[0]):
+                        print("输入的信号在dbc不存在")
+                    elif not isNumber(cmd[1]):
+                        print("输入信号值错误")
+                    else:
+                        self.sim.add_task({cmd[0]:cmd[1]})
     
     def find(self,name):
         try:
@@ -98,10 +107,10 @@ def ReMatchStr(text):
     e_i=r"-?\b[a-zA-Z0x0-9]+\b"
     signals=re.findall(e_i,text,re.A)
 
-    #去除不可能是信号的字符
+    #去除不在dbc中的信号
     tempSignals=[]
     for signal in signals:
-        if len(signal) > 3 or re.search(in_i,signal,re.A) != None:
+        if dbc.sigExist(signal) or re.search(in_i,signal,re.A) != None:
             tempSignals.append(signal)
     signals = tempSignals
     # print(signals)
@@ -112,25 +121,30 @@ def ReMatchStr(text):
         values=[]
         try:
             sig=signals[index]
-            while(re.search(word,signals[index+1],re.A) != None):
-                index += 1
-                sig = signals[index]
-                if re.search(in_i, signals[index+1], re.A) != None:
-                    index+=1
-                    values.append(signals[index])
-                    break
-            try:
-                while(re.search(in_i,signals[index+1],re.A) != None):
+            #保证开始为信号，而不是数字
+            if re.search(word,sig,re.A) != None:
+                while(re.search(word,signals[index+1],re.A) != None):
                     index += 1
-                    values.append(signals[index])
-                    if re.search(word,signals[index+1],re.A) != None:
+                    sig = signals[index]
+                    if re.search(in_i, signals[index+1], re.A) != None:
+                        index+=1
+                        values.append(signals[index])
                         break
-            except:
-                pass
-            case.signals[sig] = []
-            for value in values:
-                if re.search(word,sig,re.A) != None and re.search(in_i,value,re.A) != None:
-                    case.signals[sig].append(str(value).replace("0x",""))
+                try:
+                    while(re.search(in_i,signals[index+1],re.A) != None):
+                        index += 1
+                        values.append(signals[index])
+                        if re.search(word,signals[index+1],re.A) != None:
+                            break
+                except:
+                    pass
+                if sig not in case.signals:
+                    case.signals[sig] = []
+                for value in values:
+                    if re.search(word,sig,re.A) != None and re.search(in_i,value,re.A) != None:
+                        sendValue = str(value).replace("0x","")
+                        if sendValue not in case.signals[sig]:
+                            case.signals[sig].append(sendValue)
         except:
             pass
         index += 1
@@ -141,7 +155,7 @@ def ReMatchStr(text):
 def displayInfo(usecases):
     tmp=[]
     for case in usecases:
-        if len(case.signals)!=0 or len(case.py)!=0:
+        if len(case.signals)!=0:
             tmp.append(case)
     useCases=tmp
     isloop = True
@@ -158,14 +172,8 @@ def displayInfo(usecases):
         for case in useCases:
             if case.find(in_s):
                 print(case.index,case.Out())
-                outString=''
-                if len(case.signals)!=0:
-                    outString=case.Out()
-                    case.SendCan()
-                else:
-                    outString=case.py
-                print(outString)
-                pyperclip.copy(outString)
+                case.SendCan()
+                pyperclip.copy(case.Out())
                 break
             index += 1
 

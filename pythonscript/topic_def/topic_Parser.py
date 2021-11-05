@@ -4,11 +4,10 @@ import sys
 import os
 import xlrd
 import subprocess
-from Analyzedbc import Analyze, DataType
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 sys.path.append(pyFileDir+"..")
 from commonfun import *
-
+from Analyzedbc import Analyze, DataType
 
 def getSigJson(jsConfig,msg,sig):
     filePath=jsConfig.get(msg,{}).get("filePath","")

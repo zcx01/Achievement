@@ -3,7 +3,7 @@ import os
 import sys
 import xlrd
 from commonfun import*
-from topic_def.Analyzedbc import *
+from Analyzedbc import *
 
 def getFullPath(path,jsConfig):
     # path=str(path)
@@ -39,7 +39,6 @@ def getValueInt(src,row,col,lenght=-1):
 
 def getSigInfo(sheel,row):
     sig = SigInfo()
-    isFind = True
     sig.name = str(getValue(sheel,row,2))
     sig.Sender = str(getValue(sheel,row,1)).upper()
     sig.messageId = str(getValue(sheel,row,4)).split(".")[0]
@@ -79,6 +78,7 @@ def conversion(configPath,wirteSigName,canmatrix=""):
             continue
         if sigName.strip() == wirteSigName or isAllAdd:
             sig = getSigInfo(sheel,row)
+            isFind = True
             dbc=Analyze(dbcfile)
             dbc.writeSig(sig)
 

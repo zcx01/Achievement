@@ -31,6 +31,8 @@ private slots:
 
     void pyFinishedProcess();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     void sendPyCmd(const QString &cmd);

@@ -4,7 +4,7 @@ import os
 import sys
 import re
 from enum import Enum
-pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/topic_def/"
 from commonfun import*
 
 class DataType(Enum):
@@ -185,7 +185,10 @@ class Analyze(object):
                         self.dbcMessage[message].sigMaxRow=rowIndex+1         
                     except:
                         pass
-
+    
+    def sigExist(self,sig):
+        return sig in self.dbcSigs
+        
     def getMessageBySig(self,sig):
         try:
             return self.dbcSigs.get(sig).message

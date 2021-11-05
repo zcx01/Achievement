@@ -98,3 +98,10 @@ def getWord(text):
 def getNum(text):
     e_i = r"\b[0-9]+\b"
     return re.findall(e_i, text, re.A)
+
+#判断字符串是否是数字(数字、小数、负数、负小数、0)
+def isNumber(text):
+    if (text.split(".")[0]).isdigit() or text.isdigit() or  (text.split('-')[-1]).split(".")[-1].isdigit():
+        return True
+    else:
+        return False

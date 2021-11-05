@@ -124,6 +124,7 @@ void MainWindow::sendPyCmd(const QString &cmd)
 
 void MainWindow::sendliCmd(const QString &cmd)
 {
+    Out(ui->liTextEdit,cmd);
     liPro->write(cmd.toLocal8Bit()+"\n");
 }
 
@@ -226,5 +227,12 @@ QString MainWindow::analyline(const QString &msg,int index)
         index = contents.size()-1;
     }
     return contents.value(index);
+}
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    ui->liTextEdit->clear();
+    ui->pyTextEdit->clear();
 }
 
