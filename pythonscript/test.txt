@@ -1,0 +1,276 @@
+--------------统计--------------
+存在差异的信号有10个
+在原来的矩阵是不存在的有229个
+具体如下:
+ 
+-------------- HU_RollingCounter_3AF 3AF --------------
+HU_RollingCounter_3AF 3AF信号名称相同,具体的差别如下:
+结束位:48 --- 240
+
+-------------- EspVehSpd 1C2 --------------
+EspVehSpd 1C2和原来的EspVehSpd 1C2在同一个message1C2,具体的差别如下:
+最大值:460.744 --- 460.74375
+
+-------------- HU_CurveDistance 3AF --------------
+HU_CurveDistance 3AF信号名称相同,具体的差别如下:
+结束位:32 --- 224
+
+-------------- HU_EnterCurveInfo 3AF --------------
+HU_EnterCurveInfo 3AF信号名称相同,具体的差别如下:
+结束位:27 --- 219
+
+-------------- HU_RoadCurvature_10m 3C4 --------------
+HU_RoadCurvature_10m 3C4信号名称相同,具体的差别如下:
+结束位:22 --- 150
+
+-------------- HU_RoadCurvature_20m 3C4 --------------
+HU_RoadCurvature_20m 3C4信号名称相同,具体的差别如下:
+结束位:28 --- 156
+
+-------------- HU_RoadCurvature_30m 3C4 --------------
+HU_RoadCurvature_30m 3C4信号名称相同,具体的差别如下:
+结束位:34 --- 162
+
+-------------- HU_RoadCurvature_40m 3C4 --------------
+HU_RoadCurvature_40m 3C4信号名称相同,具体的差别如下:
+结束位:40 --- 168
+
+-------------- EpsFaild 24F --------------
+EpsFaild 24F信号名称相同,具体的差别如下:
+长度:3 --- 1
+结束位:40 --- 15
+
+-------------- CdcDistToCross 2E2 --------------
+CdcDistToCross 2E2信号名称相同,具体的差别如下:
+长度:18 --- 10
+
+--------------不在存在的信号--------------
+VcuVehAvrgEgyCnseDrivingCyc 309
+VcuVehChrgAvrgEgyCnse 309
+TboxResiMaintainRem 2F7
+HU_CurrentLocationLatitude 500
+HU_CurrentLocationLongitude 500
+ADS_IRLCEnable 307
+ADS_FRC_FCTAEnable 29E
+ADS_FRC_FCTBEnable 29E
+ADS_HWAEnableStatus 31A
+ADS_TJPEnableStatus 31A
+BcmHoodSts 288
+ACC_CRCCheck_374 36F
+ACC_CRCCheck_3C8 36F
+ACC_CRCCheck_3CA 36F
+ACC_CRCCheck_3CB 36F
+ACC_CRCCheck_3CD 36F
+ACC_HandsoffFuncStatus 31A
+ACC_HandsoffFuncTextinfo 31A
+ACC_LaneEquationC1 382
+ACC_LaneEquationC2 382
+ACC_LaneEquationC3 382
+ACC_LaneEquationStatus 382
+ACC_LaneQuality 382
+ACC_RollingCounter_374 36F
+ACC_RollingCounter_3C8 36F
+ACC_RollingCounter_3CA 36F
+ACC_RollingCounter_3CB 36F
+ACC_RollingCounter_3CD 36F
+ACC_TakeoverReqAtIPFail 36F
+ADS_AutoDriveState 307
+ADS_AutoDriveStateDisplay 36F
+ADS_CRCCheck_342 312
+ADS_CRCCheck_358 312
+ADS_DisToRamp 36F
+ADS_EOMActiveReq 312
+ADS_EOMDriverHeadPos 312
+ADS_EOMDwgradingnotice 36F
+ADS_EOMNotice 36F
+ADS_EOMSeatSteeringAdjustReq 312
+ADS_EOMStatus 312
+ADS_EOMTOReq 36F
+ADS_EOMWarnning 312
+ADS_ESSEnable 312
+ADS_ESSMode 312
+ADS_FLC_SystemStatus 29E
+ADS_FRC_Left_FCTALAlert 29E
+ADS_FRC_Right_FCTARAlert 29E
+ADS_FRC_SystemStatus 29E
+ADS_HostPedWarnLevel_1 36F
+ADS_LeftPedDetection 36F
+ADS_LeftPedWarnLevel 36F
+ADS_LLaneColor 312
+ADS_PathShow_C1 36F
+ADS_PathShow_C2 36F
+ADS_PathShow_C3 36F
+ADS_PathShow_Status 36F
+ADS_PathShowLngRange 36F
+ADS_PathThroughRamp 36F
+ADS_PromptCountDown 36F
+ADS_RampSide 36F
+ADS_RampStatus 36F
+ADS_RemoteRoadShapeC1 36F
+ADS_RemoteRoadShapeC2 36F
+ADS_RemoteRoadShapeC3 36F
+ADS_RightPedDetection 36F
+ADS_RLaneColor 312
+ADS_RoadMergeFlag 36F
+ADS_RoadMergeLatRange 36F
+ADS_RoadMergeLngRange 36F
+ADS_RoadSlopeFlag 36F
+ADS_RoadSlopeShapeC1 36F
+ADS_RoadSlopeShapeC2 36F
+ADS_RoadSlopeShapeC3 36F
+ADS_RollingCounter_342 312
+ADS_RollingCounter_358 312
+ADS_SafeStopSts 312
+ADS_SeatPostureRectifyReq 36F
+ADS_SpdLimitedStatus 312
+ADS_ToTargetLatDistance 312
+ADS_TSRHostNextSpdLimit 36F
+ADS_TSRHostNextSpdLimitDist 36F
+ADS_TunnelDis 36F
+ADS_TunnelStatus 36F
+ADS_UDLCEnableStatus 312
+ADS_UDLCLeftStatus 312
+ADS_UDLCRightStatus 312
+ADS_UDLCStatus 312
+ADS_UDLCTextInfoForDriver 312
+ADS_UDLCTurnLeftRequest 312
+ADS_UDLCTurnLightReq 312
+ADS_UDLCTurnRightRequest 312
+APA_Activation_Status 247
+APA_ButtonPress 247
+APA_CRCCheck_2A6 31E
+APA_CRCCheck_2A7 31E
+APA_CRCCheck_304 304
+APA_DynamicSlotWarning 247
+APA_FunctionOnOffSts 2C6
+APA_LAEBNotice 2C6
+APA_LF_Rebuild_Target_Dist 31E
+APA_LR_Rebuild_Target_Dist 31E
+APA_ParkNotice 247
+APA_ParkNotice_4 247
+APA_ParkNotice_5 2C6
+APA_RADSNotice 2C6
+APA_RF_Rebuild_Target_Dist 31E
+APA_RollingCounter_2A6 31E
+APA_RollingCounter_2A7 31E
+APA_RollingCounter_304 304
+APA_RR_Rebuild_Target_Dist 31E
+APA_SlotNotice 247
+APA_SystemFailureFlag 31E
+LCDAR_CRCCheck_2AC 29E
+LCDAR_RollingCounter_2AC 29E
+LFC_Sector_Dist 31E
+LFF_Sector_Dist 31E
+LFM_Sector_Dist 31E
+LFS_Sector_Dist 31E
+LRC_Sector_Dist 31E
+LRF_Sector_Dist 31E
+LRM_Sector_Dist 31E
+LRS_Sector_Dist 31E
+RFC_Sector_Dist 31E
+RFF_Sector_Dist 31E
+RFM_Sector_Dist 31E
+RFS_Sector_Dist 31E
+RRC_Sector_Dist 31E
+RRF_Sector_Dist 31E
+RRM_Sector_Dist 31E
+RRS_ButtonPress 31E
+RRS_LFCDistance 31E
+RRS_LFMDistance 31E
+RRS_LFSDistance 31E
+RRS_LRCDistance 31E
+RRS_LRMDistance 31E
+RRS_LRSDistance 31E
+RRS_RFCDistance 31E
+RRS_RFMDistance 31E
+RRS_RFSDistance 31E
+RRS_RRCDistance 31E
+RRS_RRMDistance 31E
+RRS_RRSDistance 31E
+RRS_Sector_Dist 31E
+RRS_SystemFailureFlag 31E
+RRS_WarningFrequency 31E
+RRS_WarningType 31E
+ADS_ALCDirection 312
+ADS_ALCTextInfoForDriver 312
+ADS_RightPedWarnLevel 36F
+APA_AVMNotice 31E
+APA_APAOnOff 247
+ADS_RollingCounter_36F 36F
+ADS_CRCCheck_36F 36F
+APA_RollingCounter_247 247
+APA_CRCCheck_247 247
+APA_RollingCounter_2C6 2C6
+APA_CRCCheck_2C6 2C6
+APA_RollingCounter_31E 31E
+APA_CRCCheck_31E 31E
+Mute_switch_signal 37A
+SkipFwd_switch_signal 37A
+SkipPrev_switch_signal 37A
+VolAssist_switch_signal 37A
+VolDec_switch_signal 37A
+VolInc_switch_signal 37A
+CdcTrDoorOpenReq 2D2
+CdcLeDwnRollSts 2D2
+CdcLeUpRollSts 2D2
+CdcLeLeTurnKeySts 2D2
+CdcLeRiTurnKeySts 2D2
+CdcTrDoorOpenDegReq 2D2
+DmsFaceDectSts 356
+CDCFaceAuthentSts 356
+DmsSmokeModSetFb 356
+DmsSmokeModAcoustWarnReq 356
+CdcSmokeModSet 2E2
+CST_OFF_Switch 2D2
+HU_RoadCurvature_400m 3C7
+HU_RoadCurvature_100m 3C7
+HU_RoadCurvature_300m 3C7
+HU_RoadCurvature_50m 3C6
+HU_RoadCurvature_600m 3C7
+HU_RoadCurvature_60m 3C6
+HU_RoadCurvature_70m 3C6
+HU_RoadCurvature_80m 3C6
+HU_RoadCurvature_90m 3C6
+HU_CurrentLocationValid 500
+CdcResiSocDisp 2F2
+HU_APAActive3 3BD
+HU_CurveDistance 3AF
+HU_EnterCurveInfo 3AF
+HU_RoadCurvature_10m 3C4
+HU_RoadCurvature_20m 3C4
+HU_RoadCurvature_30m 3C4
+HU_RoadCurvature_40m 3C4
+HU_RollingCounter_3AF 3AF
+HU_FullSpeedPanoramicSelect 507
+HU_RADSSwitch 3BD
+ADS_NDASetSpdModeStatus 36F
+HU_NaviDistance 3BD
+HU_ADAS_Posn_Pathldx 3AF
+HU_ADAS_Posn_Offset 3AF
+HU_NDAEnable 552
+HU_NDAAudioWarEnable 552
+HU_NDANavEnable 552
+HU_ADSSafeVoiceEnable 394
+HU_ADSLaneChangeVoiceEnable 394
+HU_ADSRoadVoiceEnable 394
+HU_NDASetSpdMode 552
+ADS_NDAEnableStatus 312
+ADS_NDAAudioWarEnableStatus 312
+ADS_NDANavEnableStatus 312
+ADS_ADSSafeVoiceEnableSts 312
+ADS_ADSLaneChangeVoiceEnableSts 312
+ADS_ADSRoadVoiceEnableSts 312
+ADS_ADSVoiceRequest 312
+ACC_VehicleStartRemindSts 3E5
+ACC_AEBTargetProb 3E5
+ACC_AEBTargetAx 3E5
+ACC_AEBTargetAy 3E5
+ACC_AEBTargetStatus 3E5
+ACC_AEBTargetLatRelSpeed 369
+ADS_NDAStatus 36F
+ADS_NDATextInfo 36F
+ADS_NDAFenceTerminalDis 36F
+ACC_RollingCounter_3E5 3E5
+ACC_CRCCheck_3E5 3E5
+IBCU_BrakeFluid_Warning 1C2
+HU_AVM Trigger method 3BD

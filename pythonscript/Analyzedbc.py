@@ -4,6 +4,7 @@ import os
 import sys
 import re
 from enum import Enum
+from time import sleep
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/topic_def/"
 from commonfun import*
 
@@ -71,6 +72,12 @@ class SigInfo(object):
 
     #endBit+(length - length%8)+(8-length)+1=startBit
     def getStartBit(self):
+        return self.getMotorolaStartBit()
+
+    def getEndBit(self):
+        return self.getMotorolaEndBit()
+
+    def getMotorolaStartBit(self):
         self.useBit.clear()
         startIndex=self.endBit
         self.useBit.append(startIndex)
@@ -87,7 +94,7 @@ class SigInfo(object):
         self.startBit = startIndex
         return startIndex
 
-    def getEndBit(self):
+    def getMotorolaEndBit(self):
         self.useBit.clear()
         endIndex=self.startBit
         self.useBit.append(endIndex)
@@ -103,6 +110,79 @@ class SigInfo(object):
             self.useBit.append(endIndex)
         self.endBit = endIndex
         return endIndex
+
+    def getIntelStartBit(self):
+        self.useBit.clear()
+        startIndex=self.endBit
+        self.useBit.append(startIndex)
+        leg=1
+        while(leg < self.length):
+            nextIndex = startIndex-1
+            mSb=startIndex//8*8
+            if nextIndex < mSb:
+                startIndex = (startIndex//8*8)-8
+            else:
+                startIndex=nextIndex
+            leg+=1
+            self.useBit.append(startIndex)
+        self.startBit = startIndex
+        return startIndex
+
+    def getIntelEndBit(self):
+        self.useBit.clear()
+        endIndex=self.startBit
+        self.useBit.append(endIndex)
+        leg=1
+        while(leg < self.length):
+            nextIndex = endIndex+1
+            mSb=endIndex//8*8+7
+            if nextIndex > mSb:
+                endIndex = (endIndex//8*8)+8
+            else:
+                endIndex=nextIndex
+            leg+=1
+            self.useBit.append(endIndex)
+        self.endBit = endIndex
+        return endIndex
+
+    def compare(self,other):
+        # other = SigInfo(other)
+        result=[]
+        isSame=False
+        link=' --- '
+        if self.startBit == other.startBit and self.endBit == other.endBit and self.messageId == other.messageId:
+            isSame = True
+            # if self.name != other.name:
+            #     result.append(f"信号名称:{other.name}{link}{self.name}")
+            if self.dataType != other.dataType:
+                result.append(f'类型:{other.dataType}{link}{self.dataType}')
+            if self.factor != other.factor:
+                result.append(f'缩放:{other.factor}{link}{self.factor}')
+            if self.Offset != other.Offset:
+                result.append(f'偏移:{other.Offset}{link}{self.Offset}')
+            if self.min != other.min:
+                result.append(f'最小值:{other.min}{link}{self.min}')
+            if self.max != other.max:
+                result.append(f'最大值:{other.max}{link}{self.max}')
+            if self.initValue != other.initValue:
+                result.append(f'初始值:{other.initValue}{link}{self.initValue}')
+            if self.cycle != other.cycle:
+                result.append(f'周期:{other.cycle}{link}{self.cycle}')
+            if len(result) != 0:
+                result.insert(0,f'{other.name}和原来的{self.name}在同一个message{self.messageId},具体的差别如下:')
+        elif self.name == other.name:
+            isSame = True
+            result.append(f"{self.name}信号名称相同,具体的差别如下:")
+            if  self.length != other.length:
+                result.append(f"长度:{other.length}{link}{self.length}")
+            if self.endBit != other.endBit:
+                result.append(f"结束位:{other.endBit}{link}{self.endBit}")
+            if self.messageId != other.messageId:
+                result.append(f"messageId:{other.messageId}{link}{self.messageId}")
+            # if len(result) != 0:
+            #     result.append(f"{self.name}信号名称相同,具体的差别如下:")
+        
+        return isSame,result
 
     @staticmethod
     def analySG(text):

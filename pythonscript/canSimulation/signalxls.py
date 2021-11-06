@@ -14,13 +14,17 @@ from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
 from threading import Thread
 import argparse
 from Analyzedbc import *
+
+
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/../topic_def/"
 PC_PWD="123456"
 PROJECT_ID='c385ev'
 CHANNEL =0
 ignore_init_send =True
+PowerSig = 'BcmPwrStsFb'
 jsConfig = getJScontent(pyFileDir+"config.json",)
 dbc=Analyze(getKeyPath("dbcfile",jsConfig))
+
 class useCase(object):
     def __init__(self):
         self.index=0
@@ -37,19 +41,8 @@ class useCase(object):
         return premise'''
         return str(self.signals)
 
-    def SendCan(self):
-        sendSig={}
-        for sigName in self.signals:
-            if len(self.signals[sigName]) > 1:
-                print(f'{sigName}索引')
-                index = int(input())
-            else:
-                index=0
-            sendSig[sigName] = self.signals[sigName][index]
-        if self.sim == None:
-            self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
-        Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
-        time.sleep(5)
+
+    def sendCanSig(self,sendSig):
         print('-s：停止发送')
         print('-h：打印可选的信号')
         print('信号名 值：修改信号值和增加信号值')
@@ -83,6 +76,32 @@ class useCase(object):
                         print("输入信号值错误")
                     else:
                         self.sim.add_task({cmd[0]:cmd[1]})
+    def SendCan(self):
+        sendSig={}
+        for sigName in self.signals:
+            if len(self.signals[sigName]) > 1:
+                print(f'{sigName}索引')
+                index = int(input())
+            else:
+                index=0
+            sendSig[sigName] = self.signals[sigName][index]
+        if self.sim == None:
+            self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
+        Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
+        if not ignore_init_send:
+            time.sleep(5)
+        self.sendCanSig(sendSig)
+    
+    def SendPowerSig(self):
+        self.signals[PowerSig]=[]
+        self.signals[PowerSig].append("2")
+        self.SendCan()
+
+    def MonitorSig(self,sigName):
+        if self.sim == None:
+            self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
+        param = [sigName] #CdcAutoHeadLiSet
+        Thread(target=self.sim.begin_listening, args=(param,)).start()
     
     def find(self,name):
         try:
@@ -195,14 +214,22 @@ if __name__ == "__main__":
     description='这个脚本是生成测试的case')
     
     #这个是要解析 -f 后面的参数
-    parser.add_argument('-b','--bugxlsx',help="jira xlsx file",default="text")
-    parser.add_argument('-c','--casexlsx',help="jira xlsx file",default="text")
+    parser.add_argument('-b','--bugxlsx',help="jira xlsx file")
+    parser.add_argument('-c','--casexlsx',help="generate case xlsx file")
+    parser.add_argument('-s', '--Simulation',help="Simulation CAN",nargs='*')
+    parser.add_argument('-m', '--Monitor',help="Monitor CAN", default="text")
 
     arg=parser.parse_args()
+
+    use = useCase()
     if "-b" in sys.argv:
         dealTest(arg.bugxlsx,1,26)
     if '-c' in sys.argv:
         dealTest(arg.casexlsx,0,1)
+    elif '-s' in sys.argv:
+        use.SendPowerSig()
+    elif '-m' in sys.argv:
+        use.MonitorSig(arg.Monitor)
     else:
         dealTest("/home/chengxiongzhu/Works/文档/测试信号.xls")
 
