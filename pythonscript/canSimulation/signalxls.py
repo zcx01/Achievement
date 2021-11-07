@@ -42,8 +42,8 @@ class useCase(object):
         return str(self.signals)
 
     def isSame(self,other):
-        print(self.signals.keys() & other.signals.keys())
-        return len(self.signals.keys() & other.signals.keys()) == len(self.signals)
+        #return len(self.signals.keys() & other.signals.keys()) == len(self.signals)
+        return len(self.signals.keys() - other.signals.keys()) ==0
 
     def sendCanSig(self,sendSig):
         print('-s：停止发送')

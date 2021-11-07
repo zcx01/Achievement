@@ -102,7 +102,7 @@ def help():
 def getBugInfo():
     #fields = 'comment'不配置就没有备注,默认不存在
     issues = jira.search_issues('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated DESC'
-    ,fields = ['comment','summary'])
+    ,fields = ['comment','summary','description'])
     for issue in issues:
         displayIssue(issue,1)    
     help()
@@ -114,13 +114,15 @@ def getBugInfo():
         elif '-c' in in_i:
             printIssue(issues,in_i_s,4)
         elif '-a' in in_i:
-            printIssue(issues,in_i_s,8)
+            printIssue(issues,in_i_s,7)
         elif '-h' in in_i:
             help()
         elif '-e' in in_i:
                 return
         else:
-            sendBugCan(in_i)
+            for issue in issues:
+                if getBugId(in_i) == issue.key:
+                    sendBugCan(in_i)
 
 
 if __name__ == "__main__":
