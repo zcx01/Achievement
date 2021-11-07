@@ -9,7 +9,7 @@ import argparse
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='这个脚本是生成测试的case')
+        description='部署C385程序')
     
     #这个是要解析 -f 后面的参数
     parser.add_argument('-t','--timeSpace',help="sleep time",default=10)

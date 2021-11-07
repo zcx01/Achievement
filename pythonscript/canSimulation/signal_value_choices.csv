@@ -1,5 +1,1 @@
 signal,value,text,choice
-BcmPwrStsFb,0,Off,BcmPwrStsFb:Off
-BcmPwrStsFb,1,FBLPower,BcmPwrStsFb:FBLPower
-BcmPwrStsFb,2,ON,BcmPwrStsFb:ON
-BcmPwrStsFb,3,Start.,BcmPwrStsFb:Start.

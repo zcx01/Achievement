@@ -9,19 +9,19 @@ import pyperclip
 import xlrd
 import re
 import time
-from commonfun import *
-from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
 from threading import Thread
 import argparse
+from commonfun import *
+from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
 from Analyzedbc import *
 
 
-pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/../topic_def/"
 PC_PWD="123456"
 PROJECT_ID='c385ev'
 CHANNEL =0
 ignore_init_send =True
 PowerSig = 'BcmPwrStsFb'
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/../topic_def/"
 jsConfig = getJScontent(pyFileDir+"config.json",)
 dbc=Analyze(getKeyPath("dbcfile",jsConfig))
 
@@ -41,6 +41,9 @@ class useCase(object):
         return premise'''
         return str(self.signals)
 
+    def isSame(self,other):
+        print(self.signals.keys() & other.signals.keys())
+        return len(self.signals.keys() & other.signals.keys()) == len(self.signals)
 
     def sendCanSig(self,sendSig):
         print('-s：停止发送')
@@ -171,6 +174,12 @@ def ReMatchStr(text):
     #     print(case.Out())
     return case
 
+def pyperclipCopy(cmd):
+    try:
+        pyperclip.copy(cmd)
+    except:
+        pass
+
 def displayInfo(usecases):
     tmp=[]
     for case in usecases:
@@ -183,7 +192,10 @@ def displayInfo(usecases):
             for case in useCases:
                 print(f'{case.index:<5}'+f'{case.key:<10}'+case.Out())
             print("请输入索引或者关键字:")
+            print('-e: 退出')
             in_s= input()
+            if '-e' in in_s:
+                return
         else:
             in_s=0
             isloop=False
@@ -192,7 +204,7 @@ def displayInfo(usecases):
             if case.find(in_s):
                 print(case.index,case.Out())
                 case.SendCan()
-                pyperclip.copy(case.Out())
+                pyperclipCopy(case.Out())
                 break
             index += 1
 
@@ -211,7 +223,13 @@ def dealTest(dataPath,keyIndex=1,signalIndex=4):
         
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-    description='这个脚本是生成测试的case')
+    description='''
+    用来发送CAN信号:
+    支持jira导出的bug
+    支持生成的case
+    直接发送CAN信号
+    监听CAN信号
+    ''')
     
     #这个是要解析 -f 后面的参数
     parser.add_argument('-b','--bugxlsx',help="jira xlsx file")
