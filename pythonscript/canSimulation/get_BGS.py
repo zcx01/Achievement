@@ -101,7 +101,7 @@ def help():
 
 def getBugInfo():
     #fields = 'comment'不配置就没有备注,默认不存在
-    issues = jira.search_issues('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated DESC'
+    issues = jira.search_issues('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC'
     ,fields = ['comment','summary','description'])
     for issue in issues:
         displayIssue(issue,1)    
