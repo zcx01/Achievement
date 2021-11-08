@@ -191,7 +191,12 @@ def dealnewSig():
             pass
         else:
             print(f"写入 {can_parse_whitelistPath} 文件")
+            can_parse_whitelist=open(can_parse_whitelistPath,"r")
+            can_parse_whitelist_content=can_parse_whitelist.read()
+            can_parse_whitelist.close()
             can_parse_whitelist=open(can_parse_whitelistPath,"a")
+            if not can_parse_whitelist_content.endswith('\n'):
+                can_parse_whitelist.write('\n')
             can_parse_whitelist.write(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
             can_parse_whitelist.close()
 

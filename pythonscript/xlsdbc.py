@@ -80,7 +80,7 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             dbc.writeSig(sig)
 
     if not isFind:
-        print("没有找到信号")
+        print(f"{wirteSigName} 在CAN矩阵中不存在")
 
 def addHeadEnd(text,name):
     text.insert(0, f'-------------- {name} --------------')

@@ -128,8 +128,8 @@ class useCase(object):
     def MonitorSig(self,sigName):
         if self.sim == None:
             self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
-        param = [sigName] #CdcAutoHeadLiSet
-        Thread(target=self.sim.begin_listening, args=(param,)).start()
+        # param = [sigName] #CdcAutoHeadLiSet
+        Thread(target=self.sim.begin_listening, args=(sigName,)).start()
     
     def find(self,name):
         try:
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     parser.add_argument('-b','--bugxlsx',help="jira xlsx file")
     parser.add_argument('-c','--casexlsx',help="generate case xlsx file")
     parser.add_argument('-s', '--Simulation',help="Simulation CAN",nargs='*')
-    parser.add_argument('-m', '--Monitor',help="Monitor CAN", default="text")
+    parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
 
     arg=parser.parse_args()
 

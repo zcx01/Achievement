@@ -34,7 +34,7 @@ useCases=[]
 
 def getBugId(bugId):
     bugId = str(bugId)
-    if '_' not in bugId:
+    if '-' not in bugId:
         if(PROJECT_ID == 'c385ev'):
             bugId = 'BGS-'+bugId
     return bugId

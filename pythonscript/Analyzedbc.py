@@ -152,7 +152,7 @@ class SigInfo(object):
         link=' --- '
         if self.startBit == other.startBit and self.endBit == other.endBit and self.messageId == other.messageId:
             isSame = True
-            if self.name != other.name:
+            if self.name.replace(' ','') != other.name.replace(' ',''):
                 result.append(f"信号名称:{other.name}{link}{self.name}")
             if self.dataType != other.dataType:
                 result.append(f'类型:{other.dataType}{link}{self.dataType}')
@@ -168,11 +168,11 @@ class SigInfo(object):
                 result.append(f'初始值:{other.initValue}{link}{self.initValue}')
             if self.cycle != other.cycle:
                 result.append(f'周期:{other.cycle}{link}{self.cycle}')
-            if len(result) != 0:
-                result.insert(0,f'{other.name}和原来的{self.name}在同一个message{self.messageId},具体的差别如下:')
+            # if len(result) != 0:
+            #     result.insert(0,f'{other.name}和原来的{self.name}在同一个message{self.messageId},具体的差别如下:')
         elif self.name == other.name:
             isSame = True
-            result.append(f"{self.name}信号名称相同,具体的差别如下:")
+            # result.append(f"{self.name}信号名称和message相同,具体的差别如下:")
             if  self.length != other.length:
                 result.append(f"长度:{other.length}{link}{self.length}")
             if self.endBit != other.endBit:
