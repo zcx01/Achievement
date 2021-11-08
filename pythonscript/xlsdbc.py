@@ -17,18 +17,37 @@ def getValueKong(src, row, col):
     return f'\"{value}\"'
 
 
+def eConverf(value):
+    digit = 3
+    valueStr =str(value)
+    if 'e' in valueStr:
+        valueStrs = valueStr.split('e')
+        digit = abs(int(valueStrs[1]))
+        digit += len(valueStrs[0])-2
+        head='{:.%df}' % digit
+        return head.format(value)
+    else:
+        return value
+
 def getValueInt(src, row, col, lenght=-1):
     try:
-        value = str(float(src.cell_value(row, col)))
+        value = str(src.cell_value(row, col))
         values = value.split(".")
-        if int(values[1]) != 0:
-            return float(value)
+        isallZero = True
+
+        #防止丢失精度
+        for c in values[1]:
+            if c != '0':
+                isallZero =False
+                break
+
+        if not isallZero:
+            return eConverf(float(value))
         return int(values[0])
     except:
         if(lenght == -1):
             return 0
         return pow(2, lenght)
-
 
 def getSigInfo(sheel, row):
     sig = SigInfo()
@@ -39,6 +58,9 @@ def getSigInfo(sheel, row):
     sig.endBit = getValueInt(sheel, row, 6)
     sig.length = getValueInt(sheel, row, 7)
     sig.factor = getValueInt(sheel, row, 8)
+    if sig.factor == float(0):
+        print(f'{sig.name}缩放不能为0，此处修改成1')
+        sig.factor = 1
     sig.Offset = getValueInt(sheel, row, 9)
     sig.min = getValueInt(sheel, row, 10)
     sig.max = getValueInt(sheel, row, 11, sig.length)
