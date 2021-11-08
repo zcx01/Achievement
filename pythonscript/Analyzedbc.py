@@ -152,8 +152,8 @@ class SigInfo(object):
         link=' --- '
         if self.startBit == other.startBit and self.endBit == other.endBit and self.messageId == other.messageId:
             isSame = True
-            # if self.name != other.name:
-            #     result.append(f"信号名称:{other.name}{link}{self.name}")
+            if self.name != other.name:
+                result.append(f"信号名称:{other.name}{link}{self.name}")
             if self.dataType != other.dataType:
                 result.append(f'类型:{other.dataType}{link}{self.dataType}')
             if self.factor != other.factor:

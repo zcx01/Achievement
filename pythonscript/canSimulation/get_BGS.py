@@ -30,6 +30,8 @@ from signalxls import *
          
 jira =JIRA("http://jira.i-tetris.com/",basic_auth=("chengxiong.zhu","@Huan2870244352"))
 
+useCases=[]
+
 def getBugId(bugId):
     bugId = str(bugId)
     if '_' not in bugId:
@@ -37,8 +39,12 @@ def getBugId(bugId):
             bugId = 'BGS-'+bugId
     return bugId
 
+def appendUseCases(case):
+    if len(case.signals)!=0:
+        useCases.append(case)
+
 def sendBugCan(bugId):
-    useCases=[]
+    useCases.clear()
     # project =jira.project(str(bugId).split("-")[0])  #获取projet为BGS的信息
     bugId=getBugId(bugId)
     issue=jira.issue(bugId)
@@ -51,9 +57,9 @@ def sendBugCan(bugId):
     descriptionCase = ReMatchStr(description)
 
     if not descriptionCase.isSame(summaryCase):
-        useCases.append(summaryCase)
+        appendUseCases(summaryCase)
 
-    useCases.append(descriptionCase)
+    appendUseCases(descriptionCase)
         
     index = 1
     for comment in issue.fields.comment.comments:
@@ -61,9 +67,10 @@ def sendBugCan(bugId):
         if descriptionCase.isSame(case):
             continue
         case.index = index
-        useCases.append(case)
+        appendUseCases(case)
         index+=1
     if len(useCases) == 0:
+        print("没有信号的存在")
         return
     pyperclipCopy(useCases[0].Out())
     displayInfo(useCases)

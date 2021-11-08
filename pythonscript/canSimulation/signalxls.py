@@ -19,7 +19,7 @@ from Analyzedbc import *
 PC_PWD="123456"
 PROJECT_ID='c385ev'
 CHANNEL =0
-ignore_init_send =True
+ignore_init_send =False
 PowerSig = 'BcmPwrStsFb'
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/../topic_def/"
 jsConfig = getJScontent(pyFileDir+"config.json",)
@@ -42,12 +42,31 @@ class useCase(object):
         return str(self.signals)
 
     def isSame(self,other):
-        #return len(self.signals.keys() & other.signals.keys()) == len(self.signals)
-        return len(self.signals.keys() - other.signals.keys()) ==0
+        sameSize = len(self.signals.keys() & other.signals.keys())
+        print(sameSize,len(self.signals),len(other.signals))
+        return sameSize == len(self.signals) and sameSize == len(other.signals)
 
-    def sendCanSig(self,sendSig):
+        # return len(self.signals.keys() - other.signals.keys()) ==0
+
+    def stopAllsig(self):
+        self.sim.stop()
+        while True:
+            if self.sim.stopped:
+                break
+            time.sleep(1)
+
+    def startSig(self,sendSig):
+        Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
+        # while True:
+        #     if  self.sim.stopped:
+        #         break
+        #     time.sleep(1)
+        time.sleep(5)
+
+    def interactiveSendCanSig(self,sendSig):
         print('-s：停止发送')
         print('-h：打印可选的信号')
+        print('-r：重新发送')
         print('信号名 值：修改信号值和增加信号值')
         print('输入信号名:停止发送')
         isStop = False
@@ -60,18 +79,22 @@ class useCase(object):
                 return
             elif '-h' in cmd:
                 print(self.signals)
+            elif '-r' in cmd:
+                self.stopAllsig()
+                self.startSig(sendSig)
             elif len(cmd) == 1:
+                if  not dbc.sigExist(cmd):
+                    print("输入的信号在dbc不存在")
+                    continue
                 self.sim.stop_task(cmd[0])
                 isStop = True
             elif len(cmd) == 2:
                 if cmd[0] in sendSig and isStop:
-                    self.sim.stop()
-                    time.sleep(2)
+                    self.stopAllsig()
                     modifySendSig = dict(sendSig)
                     modifySendSig[cmd[0]]=cmd[1]
                     isStop=False
-                    Thread(target=self.sim.begin_sending, args=(modifySendSig,)).start()
-                    time.sleep(5)
+                    self.startSig(modifySendSig)
                 else:
                     if  not dbc.sigExist(cmd[0]):
                         print("输入的信号在dbc不存在")
@@ -79,6 +102,7 @@ class useCase(object):
                         print("输入信号值错误")
                     else:
                         self.sim.add_task({cmd[0]:cmd[1]})
+
     def SendCan(self):
         sendSig={}
         for sigName in self.signals:
@@ -90,10 +114,11 @@ class useCase(object):
             sendSig[sigName] = self.signals[sigName][index]
         if self.sim == None:
             self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
-        Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
-        if not ignore_init_send:
-            time.sleep(5)
-        self.sendCanSig(sendSig)
+        # Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
+        # if not ignore_init_send:
+        #     time.sleep(5)
+        self.startSig(sendSig)
+        self.interactiveSendCanSig(sendSig)
     
     def SendPowerSig(self):
         self.signals[PowerSig]=[]
@@ -187,6 +212,8 @@ def displayInfo(usecases):
             tmp.append(case)
     useCases=tmp
     isloop = True
+    if len(useCases) == 0:
+        print('没有发现信号')
     while(isloop):
         if len(useCases) > 1:
             for case in useCases:
@@ -197,7 +224,7 @@ def displayInfo(usecases):
             if '-e' in in_s:
                 return
         else:
-            in_s=0
+            in_s=useCases[0].index
             isloop=False
         index=0
         for case in useCases:
@@ -207,6 +234,7 @@ def displayInfo(usecases):
                 pyperclipCopy(case.Out())
                 break
             index += 1
+
 
 def dealTest(dataPath,keyIndex=1,signalIndex=4):
     book=xlrd.open_workbook(dataPath)
