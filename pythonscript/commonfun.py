@@ -105,3 +105,15 @@ def isNumber(text):
         return True
     else:
         return False
+
+#科学技术法转化成数字
+def eConverf(value):
+    valueStr =str(value)#会把E转化为e
+    if 'e' in valueStr:
+        valueStrs = valueStr.split('e')
+        if valueStrs[1].startswith('-'):
+            digit = abs(int(valueStrs[1]))
+            digit += len(valueStrs[0])-2
+            head='{:.%df}' % digit
+            return head.format(value)
+    return value

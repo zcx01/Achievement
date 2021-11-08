@@ -17,18 +17,6 @@ def getValueKong(src, row, col):
     return f'\"{value}\"'
 
 
-def eConverf(value):
-    digit = 3
-    valueStr =str(value)
-    if 'e' in valueStr:
-        valueStrs = valueStr.split('e')
-        digit = abs(int(valueStrs[1]))
-        digit += len(valueStrs[0])-2
-        head='{:.%df}' % digit
-        return head.format(value)
-    else:
-        return value
-
 def getValueInt(src, row, col, lenght=-1):
     try:
         value = str(src.cell_value(row, col))
