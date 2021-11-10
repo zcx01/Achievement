@@ -147,11 +147,12 @@ def dealBug(dataPath):
         for col in range(sheel.ncols):
             text=sheel.cell_value(row,col)
 
+
 def ReMatchStr(text):
     case = useCase()
-    word=r"\b[a-zA-Z]+\b"
+    word=r"\b[a-zA-Z_]+\b"
     in_i=r"-?\b[0x0-9]+\b"
-    e_i=r"-?\b[a-zA-Z0x0-9]+\b"
+    e_i=r"-?\b[a-zA-Z_0x0-9]+\b"
     signals=re.findall(e_i,text,re.A)
 
     #去除不在dbc中的信号
@@ -160,7 +161,6 @@ def ReMatchStr(text):
         if dbc.sigExist(signal) or re.search(in_i,signal,re.A) != None:
             tempSignals.append(signal)
     signals = tempSignals
-    # print(signals)
     if signals== None:
         return case
     index=0
@@ -214,6 +214,7 @@ def displayInfo(usecases):
     isloop = True
     if len(useCases) == 0:
         print('没有发现信号')
+        return
     while(isloop):
         if len(useCases) > 1:
             for case in useCases:

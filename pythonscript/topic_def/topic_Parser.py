@@ -135,10 +135,13 @@ def getTopic(jsConfig,desc,sig,suffx):
     jsCustom["Comments"]=desc
     jsCustoms.append(jsCustom)
     writeJs(custom_topics_definePath,jsCustoms)
-    ex = subprocess.Popen("bash "+getKeyPath("generate_topic",jsConfig),stdout=subprocess.PIPE,shell=True)
+    execCmd("bash "+getKeyPath("generate_topic",jsConfig))
+    return suffx+sig
+
+def execCmd(cmd):
+    ex = subprocess.Popen(cmd,stdout=subprocess.PIPE,shell=True)
     ex.communicate()
     ex.wait()
-    return suffx+sig
 
 def getDefine(jsConfig,topic):
     definefile=getKeyPath("definefile",jsConfig)
@@ -151,14 +154,29 @@ def getDefine(jsConfig,topic):
 
 def dealnewSig():
     jsConfig=getJScontent(pyFileDir+"config.json")
-    analy=Analyze(getKeyPath("dbcfile",jsConfig))
-
     newSigFile=open(getKeyPath("newSig",jsConfig),"r")
     content=newSigFile.read().splitlines()
     newSigFile.close()
     alreadyText=[]
+    analy=Analyze(getKeyPath("dbcfile",jsConfig))
+
+    #通过CAN添加dbc文件
+    addDbcSigNames=[]
     for text in content:
         if text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n"):
+            continue
+        text=text.replace("\t"," ")
+        names=text.split(" ")
+        sig=getValueByIndex(names,0)
+        if  not analy.sigExist(sig):
+            addDbcSigNames.append(sig)
+    addDbcSigName=' '.join(addDbcSigNames)
+    print(addDbcSigName)
+    execCmd(f'xlsdbc -s {addDbcSigName}')
+
+    analy=Analyze(getKeyPath("dbcfile",jsConfig))
+    for text in content:
+        if text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n") or len(text.replace(' ',''))==0:
             continue
         text=text.replace("\t"," ")
         names=text.split(" ")
@@ -225,6 +243,9 @@ def dealnewSig():
             print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
             os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
         alreadyText.append(text)
+        
+    if judgeCommad("-x",""):
+        os.system("TestCaseGenerate")
     os.system("Parser")
 
 def xlsToTxt():
