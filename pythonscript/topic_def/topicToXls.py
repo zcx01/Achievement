@@ -17,7 +17,7 @@ def sigExist(sheel,row,col):
 
 def getTopic(deContent,topic):
     for lineContent in deContent:
-        if lineContent.startswith("#define"):
+        if not lineContent.startswith("#define"):
             continue
         topicStr = splitSpaceGetValueByIndex(lineContent,2)
         topicStr = topicStr.replace('\"','')
@@ -26,7 +26,6 @@ def getTopic(deContent,topic):
         topicStrS = topicStr.split('/')
         del topicStrS[0]
         topicStr = '/'.join(topicStrS)
-
         if  topicStr ==  topic:
             return splitSpaceGetValueByIndex(lineContent,1)
 
@@ -43,13 +42,13 @@ def generate(xlsPath,startRow,endRow):
         return
     jsConfig = getJScontent(pyFileDir+"config.json")
     defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
-
-    xlsNewSigPath = getKeyPath("xlsNewSigPath",jsConfig)
-    book = openpyxl.load_workbook(xlsNewSigPath)
-    try:
-        sh = book[book.sheetnames[0]]
-    except:
-        print('sheel名称错误')
+    # print(getKeyPath("definefile",jsConfig),defineContents)
+    # xlsNewSigPath = getKeyPath("xlsNewSigPath",jsConfig)
+    # book = openpyxl.load_workbook(xlsNewSigPath)
+    # try:
+    #     sh = book[book.sheetnames[0]]
+    # except:
+    #     print('sheel名称错误')
 
     while(startRow <= endRow):
         rowContent=[]
@@ -60,18 +59,19 @@ def generate(xlsPath,startRow,endRow):
             topicStr+='/'+sheel.cell_value(startRow,2)
         sig,isExist = sigExist(sheel,startRow,7)
         if isExist:
-            topicStr+="/set"
-            topicDefine = getTopic(defineContents,topicStr)
+            topicSetStr =topicStr+"/Set"
+            topicDefine = getTopic(defineContents,topicSetStr)
             rowContent.append(sig)
             rowContent.append('drive_assist')
             rowContent.append(comments)
             rowContent.append(className)
             rowContent.append(topicDefine)
-            rowContent.append()
-            rowContent.append()
+            rowContent.append('')
+            rowContent.append('')
             rowContent.append('n')
-            sh.append(rowContent)
-
+            print(rowContent)
+            #sh.append(rowContent)
+        rowContent.clear()
         sig,isExist = sigExist(sheel,startRow,8)
         if isExist:
             topicDefine = getTopic(defineContents,topicStr)
@@ -80,10 +80,11 @@ def generate(xlsPath,startRow,endRow):
             rowContent.append(comments+'状态')
             rowContent.append(className+'Status')
             rowContent.append(topicDefine)
-            rowContent.append()
-            rowContent.append()
+            rowContent.append('')
+            rowContent.append('')
             rowContent.append('y')
-            sh.append(rowContent)
+            print(rowContent)
+            # sh.append(rowContent)
         startRow+=1
 
     book.save(xlsNewSigPath)
