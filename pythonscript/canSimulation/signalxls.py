@@ -71,9 +71,10 @@ class useCase(object):
         print('输入信号名:停止发送')
         isStop = False
         while(True):
-            cmd=input().split(" ")
+            cmd=input()
             if len(cmd) == 0:
                 continue
+            cmd=cmd.split(" ")
             if '-s' in cmd:
                 self.sim.stop()
                 return
@@ -83,7 +84,7 @@ class useCase(object):
                 self.stopAllsig()
                 self.startSig(sendSig)
             elif len(cmd) == 1:
-                if  not dbc.sigExist(cmd):
+                if  not dbc.sigExist(cmd[0]):
                     print("输入的信号在dbc不存在")
                     continue
                 self.sim.stop_task(cmd[0])

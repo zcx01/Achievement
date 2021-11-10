@@ -10,5 +10,5 @@
     "custom_topics_define": "qt/ic_qt/resources/scripts/topic_gentools/custom_topics_define.json",
     "topics_define": "qt/ic_qt/resources/scripts/topic_gentools/topics_define.json",
     "generate_topic": "qt/ic_qt/resources/scripts/generate_topic.sh",
-    "casePath": "/home/chengxiongzhu/Works/case"
+    "casePath": "/home/chengxiongzhu/Works/case/APA"
 }
