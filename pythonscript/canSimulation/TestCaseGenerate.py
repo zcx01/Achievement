@@ -5,6 +5,7 @@ import sys
 import openpyxl 
 import xlrd
 import argparse
+from projectInI import *
 
 from commonfun import*
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
@@ -100,18 +101,21 @@ def Combination(sigCombinations,*value):
         for valueIndex in range(len(value)):
             sigCombinations.append(initCombination(value[valueIndex])) 
 
-def autoCaseGenerate(configPath=pyFileDir+"config.json"):
+def autoCaseGenerate(configPath=pyFileDir+"config.json",isAddPowerSig=True):
     jsConfig=getJScontent(configPath)
     book=xlrd.open_workbook(getKeyPath("xlsNewSigPath",jsConfig))
     sheel=book.sheet_by_index(0)
+    xlsFileName=''
     for row in range(sheel.nrows):
         if row == 0 :
             continue
         caseAim=[]
-        caseAim.append(f'CANSIG_S_I_BcmPwrStsFb_g')
+        if isAddPowerSig:
+            caseAim.append(f'CANSIG_S_I_{PowerSig}_g')
         caseAim.append(f'CANSIG_S_I_{sheel.cell_value(row,0)}_g')
         caseAim.append(sheel.cell_value(row,4))
-        xlsFileName=sheel.cell_value(row,2)
+        if len(xlsFileName) == 0:
+            xlsFileName = sheel.cell_value(row, 2)
         isSendCan = str(sheel.cell_value(row,7)) == 'y'
         generateTest('\n'.join(caseAim),xlsFileName,configPath,'',isSendCan)
 
@@ -217,8 +221,9 @@ if __name__ == "__main__":
     parser.add_argument('-x','--casefile',help="指定生成的case路径",default="text")
     parser.add_argument('-a','--aimfile',help='被自测的文件名',default="/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_info/machine_time.cpp")
     parser.add_argument('-v','--variable',help='moudle中的变量名',default='')
+    parser.add_argument('-p','--power',help='是否加入电源信号',default=1,type=int)
     args = parser.parse_args()
     if '-a' in sys.argv:
         generateTest(args.aimfile,args.casefile,configFileDir+"config.json",args.variable)
     else:
-        autoCaseGenerate(configFileDir+"config.json")
+        autoCaseGenerate(configFileDir+"config.json",args.power)

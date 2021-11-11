@@ -11,6 +11,11 @@ from commonfun import*
 class DataType(Enum):
     VINT=1
     VFLOAT=2
+
+class WriteDBCResult(Enum):
+    VINT=1
+    VFLOAT=2
+
 class SigInfo(object):
     def __init__(self) :
         self.messageId = ""
@@ -61,8 +66,8 @@ class SigInfo(object):
     def getMessageId(self):
         return f'{self.Sender}_{self.messageId}'
 
-    def getMessage(self):
-        return f'BO_  {int(self.messageId,16)} {self.getMessageId()}: 64 {self.Sender}'
+    def getMessage(self,size):
+        return f'BO_  {int(self.messageId,16)} {self.getMessageId()}: {size} {self.Sender}'
 
     def getMessageCycle(self):
         return f'BA_ \"GenMsgCycleTime\" BO_  {int(self.messageId,16)} {self.cycle};'
@@ -187,16 +192,16 @@ class SigInfo(object):
     @staticmethod
     def analySG(text):
         sig=SigInfo()
-        e_i=r"\b[a-zA-Z0x0-9]+\b"
+        e_i=r"-?\b[a-zA-Z_0x0-9]+\b"
         signals=re.findall(e_i,text,re.A)
         if signals== None:
             return sig
         try:
-            sig.name=signals[0]
-            sig.startBit=int(signals[1])
-            sig.length=int(signals[2])
-            sig.factor=signals[4]
-            sig.Offset=signals[5]
+            sig.name=signals[1]
+            sig.startBit=int(signals[2])
+            sig.length=int(signals[3])
+            sig.factor=signals[5]
+            sig.Offset=signals[6]
         except:
             pass
         sig.getEndBit()
@@ -334,6 +339,11 @@ class Analyze(object):
                                 print(f"{sig.name} 信号有覆盖:开始字节{sig.startBit},结束的字节{sig.endBit}，占用的字节{sigUsrIndexs},与{user}覆盖字节")
                                 return
 
+                #超出的原来的大小，就扩大
+                print(startRow,dm.sigMaxRow,insertRowIndex)
+                if insertRowIndex == dm.sigMaxRow and sig.endBit > 63:
+                    linelist[dm.Row] = sig.getMessage(64)
+
                 linelist.insert(insertRowIndex,sig.getSG())
                 for row in range(linelistSize):
                     if "GenSigStartValue" in str(linelist[linelistSize-1-row]):
@@ -371,7 +381,7 @@ class Analyze(object):
         if len(sig.messageId) == 0:
             return False
         linelist.insert(self.maxSigRow+1,"\n")
-        linelist.insert(self.maxSigRow+2,sig.getMessage())
+        linelist.insert(self.maxSigRow+2,sig.getMessage(8))
         linelistSize=len(linelist)
         for row in range(linelistSize):
             if "GenMsgCycleTime" in str(linelist[linelistSize-1-row]):

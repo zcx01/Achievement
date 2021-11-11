@@ -170,6 +170,5 @@ if __name__ == "__main__":
         for sigName in arg.sigNames:
             conversion(arg.config, sigName)
     elif '-t' in sys.argv:
-        diffCanMatrix(arg.fristMatrix, arg.twoMatrix,
-                      arg.config, arg.resultPath)
+        diffCanMatrix(arg.fristMatrix, arg.twoMatrix,arg.config, arg.resultPath)
     # conversion(pyFileDir+"config.json", "CdcLaneInfo")

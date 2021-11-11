@@ -32,6 +32,8 @@ elif [ $2 == "-n" ];then
     git add -A
     git commit --amend --no-edit
     git push mega HEAD:refs/for/master
+elif [ $2 == "-s" ];then
+    repo forall -c "git clean -df" && repo forall -c "git reset --hard; git checkout ." && repo sync --force-sync -j8
 elif [ $2 == "-a" ];then
     git add -A
     git commit --amend 

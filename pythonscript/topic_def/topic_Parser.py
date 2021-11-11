@@ -152,6 +152,9 @@ def getDefine(jsConfig,topic):
     print("没有找到"+topic)
     sys.exit()
 
+def InvalidRow(text,alreadyText):
+    return text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n") or len(text.replace(' ',''))==0
+
 def dealnewSig():
     jsConfig=getJScontent(pyFileDir+"config.json")
     newSigFile=open(getKeyPath("newSig",jsConfig),"r")
@@ -161,22 +164,26 @@ def dealnewSig():
     analy=Analyze(getKeyPath("dbcfile",jsConfig))
 
     #通过CAN添加dbc文件
-    addDbcSigNames=[]
+    addDbcSigNames={}
     for text in content:
-        if text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n"):
+        if InvalidRow(text,alreadyText):
             continue
         text=text.replace("\t"," ")
         names=text.split(" ")
         sig=getValueByIndex(names,0)
         if  not analy.sigExist(sig):
-            addDbcSigNames.append(sig)
-    addDbcSigName=' '.join(addDbcSigNames)
-    print(addDbcSigName)
-    execCmd(f'xlsdbc -s {addDbcSigName}')
+            desc=getValueByIndex(names,2)
+            addDbcSigNames[sig] = desc
+
+    print('正在写入dbc...')
+    for sig in addDbcSigNames:
+        print(f'{sig:<10} {addDbcSigNames[sig]}')
+    addDbcSigName=' '.join(addDbcSigNames.keys())
+    os.system(f'xlsdbc -s {addDbcSigName}')
 
     analy=Analyze(getKeyPath("dbcfile",jsConfig))
     for text in content:
-        if text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n") or len(text.replace(' ',''))==0:
+        if InvalidRow(text,alreadyText):
             continue
         text=text.replace("\t"," ")
         names=text.split(" ")
@@ -244,7 +251,7 @@ def dealnewSig():
             os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
         alreadyText.append(text)
         
-    if judgeCommad("-x",""):
+    if not judgeCommad("-t",""):
         os.system("TestCaseGenerate")
     os.system("Parser")
 
@@ -266,7 +273,7 @@ def xlsToTxt():
     wirteFileDicts(getKeyPath("newSig", jsConfig),rowDatas)
 
 if __name__ == "__main__":
-    if(judgeCommad("-x","")):
+    if not judgeCommad("-t",""):
         xlsToTxt()
     dealnewSig()
 

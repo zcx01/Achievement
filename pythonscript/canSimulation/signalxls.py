@@ -14,13 +14,9 @@ import argparse
 from commonfun import *
 from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
 from Analyzedbc import *
+from projectInI import *
 
 
-PC_PWD="123456"
-PROJECT_ID='c385ev'
-CHANNEL =0
-ignore_init_send =False
-PowerSig = 'BcmPwrStsFb'
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/../topic_def/"
 jsConfig = getJScontent(pyFileDir+"config.json",)
 dbc=Analyze(getKeyPath("dbcfile",jsConfig))

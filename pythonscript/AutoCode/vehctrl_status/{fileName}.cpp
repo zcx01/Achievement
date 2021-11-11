@@ -62,7 +62,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
 
 void {ClassName}::publish_status(const std::string &topic, float value,bool isVaild)
 {
-    nlohmann::json j = PayloadInfo{ value, isVaild, "", false, ValueType::FLOAT};
+    nlohmann::json j = PayloadInfo{ value, isVaild, "", false};
 
     std::string msg = j.dump();
     TB_LOG_INFO("{ClassName} msg: %s %s %f", msg.data(), topic.data(), value);

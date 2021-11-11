@@ -13,7 +13,13 @@ import argparse
 
 def sigExist(sheel,row,col):
     sig = str(sheel.cell_value(row,col))
-    return sig,len(sig)>3
+    relation=''
+    if ',' in sig:
+        sigs = sig.split(',')
+        sig = sigs[0]
+        del sigs[0]
+        relation = ','.join(sigs)
+    return sig,len(sig)>3,relation
 
 def getTopic(deContent,topic):
     for lineContent in deContent:
@@ -33,8 +39,8 @@ def getTopic(deContent,topic):
     return ''
 
 def generate(xlsPath,startRow,endRow):
-    startRow+=1
-    endRow+=1
+    startRow-=1
+    endRow-=1
     book=xlrd.open_workbook(xlsPath)
     sheel=book.sheet_by_index(0)
     if startRow >= sheel.nrows or endRow >= sheel.nrows or startRow > endRow:
@@ -42,23 +48,19 @@ def generate(xlsPath,startRow,endRow):
         return
     jsConfig = getJScontent(pyFileDir+"config.json")
     defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
-    # print(getKeyPath("definefile",jsConfig),defineContents)
-    # xlsNewSigPath = getKeyPath("xlsNewSigPath",jsConfig)
-    # book = openpyxl.load_workbook(xlsNewSigPath)
-    # try:
-    #     sh = book[book.sheetnames[0]]
-    # except:
-    #     print('sheel名称错误')
+    xlsNewSigPath = getKeyPath("xlsNewSigPath",jsConfig)
+    book = openpyxl.Workbook()
+    sh = book.active
 
     while(startRow <= endRow):
-        rowContent=[]
         comments =  sheel.cell_value(startRow,5)
         className = sheel.cell_value(startRow,1)+ sheel.cell_value(startRow,2)
         topicStr = sheel.cell_value(startRow,1)
         if len(str(sheel.cell_value(startRow,2))) !=0:
             topicStr+='/'+sheel.cell_value(startRow,2)
-        sig,isExist = sigExist(sheel,startRow,7)
+        sig,isExist,relation = sigExist(sheel,startRow,7)
         if isExist:
+            rowContent=[]
             topicSetStr =topicStr+"/Set"
             topicDefine = getTopic(defineContents,topicSetStr)
             rowContent.append(sig)
@@ -69,25 +71,29 @@ def generate(xlsPath,startRow,endRow):
             rowContent.append('')
             rowContent.append('')
             rowContent.append('n')
+            rowContent.append(relation)
             print(rowContent)
-            #sh.append(rowContent)
-        rowContent.clear()
-        sig,isExist = sigExist(sheel,startRow,8)
+            sh.append(rowContent)
+
+        sig,isExist,relation = sigExist(sheel,startRow,8)
         if isExist:
+            rowContent=[]
             topicDefine = getTopic(defineContents,topicStr)
             rowContent.append(sig)
-            rowContent.append('drive_assist_sts')
+            rowContent.append('vehctrl_status')
             rowContent.append(comments+'状态')
             rowContent.append(className+'Status')
             rowContent.append(topicDefine)
             rowContent.append('')
             rowContent.append('')
             rowContent.append('y')
+            rowContent.append(relation)
             print(rowContent)
-            # sh.append(rowContent)
+            sh.append(rowContent)
         startRow+=1
 
-    book.save(xlsNewSigPath)
+    book.save(xlsNewSigPath+'.xlsx')
+    book.close()
     print("生成完成")
 
 
