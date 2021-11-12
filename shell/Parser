@@ -7,6 +7,9 @@ sudo make
 exit 0
 EOF
 
+# cd  ~/Works/Repos/tool_parser 
+# echo '123456' | sudo -S make
+
 echo "删除原来的文件"
 rm -rf ~/Works/Repos/changan_c835/src/ic_service/parser/generated/
 

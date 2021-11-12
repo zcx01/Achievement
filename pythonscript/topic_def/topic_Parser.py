@@ -4,6 +4,7 @@ import sys
 import os
 import xlrd
 import subprocess
+import argparse
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 sys.path.append(pyFileDir+"..")
 from commonfun import *
@@ -50,7 +51,7 @@ def addEscape(s):
     temp = temp.replace(")","\)")
     return temp
 
-def judgeCommad(cmd,all):
+def judgeCommad(cmd,all=[]):
     if cmd in sys.argv or cmd in all:
         return True
     return False
@@ -155,7 +156,7 @@ def getDefine(jsConfig,topic):
 def InvalidRow(text,alreadyText):
     return text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n") or len(text.replace(' ',''))==0
 
-def dealnewSig():
+def dealnewSig(can_parse_whitelist_return=False):
     jsConfig=getJScontent(pyFileDir+"config.json")
     newSigFile=open(getKeyPath("newSig",jsConfig),"r")
     content=newSigFile.read().splitlines()
@@ -213,7 +214,9 @@ def dealnewSig():
         #写入 can_parse_whitelist 文件
         can_parse_whitelistPath=getKeyPath("can_parse_whitelist",jsConfig)
         if judgeCommad("-bc",names) or findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
-            pass
+            if can_parse_whitelist_return:
+                print(f'{can_parse_whitelistPath} 文件存在，跳过')
+                continue
         else:
             print(f"写入 {can_parse_whitelistPath} 文件")
             can_parse_whitelist=open(can_parse_whitelistPath,"r")
@@ -250,15 +253,12 @@ def dealnewSig():
             print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
             os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
         alreadyText.append(text)
-        
-    if not judgeCommad("-t",""):
-        os.system("TestCaseGenerate")
-    os.system("Parser")
+    
 
-def xlsToTxt():
+def xlsToTxt(shellIndex=0):
     jsConfig=getJScontent(pyFileDir+"config.json")
     book=xlrd.open_workbook(getKeyPath("xlsNewSigPath",jsConfig))
-    sheel=book.sheet_by_index(0)
+    sheel=book.sheet_by_index(shellIndex)
     rowDatas=[]
     newSigFile = open(getKeyPath("newSig", jsConfig), "r")
     oldRowDatas=newSigFile.read().splitlines()
@@ -273,7 +273,19 @@ def xlsToTxt():
     wirteFileDicts(getKeyPath("newSig", jsConfig),rowDatas)
 
 if __name__ == "__main__":
-    if not judgeCommad("-t",""):
-        xlsToTxt()
-    dealnewSig()
+    parse = argparse.ArgumentParser(description='可以通过文本或者表格生成代码的脚本')
+    parse.add_argument('-s','--shell',help='shell的索引',type=int,default=0)
+    parse.add_argument('-t','--text',help='文本生成')
+    parse.add_argument('-r', '--CanParseWhitelistReturn', help='在can的白名单中存在就不生成代码',type=int,default=0)
+    parse.add_argument('-p','--power',help='是否加入电源信号',default=1,type=int)
 
+    arg = parse.parse_args()
+
+    isShell = not judgeCommad("-t") or judgeCommad('-s')
+    if isShell:
+        xlsToTxt(arg.shell)
+    dealnewSig(arg.CanParseWhitelistReturn)
+
+    if isShell:
+        os.system(f"TestCaseGenerate -s {arg.shell} -p {arg.power}")
+    os.system("Parser")

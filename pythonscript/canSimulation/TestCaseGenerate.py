@@ -101,10 +101,10 @@ def Combination(sigCombinations,*value):
         for valueIndex in range(len(value)):
             sigCombinations.append(initCombination(value[valueIndex])) 
 
-def autoCaseGenerate(configPath=pyFileDir+"config.json",isAddPowerSig=True):
+def autoCaseGenerate(configPath=pyFileDir+"config.json",shellIndex=0,isAddPowerSig=True):
     jsConfig=getJScontent(configPath)
     book=xlrd.open_workbook(getKeyPath("xlsNewSigPath",jsConfig))
-    sheel=book.sheet_by_index(0)
+    sheel=book.sheet_by_index(shellIndex)
     xlsFileName=''
     for row in range(sheel.nrows):
         if row == 0 :
@@ -222,8 +222,9 @@ if __name__ == "__main__":
     parser.add_argument('-a','--aimfile',help='被自测的文件名',default="/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_info/machine_time.cpp")
     parser.add_argument('-v','--variable',help='moudle中的变量名',default='')
     parser.add_argument('-p','--power',help='是否加入电源信号',default=1,type=int)
+    parser.add_argument('-s', '--shellIndex', help='shell的索引', default=0, type=int)
     args = parser.parse_args()
     if '-a' in sys.argv:
         generateTest(args.aimfile,args.casefile,configFileDir+"config.json",args.variable)
     else:
-        autoCaseGenerate(configFileDir+"config.json",args.power)
+        autoCaseGenerate(configFileDir+"config.json",args.shellIndex,args.power)

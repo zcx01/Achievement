@@ -7,10 +7,11 @@ namespace DriveAssist
 
 void {ClassName}::state_process(const std::string &topic, const std::string &content)
 {
-	VehCtrlInfo info = fds::ParseAndLogInfo(topic, content);
+	PayloadInfo info = fds::ParseAndLogPayloadInfo(topic, content);
+	float value = info.value.get<float>();
+	TB_LOG_INFO("state_process: %s, %s", topic.data(), content.data());
 
-
-	fds::SendCanFrame(&CANSIG_{1}_g, info.value, signal_value_type::eSigValType_u{4}32_t);
+	fds::SendCanFrame(&CANSIG_{1}_g, value, signal_value_type::eSigValType_u{4}32_t);
 }
 
 }

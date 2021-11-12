@@ -6,6 +6,8 @@ sudo apt-get install git
 
 sudo apt-get install vim
 
+sudo apt install mosquitto mosquitto-dev mosquitto-clients
+
 安装repo
 https://blog.csdn.net/qq_33160790/article/details/78193314
 注*:环境变量要配置正确
