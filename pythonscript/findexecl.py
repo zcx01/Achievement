@@ -1,9 +1,6 @@
 #!/bin/python
 import os
 from posixpath import dirname
-import re
-import sys
-from subprocess import Popen
 from typing import List
 import xlrd
 import json

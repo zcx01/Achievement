@@ -1,8 +1,4 @@
 #!/bin/python
-from pykeyboard import *
-from pymouse import *
-import subprocess
-import time
 import sys
 from key_mouse import *
 
