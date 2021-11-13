@@ -25,34 +25,36 @@ class useCase(object):
     def __init__(self):
         self.index=0
         self.key=""
-        self.signals={}
-        self.sim = None
+        self.sendSignals={}
+        self.monitorSignals=[]
+        self.sendSim = None
+        self.monitorSim =None
 
     def Out(self):
         "python3 monitor.py -s BcmPwrStsFb -v 1"
         '''premise = "python3 monitor.py"
-        for signal in self.signals:
-            for value in self.signals[signal]:
+        for signal in self.sendSignals:
+            for value in self.sendSignals[signal]:
                 premise+=" -s "+signal+" -v "+value
         return premise'''
-        return str(self.signals)
+        return str(self.sendSignals)
 
     def isSame(self,other):
-        sameSize = len(self.signals.keys() & other.signals.keys())
-        print(sameSize,len(self.signals),len(other.signals))
-        return sameSize == len(self.signals) and sameSize == len(other.signals)
+        sameSize = len(self.sendSignals.keys() & other.sendSignals.keys())
+        print(sameSize,len(self.sendSignals),len(other.sendSignals))
+        return sameSize == len(self.sendSignals) and sameSize == len(other.sendSignals)
 
         # return len(self.signals.keys() - other.signals.keys()) ==0
 
     def stopAllsig(self):
-        self.sim.stop()
+        self.sendSim.stop()
         while True:
-            if self.sim.stopped:
+            if self.sendSim.stopped:
                 break
             time.sleep(1)
 
     def startSig(self,sendSig):
-        Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
+        Thread(target=self.sendSim.begin_sending, args=(sendSig,)).start()
         # while True:
         #     if  self.sim.stopped:
         #         break
@@ -72,10 +74,10 @@ class useCase(object):
                 continue
             cmd=cmd.split(" ")
             if '-s' in cmd:
-                self.sim.stop()
+                self.sendSim.stop()
                 return
             elif '-h' in cmd:
-                print(self.signals)
+                print(self.sendSignals)
             elif '-r' in cmd:
                 self.stopAllsig()
                 self.startSig(sendSig)
@@ -83,7 +85,7 @@ class useCase(object):
                 if  not dbc.sigExist(cmd[0]):
                     print("输入的信号在dbc不存在")
                     continue
-                self.sim.stop_task(cmd[0])
+                self.sendSim.stop_task(cmd[0])
                 isStop = True
             elif len(cmd) == 2:
                 if cmd[0] in sendSig and isStop:
@@ -98,35 +100,34 @@ class useCase(object):
                     elif not isNumber(cmd[1]):
                         print("输入信号值错误")
                     else:
-                        self.sim.add_task({cmd[0]:cmd[1]})
+                        self.sendSim.add_task({cmd[0]:cmd[1]})
 
-    def SendCan(self):
+    def SimulationCan(self):
         sendSig={}
-        for sigName in self.signals:
-            if len(self.signals[sigName]) > 1:
+        for sigName in self.sendSignals:
+            if len(self.sendSignals[sigName]) > 1:
                 print(f'{sigName}索引')
                 index = int(input())
             else:
                 index=0
-            sendSig[sigName] = self.signals[sigName][index]
-        if self.sim == None:
-            self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
-        # Thread(target=self.sim.begin_sending, args=(sendSig,)).start()
-        # if not ignore_init_send:
-        #     time.sleep(5)
+            sendSig[sigName] = self.sendSignals[sigName][index]
+        if self.sendSim == None:
+            self.sendSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
         self.startSig(sendSig)
+        if len(self.monitorSignals) !=0:
+            self.MonitorSig(self.monitorSignals)
         self.interactiveSendCanSig(sendSig)
     
     def SendPowerSig(self):
-        self.signals[PowerSig]=[]
-        self.signals[PowerSig].append("2")
-        self.SendCan()
+        self.sendSignals[PowerSig]=[]
+        self.sendSignals[PowerSig].append("2")
+        self.SimulationCan()
 
     def MonitorSig(self,sigName):
-        if self.sim == None:
-            self.sim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
+        if self.monitorSim == None:
+            self.monitorSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
         # param = [sigName] #CdcAutoHeadLiSet
-        Thread(target=self.sim.begin_listening, args=(sigName,)).start()
+        Thread(target=self.monitorSim.begin_listening, args=(sigName,)).start()
     
     def find(self,name):
         try:
@@ -152,11 +153,16 @@ def ReMatchStr(text):
     e_i=r"-?\b[a-zA-Z_0x0-9]+\b"
     signals=re.findall(e_i,text,re.A)
 
-    #去除不在dbc中的信号
     tempSignals=[]
+    preStr=''
     for signal in signals:
+        #去除不在dbc中的信号
         if dbc.sigExist(signal) or re.search(in_i,signal,re.A) != None:
-            tempSignals.append(signal)
+            if dbc.sender(signal) in local_machine_Sender or preStr == '-l':
+                case.monitorSignals.append(signal)
+            else:
+                tempSignals.append(signal)
+        preStr = signal
     signals = tempSignals
     if signals== None:
         return case
@@ -182,13 +188,13 @@ def ReMatchStr(text):
                             break
                 except:
                     pass
-                if sig not in case.signals:
-                    case.signals[sig] = []
+                if sig not in case.sendSignals:
+                    case.sendSignals[sig] = []
                 for value in values:
                     if re.search(word,sig,re.A) != None and re.search(in_i,value,re.A) != None:
                         sendValue = str(value).replace("0x","")
-                        if sendValue not in case.signals[sig]:
-                            case.signals[sig].append(sendValue)
+                        if sendValue not in case.sendSignals[sig]:
+                            case.sendSignals[sig].append(sendValue)
         except:
             pass
         index += 1
@@ -205,7 +211,7 @@ def pyperclipCopy(cmd):
 def displayInfo(usecases):
     tmp=[]
     for case in usecases:
-        if len(case.signals)!=0:
+        if len(case.sendSignals)!=0:
             tmp.append(case)
     useCases=tmp
     isloop = True
@@ -228,7 +234,7 @@ def displayInfo(usecases):
         for case in useCases:
             if case.find(in_s):
                 print(case.index,case.Out())
-                case.SendCan()
+                case.SimulationCan()
                 pyperclipCopy(case.Out())
                 break
             index += 1
@@ -240,7 +246,7 @@ def dealTest(dataPath,keyIndex=1,signalIndex=4):
     useCases=[]
     for row in range(sheel.nrows):
         case = ReMatchStr(sheel.cell_value(row,signalIndex))
-        if len(case.signals) == 0: 
+        if len(case.sendSignals) == 0: 
             continue
         case.key = sheel.cell_value(row, keyIndex)
         case.index = row+1
@@ -260,7 +266,7 @@ if __name__ == "__main__":
     #这个是要解析 -f 后面的参数
     parser.add_argument('-b','--bugxlsx',help="jira xlsx file")
     parser.add_argument('-c','--casexlsx',help="generate case xlsx file")
-    parser.add_argument('-s', '--Simulation',help="Simulation CAN",nargs='*')
+    parser.add_argument('-s', '--Send',help="Send CAN",nargs='*')
     parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
 
     arg=parser.parse_args()
