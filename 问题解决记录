@@ -129,3 +129,6 @@ https://blog.csdn.net/qq_42973562/article/details/101986353
 
 2)在PATH添加上git中ssh的路径 C:\Program Files\Git\usr\bin(即 ssh.exe 的目录)，重启
 
+19.vscode提示 command 'clipboard.copy' not found
+重写安装Clipborad History
+

@@ -13,17 +13,23 @@ sudo pip install pyperclip
 #linux 
 sudo apt-get install xsel xclip 
 
-4.xlrd
+4.excel
 pip install xlrd==1.2.0
 注意：xlrd 新版本只支持 xls 格式，所以我们这里指定安装 1.2.0 老版本，可以支持xlsx格式
+pip install openpyxl
 
-5.pykeyboard,pymouse模拟键盘、鼠标
+5.模拟键盘、鼠标
+linux
 sudo pip install pykeyboard 
 sudo pip install pymouse
+win:
+pip install PyUserInput
+pip install pywin32
 
 6.jira库
 pip3 install jira
 https://my.oschina.net/u/4335406/blog/4437033
+
 
 aenum                  3.1.0               
 apturl                 0.5.2               
