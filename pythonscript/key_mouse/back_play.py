@@ -1,6 +1,4 @@
 #!/bin/python
-import time
-import sys
 from key_mouse import *
 
 keyStr("cd ~/Works/Repos/back_play/mega_cantools_lib")
