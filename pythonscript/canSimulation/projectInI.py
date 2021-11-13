@@ -3,3 +3,4 @@ PROJECT_ID='c385ev'
 CHANNEL =0
 ignore_init_send =False
 PowerSig = 'BcmPwrStsFb'
+local_machine_Sender=['CDC']

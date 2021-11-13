@@ -55,24 +55,7 @@ https://blog.csdn.net/daihuibing389/article/details/84920332
 13.ubuntu 查看当前目录下的各文件的大小(清理垃圾)
 sudo du --max-depth=1 -h
 
-14.查看code文件-----------------------------
-把.code文件放入到ic(程序所在目录)文件下,方便查找
-1)配置环境变量
-source set_env.sh 
-
-2)进入程序所在目录
-cd prebuilts/ic/
-
-3)执行gdb ntoaarch64-gdb 二进制程序 .code
-ntoaarch64-gdb bin/ic_service ic_service.core
-
-4)设置路径搜索库的路径
-set solib-search-path lib/
-
-5)查看
-bt
-
-15.拷贝qnx上的.code-----------------------------
+14.拷贝qnx上的.code-----------------------------
 1)进入qnx
  adb shell
  telnet cdc-qnx
@@ -95,6 +78,23 @@ exit
 
 7)传到本地
 adb pull /sdcard/ic_service.core ./
+
+15.查看code文件-----------------------------
+把.code文件放入到ic(程序所在目录)文件下,方便查找
+1)配置环境变量
+source set_env.sh 
+
+2)进入程序所在目录
+cd prebuilts/ic/
+
+3)执行gdb ntoaarch64-gdb 二进制程序 .code
+ntoaarch64-gdb bin/ic_service ic_service.core
+
+4)设置路径搜索库的路径
+set solib-search-path lib/
+
+5)查看
+bt
 
 16.把liunx上的代码在win上编译(win上配置C++环境)---------------------------------
 1)大概就是安装mingw，cmake，VS code，然后安装VS code中的插件

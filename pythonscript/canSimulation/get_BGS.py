@@ -40,7 +40,7 @@ def getBugId(bugId):
     return bugId
 
 def appendUseCases(case):
-    if len(case.signals)!=0:
+    if len(case.sendSignals)!=0:
         useCases.append(case)
 
 def sendBugCan(bugId):
