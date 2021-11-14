@@ -85,6 +85,16 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             continue
         if sigName.strip() == wirteSigName or isAllAdd:
             sig = getSigInfo(sheel, row)
+            if sig.initValue < sig.min or sig.initValue > sig.max or sig.min == sig.max:
+                print(f'写入失败 最大值最小值或者初始值不合理,初始值为{sig.initValue},最小值为{sig.min},最大值为{sig.max}')
+                return
+            initPy = sig.initValue * sig.factor + sig.Offset
+            if initPy < sig.min or initPy > sig.max:
+                print(f'缩放偏移或者初始值物理值不合理,初始值物理值为{sig.initValue},最小值为{sig.min},最大值为{sig.max},缩放为{sig.factor},偏移为{sig.Offset}')
+                print('是否继续写入(y/n)')
+                cWrite = input()
+                if cWrite != 'y':
+                    return
             isFind = True
             dbc = Analyze(dbcfile)
             dbc.writeSig(sig)

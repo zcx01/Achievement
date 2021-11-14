@@ -148,11 +148,7 @@ def dealBug(dataPath):
 
 def ReMatchStr(text):
     case = useCase()
-    word=r"\b[a-zA-Z_]+\b"
-    in_i=r"-?\b[0x0-9]+\b"
-    e_i=r"-?\b[a-zA-Z_0x0-9]+\b"
     signals=re.findall(e_i,text,re.A)
-
     tempSignals=[]
     preStr=''
     for signal in signals:

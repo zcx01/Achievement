@@ -6,19 +6,19 @@ from time import sleep
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/topic_def/"
 from commonfun import*
 
+word=r"\b[a-zA-Z_]+\b"
+in_i=r"-?\b[0x0-9]+\b"
+e_i=r"-?\b[a-zA-Z_0x0-9]+\b"
+
 class DataType(Enum):
     VINT=1
     VFLOAT=2
 
-#信号已经存在
-#信号有覆盖
-#写入完成
-#没有message
 class WriteDBCResult(Enum):
-    AlreadyExists=1
-    SignalCoverage=2
-    WriteComplete=3
-    NoMessage=4
+    AlreadyExists=1     #信号已经存在
+    SignalCoverage=2    #信号有覆盖
+    WriteComplete=3     #写入完成
+    NoMessage=4         #没有message
 
 class SigInfo(object):
     def __init__(self,info=None) :
@@ -69,14 +69,13 @@ class SigInfo(object):
     
     def getEnum(self):
         try:
-            enumStr=self.enum
-            if ":" in self.enum:
-                enumStrA=[]
-                enumS=self.enum.split(" ")
-                for enumM in enumS:
-                    enumMs=enumM.split(":")
-                    enumStrA.append(f'{int(enumMs[0],16)} \"{enumMs[1]}\"')
-                enumStr=" ".join(enumStrA)
+            enumStrA=[]
+            enumS=re.findall(e_i,self.enum,re.A)
+            enumIndex = 0
+            while enumIndex < len(enumS):
+                enumStrA.append(f'{int(enumS[enumIndex],16)} \"{enumS[enumIndex+1]}\"')
+                enumIndex += 2
+            enumStr=" ".join(enumStrA)
             
             if len(enumStr) == 0 or "~" in enumStr:
                 return ""
@@ -326,7 +325,6 @@ class Analyze(object):
     @staticmethod
     def analySG(text):
         sig=SigInfo()
-        e_i=r"-?\b[a-zA-Z_0x0-9]+\b"
         signals=re.findall(e_i,text,re.A)
         if signals== None:
             return sig
