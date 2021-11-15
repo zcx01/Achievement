@@ -55,7 +55,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
         TB_LOG_ERROR("{1} signal get error.");
         return;
     }    
-    value = raw_value.val_uint32_t;
+    value = raw_value.val_{4}_t;
     
     publish_status(topic,value,true);
 }

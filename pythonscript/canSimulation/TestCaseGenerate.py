@@ -57,6 +57,7 @@ def getDesc(lineContents,define):
             return str(lineContents[index-1]).replace("//",'')
 
 def sendMqtt(topic,value):
+    topic=str(topic).replace(r'"','')
     return f'mosquitto_pub -h cdc-qnx -t  \'{topic}\'  -m \''+'{'+f'\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":{value}'+'}\''
 
 def subMqtt(topic):

@@ -87,7 +87,9 @@ class useCase(object):
                     continue
                 self.sendSim.stop_task(cmd[0])
                 isStop = True
-            elif len(cmd) == 2:
+            elif len(cmd) % 2 == 0:
+                sigNames = {}
+                cmd = re.findall(e_i," ".join(cmd),re.A)
                 if cmd[0] in sendSig and isStop:
                     self.stopAllsig()
                     modifySendSig = dict(sendSig)
@@ -95,12 +97,18 @@ class useCase(object):
                     isStop=False
                     self.startSig(modifySendSig)
                 else:
-                    if  not dbc.sigExist(cmd[0]):
-                        print("输入的信号在dbc不存在")
-                    elif not isNumber(cmd[1]):
-                        print("输入信号值错误")
-                    else:
-                        self.sendSim.add_task({cmd[0]:cmd[1]})
+                    index = 0
+                    while(index < len(cmd)):
+                        sigName = cmd[index]
+                        sigValue = cmd[index+1]
+                        if  not dbc.sigExist(sigName):
+                            print("输入的信号在dbc不存在")
+                        elif not isNumber(sigValue):
+                            print("输入信号值错误")
+                        else:
+                            sigNames[sigName]=sigValue
+                        index+=2
+                    self.sendSim.add_task(sigNames)
 
     def SimulationCan(self):
         sendSig={}

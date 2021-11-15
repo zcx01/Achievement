@@ -8,7 +8,7 @@ import argparse
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 sys.path.append(pyFileDir+"..")
 from commonfun import *
-from Analyzedbc import Analyze, DataType
+from Analyzedbc import *
 
 def getSigJson(jsConfig,msg,sig):
     filePath=jsConfig.get(msg,{}).get("filePath","")
@@ -219,14 +219,18 @@ def dealnewSig(can_parse_whitelist_return=False):
                 continue
         else:
             print(f"写入 {can_parse_whitelistPath} 文件")
-            can_parse_whitelist=open(can_parse_whitelistPath,"r")
-            can_parse_whitelist_content=can_parse_whitelist.read()
-            can_parse_whitelist.close()
-            can_parse_whitelist=open(can_parse_whitelistPath,"a")
-            if not can_parse_whitelist_content.endswith('\n'):
-                can_parse_whitelist.write('\n')
-            can_parse_whitelist.write(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
-            can_parse_whitelist.close()
+            # can_parse_whitelist=open(can_parse_whitelistPath,"r")
+            can_parse_whitelist_content_line=readFileLines(can_parse_whitelistPath)
+  
+            #写在现有的message后面
+            behindStr(can_parse_whitelist_content_line,'message',f'{message:<18}[message]		[all]')
+
+            if not can_parse_whitelist_content_line[len(can_parse_whitelist_content_line)-1].endswith('\n'):
+                can_parse_whitelist_content_line.append('\n')
+
+            can_parse_whitelist_content_line.append(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
+            wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_line,False)
+            
 
         # sigType = WriteType(jsConfig, message+messagesuffix)
         # suffx=jsConfig.get(message+messagesuffix,{}).get("suffx","")
@@ -235,10 +239,7 @@ def dealnewSig(can_parse_whitelist_return=False):
         define = getDefine(jsConfig,topic)
 
         #写入 cpp 文件 #创建 .h .cpp 文件
-        dataType=analy.getSigDataType(sig)
-        dataTypeStr="int"
-        if dataType == DataType.VFLOAT:
-            dataTypeStr="float"
+        dataTypeStr=analy.getSigDataType(sig)
         if judgeCommad("-A",names):
             continue
         elif judgeCommad("-m",names):

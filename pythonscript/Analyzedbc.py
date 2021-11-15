@@ -41,6 +41,9 @@ class SigInfo(object):
             self.Sender=""
             self.cycle=0
             self.useBit=[]
+            #----------dbc中独有的-------------
+            self.dbcMessage=None
+            self.Row=0
         else:
             self.messageId = info.messageId
             self.name=info.name
@@ -60,6 +63,8 @@ class SigInfo(object):
             self.Sender=info.Sender
             self.cycle=info.cycle
             self.useBit=info.useBit
+            self.dbcMessage = info.dbcMessage
+            self.Row = info.Row
     
     def getMId(self):
         return int(self.messageId,16)
@@ -86,17 +91,17 @@ class SigInfo(object):
     def getStartValue(self):
         return f'BA_ \"GenSigStartValue\" SG_  {self.getMId()} {self.name} {self.initValue};'
 
-    def getMessageId(self):
+    def getMessage_Id(self):
         return f'{self.Sender}_{self.messageId}'
 
-    def getMessage(self,size):
-        return f'BO_  {int(self.messageId,16)} {self.getMessageId()}: {size} {self.Sender}'
+    def getMessageRowContent(self,size):
+        return f'BO_  {self.getMId()} {self.getMessage_Id()}: {size} {self.Sender}'
 
     def getMessageCycle(self):
-        return f'BA_ \"GenMsgCycleTime\" BO_  {int(self.messageId,16)} {self.cycle};'
+        return f'BA_ \"GenMsgCycleTime\" BO_  {self.getMId()} {self.cycle};'
 
     def getMessageVFrameFormat(self):
-        return f'BA_ \"VFrameFormat\" BO_ {int(self.messageId,16)} 14;'
+        return f'BA_ \"VFrameFormat\" BO_ {self.getMId()} 14;'
 
     #endBit+(length - length%8)+(8-length)+1=startBit
     def getStartBit(self):
@@ -212,18 +217,10 @@ class SigInfo(object):
         
         return isSame,result
 
-class dbcSig(object):
-    def __init__(self) -> None:
-        super().__init__()
-        self.dbcMessage=None
-        self.dataType=DataType.VINT
-        self.Row=0
-        self.startBit=0
-
 class dbcMessage(object):
     def __init__(self) -> None:
         super().__init__()
-        self.messgaeId=''
+        self.message_Id=''
         self.Row=-1
         self.sigMaxRow=-1
         self.sender=''
@@ -253,14 +250,12 @@ class Analyze(object):
                 if len(text) == 0:
                     continue
                 if text.startswith("BO_") :
-                    messageId= self.analyline(text)
-                    texts=text.split(' ')
-                    dm=dbcMessage()
-                    dm.messgaeId=messageId
+                    dm= Analyze.analyMessage(text)
+                    if dm == None:
+                        continue
                     dm.Row=rowIndex
                     dm.sigMaxRow=dm.Row+1
-                    dm.sender = texts[len(texts)-1]
-                    self.dbcMessage[messageId]=dm
+                    self.dbcMessage[dm.message_Id]=dm
                     currentdbcMessage =dm
                 elif text.startswith("BU_:"):
                     try:
@@ -268,18 +263,16 @@ class Analyze(object):
                     except:
                         pass
                 elif text.startswith("SG_"):
-                    sigNams=self.analyline(text)
-                    ds=dbcSig()
+                    ds = Analyze.analySG(text)
                     ds.dbcMessage=currentdbcMessage
                     ds.Row=rowIndex
-                    ds.dataType=Analyze.analyDataType(text)
-                    self.dbcSigs[sigNams] = ds
+                    self.dbcSigs[ds.name] = ds
                     self.maxSigRow = rowIndex
                     try:
-                        self.dbcMessage[currentdbcMessage.messgaeId].sigMaxRow=rowIndex+1         
+                        self.dbcMessage[currentdbcMessage.message_Id].sigMaxRow=rowIndex+1         
                     except:
                         pass
-    
+
     def sigExist(self,sig):
         return sig in self.dbcSigs
 
@@ -291,17 +284,26 @@ class Analyze(object):
 
     def getMessageBySig(self,sig):
         try:
-            return self.dbcSigs[sig].dbcMessage.messgaeId
+            return self.dbcSigs[sig].dbcMessage.message_Id
         except:
             # print(f'{sig}没有找到message')
             return ""
             # sys.exit()
 
-    def getSigDataType(self,sig):
+    def getSigDataType(self,sigName):
+        dataTypeStr=""
         try:
-            return self.dbcSigs.get(sig).dataType
+            sig = SigInfo(self.dbcSigs.get(sigName))
+            dayaType = sig.dataType
+            if dayaType == '-':
+                dataTypeStr="int32" 
+            elif dataTypeStr == '+':
+                dataTypeStr="uint32"
+            if '.' in str(sig.min) or '.' in str(sig.max):
+                dataTypeStr='float'
         except:
-            return DataType.VINT
+            pass
+        return dataTypeStr
 
     def analyline(self,msg):
         contents=msg.split(":")
@@ -312,16 +314,15 @@ class Analyze(object):
         return f'BU_: {" ".join(self.control)}'
 
     @staticmethod
-    def analyDataType(lineContent):
-        contents=lineContent.split(" ")
-        for text in contents:
-            if(text.startswith("(")):
-                texts=text.split(",")
-                accuracy=texts[0].replace("(","")
-                if "." in accuracy:
-                    return DataType.VFLOAT
-        return DataType.VINT
-
+    def analyMessage(text):
+        messages = re.findall(e_i,text,re.A)
+        if len(messages) < 4:
+            return None
+        ms = dbcMessage()
+        ms.message_Id = messages[2]
+        ms.sender = messages[4]
+        return ms
+        
     @staticmethod
     def analySG(text):
         sig=SigInfo()
@@ -336,6 +337,8 @@ class Analyze(object):
             sig.Offset=signals[6]
             if '0-' in text:
                 sig.dataType = '-'
+            sig.min=signals[7]
+            sig.max=signals[8]
         except:
             pass
         sig.getEndBit()
@@ -349,7 +352,7 @@ class Analyze(object):
             print(f"{sig.name}信号已经存在")
             return WriteDBCResult.AlreadyExists
         try:
-            dm = self.dbcMessage.get(sig.getMessageId())
+            dm = self.dbcMessage.get(sig.getMessage_Id())
             startRow = dm.Row+1
             insertRowIndex=-1
             try:
@@ -375,7 +378,7 @@ class Analyze(object):
                 #超出的原来的大小，就扩大
                 print(startRow,dm.sigMaxRow,insertRowIndex)
                 if insertRowIndex == dm.sigMaxRow and sig.endBit > 63:
-                    linelist[dm.Row] = sig.getMessage(64)
+                    linelist[dm.Row] = sig.getMessageRowContent(64)
 
                 linelist.insert(insertRowIndex,sig.getSG())
                 for row in range(linelistSize):
@@ -415,7 +418,7 @@ class Analyze(object):
         if len(sig.messageId) == 0:
             return False
         linelist.insert(self.maxSigRow+1,"\n")
-        linelist.insert(self.maxSigRow+2,sig.getMessage(8))
+        linelist.insert(self.maxSigRow+2,sig.getMessageRowContent(8))
         linelistSize=len(linelist)
         for row in range(linelistSize):
             if "GenMsgCycleTime" in str(linelist[linelistSize-1-row]):

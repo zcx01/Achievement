@@ -41,6 +41,7 @@ def getBugId(bugId):
 
 def appendUseCases(case):
     if len(case.sendSignals)!=0:
+        case.index = len(useCases)
         useCases.append(case)
 
 def sendBugCan(bugId):
@@ -61,14 +62,11 @@ def sendBugCan(bugId):
 
     appendUseCases(descriptionCase)
         
-    index = 1
     for comment in issue.fields.comment.comments:
         case = ReMatchStr(comment.body)
         if descriptionCase.isSame(case):
             continue
-        case.index = index
         appendUseCases(case)
-        index+=1
     if len(useCases) == 0:
         print("没有信号的存在")
         return

@@ -1,5 +1,1 @@
 signal,value,text,choice
-BrakeFluidInL,0,high,BrakeFluidInL:high
-BrakeFluidInL,1,low_less_then_2s,BrakeFluidInL:low_less_then_2s
-BrakeFluidInL,2,low_more_than_2s,BrakeFluidInL:low_more_than_2s
-BrakeFluidInL,3,Reserved,BrakeFluidInL:Reserved

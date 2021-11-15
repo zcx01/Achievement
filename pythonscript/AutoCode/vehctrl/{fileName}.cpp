@@ -12,7 +12,7 @@ void {ClassName}::state_process(const std::string &topic, const std::string &con
 	float value = info.value.get<float>();
 	TB_LOG_INFO("state_process: %s, %s", topic.data(), content.data());
 
-	fds::CheckPowerAndSendCanFrame(&CANSIG_{1}_g, info.value, signal_value_type::eSigValType_u{4}32_t, topic);
+	fds::CheckPowerAndSendCanFrame(&CANSIG_{1}_g, info.value, signal_value_type::eSigValType_{4}_t, topic);
 }
 
 }

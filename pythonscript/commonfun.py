@@ -117,3 +117,16 @@ def eConverf(value):
             head='{:.%df}' % digit
             return head.format(value)
     return value
+
+#在lines关键字behind后面添加content
+def behindStr(lines,behind,content):
+    index = 0
+    behinds=[]
+    row=0
+    while index < len(lines):
+        if behind in lines[index]:
+            behinds.append(lines[index])
+            row = index+1
+        index+=1
+    if content not in behinds:
+        lines.insert(row,content)
