@@ -180,7 +180,7 @@ def dealnewSig(can_parse_whitelist_return=False):
     for sig in addDbcSigNames:
         print(f'{sig:<10} {addDbcSigNames[sig]}')
     addDbcSigName=' '.join(addDbcSigNames.keys())
-    os.system(f'xlsdbc -s {addDbcSigName}')
+    # os.system(f'xlsdbc -s {addDbcSigName}')
 
     analy=Analyze(getKeyPath("dbcfile",jsConfig))
     for text in content:
@@ -219,15 +219,16 @@ def dealnewSig(can_parse_whitelist_return=False):
                 continue
         else:
             print(f"写入 {can_parse_whitelistPath} 文件")
-            # can_parse_whitelist=open(can_parse_whitelistPath,"r")
+            can_parse_whitelist_read=open(can_parse_whitelistPath,"r")
             can_parse_whitelist_content_line=readFileLines(can_parse_whitelistPath)
   
             #写在现有的message后面
             behindStr(can_parse_whitelist_content_line,'message',f'{message:<18}[message]		[all]')
 
-            if not can_parse_whitelist_content_line[len(can_parse_whitelist_content_line)-1].endswith('\n'):
+            if not can_parse_whitelist_read.read().endswith('\n'):
                 can_parse_whitelist_content_line.append('\n')
-
+            can_parse_whitelist_read.close()
+            
             can_parse_whitelist_content_line.append(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
             wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_line,False)
             

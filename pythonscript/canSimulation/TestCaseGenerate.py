@@ -118,7 +118,7 @@ def autoCaseGenerate(configPath=pyFileDir+"config.json",shellIndex=0,isAddPowerS
         if len(xlsFileName) == 0:
             xlsFileName = sheel.cell_value(row, 2)
         isSendCan = str(sheel.cell_value(row,7)) == 'y'
-        generateTest('\n'.join(caseAim),xlsFileName,configPath,'',isSendCan)
+        generateTest('\n'.join(caseAim),xlsFileName,configPath,'',isSendCan,row == len(sheel.nrows)-1)
 
 
 def generate(contents,defineContents,isSendCan,canmatrixSheel,sh):
@@ -171,7 +171,7 @@ def generate(contents,defineContents,isSendCan,canmatrixSheel,sh):
             rowContent.append(lCan(' -l '.join(sigNames)))
             sh.append(rowContent)
 
-def generateTest(caseAim,xlsFileName,jsConfigPath,variable,isSendCan=False):
+def generateTest(caseAim,xlsFileName,jsConfigPath,variable,isSendCan=False,isOPenCase=True):
     jsConfig = getJScontent(jsConfigPath)
     casePath = getKeyPath("casePath",jsConfig)+"/"+xlsFileName+'.xlsx'
     defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
@@ -211,9 +211,10 @@ def generateTest(caseAim,xlsFileName,jsConfigPath,variable,isSendCan=False):
 
     book.save(casePath)
     print("生成完成")
-    path = str(casePath).replace('(','\(')
-    path = str(path).replace(')','\)')
-    os.system("xdg-open "+ path)
+    if isOPenCase:
+        path = str(casePath).replace('(','\(')
+        path = str(path).replace(')','\)')
+        os.system("xdg-open "+ path)
         
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

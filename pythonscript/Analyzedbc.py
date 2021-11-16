@@ -297,7 +297,7 @@ class Analyze(object):
             dayaType = sig.dataType
             if dayaType == '-':
                 dataTypeStr="int32" 
-            elif dataTypeStr == '+':
+            elif dayaType == '+':
                 dataTypeStr="uint32"
             if '.' in str(sig.min) or '.' in str(sig.max):
                 dataTypeStr='float'

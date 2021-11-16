@@ -1,14 +1,14 @@
 #!/bin/bash
 
-echo "docker exec -i kiara_build_18 bash"
-docker exec -i kiara_build_18 bash  <<EOF
-cd  ~/Works/Repos/tool_parser 
-sudo make
-exit 0
-EOF
-
+# echo "docker exec -i kiara_build_18 bash"
+# docker exec -i kiara_build_18 bash  <<EOF
 # cd  ~/Works/Repos/tool_parser 
-# echo '123456' | sudo -S make
+# sudo make
+# exit 0
+# EOF
+
+cd  ~/Works/Repos/tool_parser 
+echo '123456' | sudo -S make
 
 echo "删除原来的文件"
 rm -rf ~/Works/Repos/changan_c835/src/ic_service/parser/generated/
