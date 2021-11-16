@@ -40,7 +40,7 @@ def getBugId(bugId):
     return bugId
 
 def appendUseCases(case):
-    if len(case.sendSignals)!=0:
+    if case.isVaild:
         case.index = len(useCases)
         useCases.append(case)
 
@@ -136,3 +136,4 @@ if __name__ == "__main__":
     else:
         getBugInfo()
     # getBugInfo("BGS-3771")
+    # sendBugCan("BGS-3767")

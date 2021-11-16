@@ -30,6 +30,13 @@ class useCase(object):
         self.sendSim = None
         self.monitorSim =None
 
+    def isVaild(self):
+        return len(self.sendSignals) !=0 or len(self.monitorSignals) !=0
+
+    def appendMonitorSignal(self,monitorSignal):
+        if monitorSignal not in self.monitorSignals:
+            self.monitorSignals.append(monitorSignal)
+
     def Out(self):
         "python3 monitor.py -s BcmPwrStsFb -v 1"
         '''premise = "python3 monitor.py"
@@ -41,7 +48,6 @@ class useCase(object):
 
     def isSame(self,other):
         sameSize = len(self.sendSignals.keys() & other.sendSignals.keys())
-        print(sameSize,len(self.sendSignals),len(other.sendSignals))
         return sameSize == len(self.sendSignals) and sameSize == len(other.sendSignals)
 
         # return len(self.signals.keys() - other.signals.keys()) ==0
@@ -114,7 +120,7 @@ class useCase(object):
         sendSig={}
         for sigName in self.sendSignals:
             if len(self.sendSignals[sigName]) > 1:
-                print(f'{sigName}索引')
+                print(f'{sigName}:{self.sendSignals[sigName]} 索引')
                 index = int(input())
             else:
                 index=0
@@ -123,6 +129,7 @@ class useCase(object):
             self.sendSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
         self.startSig(sendSig)
         if len(self.monitorSignals) !=0:
+            print(self.monitorSignals)
             self.MonitorSig(self.monitorSignals)
         self.interactiveSendCanSig(sendSig)
     
@@ -163,7 +170,7 @@ def ReMatchStr(text):
         #去除不在dbc中的信号
         if dbc.sigExist(signal) or re.search(in_i,signal,re.A) != None:
             if dbc.sender(signal) in local_machine_Sender or preStr == '-l':
-                case.monitorSignals.append(signal)
+                case.appendMonitorSignal(signal)
             else:
                 tempSignals.append(signal)
         preStr = signal
@@ -215,7 +222,7 @@ def pyperclipCopy(cmd):
 def displayInfo(usecases):
     tmp=[]
     for case in usecases:
-        if len(case.sendSignals)!=0:
+        if case.isVaild:
             tmp.append(case)
     useCases=tmp
     isloop = True
@@ -237,7 +244,6 @@ def displayInfo(usecases):
         index=0
         for case in useCases:
             if case.find(in_s):
-                print(case.index,case.Out())
                 case.SimulationCan()
                 pyperclipCopy(case.Out())
                 break
