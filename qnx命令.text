@@ -1,2 +1,8 @@
 1.在fastboot下重启
 fastboot reboot
+
+2.进入fastboot中
+reset -f
+
+3.查看内存的使用
+showmem -p 925786

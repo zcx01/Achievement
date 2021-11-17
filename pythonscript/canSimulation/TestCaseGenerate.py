@@ -39,7 +39,7 @@ def getSigValue(sig,sheel):
             return sig
     return SigInfo()
 
-def getDefineStr(text):
+def getDefine(text):
     e_i = r"\bIPC_\S+\b"
     sigNames = re.findall(e_i, text, re.A)
     sigNames = list(set(sigNames))
@@ -124,7 +124,7 @@ def autoCaseGenerate(configPath=pyFileDir+"config.json",shellIndex=0,isAddPowerS
 def generate(contents,defineContents,isSendCan,canmatrixSheel,sh):
     sigNames = getSig(contents)
     expectedResults=[]
-    topicDefines = getDefineStr(contents)
+    topicDefines = getDefine(contents)
     desc=''
     if len(topicDefines) > 0:
         desc =getDesc(defineContents,topicDefines[len(topicDefines)-1])

@@ -1,5 +1,0 @@
-signal,value,text,choice
-CdcBokgChrgSts,0,Not req,CdcBokgChrgSts:Not req
-CdcBokgChrgSts,1,PlugAndCharge,CdcBokgChrgSts:PlugAndCharge
-CdcBokgChrgSts,2,ReservationCharge,CdcBokgChrgSts:ReservationCharge
-CdcBokgChrgSts,3,Reserved,CdcBokgChrgSts:Reserved

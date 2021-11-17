@@ -20,8 +20,8 @@ def sigExist(sheel,row,col,CallFun):
         del sigs[0]
         relation = ','.join(sigs)
     return sig,len(sig)>3,relation
-
-def getTopic(deContent,topic):
+ 
+def getDefine(deContent,topic):
     for lineContent in deContent:
         if not lineContent.startswith("#define"):
             continue
@@ -69,7 +69,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun):
         if isExist:
             rowContent=[]
             topicSetStr =topicStr+"/Set"
-            topicDefine = getTopic(defineContents,topicSetStr)
+            topicDefine = getDefine(defineContents,topicSetStr)
             rowContent.append(sig)
             rowContent.append(down)
             rowContent.append(comments)
@@ -85,7 +85,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun):
         sig,isExist,relation = sigExist(sheel,startRow,8,CallFun)
         if isExist:
             rowContent=[]
-            topicDefine = getTopic(defineContents,topicStr)
+            topicDefine = getDefine(defineContents,topicStr)
             rowContent.append(sig)
             rowContent.append(up)
             rowContent.append(comments+'状态')

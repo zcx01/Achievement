@@ -92,8 +92,7 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             if initPy < sig.min or initPy > sig.max:
                 print(f'缩放偏移或者初始值物理值不合理,初始值物理值为{sig.initValue},最小值为{sig.min},最大值为{sig.max},缩放为{sig.factor},偏移为{sig.Offset}')
                 print('是否继续写入(y/n)')
-                cWrite = input()
-                if cWrite != 'y':
+                if input() != 'y':
                     return
             isFind = True
             dbc = Analyze(dbcfile)

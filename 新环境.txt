@@ -8,16 +8,19 @@ sudo apt-get install vim
 
 sudo apt install mosquitto mosquitto-dev mosquitto-clients
 
-安装repo
-https://blog.csdn.net/qq_33160790/article/details/78193314
-注*:环境变量要配置正确
+#安装按照虚拟屏
+sudo apt install scrcpy
 
-安装Qt无法qmke
+#安装repo
+https://blog.csdn.net/qq_33160790/article/details/78193314
+#注*:环境变量要配置正确
+
+#安装Qt无法qmke
 sudo apt install make
 
-出现cannot find -lGL
+#出现cannot find -lGL
 sudo apt-get install libgl1-mesa-dev
 
-点击任务栏中的图标隐藏
-gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize-or-previews'
-https://ywnz.com/linuxjc/5554.html
+#点击任务栏中的图标隐藏
+#gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize-or-previews'
+#https://ywnz.com/linuxjc/5554.html
