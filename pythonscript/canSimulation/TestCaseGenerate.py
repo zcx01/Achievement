@@ -118,7 +118,7 @@ def autoCaseGenerate(configPath=pyFileDir+"config.json",shellIndex=0,isAddPowerS
         if len(xlsFileName) == 0:
             xlsFileName = sheel.cell_value(row, 2)
         isSendCan = str(sheel.cell_value(row,7)) == 'y'
-        generateTest('\n'.join(caseAim),xlsFileName,configPath,'',isSendCan,row == len(sheel.nrows)-1)
+        generateTest('\n'.join(caseAim),xlsFileName,configPath,'',isSendCan,row == sheel.nrows-1)
 
 
 def generate(contents,defineContents,isSendCan,canmatrixSheel,sh):

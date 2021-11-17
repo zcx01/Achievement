@@ -1,6 +1,5 @@
 from __future__ import print_function
 import os.path
-import json
 import argparse
 import sys
 from googleapiclient.discovery import build
@@ -58,6 +57,8 @@ def generateByRemote(startRow,endRow,down,up):
             print('输入的行号不合法')
             return
         generate(values,startRow,endRow,down,up,GoValue)
+
+    print(getTopicByXls)
 
 def GoValue(values,row,col):
     return values[row][col]

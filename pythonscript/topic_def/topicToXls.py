@@ -5,21 +5,19 @@ import sys
 import os
 import xlrd
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
-sys.path.append(pyFileDir+"..")
 from commonfun import *
-from Analyzedbc import Analyze, DataType
 import openpyxl 
 import argparse
 
 def sigExist(sheel,row,col,CallFun):
-    sig = str(CallFun(sheel,row,col))
+    sig = str(getValue(CallFun,sheel,row,col))
     relation=''
     if ',' in sig:
         sigs = sig.split(',')
         sig = sigs[0]
         del sigs[0]
         relation = ','.join(sigs)
-    return sig,len(sig)>3,relation
+    return sig,len(sig)>3 and sig!='None',relation
  
 def getDefine(deContent,topic):
     for lineContent in deContent:
@@ -29,9 +27,6 @@ def getDefine(deContent,topic):
         topicStr = topicStr.replace('\"','')
 
         #去除第一个
-        topicStrS = topicStr.split('/')
-        del topicStrS[0]
-        topicStr = '/'.join(topicStrS)
         if  topicStr ==  topic:
             return splitSpaceGetValueByIndex(lineContent,1)
 
@@ -51,6 +46,38 @@ def generateByXls(xlsPath,startRow,endRow,down,up):
 def xlsVaule(sheel,row,col):
     return sheel.cell_value(row,col)
 
+def getValue(CallFun,sheel,row,col):
+    try:
+        return CallFun(sheel,row,col)
+    except:
+        print(row+1,chr(col+65),'值不存在')
+        return
+
+def getTopicByXls(CallFun,sheel,row):
+    topics = []
+    try:
+        col=0
+        findRow = row
+        COLNUM=3
+        while col < COLNUM:
+            topic = CallFun(sheel,findRow,col)
+            if col == COLNUM-1 and len(topic) == 0:
+                break
+            if len(topic) != 0:
+                #去除第一个topic中的/
+                if len(topics) == 0:
+                    topic = EesyStr.removeAt(topic,len(topic)-1)
+                topics.append(topic)
+                findRow = row
+                col+=1
+            else:
+                findRow-=1
+        return '/'.join(topics)
+    except:
+        if len(topics):
+            print(row+1,'值不存在')
+    return '/'.join(topics)
+
 def generate(sheel,startRow,endRow,down,up,CallFun):
     jsConfig = getJScontent(pyFileDir+"config.json")
     defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
@@ -60,11 +87,9 @@ def generate(sheel,startRow,endRow,down,up,CallFun):
     rowContent=[]
 
     while(startRow <= endRow):
-        comments =  CallFun(sheel,startRow,5)
-        className = CallFun(sheel,startRow,1)+ CallFun(sheel,startRow,2)
-        topicStr = CallFun(sheel,startRow,1)
-        if len(str(CallFun(sheel,startRow,2))) !=0:
-            topicStr+='/'+CallFun(sheel,startRow,2)
+        comments =  getValue(CallFun,sheel,startRow,5)
+        className = getValue(CallFun,sheel,startRow,1)+ getValue(CallFun,sheel,startRow,2)
+        topicStr = getTopicByXls(CallFun,sheel,startRow)
         sig,isExist,relation = sigExist(sheel,startRow,7,CallFun)
         if isExist:
             rowContent=[]
@@ -104,8 +129,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun):
     book.close()
     print("生成完成")
     os.system(f'xdg-open {saveFileName}')
-
-
+ 
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(description='这个是通过topic表格生成生成newSig表格')
     parse.add_argument('-d','--down',help='下行信号的类型',default="vehctrl")

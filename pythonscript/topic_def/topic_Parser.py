@@ -180,7 +180,7 @@ def dealnewSig(can_parse_whitelist_return=False):
     for sig in addDbcSigNames:
         print(f'{sig:<10} {addDbcSigNames[sig]}')
     addDbcSigName=' '.join(addDbcSigNames.keys())
-    # os.system(f'xlsdbc -s {addDbcSigName}')
+    os.system(f'xlsdbc -s {addDbcSigName}')
 
     analy=Analyze(getKeyPath("dbcfile",jsConfig))
     for text in content:
