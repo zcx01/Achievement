@@ -15,8 +15,8 @@ configFileDir = os.path.dirname(os.path.abspath(__file__))+"/../topic_def/"
 
 
 def getSig(text):
-    e_i = r"CANSIG_.*_g"
-    sigNames = re.findall(e_i, text, re.A)
+    s_i = r"CANSIG_.*_g"
+    sigNames = re.findall(s_i, text, re.A)
     sigNames = list(set(sigNames))
     sigs=[]
     for sigName in sigNames:
@@ -40,8 +40,8 @@ def getSigValue(sig,sheel):
     return SigInfo()
 
 def getDefine(text):
-    e_i = r"\bIPC_\S+\b"
-    sigNames = re.findall(e_i, text, re.A)
+    t_i = r"\bIPC_\S+\b"
+    sigNames = re.findall(t_i, text, re.A)
     sigNames = list(set(sigNames))
     return sigNames
 
@@ -117,7 +117,7 @@ def autoCaseGenerate(configPath=pyFileDir+"config.json",shellIndex=0,isAddPowerS
         caseAim.append(sheel.cell_value(row,4))
         if len(xlsFileName) == 0:
             xlsFileName = sheel.cell_value(row, 2)
-        isSendCan = str(sheel.cell_value(row,7)) == 'y'
+        isSendCan = str(sheel.cell_value(row,5)) == 'y'
         generateTest('\n'.join(caseAim),xlsFileName,configPath,'',isSendCan,row == sheel.nrows-1)
 
 

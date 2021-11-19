@@ -156,6 +156,29 @@ def getDefine(jsConfig,topic):
 def InvalidRow(text,alreadyText):
     return text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n") or len(text.replace(' ',''))==0
 
+#写入 can_parse_whitelist 文件
+def WriteCan_parse_whitelist(jsConfig,message,messagesig,can_parse_whitelist_return):
+    can_parse_whitelistPath=getKeyPath("can_parse_whitelist",jsConfig)
+    if  findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
+        if can_parse_whitelist_return:
+            print(f'{can_parse_whitelistPath} 文件存在，跳过')
+            return False
+    else:
+        print(f"写入 {can_parse_whitelistPath} 文件")
+        can_parse_whitelist_read=open(can_parse_whitelistPath,"r")
+        can_parse_whitelist_content_line=readFileLines(can_parse_whitelistPath)
+
+        #写在现有的message后面
+        behindStr(can_parse_whitelist_content_line,'message',f'{message:<18}[message]		[all]')
+
+        if not can_parse_whitelist_read.read().endswith('\n'):
+            can_parse_whitelist_content_line.append('\n')
+        can_parse_whitelist_read.close()
+        
+        can_parse_whitelist_content_line.append(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
+        wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_line,False)
+    return True
+
 def dealnewSig(can_parse_whitelist_return=False):
     jsConfig=getJScontent(pyFileDir+"config.json")
     newSigFile=open(getKeyPath("newSig",jsConfig),"r")
@@ -171,16 +194,18 @@ def dealnewSig(can_parse_whitelist_return=False):
             continue
         text=text.replace("\t"," ")
         names=text.split(" ")
-        sig=getValueByIndex(names,0)
-        if  not analy.sigExist(sig):
-            desc=getValueByIndex(names,2)
-            addDbcSigNames[sig] = desc
+        sigs=getValueByIndex(names,0).split(',')
+        for sig in sigs:
+            if  not analy.sigExist(sig):
+                desc=getValueByIndex(names,2)
+                addDbcSigNames[sig] = desc
 
     print('正在写入dbc...')
     for sig in addDbcSigNames:
         print(f'{sig:<10} {addDbcSigNames[sig]}')
-    addDbcSigName=' '.join(addDbcSigNames.keys())
-    os.system(f'xlsdbc -s {addDbcSigName}')
+    if len(addDbcSigNames):
+        addDbcSigName=' '.join(addDbcSigNames.keys())
+        os.system(f'xlsdbc -s {addDbcSigName}')
 
     analy=Analyze(getKeyPath("dbcfile",jsConfig))
     for text in content:
@@ -188,53 +213,34 @@ def dealnewSig(can_parse_whitelist_return=False):
             continue
         text=text.replace("\t"," ")
         names=text.split(" ")
-        sig=getValueByIndex(names,0)
-        sigType = getValueByIndex(names, 1)
+        sigs=getValueByIndex(names,0).split(",")
+        isWriteCanContinue = False
+        for sig in sigs:
+            message=analy.getMessageBySig(sig)
+            if len(message)==0:
+                print(f'{sig} 对应的message不存在')
+                isWriteCanContinue = True
+                break
+            messagesig=message+"__"+sig
+            if not WriteCan_parse_whitelist(jsConfig,message,messagesig,can_parse_whitelist_return):
+                isWriteCanContinue = True
+                break
 
+        if isWriteCanContinue:
+            continue
+        
+        sig = sigs[0]
+        message = analy.getMessageBySig(sig)
+        messagesig=message+"__"+sig
+        sigType = getValueByIndex(names, 1)
         #通过 CAN matrix 表格获取中文描述
         if len(names) < 2 or len(names[2]) == 0 or names[1] == "d":
             desc=getSignalDescInexcel(sig,getKeyPath("canmatrix",jsConfig))
         else:
             desc=getValueByIndex(names,2)
-
         className=getValueByIndex(names,3,"x")
-
-        # messagesuffix=getValueByIndex(names,3)
-        # if len(messagesuffix) != 0:
-        #     messagesuffix="."+messagesuffix
-
         topic=getValueByIndex(names,4)
-
-        message=analy.getMessageBySig(sig)
-        if len(message)==0:
-            print(f'{sig} {desc} 对应的message不存在')
-            continue
         
-        messagesig=message+"__"+sig
-        #写入 can_parse_whitelist 文件
-        can_parse_whitelistPath=getKeyPath("can_parse_whitelist",jsConfig)
-        if judgeCommad("-bc",names) or findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
-            if can_parse_whitelist_return:
-                print(f'{can_parse_whitelistPath} 文件存在，跳过')
-                continue
-        else:
-            print(f"写入 {can_parse_whitelistPath} 文件")
-            can_parse_whitelist_read=open(can_parse_whitelistPath,"r")
-            can_parse_whitelist_content_line=readFileLines(can_parse_whitelistPath)
-  
-            #写在现有的message后面
-            behindStr(can_parse_whitelist_content_line,'message',f'{message:<18}[message]		[all]')
-
-            if not can_parse_whitelist_read.read().endswith('\n'):
-                can_parse_whitelist_content_line.append('\n')
-            can_parse_whitelist_read.close()
-            
-            can_parse_whitelist_content_line.append(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
-            wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_line,False)
-            
-
-        # sigType = WriteType(jsConfig, message+messagesuffix)
-        # suffx=jsConfig.get(message+messagesuffix,{}).get("suffx","")
         if len(topic)==0 or topic == "x":
             topic = getTopic(jsConfig, desc, sig, "")
         define = getDefine(jsConfig,topic)
@@ -243,13 +249,13 @@ def dealnewSig(can_parse_whitelist_return=False):
         dataTypeStr=analy.getSigDataType(sig)
         if judgeCommad("-A",names):
             continue
-        elif judgeCommad("-m",names):
-            print('\
-        //%s\n\
-        else if (topicId == %s) \n\
-	{\n\
-        sig=&CANSIG_%s_g;\n\
-	}'% (desc,define,messagesig))
+    #     elif judgeCommad("-m",names):
+    #         print('\
+    #     //%s\n\
+    #     else if (topicId == %s) \n\
+	# {\n\
+    #     sig=&CANSIG_%s_g;\n\
+	# }'% (desc,define,messagesig))
         else:
             desc=addEscape(desc)
             print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')

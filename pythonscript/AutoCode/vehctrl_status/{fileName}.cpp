@@ -37,10 +37,6 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     {
         return;
     }
-    if (signal->is_timeout)
-    {
-        return;
-    }
 
     if(signal->is_timeout)
     {

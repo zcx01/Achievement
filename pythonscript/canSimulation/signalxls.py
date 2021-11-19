@@ -160,7 +160,6 @@ def dealBug(dataPath):
         for col in range(sheel.ncols):
             text=sheel.cell_value(row,col)
 
-
 def ReMatchStr(text):
     case = useCase()
     signals=re.findall(e_i,text,re.A)
@@ -168,14 +167,14 @@ def ReMatchStr(text):
     preStr=''
     for signal in signals:
         #去除不在dbc中的信号
-        if dbc.sigExist(signal) or re.search(in_i,signal,re.A) != None:
+        if dbc.sigExist(signal) or isNumber(signal):
             if dbc.sender(signal) in local_machine_Sender or preStr == '-l':
                 case.appendMonitorSignal(signal)
             else:
                 tempSignals.append(signal)
         preStr = signal
     signals = tempSignals
-    if signals== None:
+    if len(signals)== 0:
         return case
     index=0
     while(index < len(signals)):
@@ -222,7 +221,7 @@ def pyperclipCopy(cmd):
 def displayInfo(usecases):
     tmp=[]
     for case in usecases:
-        if case.isVaild:
+        if case.isVaild():
             tmp.append(case)
     useCases=tmp
     isloop = True
@@ -262,7 +261,12 @@ def dealTest(dataPath,keyIndex=1,signalIndex=4):
         case.index = row+1
         useCases.append(case)
     displayInfo(useCases)
-        
+
+def printSigTypes(sigNames):
+    for sigName in sigNames:
+        dataTypeStr = dbc.getSigDataType(sigName)
+        print(f'{dataTypeStr:<8}{sigName} =0;')
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
     description='''
@@ -278,6 +282,7 @@ if __name__ == "__main__":
     parser.add_argument('-c','--casexlsx',help="generate case xlsx file")
     parser.add_argument('-s', '--Send',help="Send CAN",nargs='*')
     parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
+    parser.add_argument('-d', '--dataType',help="get sig data type", default=[], nargs='+', type=str)
 
     arg=parser.parse_args()
 
@@ -290,6 +295,8 @@ if __name__ == "__main__":
         use.SendPowerSig()
     elif '-m' in sys.argv:
         use.MonitorSig(arg.Monitor)
+    elif '-d' in sys.argv:
+        printSigTypes(arg.dataType)
     else:
         dealTest("/home/chengxiongzhu/Works/文档/测试信号.xls")
 

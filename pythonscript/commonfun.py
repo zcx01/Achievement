@@ -1,6 +1,10 @@
 # from typing import List
 import json
 import re
+word=r"\b[a-zA-Z_]+\b"
+in_i=r"-?\b[0x0-9]+\b"
+e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"
+
 class EesyStr():
     @staticmethod
     def removeAt(s,index):
@@ -88,16 +92,13 @@ def splitSpaceGetValueByIndex(text,index,defaultValue=""):
     return getValueByIndex(splitSpace(text),index,defaultValue)
 
 def getWordAndNum(text):
-    e_i = r"\b[a-zA-Z0x0-9]+\b"
     return re.findall(e_i, text, re.A)
 
 def getWord(text):
-    e_i = r"\b[a-zA-Z]+\b"
-    return re.findall(e_i, text, re.A)
+    return re.findall(word, text, re.A)
 
 def getNum(text):
-    e_i = r"\b[0-9]+\b"
-    return re.findall(e_i, text, re.A)
+    return re.findall(in_i, text, re.A)
 
 #判断字符串是否是数字(数字、小数、负数、负小数、0)
 def isNumber(text):

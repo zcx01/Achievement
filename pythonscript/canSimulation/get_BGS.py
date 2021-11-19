@@ -40,7 +40,7 @@ def getBugId(bugId):
     return bugId
 
 def appendUseCases(case):
-    if case.isVaild:
+    if case.isVaild():
         case.index = len(useCases)
         useCases.append(case)
 
@@ -131,9 +131,9 @@ def getBugInfo():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        sendBugCan(sys.argv[1])
-    else:
-        getBugInfo()
+    # if len(sys.argv) == 2:
+    #     sendBugCan(sys.argv[1])
+    # else:
+    #     getBugInfo()
     # getBugInfo("BGS-3771")
-    # sendBugCan("BGS-3767")
+    sendBugCan("BGS-4738")

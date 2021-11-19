@@ -78,6 +78,18 @@ git rebase --skip
 提交
 git push mega HEAD:refs/for/master 
 
+----------------------解决远端冲突-------------------------
+从网站上还原代码
+repo download xxxxxx
+
+修改完成冲突后执行
+git add . && git commit --amend --no-edit
+
+提交
+git push mega HEAD:refs/for/master 
+
+在网站上添加review
+
 ----------------------git commit后，如何撤销commit----------
 git reset --soft HEAD^
 这样就成功撤销了commit，如果想要连着add也撤销的话，--soft改为--hard（删除工作空间的改动代码）。

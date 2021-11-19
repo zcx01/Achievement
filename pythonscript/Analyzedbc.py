@@ -6,10 +6,6 @@ from time import sleep
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/topic_def/"
 from commonfun import*
 
-word=r"\b[a-zA-Z_]+\b"
-in_i=r"-?\b[0x0-9]+\b"
-e_i=r"-?\b[a-zA-Z_0x0-9]+\b"
-
 class DataType(Enum):
     VINT=1
     VFLOAT=2

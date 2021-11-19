@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 import os.path
 import argparse
 import sys
@@ -7,7 +8,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 sys.path.append(os.path.dirname(os.path.abspath(__file__))+"/../")
-from topic_def.topicToXls import *
+from topic_def.xslToNewSig import *
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -16,7 +17,8 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 SAMPLE_SPREADSHEET_ID = '1paIMJgPVcFIohJDAsrnRmFchWjxrkmeNhMOTGEm2F0Y'
 SAMPLE_RANGE_NAME = 'A:I'
 
-def generateByRemote(startRow,endRow,down,up):
+
+def getShellValueDrive():
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
@@ -43,31 +45,34 @@ def generateByRemote(startRow,endRow,down,up):
     # Call the Sheets API
     sheet = service.spreadsheets()
     result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-        range=SAMPLE_RANGE_NAME).execute()
+                                range=SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
+    return values
 
-    topic_def_array = []
-    
-    if not values:
-        print('No data found.')
-    else:
-        startRow-=1
-        endRow-=1
-        if startRow >= len(values) or endRow >= len(values) or startRow > endRow:
-            print('输入的行号不合法')
-            return
-        generate(values,startRow,endRow,down,up,GoValue)
 
-    print(getTopicByXls)
+def generateByRemote(startRow, endRow, down, up):
+    values = getShellValueDrive()
+    generate(values, startRow, endRow, down, up, GoValue, len(values))
 
-def GoValue(values,row,col):
+
+def findTopicAndDefine(rows):
+    values = getShellValueDrive()
+    getTopicAndDefine(values,GoValue,rows)
+
+
+def GoValue(values, row, col):
     return values[row][col]
 
 if __name__ == '__main__':
     parse = argparse.ArgumentParser(description='这个是通过topic表格生成生成newSig表格')
-    parse.add_argument('-d','--down',help='下行信号的类型',default="vehctrl")
-    parse.add_argument('-u','--up',help='上行信号的类型',default="vehctrl_status")
-    parse.add_argument('-s','--startRow',help='开始的行号',type=int)
-    parse.add_argument('-e','--endRow',help='结束的行号',type=int)
+    parse.add_argument('-d', '--down', help='下行信号的类型', default="vehctrl")
+    parse.add_argument('-u', '--up', help='上行信号的类型', default="vehctrl_status")
+    parse.add_argument('-s', '--startRow', help='开始的行号', type=int)
+    parse.add_argument('-e', '--endRow', help='结束的行号', type=int)
+    parse.add_argument('-f', '--findRows',
+                       help='生成topic和define的行号列表', type=int, nargs='+')
     arg = parse.parse_args()
-    generateByRemote(arg.startRow,arg.endRow,arg.down,arg.up)
+    if '-f' in sys.argv:
+        findTopicAndDefine(arg.findRows)
+    else:
+        generateByRemote(arg.startRow, arg.endRow, arg.down, arg.up)
