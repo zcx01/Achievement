@@ -91,15 +91,6 @@ def getKeyPath(key,jsConfig):
 def splitSpaceGetValueByIndex(text,index,defaultValue=""):
     return getValueByIndex(splitSpace(text),index,defaultValue)
 
-def getWordAndNum(text):
-    return re.findall(e_i, text, re.A)
-
-def getWord(text):
-    return re.findall(word, text, re.A)
-
-def getNum(text):
-    return re.findall(in_i, text, re.A)
-
 #判断字符串是否是数字(数字、小数、负数、负小数、0)
 def isNumber(text):
     if (text.split(".")[0]).isdigit() or text.isdigit() or  (text.split('-')[-1]).split(".")[-1].isdigit():

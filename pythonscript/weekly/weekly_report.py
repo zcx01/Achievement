@@ -6,8 +6,7 @@ def main():
     auth_data = {}
     with open('auth.json','r')as f:
         auth_data = json.load(f)
-    print(auth_data)
-    jira = JIRA("http://jira.i-tetris.com/", auth=(auth_data['username'], auth_data['password']))
+    jira = JIRA("http://jira.i-tetris.com/", basic_auth=(auth_data['username'], auth_data['password']))
 
     issues = jira.search_issues('resolved >= -1w AND assignee in (currentUser())', maxResults=-1)
     for issue in issues:

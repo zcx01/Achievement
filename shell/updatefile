@@ -16,7 +16,7 @@ fi
 for file in $files
 do
     if [ $file != $1 ]; then
-        sudo cp -r $1 $file
+        echo '123456' | sudo -S cp -r $1 $file
         echo "替换 $file"
     fi
 done

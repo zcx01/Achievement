@@ -53,11 +53,18 @@ class useCase(object):
         # return len(self.signals.keys() - other.signals.keys()) ==0
 
     def stopAllsig(self):
-        self.sendSim.stop()
+        useCase.stopSig(self.sendSim)
+        useCase.stopSig(self.monitorSignals)
+    
+    @staticmethod
+    def stopSig(sim):
+        if sim == None:
+            return
+        sim.stop()
         while True:
-            if self.sendSim.stopped:
-                break
             time.sleep(1)
+            if sim.stopped:
+                break
 
     def startSig(self,sendSig):
         Thread(target=self.sendSim.begin_sending, args=(sendSig,)).start()
@@ -65,25 +72,29 @@ class useCase(object):
         #     if  self.sim.stopped:
         #         break
         #     time.sleep(1)
-        time.sleep(5)
+        if not ignore_init_send:
+            time.sleep(5)
+        else:
+            time.sleep(1)
 
     def interactiveSendCanSig(self,sendSig):
-        print('-s：停止发送')
-        print('-h：打印可选的信号')
+        print('-s：停止发送所有的信号')
         print('-r：重新发送')
         print('信号名 值：修改信号值和增加信号值')
+        print('值：修改上一个信号的发送值')
         print('输入信号名:停止发送')
-        isStop = False
+        preSigs = list(dict(sendSig).keys())
+        preSig = preSigs[len(preSigs)-1]
         while(True):
             cmd=input()
             if len(cmd) == 0:
                 continue
-            cmd=cmd.split(" ")
+            cmd = cmd.split(" ")
+            if isNumber(cmd[0]):
+                cmd.insert(0,preSig)
             if '-s' in cmd:
                 self.sendSim.stop()
                 return
-            elif '-h' in cmd:
-                print(self.sendSignals)
             elif '-r' in cmd:
                 self.stopAllsig()
                 self.startSig(sendSig)
@@ -92,29 +103,21 @@ class useCase(object):
                     print("输入的信号在dbc不存在")
                     continue
                 self.sendSim.stop_task(cmd[0])
-                isStop = True
             elif len(cmd) % 2 == 0:
                 sigNames = {}
                 cmd = re.findall(e_i," ".join(cmd),re.A)
-                if cmd[0] in sendSig and isStop:
-                    self.stopAllsig()
-                    modifySendSig = dict(sendSig)
-                    modifySendSig[cmd[0]]=cmd[1]
-                    isStop=False
-                    self.startSig(modifySendSig)
-                else:
-                    index = 0
-                    while(index < len(cmd)):
-                        sigName = cmd[index]
-                        sigValue = cmd[index+1]
-                        if  not dbc.sigExist(sigName):
-                            print("输入的信号在dbc不存在")
-                        elif not isNumber(sigValue):
-                            print("输入信号值错误")
-                        else:
-                            sigNames[sigName]=sigValue
-                        index+=2
-                    self.sendSim.add_task(sigNames)
+                index = 0
+                while(index < len(cmd)):
+                    sigName = cmd[index]
+                    sigValue = cmd[index+1]
+                    if  not dbc.sigExist(sigName):
+                        print("输入的信号在dbc不存在")
+                    elif not isNumber(sigValue):
+                        print("输入信号值错误")
+                    else:
+                        sigNames[sigName]=sigValue
+                    index+=2
+                self.sendSim.add_task(sigNames)
 
     def SimulationCan(self):
         sendSig={}
@@ -182,26 +185,25 @@ def ReMatchStr(text):
         try:
             sig=signals[index]
             #保证开始为信号，而不是数字
-            if re.search(word,sig,re.A) != None:
-                while(re.search(word,signals[index+1],re.A) != None):
+            if not isNumber(sig):
+                while not isNumber(signals[index+1]):
                     index += 1
                     sig = signals[index]
-                    if re.search(in_i, signals[index+1], re.A) != None:
+                    if  isNumber(signals[index+1]):
                         index+=1
                         values.append(signals[index])
                         break
                 try:
-                    while(re.search(in_i,signals[index+1],re.A) != None):
+                     while isNumber(signals[index+1]):
                         index += 1
                         values.append(signals[index])
-                        if re.search(word,signals[index+1],re.A) != None:
+                        if not isNumber(signals[index+1]):
                             break
                 except:
                     pass
                 if sig not in case.sendSignals:
                     case.sendSignals[sig] = []
                 for value in values:
-                    if re.search(word,sig,re.A) != None and re.search(in_i,value,re.A) != None:
                         sendValue = str(value).replace("0x","")
                         if sendValue not in case.sendSignals[sig]:
                             case.sendSignals[sig].append(sendValue)

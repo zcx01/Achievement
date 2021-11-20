@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import os
 import re
+import cantools
+from cantools.database import *
 from enum import Enum
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/topic_def/"
 from commonfun import*
@@ -232,41 +234,48 @@ class Analyze(object):
         self.analy()
         
     def analy(self):
-        self.dbcSigs={}
-        self.dbcMessage={}
-        self.maxSigRow=0
-        with open(self.dbcPath,"r") as f:
-            linelist=f.readlines()
-            currentdbcMessage=None
-            rowIndex=-1
-            for text in linelist:
-                rowIndex+=1
-                text=text.strip()
-                if len(text) == 0:
-                    continue
-                if text.startswith("BO_") :
-                    dm= Analyze.analyMessage(text)
-                    if dm == None:
-                        continue
-                    dm.Row=rowIndex
-                    dm.sigMaxRow=dm.Row+1
-                    self.dbcMessage[dm.message_Id]=dm
-                    currentdbcMessage =dm
-                elif text.startswith("BU_:"):
-                    try:
-                        self.control = splitSpace(text.split(":")[1])
-                    except:
-                        pass
-                elif text.startswith("SG_"):
-                    ds = Analyze.analySG(text)
-                    ds.dbcMessage=currentdbcMessage
-                    ds.Row=rowIndex
-                    self.dbcSigs[ds.name] = ds
-                    self.maxSigRow = rowIndex
-                    try:
-                        self.dbcMessage[currentdbcMessage.message_Id].sigMaxRow=rowIndex+1         
-                    except:
-                        pass
+        dbc = cantools.db.load_file(self.dbcPath)
+        assert isinstance(dbc, Database)
+        for message in dbc.messages:# type: Message
+            assert isinstance(message, Message)
+            for sig in message.signals:
+                assert isinstance(sig, Signal)
+                print(sig.name,sig.)
+        # self.dbcSigs={}
+        # self.dbcMessage={}
+        # self.maxSigRow=0
+        # with open(self.dbcPath,"r") as f:
+        #     linelist=f.readlines()
+        #     currentdbcMessage=None
+        #     rowIndex=-1
+        #     for text in linelist:
+        #         rowIndex+=1
+        #         text=text.strip()
+        #         if len(text) == 0:
+        #             continue
+        #         if text.startswith("BO_") :
+        #             dm= Analyze.analyMessage(text)
+        #             if dm == None:
+        #                 continue
+        #             dm.Row=rowIndex
+        #             dm.sigMaxRow=dm.Row+1
+        #             self.dbcMessage[dm.message_Id]=dm
+        #             currentdbcMessage =dm
+        #         elif text.startswith("BU_:"):
+        #             try:
+        #                 self.control = splitSpace(text.split(":")[1])
+        #             except:
+        #                 pass
+        #         elif text.startswith("SG_"):
+        #             ds = Analyze.analySG(text)
+        #             ds.dbcMessage=currentdbcMessage
+        #             ds.Row=rowIndex
+        #             self.dbcSigs[ds.name] = ds
+        #             self.maxSigRow = rowIndex
+        #             try:
+        #                 self.dbcMessage[currentdbcMessage.message_Id].sigMaxRow=rowIndex+1         
+        #             except:
+        #                 pass
 
     def sigExist(self,sig):
         return sig in self.dbcSigs
@@ -430,7 +439,7 @@ class Analyze(object):
 
 
 
-# a=Analyze("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210318.dbc")
+a=Analyze("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc")
 # print(a.getMessageBySig("CdcDtc1HiByte"))
 # sig=SigInfo()
 # sig.endBit=104

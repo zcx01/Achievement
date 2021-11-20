@@ -131,9 +131,9 @@ def getBugInfo():
 
 
 if __name__ == "__main__":
-    # if len(sys.argv) == 2:
-    #     sendBugCan(sys.argv[1])
-    # else:
-    #     getBugInfo()
+    if len(sys.argv) == 2:
+        sendBugCan(sys.argv[1])
+    else:
+        getBugInfo()
     # getBugInfo("BGS-3771")
-    sendBugCan("BGS-4738")
+    # sendBugCan("BGS-4738")
