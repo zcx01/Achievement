@@ -211,12 +211,13 @@ def dealnewSig(can_parse_whitelist_return=False):
     for text in content:
         if InvalidRow(text,alreadyText):
             continue
+        alreadyText.append(text)
         text=text.replace("\t"," ")
         names=text.split(" ")
         sigs=getValueByIndex(names,0).split(",")
         isWriteCanContinue = False
         for sig in sigs:
-            message=analy.getMessageBySig(sig)
+            message=analy.getMessage_Id_BySig(sig)
             if len(message)==0:
                 print(f'{sig} 对应的message不存在')
                 isWriteCanContinue = True
@@ -226,11 +227,11 @@ def dealnewSig(can_parse_whitelist_return=False):
                 isWriteCanContinue = True
                 break
 
-        if isWriteCanContinue:
+        if isWriteCanContinue or judgeCommad("-A",names):
             continue
         
         sig = sigs[0]
-        message = analy.getMessageBySig(sig)
+        message = analy.getMessage_Id_BySig(sig)
         messagesig=message+"__"+sig
         sigType = getValueByIndex(names, 1)
         #通过 CAN matrix 表格获取中文描述
@@ -247,8 +248,9 @@ def dealnewSig(can_parse_whitelist_return=False):
 
         #写入 cpp 文件 #创建 .h .cpp 文件
         dataTypeStr=analy.getSigDataType(sig)
-        if judgeCommad("-A",names):
-            continue
+        desc=addEscape(desc)
+        print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
+        os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
     #     elif judgeCommad("-m",names):
     #         print('\
     #     //%s\n\
@@ -256,11 +258,6 @@ def dealnewSig(can_parse_whitelist_return=False):
 	# {\n\
     #     sig=&CANSIG_%s_g;\n\
 	# }'% (desc,define,messagesig))
-        else:
-            desc=addEscape(desc)
-            print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
-            os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
-        alreadyText.append(text)
     
 
 def xlsToTxt(shellIndex=0):

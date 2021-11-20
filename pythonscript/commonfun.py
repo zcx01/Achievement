@@ -2,7 +2,9 @@
 import json
 import re
 word=r"\b[a-zA-Z_]+\b"
+w_d=r'[a-zA-Z_]'
 in_i=r"-?\b[0x0-9]+\b"
+i_i=r"-?[0x0-9]"
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"
 
 class EesyStr():
@@ -93,10 +95,12 @@ def splitSpaceGetValueByIndex(text,index,defaultValue=""):
 
 #判断字符串是否是数字(数字、小数、负数、负小数、0)
 def isNumber(text):
+    assert isinstance(text,str)
+    text=text.replace("0x",'')
     if (text.split(".")[0]).isdigit() or text.isdigit() or  (text.split('-')[-1]).split(".")[-1].isdigit():
-        return True
-    else:
-        return False
+        if re.search(w_d,text,re.A) == None:
+            return True
+    return False
 
 #科学技术法转化成数字
 def eConverf(value):
@@ -122,3 +126,4 @@ def behindStr(lines,behind,content):
         index+=1
     if content not in behinds:
         lines.insert(row,content)
+

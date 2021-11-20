@@ -240,7 +240,6 @@ class Analyze(object):
             assert isinstance(message, Message)
             for sig in message.signals:
                 assert isinstance(sig, Signal)
-                print(sig.name,sig.)
         # self.dbcSigs={}
         # self.dbcMessage={}
         # self.maxSigRow=0
@@ -286,7 +285,7 @@ class Analyze(object):
         except:
             return ''
 
-    def getMessageBySig(self,sig):
+    def getMessage_Id_BySig(self,sig):
         try:
             return self.dbcSigs[sig].dbcMessage.message_Id
         except:
@@ -440,7 +439,7 @@ class Analyze(object):
 
 
 a=Analyze("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc")
-# print(a.getMessageBySig("CdcDtc1HiByte"))
+# print(a.getMessage_Id_BySig("CdcDtc1HiByte"))
 # sig=SigInfo()
 # sig.endBit=104
 # sig.length=13

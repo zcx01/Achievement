@@ -136,4 +136,4 @@ if __name__ == "__main__":
     else:
         getBugInfo()
     # getBugInfo("BGS-3771")
-    # sendBugCan("BGS-4738")
+    # sendBugCan("BGS-4547")

@@ -16,50 +16,29 @@ class WriteDBCResult(Enum):
     NoMessage=4         #没有message
 
 class SigInfo(object):
-    def __init__(self,info=None) :
-        if info == None:
-            self.messageId = ""
-            self.name=""
-            self.startBit=0
-            self.endBit=0
-            self.length=0
-            self.dataType="+"
-            self.factor=0
-            self.Offset=0
-            self.min=0
-            self.max=0
-            self.Unit=""
-            self.enum=""
-            self.initValue=0#十进制
-            self.invalidValue=0
-            self.Recevier=""
-            self.Sender=""
-            self.cycle=0
-            self.useBit=[]
-            #----------dbc中独有的-------------
-            self.dbcMessage=None
-            self.Row=0
-        else:
-            self.messageId = info.messageId
-            self.name=info.name
-            self.startBit=info.startBit
-            self.endBit=info.endBit
-            self.length=info.length
-            self.dataType=info.dataType
-            self.factor=info.factor
-            self.Offset=info.Offset
-            self.min=info.min
-            self.max=info.max
-            self.Unit=info.Unit
-            self.enum=info.enum
-            self.initValue=info.initValue
-            self.invalidValue=info.invalidValue
-            self.Recevier=info.Recevier
-            self.Sender=info.Sender
-            self.cycle=info.cycle
-            self.useBit=info.useBit
-            self.dbcMessage = info.dbcMessage
-            self.Row = info.Row
+    def __init__(self) :
+        self.messageId = ""
+        self.name=""
+        self.startBit=0
+        self.endBit=0
+        self.length=0
+        self.dataType="+"
+        self.factor=0
+        self.Offset=0
+        self.min=0
+        self.max=0
+        self.Unit=""
+        self.enum=""
+        self.initValue=0#十进制
+        self.invalidValue=0
+        self.Recevier=""
+        self.Sender=""
+        self.cycle=0
+        self.useBit=[]
+        #----------dbc中独有的------------
+        self.Row=0
+        self.initRow=0
+        self.enumRow=0
     
     def getMId(self):
         return int(self.messageId,16)
@@ -174,7 +153,7 @@ class SigInfo(object):
         return endIndex
 
     def compare(self,other):
-        other = SigInfo(other)
+        assert isinstance(other,SigInfo)
         result=[]
         isSame=False
         link=' --- '
@@ -216,9 +195,12 @@ class dbcMessage(object):
     def __init__(self) -> None:
         super().__init__()
         self.message_Id=''
+        self.messageId = 0
         self.Row=-1
         self.sigMaxRow=-1
         self.sender=''
+        self.cycle = 0
+        self.cycleRow=0
 
 class Analyze(object):
     def __init__(self,dbc_file=None) :
@@ -235,6 +217,7 @@ class Analyze(object):
         self.dbcSigs={}
         self.dbcMessage={}
         self.maxSigRow=0
+        isStart = False
         with open(self.dbcPath,"r") as f:
             linelist=f.readlines()
             currentdbcMessage=None
@@ -244,42 +227,91 @@ class Analyze(object):
                 text=text.strip()
                 if len(text) == 0:
                     continue
+                if text.startswith("BU_:"):
+                    if not isStart: isStart = True
+                    try:
+                        self.control = splitSpace(text.split(":")[1])
+                    except:
+                        pass
+                if not isStart: continue
+
                 if text.startswith("BO_") :
                     dm= Analyze.analyMessage(text)
                     if dm == None:
                         continue
                     dm.Row=rowIndex
                     dm.sigMaxRow=dm.Row+1
-                    self.dbcMessage[dm.message_Id]=dm
+                    self.dbcMessage[dm.messageId]=dm
                     currentdbcMessage =dm
-                elif text.startswith("BU_:"):
-                    try:
-                        self.control = splitSpace(text.split(":")[1])
-                    except:
-                        pass
                 elif text.startswith("SG_"):
                     ds = Analyze.analySG(text)
-                    ds.dbcMessage=currentdbcMessage
+                    ds.Sender = currentdbcMessage.sender
+                    ds.messageId = currentdbcMessage.messageId
                     ds.Row=rowIndex
                     self.dbcSigs[ds.name] = ds
                     self.maxSigRow = rowIndex
                     try:
-                        self.dbcMessage[currentdbcMessage.message_Id].sigMaxRow=rowIndex+1         
+                        self.dbcMessage[currentdbcMessage.messageId].sigMaxRow=rowIndex+1         
                     except:
                         pass
+                elif "GenSigStartValue" in text:
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        sigName = texts[4]
+                        sigValue = int(texts[5])
+                        sig = self.dbcSigs[sigName]
+                        assert isinstance(sig,SigInfo)
+                        sig.initValue = sigValue
+                        sig.initRow = rowIndex
+                        self.dbcSigs[sigName] = sig
+                    except:
+                        # print(f'初始值 {text} 信号不在定义中')
+                        pass
+                elif "GenMsgCycleTime" in text:
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        messageId = texts[3]
+                        me = self.dbcMessage[messageId]
+                        assert isinstance(me,dbcMessage)
+                        me.cycle = int(texts[4])
+                        me.cycleRow = rowIndex
+                        self.dbcMessage[messageId] = me
+                    except:
+                        # print(f'周期 {text} 不在定义中')
+                        pass
+                elif text.startswith('VAL_'):
+                    try:
+    
+                        texts = re.findall(e_i,text,re.A)
+                        sigName = texts[2]
+                        sig = self.dbcSigs[sigName]
+                        assert isinstance(sig,SigInfo)
+                        try:
+                            sig.enum = text.split(sigName)[1].strip()
+                        except:
+                            pass
+                        sig.enumRow = rowIndex
+                        self.dbcSigs[sigName] = sig
+                    except:
+                        print(f'枚举值 {text} 信号不在定义中')
+                        pass
 
-    def sigExist(self,sig):
-        return sig in self.dbcSigs
+    def sigExist(self,sigName):
+        return sigName in self.dbcSigs
 
-    def sender(self,sig):
+    def sender(self,sigName):
         try:
-            return self.dbcSigs[sig].dbcMessage.sender
+            sig = self.dbcSigs[sigName]
+            assert isinstance(sig,SigInfo)
+            return sig.Sender
         except:
             return ''
 
-    def getMessageBySig(self,sig):
+    def getMessage_Id_BySig(self,sigName):
         try:
-            return self.dbcSigs[sig].dbcMessage.message_Id
+            sig = self.dbcSigs[sigName]
+            assert isinstance(sig,SigInfo)
+            return sig.getMessage_Id()
         except:
             # print(f'{sig}没有找到message')
             return ""
@@ -288,7 +320,8 @@ class Analyze(object):
     def getSigDataType(self,sigName):
         dataTypeStr=""
         try:
-            sig = SigInfo(self.dbcSigs.get(sigName))
+            sig = self.dbcSigs.get(sigName)
+            assert isinstance(sig,SigInfo)
             dayaType = sig.dataType
             if dayaType == '-':
                 dataTypeStr="int32" 
@@ -314,6 +347,7 @@ class Analyze(object):
         if len(messages) < 4:
             return None
         ms = dbcMessage()
+        ms.messageId =  messages[1]
         ms.message_Id = messages[2]
         ms.sender = messages[4]
         return ms
@@ -340,7 +374,7 @@ class Analyze(object):
         return sig
 
     def writeSig(self,sig):
-        sig=SigInfo(sig)
+        assert isinstance(sig,SigInfo)
         linelist=readFileLines(self.dbcPath)
         linelistSize=len(linelist)
         if sig.name in self.dbcSigs:
@@ -408,8 +442,8 @@ class Analyze(object):
         return WriteDBCResult.WriteComplete
 
     def writeMessage(self,sig,linelist):
-        # linelist=list(linelist)
-        # sig=SigInfo(sig)
+        assert isinstance(linelist,list)
+        assert isinstance(sig,SigInfo)
         if len(sig.messageId) == 0:
             return False
         linelist.insert(self.maxSigRow+1,"\n")
@@ -431,7 +465,7 @@ class Analyze(object):
 
 
 # a=Analyze("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210318.dbc")
-# print(a.getMessageBySig("CdcDtc1HiByte"))
+# print(a.getMessage_Id_BySig("CdcDtc1HiByte"))
 # sig=SigInfo()
 # sig.endBit=104
 # sig.length=13

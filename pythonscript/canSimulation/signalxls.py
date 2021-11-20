@@ -49,7 +49,6 @@ class useCase(object):
     def isSame(self,other):
         sameSize = len(self.sendSignals.keys() & other.sendSignals.keys())
         return sameSize == len(self.sendSignals) and sameSize == len(other.sendSignals)
-
         # return len(self.signals.keys() - other.signals.keys()) ==0
 
     def stopAllsig(self):
@@ -116,11 +115,13 @@ class useCase(object):
                         print("输入信号值错误")
                     else:
                         sigNames[sigName]=sigValue
+                        preSig = sigName
                     index+=2
                 self.sendSim.add_task(sigNames)
 
     def SimulationCan(self):
         sendSig={}
+        if not ignore_init_send: self.AddPowerSig()
         for sigName in self.sendSignals:
             if len(self.sendSignals[sigName]) > 1:
                 print(f'{sigName}:{self.sendSignals[sigName]} 索引')
@@ -136,10 +137,10 @@ class useCase(object):
             self.MonitorSig(self.monitorSignals)
         self.interactiveSendCanSig(sendSig)
     
-    def SendPowerSig(self):
-        self.sendSignals[PowerSig]=[]
-        self.sendSignals[PowerSig].append("2")
-        self.SimulationCan()
+    
+    def AddPowerSig(self):
+        if PowerSig not in self.sendSignals:
+            self.sendSignals[PowerSig]=PowerSigValue
 
     def MonitorSig(self,sigName):
         if self.monitorSim == None:
@@ -294,7 +295,8 @@ if __name__ == "__main__":
     if '-c' in sys.argv:
         dealTest(arg.casexlsx,0,1)
     elif '-s' in sys.argv:
-        use.SendPowerSig()
+        use.AddPowerSig()
+        use.SimulationCan()
     elif '-m' in sys.argv:
         use.MonitorSig(arg.Monitor)
     elif '-d' in sys.argv:
