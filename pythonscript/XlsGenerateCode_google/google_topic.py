@@ -55,10 +55,19 @@ def generateByRemote(startRow, endRow, down, up):
     generate(values, startRow, endRow, down, up, GoValue, len(values))
 
 
-def findTopicAndDefine(rows):
-    values = getShellValueDrive()
-    getTopicAndDefine(values,GoValue,rows)
+def findTopicAndDefine(findArg):
+    if type(findArg[0]) == int:
+        findTopicAndDefineByRow(findArg)
+    else:
+        findTopicAndDefineByDesc(findArg[0])
 
+def findTopicAndDefineByRow(rows):
+    values = getShellValueDrive()
+    getTopicAndDefineByRow(values,GoValue,rows)
+
+def findTopicAndDefineByDesc(desc):
+    values = getShellValueDrive()
+    getTopicAndDefineByDesc(values,GoValue,desc, len(values))
 
 def GoValue(values, row, col):
     return values[row][col]
@@ -69,10 +78,10 @@ if __name__ == '__main__':
     parse.add_argument('-u', '--up', help='上行信号的类型', default="vehctrl_status")
     parse.add_argument('-s', '--startRow', help='开始的行号', type=int)
     parse.add_argument('-e', '--endRow', help='结束的行号', type=int)
-    parse.add_argument('-f', '--findRows',
-                       help='生成topic和define的行号列表', type=int, nargs='+')
+    parse.add_argument('-f', '--findArg',
+                       help='查找topic和define的行号列表', nargs='+')
     arg = parse.parse_args()
     if '-f' in sys.argv:
-        findTopicAndDefine(arg.findRows)
+        findTopicAndDefine(arg.findArg)
     else:
         generateByRemote(arg.startRow, arg.endRow, arg.down, arg.up)

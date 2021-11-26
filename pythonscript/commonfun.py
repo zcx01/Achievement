@@ -7,6 +7,13 @@ in_i=r"-?\b[0x0-9]+\b"
 i_i=r"-?[0x0-9]"
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"
 
+def sendMqtt(topic,value):
+    topic=str(topic).replace(r'"','')
+    return f'mosquitto_pub -h cdc-qnx -t  \'{topic}\'  -m \''+'{'+f'\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":{value}'+'}\''
+
+def subMqtt(topic):
+    return f'mosquitto_sub -h cdc-qnx -v -t {topic}'
+    
 class EesyStr():
     @staticmethod
     def removeAt(s,index):
@@ -126,4 +133,11 @@ def behindStr(lines,behind,content):
         index+=1
     if content not in behinds:
         lines.insert(row,content)
+
+def getNoOx16(text):
+    content = str(text)
+    if content.startswith('0x'):
+        return content.replace('0x', '').upper()
+    else:
+        return str(hex(int(text))).replace('0x','').upper()
 

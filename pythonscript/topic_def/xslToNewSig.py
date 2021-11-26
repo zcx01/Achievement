@@ -15,7 +15,10 @@ def sigExist(sheel,row,col,CallFun):
         sig = sigs[0]
         del sigs[0]
         relation = ','.join(sigs)
-    return sig,len(sig)>3 and sig!='None',relation
+    exist = len(sig)>3 and sig!='None'
+    if not exist:
+        print(row+1,chr(col+65),'信号不存在')
+    return sig,exist,relation
  
 def getDefineByFile(deContent,topic):
     for lineContent in deContent:
@@ -51,10 +54,10 @@ def getValue(CallFun,sheel,row,col):
     try:
         return CallFun(sheel,row,col)
     except:
-        print(row+1,chr(col+65),'值不存在')
+        # print(row+1,chr(col+65),'值不存在')
         return
 
-def getTopicByXls(CallFun,sheel,row):
+def  getTopicByXls(CallFun,sheel,row):
     topics = []
     try:
         col=0
@@ -87,7 +90,10 @@ def getComments(CallFun,sheel,startRow):
         commentStatus=comment+statusStr
     return comment,commentStatus
 
-def getTopicAndDefine(sheel,CallFun,rows):
+def getTopicAndDefineByRow(sheel,CallFun,rows):
+    pubTopic=[]
+    subTopic=[]
+    descs=[]
     for row in rows:
         row-=1
         commentSet, comment = getComments(CallFun, sheel, row)
@@ -96,11 +102,42 @@ def getTopicAndDefine(sheel,CallFun,rows):
         defineStr = getDefineBySelf(topicStr)
         print(f'{row:<5}{topicStr:<50}{defineStr:<50}{comment}')
         print(f'{row:<5}{topicStrSet:<50}{defineStrSet:<50}{commentSet:}')
+        subTopic.append(topicStr)
+        pubTopic.append(topicStrSet)
+        descs.append(comment)
+    
+    try:
+        while True:
+            m = input('是否生成消息(y/n/h)')
+            if  m == 'n':
+                return
+            if  m == 'h':
+                for row in range(len(subTopic)):
+                    print(f'{row:<5}{subTopic[row]:<50}{descs[row]}')
+            rowIndex = input('输入索引')
+            for row in range(len(subTopic)):
+                if row == int(rowIndex):
+                    print(subMqtt(f'\'{subTopic[row]}\''))
+                    print(sendMqtt(f'{pubTopic[row]}',1))
+    except:
+        pass
 
-def generate(sheel,startRow,endRow,down,up,CallFun,size):
+
+def getTopicAndDefineByDesc(sheel,CallFun,desc,rows):
+    findRows=[]
+    for row in range(rows):
+        try:
+            commentSet, comment = getComments(CallFun, sheel, row)
+            if desc in commentSet or desc in comment:
+                findRows.append(row+1)
+        except:
+            pass
+    getTopicAndDefineByRow(sheel,CallFun,findRows)
+
+def generate(sheel,startRow,endRow,down,up,CallFun,rows):
     startRow-=1
     endRow-=1
-    if startRow >= size or endRow >= size or startRow > endRow:
+    if startRow >= rows or endRow >= rows or startRow > endRow:
         print('输入的行号不合法')
         return
     jsConfig = getJScontent(pyFileDir+"config.json")

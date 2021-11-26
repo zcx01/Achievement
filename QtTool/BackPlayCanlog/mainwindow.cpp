@@ -203,7 +203,7 @@ void MainWindow::analydbc()
         else if(text.startsWith("SG_"))
         {
             QString sigName = analyline(text);
-            qDebug()<<sigName;
+            qDebug()<<sigName<<messageId;
             sigMessageIds.insert(sigName,messageId);
         }
     }

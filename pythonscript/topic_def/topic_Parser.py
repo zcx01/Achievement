@@ -5,8 +5,6 @@ import os
 import xlrd
 import subprocess
 import argparse
-pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
-sys.path.append(pyFileDir+"..")
 from commonfun import *
 from Analyzedbc import *
 
@@ -68,15 +66,6 @@ def findsignalInfile(signal,filePath):
     except:
         return False
 
-def getSignalDescInexcel(signal,filePath):
-    book=xlrd.open_workbook(filePath)
-    sheel=book.sheet_by_name("5_Matrix")
-    for row in range(sheel.nrows):
-        text=sheel.cell_value(row,2)
-        if str(text).find(signal)!=-1:
-            return str(sheel.cell_value(row,3))
-    return ""
-
 def getFullPath(path,jsConfig):
     # path=str(path)
     if path.startswith("/"):
@@ -88,56 +77,8 @@ def getFullPath(path,jsConfig):
 def getKeyPath(key,jsConfig):
     return getFullPath(jsConfig.get(key,""),jsConfig)
 
-def getTopic_P(jsContents,desc):
-    level=""
-    for jsGeneral in jsContents:
-        Comments=jsGeneral["Comments"]
-        if len(Comments)==0: continue
-        lev=jsGeneral["Topic Level 1"]
-        if len(lev) != 0: level=lev
-        if Comments.find(desc)!=-1 or desc.find(Comments)!=-1:
-            levelCount=2
-            while(1):
-                levelStr="Topic Level "+str(levelCount)
-                if len(jsGeneral.get(levelStr,"")) ==0:
-                    level=EesyStr.removeAt(level,len(level)-1)
-                    return level
-                else:
-                    level=level+jsGeneral[levelStr]+"/"
-                levelCount+=1
-    return level
-
-def getTopic(jsConfig,desc,sig,suffx):
-    topic=""
-    try:
-        jsGenerals=getJScontent(getKeyPath("topics_define",jsConfig))
-        topic=getTopic_P(jsGenerals,desc)
-        if len(topic) !=0:
-            return topic
-    except:
-        pass
-    print(f"没有找到{desc},请输入topic?")
-    topic=input()
-    if len(topic) != 0:
-        return topic
-    print(f"输入的{desc}为空,是否生成自定义topic(y/n)?")
-    cmd=input()
-    if "n" in cmd:
-        return
-    custom_topics_definePath=getKeyPath("topics_define",jsConfig)
-    jsCustoms=getJScontent(custom_topics_definePath)
-    topic=getTopic_P(jsCustoms,desc)
-    if len(topic) !=0:
-        return topic
-    jsCustom={}
-    jsCustom["Topic Level 1"]=suffx
-    jsCustom["Topic Level 2"]=sig
-    jsCustom["HasSet"]=""
-    jsCustom["Comments"]=desc
-    jsCustoms.append(jsCustom)
-    writeJs(custom_topics_definePath,jsCustoms)
-    execCmd("bash "+getKeyPath("generate_topic",jsConfig))
-    return suffx+sig
+def getTopic(jsConfig,desc):
+    return desc
 
 def execCmd(cmd):
     ex = subprocess.Popen(cmd,stdout=subprocess.PIPE,shell=True)
@@ -157,26 +98,26 @@ def InvalidRow(text,alreadyText):
     return text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n") or len(text.replace(' ',''))==0
 
 #写入 can_parse_whitelist 文件
-def WriteCan_parse_whitelist(jsConfig,message,messagesig,can_parse_whitelist_return):
-    can_parse_whitelistPath=getKeyPath("can_parse_whitelist",jsConfig)
-    if  findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
-        if can_parse_whitelist_return:
-            print(f'{can_parse_whitelistPath} 文件存在，跳过')
-            return False
-    else:
-        print(f"写入 {can_parse_whitelistPath} 文件")
-        can_parse_whitelist_read=open(can_parse_whitelistPath,"r")
-        can_parse_whitelist_content_line=readFileLines(can_parse_whitelistPath)
+def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return):
+    if os.path.isfile(can_parse_whitelistPath):  
+        if  findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
+            if can_parse_whitelist_return:
+                print(f'{can_parse_whitelistPath} 文件存在，跳过')
+                return False
+        else:
+            print(f"写入 {can_parse_whitelistPath} 文件")
+            can_parse_whitelist_read=open(can_parse_whitelistPath,"r")
+            can_parse_whitelist_content_line=readFileLines(can_parse_whitelistPath)
 
-        #写在现有的message后面
-        behindStr(can_parse_whitelist_content_line,'message',f'{message:<18}[message]		[all]')
+            #写在现有的message后面
+            behindStr(can_parse_whitelist_content_line,'message',f'{message:<18}[message]		[all]')
 
-        if not can_parse_whitelist_read.read().endswith('\n'):
-            can_parse_whitelist_content_line.append('\n')
-        can_parse_whitelist_read.close()
-        
-        can_parse_whitelist_content_line.append(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
-        wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_line,False)
+            if not can_parse_whitelist_read.read().endswith('\n'):
+                can_parse_whitelist_content_line.append('\n')
+            can_parse_whitelist_read.close()
+            
+            can_parse_whitelist_content_line.append(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
+            wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_line,False)
     return True
 
 def dealnewSig(can_parse_whitelist_return=False):
@@ -207,6 +148,8 @@ def dealnewSig(can_parse_whitelist_return=False):
         addDbcSigName=' '.join(addDbcSigNames.keys())
         os.system(f'xlsdbc -s {addDbcSigName}')
 
+    successWrite=[]
+    failWrite=[]
     analy=Analyze(getKeyPath("dbcfile",jsConfig))
     for text in content:
         if InvalidRow(text,alreadyText):
@@ -220,10 +163,12 @@ def dealnewSig(can_parse_whitelist_return=False):
             message=analy.getMessage_Id_BySig(sig)
             if len(message)==0:
                 print(f'{sig} 对应的message不存在')
+                failWrite.append(sig)
                 isWriteCanContinue = True
                 break
-            messagesig=message+"__"+sig
-            if not WriteCan_parse_whitelist(jsConfig,message,messagesig,can_parse_whitelist_return):
+            messagesig=analy.getMessage_Id_Sig(sig)
+            can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
+            if not WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return):
                 isWriteCanContinue = True
                 break
 
@@ -231,19 +176,14 @@ def dealnewSig(can_parse_whitelist_return=False):
             continue
         
         sig = sigs[0]
-        message = analy.getMessage_Id_BySig(sig)
-        messagesig=message+"__"+sig
+        messagesig=analy.getMessage_Id_Sig(sig)
         sigType = getValueByIndex(names, 1)
-        #通过 CAN matrix 表格获取中文描述
-        if len(names) < 2 or len(names[2]) == 0 or names[1] == "d":
-            desc=getSignalDescInexcel(sig,getKeyPath("canmatrix",jsConfig))
-        else:
-            desc=getValueByIndex(names,2)
+        desc=getValueByIndex(names,2)
         className=getValueByIndex(names,3,"x")
         topic=getValueByIndex(names,4)
         
         if len(topic)==0 or topic == "x":
-            topic = getTopic(jsConfig, desc, sig, "")
+            topic = getTopic(jsConfig, desc)
         define = getDefine(jsConfig,topic)
 
         #写入 cpp 文件 #创建 .h .cpp 文件
@@ -251,6 +191,7 @@ def dealnewSig(can_parse_whitelist_return=False):
         desc=addEscape(desc)
         print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
         os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
+        successWrite.append(sig)
     #     elif judgeCommad("-m",names):
     #         print('\
     #     //%s\n\
@@ -281,16 +222,19 @@ if __name__ == "__main__":
     parse = argparse.ArgumentParser(description='可以通过文本或者表格生成代码的脚本')
     parse.add_argument('-s','--shell',help='shell的索引',type=int,default=0)
     parse.add_argument('-t','--text',help='文本生成')
-    parse.add_argument('-r', '--CanParseWhitelistReturn', help='在can的白名单中存在就不生成代码',type=int,default=0)
+    parse.add_argument('-r','--CanParseWhitelistReturn', help='在can的白名单中存在就不生成代码',type=int,default=0)
     parse.add_argument('-p','--power',help='是否加入电源信号',default=0,type=int)
-
+    parse.add_argument('-w','--whitelist',nargs='+')
     arg = parse.parse_args()
 
-    isShell = not judgeCommad("-t") or judgeCommad('-s')
-    if isShell:
-        xlsToTxt(arg.shell)
-    dealnewSig(arg.CanParseWhitelistReturn)
+    if judgeCommad('-w'):
+        WriteCan_parse_whitelist(arg.whitelist[0],arg.whitelist[1],arg.whitelist[2],False)
+    else:
+        isXls = judgeCommad('-s') or not judgeCommad('-t')
+        if isXls:
+            xlsToTxt(arg.shell)
+        dealnewSig(arg.CanParseWhitelistReturn)
 
-    if isShell:
-        os.system(f"TestCaseGenerate -s {arg.shell} -p {arg.power}")
-    os.system("Parser")
+        if isXls:
+            os.system(f"TestCaseGenerate -s {arg.shell} -p {arg.power}")
+        os.system("Parser")

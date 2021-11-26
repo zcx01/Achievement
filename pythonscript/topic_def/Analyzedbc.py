@@ -1,10 +1,9 @@
 #!/usr/bin/python
+import sys
 import os
 import re
-import cantools
-from cantools.database import *
 from enum import Enum
-pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/topic_def/"
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 from commonfun import*
 
 class DataType(Enum):
@@ -18,50 +17,30 @@ class WriteDBCResult(Enum):
     NoMessage=4         #没有message
 
 class SigInfo(object):
-    def __init__(self,info=None) :
-        if info == None:
-            self.messageId = ""
-            self.name=""
-            self.startBit=0
-            self.endBit=0
-            self.length=0
-            self.dataType="+"
-            self.factor=0
-            self.Offset=0
-            self.min=0
-            self.max=0
-            self.Unit=""
-            self.enum=""
-            self.initValue=0#十进制
-            self.invalidValue=0
-            self.Recevier=""
-            self.Sender=""
-            self.cycle=0
-            self.useBit=[]
-            #----------dbc中独有的-------------
-            self.dbcMessage=None
-            self.Row=0
-        else:
-            self.messageId = info.messageId
-            self.name=info.name
-            self.startBit=info.startBit
-            self.endBit=info.endBit
-            self.length=info.length
-            self.dataType=info.dataType
-            self.factor=info.factor
-            self.Offset=info.Offset
-            self.min=info.min
-            self.max=info.max
-            self.Unit=info.Unit
-            self.enum=info.enum
-            self.initValue=info.initValue
-            self.invalidValue=info.invalidValue
-            self.Recevier=info.Recevier
-            self.Sender=info.Sender
-            self.cycle=info.cycle
-            self.useBit=info.useBit
-            self.dbcMessage = info.dbcMessage
-            self.Row = info.Row
+    def __init__(self) :
+        self.messageId = ""
+        self.name=""
+        self.startBit=0
+        self.endBit=0
+        self.length=0
+        self.dataType="+"
+        self.factor=0
+        self.Offset=0
+        self.min=0
+        self.max=0
+        self.Unit=""
+        self.enum=""
+        self.initValue=0#十进制
+        self.invalidValue=0
+        self.useBit=[]
+        #-------message--------
+        self.Recevier=""
+        self.Sender=""
+        self.cycle=0
+        #----------dbc中独有的------------
+        self.Row=0
+        self.initRow=0
+        self.enumRow=0
     
     def getMId(self):
         return int(self.messageId,16)
@@ -70,9 +49,17 @@ class SigInfo(object):
         return f' SG_ {self.name} : {self.startBit}|{self.length}@0{self.dataType} ({self.factor},{self.Offset}) [{self.min}|{self.max}] {self.Unit}  {self.Recevier}'
     
     def getEnum(self):
+        enumS = self.enum.replace("\n",':')
+        enumS = enumS.split(':')
+        enumStr = self.getEnumBylist(enumS)
+        if len(enumStr) == 0:
+            enumS=re.findall(e_i,self.enum,re.A)
+            enumStr = self.getEnumBylist(enumS)
+        return enumStr
+
+    def getEnumBylist(self,enumS):
         try:
             enumStrA=[]
-            enumS=re.findall(e_i,self.enum,re.A)
             enumIndex = 0
             while enumIndex < len(enumS):
                 enumStrA.append(f'{int(enumS[enumIndex],16)} \"{enumS[enumIndex+1]}\"')
@@ -85,20 +72,15 @@ class SigInfo(object):
         except:
             return ""
 
+
     def getStartValue(self):
         return f'BA_ \"GenSigStartValue\" SG_  {self.getMId()} {self.name} {self.initValue};'
 
     def getMessage_Id(self):
         return f'{self.Sender}_{self.messageId}'
 
-    def getMessageRowContent(self,size):
-        return f'BO_  {self.getMId()} {self.getMessage_Id()}: {size} {self.Sender}'
-
-    def getMessageCycle(self):
-        return f'BA_ \"GenMsgCycleTime\" BO_  {self.getMId()} {self.cycle};'
-
-    def getMessageVFrameFormat(self):
-        return f'BA_ \"VFrameFormat\" BO_ {self.getMId()} 14;'
+    def getMessage_Sig(self):
+        return self.getMessage_Id()+"__"+self.name
 
     #endBit+(length - length%8)+(8-length)+1=startBit
     def getStartBit(self):
@@ -176,7 +158,7 @@ class SigInfo(object):
         return endIndex
 
     def compare(self,other):
-        other = SigInfo(other)
+        assert isinstance(other,SigInfo)
         result=[]
         isSame=False
         link=' --- '
@@ -214,13 +196,58 @@ class SigInfo(object):
         
         return isSame,result
 
-class dbcMessage(object):
+class MessageInfo(object):
     def __init__(self) -> None:
         super().__init__()
-        self.message_Id=''
-        self.Row=-1
-        self.sigMaxRow=-1
+        self.messageId = 0
         self.sender=''
+        self.cycle = 0
+        self.frame=0
+        self.subNet=''
+        self.Recevier=''
+        self.lenght=0
+        #---------dbc专有
+        self.message_Id=''
+        self.sigs=[]
+        self.Row=-1
+        self.cycleRow=0
+        self.frameRow=0
+        self.sigMaxRow=-1
+
+    def getMessage_Id(self):
+        if len(self.message_Id) !=0:
+            return self.message_Id
+        return f'{self.sender}_{self.messageId}'
+
+    def getAllSigInitValue(self):
+        sig_value={}
+        for sig in self.sigs:
+            assert isinstance(sig,SigInfo)
+            sig_value[sig.name] = sig.min
+        return sig_value
+
+    def getMId(self):
+        return int(self.messageId,16)
+
+    def getMessageRowContent(self):
+        return f'BO_  {self.getMId()} {self.getMessage_Id()}: {self.lenght} {self.sender}'
+
+    def getMessageCycle(self):
+        return f'BA_ \"GenMsgCycleTime\" BO_ {self.getMId()} {self.cycle};'
+
+    def getMessageVFrameFormat(self):
+        return f'BA_ \"VFrameFormat\" BO_ {self.getMId()} {self.frame};'
+
+    def CopyXls(self,other):
+        assert isinstance(other,MessageInfo)
+        self.messageId = other.messageId
+        self.sender= other.sender
+        self.cycle =  other.cycle
+        self.frame=  other.frame
+        self.subNet= other.subNet
+        self.Recevier= other.Recevier
+        self.lenght= other.lenght
+        
 
 class Analyze(object):
     def __init__(self,dbc_file=None) :
@@ -234,69 +261,130 @@ class Analyze(object):
         self.analy()
         
     def analy(self):
-        dbc = cantools.db.load_file(self.dbcPath)
-        assert isinstance(dbc, Database)
-        for message in dbc.messages:# type: Message
-            assert isinstance(message, Message)
-            for sig in message.signals:
-                assert isinstance(sig, Signal)
-        # self.dbcSigs={}
-        # self.dbcMessage={}
-        # self.maxSigRow=0
-        # with open(self.dbcPath,"r") as f:
-        #     linelist=f.readlines()
-        #     currentdbcMessage=None
-        #     rowIndex=-1
-        #     for text in linelist:
-        #         rowIndex+=1
-        #         text=text.strip()
-        #         if len(text) == 0:
-        #             continue
-        #         if text.startswith("BO_") :
-        #             dm= Analyze.analyMessage(text)
-        #             if dm == None:
-        #                 continue
-        #             dm.Row=rowIndex
-        #             dm.sigMaxRow=dm.Row+1
-        #             self.dbcMessage[dm.message_Id]=dm
-        #             currentdbcMessage =dm
-        #         elif text.startswith("BU_:"):
-        #             try:
-        #                 self.control = splitSpace(text.split(":")[1])
-        #             except:
-        #                 pass
-        #         elif text.startswith("SG_"):
-        #             ds = Analyze.analySG(text)
-        #             ds.dbcMessage=currentdbcMessage
-        #             ds.Row=rowIndex
-        #             self.dbcSigs[ds.name] = ds
-        #             self.maxSigRow = rowIndex
-        #             try:
-        #                 self.dbcMessage[currentdbcMessage.message_Id].sigMaxRow=rowIndex+1         
-        #             except:
-        #                 pass
+        self.dbcSigs={}
+        self.dbcMessage={}
+        self.maxSigRow=0
+        isStart = False
+        with open(self.dbcPath,"r") as f:
+            linelist=f.readlines()
+            currentdbcMessage=None
+            rowIndex=-1
+            for text in linelist:
+                rowIndex+=1
+                text=text.strip()
+                if len(text) == 0:
+                    continue
+                if text.startswith("BU_:"):
+                    if not isStart: isStart = True
+                    try:
+                        self.control = splitSpace(text.split(":")[1])
+                    except:
+                        pass
+                if not isStart: continue
 
-    def sigExist(self,sig):
-        return sig in self.dbcSigs
+                if text.startswith("BO_") :
+                    dm= Analyze.analyMessage(text)
+                    if dm == None:
+                        continue
+                    dm.Row=rowIndex
+                    dm.sigMaxRow=dm.Row+1
+                    self.dbcMessage[dm.messageId]=dm
+                    currentdbcMessage =dm
+                elif text.startswith("SG_"):
+                    ds = Analyze.analySG(text)
+                    ds.Sender = currentdbcMessage.sender
+                    ds.messageId = currentdbcMessage.messageId
+                    ds.Row=rowIndex
+                    self.dbcSigs[ds.name] = ds
+                    self.maxSigRow = rowIndex
+                    try: 
+                        currentdbcMessage.sigMaxRow = rowIndex+1
+                        currentdbcMessage.sigs.append(ds)
+                    except:
+                        pass
+                elif "GenSigStartValue" in text:
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        sigName = texts[4]
+                        sigValue = int(texts[5])
+                        sig = self.dbcSigs[sigName]
+                        assert isinstance(sig,SigInfo)
+                        sig.initValue = sigValue
+                        sig.initRow = rowIndex
+                    except:
+                        # print(f'初始值 {text} 信号不在定义中')
+                        pass
+                elif "GenMsgCycleTime" in text:
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        messageId = getNoOx16(texts[3])
+                        me = self.dbcMessage[messageId]
+                        assert isinstance(me,MessageInfo)
+                        me.cycle = int(texts[4])
+                        me.cycleRow = rowIndex
+                    except:
+                        # print(f'周期 {text} 不在定义中')
+                        pass
+                elif 'VFrameFormat' in text:
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        messageId = getNoOx16(texts[3])
+                        me = self.dbcMessage[messageId]
+                        assert isinstance(me,MessageInfo)
+                        me.frame = int(texts[4])
+                        me.frameRow = rowIndex
+                    except:
+                        # print(f'frame {text} 不在定义中')
+                        pass
+                elif text.startswith('VAL_'):
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        sigName = texts[2]
+                        sig = self.dbcSigs[sigName]
+                        assert isinstance(sig,SigInfo)
+                        try:
+                            sig.enum = text.split(sigName)[1].strip()
+                        except:
+                            pass
+                        sig.enumRow = rowIndex
+                    except:
+                        print(f'枚举值 {text} 信号不在定义中')
+                        pass
 
-    def sender(self,sig):
+    def sigExist(self,sigName):
+        return sigName in self.dbcSigs
+
+    def sender(self,sigName):
         try:
-            return self.dbcSigs[sig].dbcMessage.sender
+            sig = self.dbcSigs[sigName]
+            assert isinstance(sig,SigInfo)
+            return sig.Sender 
         except:
             return ''
 
-    def getMessage_Id_BySig(self,sig):
+    def getMessage_Id_BySig(self,sigName):
         try:
-            return self.dbcSigs[sig].dbcMessage.message_Id
+            sig = self.dbcSigs[sigName]
+            assert isinstance(sig,SigInfo)
+            return sig.getMessage_Id()
         except:
             # print(f'{sig}没有找到message')
             return ""
             # sys.exit()
 
+    def getMessage_Id_Sig(self,sigName):
+        try:
+            sig = self.dbcSigs[sigName]
+            assert isinstance(sig,SigInfo)
+            return sig.getMessage_Sig()
+        except:
+            return ""
+
     def getSigDataType(self,sigName):
         dataTypeStr=""
         try:
-            sig = SigInfo(self.dbcSigs.get(sigName))
+            sig = self.dbcSigs.get(sigName)
+            assert isinstance(sig,SigInfo)
             dayaType = sig.dataType
             if dayaType == '-':
                 dataTypeStr="int32" 
@@ -321,8 +409,10 @@ class Analyze(object):
         messages = re.findall(e_i,text,re.A)
         if len(messages) < 4:
             return None
-        ms = dbcMessage()
+        ms = MessageInfo()
+        ms.messageId =  getNoOx16(messages[1])
         ms.message_Id = messages[2]
+        ms.lenght = messages[3]
         ms.sender = messages[4]
         return ms
         
@@ -347,15 +437,16 @@ class Analyze(object):
         sig.getEndBit()
         return sig
 
-    def writeSig(self,sig):
-        sig=SigInfo(sig)
+    def writeSig(self,sig,msg):
+        assert isinstance(sig,SigInfo)
+        assert isinstance(msg,MessageInfo)
         linelist=readFileLines(self.dbcPath)
         linelistSize=len(linelist)
         if sig.name in self.dbcSigs:
             print(f"{sig.name}信号已经存在")
             return WriteDBCResult.AlreadyExists
         try:
-            dm = self.dbcMessage.get(sig.getMessage_Id())
+            dm = self.dbcMessage.get(sig.messageId)
             startRow = dm.Row+1
             insertRowIndex=-1
             try:
@@ -377,11 +468,6 @@ class Analyze(object):
                             if sigUsrIndex in userIndex[user]:
                                 print(f"{sig.name} 信号有覆盖:开始字节{sig.startBit},结束的字节{sig.endBit}，占用的字节{sigUsrIndexs},与{user}覆盖字节")
                                 return WriteDBCResult.SignalCoverage
-
-                #超出的原来的大小，就扩大
-                print(startRow,dm.sigMaxRow,insertRowIndex)
-                if insertRowIndex == dm.sigMaxRow and sig.endBit > 63:
-                    linelist[dm.Row] = sig.getMessageRowContent(64)
 
                 linelist.insert(insertRowIndex,sig.getSG())
                 for row in range(linelistSize):
@@ -408,37 +494,46 @@ class Analyze(object):
                 print(f"{sig.name} 写入失败:{str(e)}")
         except:
             print(f'{sig.name} 正在写入message')
-            if not self.writeMessage(sig,linelist):
+            if not self.writeMessage(msg,linelist):
                 print(f'{sig.name} 没有message')
                 return WriteDBCResult.NoMessage
             self.analy()
-            self.writeSig(sig)
+            self.writeSig(sig,msg)
         return WriteDBCResult.WriteComplete
 
-    def writeMessage(self,sig,linelist):
-        # linelist=list(linelist)
-        # sig=SigInfo(sig)
-        if len(sig.messageId) == 0:
+    def writeMessage(self,msg,linelist):
+        assert isinstance(linelist,list)
+        assert isinstance(msg,MessageInfo)
+        if len(msg.messageId) == 0:
             return False
         linelist.insert(self.maxSigRow+1,"\n")
-        linelist.insert(self.maxSigRow+2,sig.getMessageRowContent(8))
+        linelist.insert(self.maxSigRow+2,msg.getMessageRowContent())
         linelistSize=len(linelist)
         for row in range(linelistSize):
             if "GenMsgCycleTime" in str(linelist[linelistSize-1-row]):
-                linelist.insert(linelistSize-row,sig.getMessageCycle())
+                linelist.insert(linelistSize-row,msg.getMessageCycle())
                 break
 
         for row in range(linelistSize):
             if "VFrameFormat" in str(linelist[linelistSize-1-row]):
-                linelist.insert(linelistSize-row,sig.getMessageVFrameFormat())
+                linelist.insert(linelistSize-row,msg.getMessageVFrameFormat())
                 break
         wirteFileDicts(self.dbcPath,linelist,False)
         return True
          
+    def repalceMessage(self,msgs):
+        linelist = readFileLines(self.dbcPath)
+        for msg in msgs:
+            assert isinstance(msg,MessageInfo)
+            linelist[msg.Row] = msg.getMessageRowContent()
+            linelist[msg.cycleRow] = msg.getMessageCycle()
+            linelist[msg.frameRow] =  msg.getMessageVFrameFormat()
+            # print(f'替换 {msg.messageId} {msg.Row} {msg.cycleRow} {msg.frameRow}')
+        wirteFileDicts(self.dbcPath, linelist, False)
 
 
 
-a=Analyze("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc")
+# a=Analyze("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210318.dbc")
 # print(a.getMessage_Id_BySig("CdcDtc1HiByte"))
 # sig=SigInfo()
 # sig.endBit=104

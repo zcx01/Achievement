@@ -2,6 +2,7 @@
 #include <type_traits>
 #include "ObjectFactory.h"
 #include <iostream>
+#include "commondefine.hpp"
 
 void exec(std::list<std::string> names,std::string i)
 {
@@ -35,6 +36,21 @@ int main(int arg, char *argv[])
 {
     std::list<std::string> names;
     ObjectFactory::getObjectName(names);
+    const char *ce = "385";
+    std::string sc = "385";
+    if(std::string(ce) == sc)
+    {
+        COUT("ddddddd")
+    }
+
+#ifdef C385F
+    
+    COUT("C385")
+#endif  // 
+
+#ifdef  C385EV
+    COUT("C385EV")
+#endif  //C385EV
 
 // #ifndef NDEBUG
 //     std::string cl;

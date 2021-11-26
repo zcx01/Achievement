@@ -1,14 +1,16 @@
 #!/usr/bin/python
-import os
 import sys
 import xlrd
 import argparse
+
+from xlrd.book import Book
+from xlrd.sheet import Sheet
 from commonfun import*
 from Analyzedbc import *
+from projectInI import *
 
 def getValue(src, row, col):
     return src.cell_value(row, col)
-
 
 def getValueKong(src, row, col):
     value = str(src.cell_value(row, col))
@@ -55,7 +57,7 @@ def getSigInfo(sheel, row):
     if getValue(sheel, row, 12) == "Signed":
         sig.dataType = "-"
     sig.Unit = getValueKong(sheel, row, 13)
-    sig.enum = str(getValue(sheel, row, 14)).replace("\n", " ")
+    sig.enum = str(getValue(sheel, row, 14))
     try:
         if str(getValue(sheel, row, 15)) != 'nan':
             sig.initValue = int(getValue(sheel, row, 15), 16)  # 十进制
@@ -66,6 +68,34 @@ def getSigInfo(sheel, row):
     sig.getStartBit()
     return sig
 
+def getMessageInfo(sheel):
+    msgs={}
+    assert isinstance(sheel, Sheet)
+    for row in range(sheel.nrows):
+        try:
+            msg=MessageInfo()
+            msg.subNet = sheel.cell_value(row,0)
+            msg.sender = sheel.cell_value(row,1)
+            msg.cycle =  getValueInt(sheel,row,3)
+            msg.messageId =  getNoOx16(str(sheel.cell_value(row,4)))
+            msg.lenght = getValueInt(sheel,row,5)
+            msg.Recevier = str(sheel.cell_value(row,6))
+            frame = str(sheel.cell_value(row,9))
+            if len(frame) ==0 or len(splitSpace(frame)) == 0 or not isNumber(frame):
+                frame = SubNet_Frame.get(msg.subNet,0)
+            else:
+                frame = VFrameFormat.get(frame,0)
+            msg.frame = frame
+            if msg.messageId not in msgs:
+                msgs[msg.messageId] = msg
+            else:
+                # print(f'{row} {msg.messageId} 已经存在')
+                pass
+        except:
+            if len(msgs) !=0:
+                print(f'{row} 是值不合法的')
+            pass
+    return msgs
 
 def conversion(configPath, wirteSigName, canmatrix=""):
     print(configPath)
@@ -77,8 +107,13 @@ def conversion(configPath, wirteSigName, canmatrix=""):
     print(canmatrix)
     dbcfile = getKeyPath("dbcfile", jsConfig)
     book = xlrd.open_workbook(canmatrix)
-    sheel = book.sheet_by_name("5_Matrix")
+    assert isinstance(book,Book)
+    sheel = book.sheet_by_name(Sig_Matrix)
+    messageSheel = book.sheet_by_name(Message_Matrix)
+    assert isinstance(messageSheel,Sheet)
     isFind = False
+    msgs = getMessageInfo(messageSheel)
+    assert isinstance(msgs,dict)
     for row in range(sheel.nrows):
         sigName = str(getValue(sheel, row, 2))
         if isAllAdd and row == 0:
@@ -96,8 +131,14 @@ def conversion(configPath, wirteSigName, canmatrix=""):
                     return
             isFind = True
             dbc = Analyze(dbcfile)
-            dbc.writeSig(sig)
-
+            msg = msgs.get(sig.messageId,None)
+            if msg == None:
+                print(f' {sig.name} 对应的 {sig.messageId} message不存在')
+                continue
+            dbc.writeSig(sig,msg)
+            can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
+            if os.path.isfile(can_parse_whitelistPath):
+                os.system(f"topic_Parser -w {can_parse_whitelistPath} {sig.getMessage_Id()} {sig.getMessage_Sig()}")
     if not isFind:
         print(f"{wirteSigName} 在CAN矩阵中不存在")
 
@@ -111,9 +152,9 @@ def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath):
         jsConfig = getJScontent(configPath)
         fristMatrix = getKeyPath("canmatrix", jsConfig)
     book1 = xlrd.open_workbook(fristMatrix)
-    sheel1 = book1.sheet_by_name("5_Matrix")
+    sheel1 = book1.sheet_by_name(Sig_Matrix)
     book2 = xlrd.open_workbook(twoMatrix)
-    sheel2 = book2.sheet_by_name("5_Matrix")
+    sheel2 = book2.sheet_by_name(Sig_Matrix)
     sigInfos = []
     for row in range(sheel1.nrows):
         if row == 0:
@@ -159,6 +200,26 @@ def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath):
     print("比较完成!")
 
 
+def modifyMessageInfo(configPath):
+    jsConfig = getJScontent(configPath)
+    matrixFilePath = getKeyPath("canmatrix", jsConfig)
+    book = xlrd.open_workbook(matrixFilePath)
+    assert isinstance(book,Book)
+    print(book.sheet_names())
+    messageSheel = book.sheet_by_name(Message_Matrix)
+    assert isinstance(messageSheel,Sheet)
+    dbc = Analyze(getKeyPath("dbcfile", jsConfig))
+    msgs = getMessageInfo(messageSheel)
+    for messageId in dbc.dbcMessage:
+        try:
+            dbcMsg = dbc.dbcMessage[messageId]
+            assert isinstance(dbcMsg,MessageInfo)
+            dbcMsg.CopyXls(msgs[messageId])
+        except:
+            print(f'{dbc.dbcMessage[messageId].messageId} 在CAN矩阵没有找到')
+
+    dbc.repalceMessage(dbc.dbcMessage.values())
+    
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(description='这个脚本是用来通过生成dbc,比较CAN矩阵')
 
@@ -171,6 +232,7 @@ if __name__ == "__main__":
                        help='比较dbc矩阵,比较的文件,没有指定就使用配置文件中的路径', default="")
     parse.add_argument('-t', '--twoMatrix', help='比较dbc矩阵,被比较的文件')
     parse.add_argument('-r', '--resultPath', help='比较dbc矩阵结果路径', default='')
+    parse.add_argument('-m', '--modifyMessageInfo', help='替换message信息,有m就会替换', default=1,type=int,nargs='*')
     arg = parse.parse_args()
 
     if "-a" in sys.argv:
@@ -178,6 +240,7 @@ if __name__ == "__main__":
     elif '-s' in sys.argv:
         for sigName in arg.sigNames:
             conversion(arg.config, sigName)
+    elif '-m' in sys.argv:
+        modifyMessageInfo(arg.config)
     elif '-t' in sys.argv:
         diffCanMatrix(arg.fristMatrix, arg.twoMatrix,arg.config, arg.resultPath)
-    # conversion(pyFileDir+"config.json", "CdcLaneInfo")

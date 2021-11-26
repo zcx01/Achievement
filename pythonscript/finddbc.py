@@ -1,6 +1,7 @@
 #!/bin/python
 import os
 import xlrd
+from canSimulation.projectInI import *
 
 def findValue(text,signal,filePath,*other):
     if(str(text).find(signal)!=-1):
@@ -21,7 +22,7 @@ def findsignalInfile(signal,filePath):
     
 def findsignalInexcel(signal,filePath):
     book=xlrd.open_workbook(filePath)
-    sheel=book.sheet_by_name("5_Matrix")
+    sheel=book.sheet_by_name(Sig_Matrix)
     for row in range(sheel.nrows):
         for col in range(sheel.ncols):
             text=sheel.cell_value(row,col)

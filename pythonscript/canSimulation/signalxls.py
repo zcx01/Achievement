@@ -16,8 +16,6 @@ from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
 from Analyzedbc import *
 from projectInI import *
 
-
-pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/../topic_def/"
 jsConfig = getJScontent(pyFileDir+"config.json",)
 dbc=Analyze(getKeyPath("dbcfile",jsConfig))
 
@@ -53,7 +51,7 @@ class useCase(object):
 
     def stopAllsig(self):
         useCase.stopSig(self.sendSim)
-        useCase.stopSig(self.monitorSignals)
+        useCase.stopSig(self.monitorSim)
     
     @staticmethod
     def stopSig(sim):
@@ -66,6 +64,8 @@ class useCase(object):
                 break
 
     def startSig(self,sendSig):
+        if self.sendSim == None:
+            self.sendSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
         Thread(target=self.sendSim.begin_sending, args=(sendSig,)).start()
         # while True:
         #     if  self.sim.stopped:
@@ -92,7 +92,7 @@ class useCase(object):
             if isNumber(cmd[0]):
                 cmd.insert(0,preSig)
             if '-s' in cmd:
-                self.sendSim.stop()
+                self.stopAllsig()
                 return
             elif '-r' in cmd:
                 self.stopAllsig()
@@ -129,8 +129,6 @@ class useCase(object):
             else:
                 index=0
             sendSig[sigName] = self.sendSignals[sigName][index]
-        if self.sendSim == None:
-            self.sendSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
         self.startSig(sendSig)
         if len(self.monitorSignals) !=0:
             print(self.monitorSignals)
@@ -138,6 +136,21 @@ class useCase(object):
         self.interactiveSendCanSig(sendSig)
     
     
+    def SequenceSendInitValue(self,timeSpace=2):
+        sendSig={PowerSig:PowerSigValue}
+        self.startSig(sendSig)
+        temp = []
+        for message in dbc.dbcMessage:
+            me = dbc.dbcMessage[message]
+            assert isinstance(me,MessageInfo)
+            task = me.getAllSigInitValue()
+            if str(me.messageId) in temp:
+                continue
+            elif PowerSig not in task  and me.sender not in local_machine_Sender and len(task) !=0:
+                print(me.messageId,task)
+                self.sendSim.add_task(task)
+                time.sleep(timeSpace)
+
     def AddPowerSig(self):
         if PowerSig not in self.sendSignals:
             self.sendSignals[PowerSig]=PowerSigValue
@@ -217,7 +230,8 @@ def ReMatchStr(text):
 
 def pyperclipCopy(cmd):
     try:
-        pyperclip.copy(cmd)
+        pass
+        # pyperclip.copy(cmd)
     except:
         pass
 
@@ -286,13 +300,14 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--Send',help="Send CAN",nargs='*')
     parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
     parser.add_argument('-d', '--dataType',help="get sig data type", default=[], nargs='+', type=str)
+    parser.add_argument('-i', '--SequenceSendInitValue',help="按照指定的间隔发送信号初始值",type=int,default=2)
 
     arg=parser.parse_args()
 
     use = useCase()
     if "-b" in sys.argv:
         dealTest(arg.bugxlsx,1,26)
-    if '-c' in sys.argv:
+    elif '-c' in sys.argv:
         dealTest(arg.casexlsx,0,1)
     elif '-s' in sys.argv:
         use.AddPowerSig()
@@ -301,6 +316,8 @@ if __name__ == "__main__":
         use.MonitorSig(arg.Monitor)
     elif '-d' in sys.argv:
         printSigTypes(arg.dataType)
+    elif '-i' in sys.argv:
+        use.SequenceSendInitValue(arg.SequenceSendInitValue)
     else:
         dealTest("/home/chengxiongzhu/Works/文档/测试信号.xls")
 

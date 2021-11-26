@@ -8,10 +8,7 @@ import argparse
 from projectInI import *
 
 from commonfun import*
-pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
-sys.path.append(pyFileDir+"..")
 from xlsdbc import *
-configFileDir = os.path.dirname(os.path.abspath(__file__))+"/../topic_def/"
 
 
 def getSig(text):
@@ -56,15 +53,8 @@ def getDesc(lineContents,define):
         if splitSpaceGetValueByIndex(lineContents[index],1) ==  define:
             return str(lineContents[index-1]).replace("//",'')
 
-def sendMqtt(topic,value):
-    topic=str(topic).replace(r'"','')
-    return f'mosquitto_pub -h cdc-qnx -t  \'{topic}\'  -m \''+'{'+f'\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":{value}'+'}\''
-
-def subMqtt(topic):
-    return f'mosquitto_sub -h cdc-qnx -v -t {topic}'
-
 def lCan(sigNames):
-    return f'python monitor.py -l {sigNames}'
+    return f'{sigNames}'
 
 def getModuleContent(modulePath,var):
     moduleContents = readFileLines(modulePath)
@@ -175,7 +165,7 @@ def generateTest(caseAim,xlsFileName,jsConfigPath,variable,isSendCan=False,isOPe
     jsConfig = getJScontent(jsConfigPath)
     casePath = getKeyPath("casePath",jsConfig)+"/"+xlsFileName+'.xlsx'
     defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
-    canmatrixSheel= xlrd.open_workbook(getKeyPath("canmatrix",jsConfig)).sheet_by_name("5_Matrix")
+    canmatrixSheel= xlrd.open_workbook(getKeyPath("canmatrix",jsConfig)).sheet_by_name(Sig_Matrix)
 
     # 创建一个Excel workbook 对象
     if os.path.isfile(casePath):
@@ -227,6 +217,6 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--shellIndex', help='shell的索引', default=0, type=int)
     args = parser.parse_args()
     if '-a' in sys.argv:
-        generateTest(args.aimfile,args.casefile,configFileDir+"config.json",args.variable)
+        generateTest(args.aimfile,args.casefile,pyFileDir+"config.json",args.variable)
     else:
-        autoCaseGenerate(configFileDir+"config.json",args.shellIndex,args.power)
+        autoCaseGenerate(pyFileDir+"config.json",args.shellIndex,args.power)
