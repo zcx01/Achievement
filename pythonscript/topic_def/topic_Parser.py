@@ -77,9 +77,6 @@ def getFullPath(path,jsConfig):
 def getKeyPath(key,jsConfig):
     return getFullPath(jsConfig.get(key,""),jsConfig)
 
-def getTopic(jsConfig,desc):
-    return desc
-
 def execCmd(cmd):
     ex = subprocess.Popen(cmd,stdout=subprocess.PIPE,shell=True)
     ex.communicate()
@@ -180,11 +177,10 @@ def dealnewSig(can_parse_whitelist_return=False):
         sigType = getValueByIndex(names, 1)
         desc=getValueByIndex(names,2)
         className=getValueByIndex(names,3,"x")
-        topic=getValueByIndex(names,4)
+        define=getValueByIndex(names,4)
         
-        if len(topic)==0 or topic == "x":
-            topic = getTopic(jsConfig, desc)
-        define = getDefine(jsConfig,topic)
+        if len(define)==0 or define == "x":
+            define = getDefine(jsConfig, desc)
 
         #写入 cpp 文件 #创建 .h .cpp 文件
         dataTypeStr=analy.getSigDataType(sig)

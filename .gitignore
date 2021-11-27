@@ -85,3 +85,5 @@ CMakeCache*
 *.pyc
 
 .vscode/c_cpp_properties.json
+*signal_listened.csv
+*signal_value_choices.csv
