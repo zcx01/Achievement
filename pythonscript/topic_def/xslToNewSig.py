@@ -7,6 +7,8 @@ from commonfun import *
 import openpyxl 
 import argparse
 
+SETSTR='/Set'
+
 def sigExist(sheel,row,col,CallFun):
     sig = str(getValue(CallFun,sheel,row,col))
     relation=''
@@ -20,16 +22,34 @@ def sigExist(sheel,row,col,CallFun):
         print(row+1,chr(col+65),'信号不存在')
     return sig,exist,relation
  
-def getDefineByFile(deContent,topic):
+#返回 define topic desc
+def analyDefine(deContent,contents,spaceIndex):
+    desc=''
+    defines=[]
+    topics=[]
+    descs=[]
     for lineContent in deContent:
         if not lineContent.startswith("#define"):
+            desc=lineContent
             continue
-        topicStr = splitSpaceGetValueByIndex(lineContent,2)
-        topicStr = topicStr.replace('\"','')
-        if  topicStr ==  topic:
-            return splitSpaceGetValueByIndex(lineContent,1)
-    print(f'{topic}没有对应的topic，请重新生成topic')
-    return ''
+        spaceStr = splitSpaceGetValueByIndex(lineContent,spaceIndex)
+        spaceStr = spaceStr.replace('\"','')
+        if  spaceStr in  contents:
+            define=splitSpaceGetValueByIndex(lineContent, 1)
+            topic = splitSpaceGetValueByIndex(lineContent, 2)
+            if len(contents) == 0:
+                return define , topic , desc
+            else:
+                defines.append(define)
+                topics.append(topic)
+                descs.append(desc)
+    if len(define) == 0:
+        print(f'没有找到 {contents} ')
+    return defines,topics,descs
+
+def getDefineByFile(deContent,topic):
+    define,topic,dec = analyDefine(deContent,topic,2)
+    return define
 
 def getDefineBySelf(topic):
     topic = topic.replace('/','')
@@ -57,7 +77,7 @@ def getValue(CallFun,sheel,row,col):
         # print(row+1,chr(col+65),'值不存在')
         return
 
-def  getTopicByXls(CallFun,sheel,row):
+def getTopicByXls(CallFun,sheel,row):
     topics = []
     try:
         col=0
@@ -80,7 +100,7 @@ def  getTopicByXls(CallFun,sheel,row):
         if len(topics):
             print(row+1,'值不存在')
     topic = '/'.join(topics)
-    return topic+'/Set',topic
+    return topic+SETSTR,topic
 
 def getComments(CallFun,sheel,startRow):
     comment = getValue(CallFun,sheel,startRow,5)
@@ -91,8 +111,8 @@ def getComments(CallFun,sheel,startRow):
     return comment,commentStatus
 
 def getTopicAndDefineByRow(sheel,CallFun,rows):
-    pubTopic=[]
     subTopic=[]
+    pubTopic=[]
     descs=[]
     for row in rows:
         row-=1
@@ -100,28 +120,35 @@ def getTopicAndDefineByRow(sheel,CallFun,rows):
         topicStrSet, topicStr = getTopicByXls(CallFun, sheel, row)
         defineStrSet = getDefineBySelf(topicStrSet)
         defineStr = getDefineBySelf(topicStr)
-        print(f'{row:<5}{topicStr:<50}{defineStr:<50}{comment}')
-        print(f'{row:<5}{topicStrSet:<50}{defineStrSet:<50}{commentSet:}')
+        print(f'{row:<5}{topicStr:<50}{defineStr:<70}{comment}')
+        print(f'{row:<5}{topicStrSet:<50}{defineStrSet:<70}{commentSet:}')
         subTopic.append(topicStr)
         pubTopic.append(topicStrSet)
         descs.append(comment)
-    
+
+    interactiveTopic(subTopic,pubTopic,descs)
+
+def interactiveTopic(subTopic,pubTopic,descs,isTip=True):
     try:
+        for row in range(len(subTopic)):
+            print(f'{row:<5}{subTopic[row]:<50}{descs[row]}')
+        rowIndex = -1
         while True:
-            m = input('是否生成消息(y/n/h)')
-            if  m == 'n':
-                return
-            if  m == 'h':
-                for row in range(len(subTopic)):
-                    print(f'{row:<5}{subTopic[row]:<50}{descs[row]}')
-            rowIndex = input('输入索引')
+            if isTip:
+                m = input('是否生成消息(y/n/h)')
+                if  m == 'n':return
+                rowIndex = input('输入索引')
             for row in range(len(subTopic)):
-                if row == int(rowIndex):
-                    print(subMqtt(f'\'{subTopic[row]}\''))
-                    print(sendMqtt(f'{pubTopic[row]}',1))
+                if row == int(rowIndex) or rowIndex == -1:
+                    if subTopic[row].endswith(SETSTR):
+                        print(sendMqtt(f'{pubTopic[row]}',1))
+                    else:
+                        print(subMqtt(f'\'{subTopic[row]}\''))
+                    if row < len(pubTopic):
+                        print(sendMqtt(f'{pubTopic[row]}',1))
+            if not isTip:return
     except:
         pass
-
 
 def getTopicAndDefineByDesc(sheel,CallFun,desc,rows):
     findRows=[]
@@ -133,6 +160,69 @@ def getTopicAndDefineByDesc(sheel,CallFun,desc,rows):
         except:
             pass
     getTopicAndDefineByRow(sheel,CallFun,findRows)
+
+
+def getDefineByContent(defineSets,content):
+    defines =  re.findall(d_t, content, re.A)
+    for define in defines:
+        assert isinstance(define,str)
+        defineSets.add(define)
+        return defineSets
+
+def getDefineBySig(sigName,srcPath):
+    defineSets=set()
+    className = ''
+    for (dirpath,dirnames,filenames) in os.walk(srcPath):
+        for fileName in filenames:
+            if os.path.splitext(fileName)[1] == '.cpp': 
+                filePath = dirpath+'/'+fileName
+                contents = readFileLines(filePath)
+                for content in contents:
+                    classNames = getClassNames(content)
+                    if len(classNames) != 0:
+                        className = classNames[0]
+                    if sigName in content:
+                        getDefineByContent(defineSets,content)
+                        if len(defineSets) != 0:
+                            return defineSets
+   
+                with open(filePath, "r") as cr:
+                    content = cr.read()
+                    if sigName in content:
+                        getDefineByContent(defineSets,content)
+
+    if len(defineSets) == 0 and len(className) !=0:
+        for (dirpath,dirnames,filenames) in os.walk(srcPath):
+            for fileName in filenames:
+                if os.path.splitext(fileName)[1] == '.cpp': 
+                    filePath = dirpath+'/'+fileName
+                    contents = readFileLines(filePath)
+                    for contentIndex in range(len(contents)):
+                        classNames = getClassNames(contents[contentIndex])
+                        if len(classNames) != 0:
+                            if classNames[0] == className:
+                                while contentIndex < len(content):
+                                    getDefineByContent(defineSets,contents[contentIndex])
+                                    contentIndex+=1
+                                    classNames = getClassNames(contents[contentIndex])
+                                    if len(classNames) != 0:
+                                         return defineSets
+                        contentIndex+=1
+
+    return defineSets
+
+def getTopicAndDefineBySig(sigName):
+    jsConfig = getJScontent(pyFileDir+"config.json")
+    defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
+    srcPath = getKeyPath("srcPath",jsConfig)
+    topics=[]
+    defineSets=getDefineBySig(sigName,srcPath)
+    if len(defineSets) ==0:
+        print(f'没有找到')
+        return
+    defines,topics,decs = analyDefine(defineContents,defineSets,1)     
+    interactiveTopic(topics,[],decs,False)
+
 
 def generate(sheel,startRow,endRow,down,up,CallFun,rows):
     startRow-=1
@@ -185,7 +275,8 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
     book.close()
     print("生成完成")
     os.system(f'xdg-open {saveFileName}')
- 
+
+# getTopicAndDefineBySig('ItmsAutoDefrstDefogFctSts')
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(description='这个是通过topic表格生成生成newSig表格')
     parse.add_argument('-d','--down',help='下行信号的类型',default="vehctrl")
@@ -193,5 +284,9 @@ if __name__ == "__main__":
     parse.add_argument('-x','--xlsPath',help='topic表格路径')
     parse.add_argument('-s','--startRow',help='开始的行号',type=int)
     parse.add_argument('-e','--endRow',help='结束的行号',type=int)
+    parse.add_argument('-f','--findSigName',help='信号名称',type=str)
     arg = parse.parse_args()
-    generateByXls(arg.xlsPath,arg.startRow,arg.endRow,arg.down,arg.up)
+    if '-f' in sys.argv:
+        getTopicAndDefineBySig(arg.findSigName)
+    else:
+        generateByXls(arg.xlsPath,arg.startRow,arg.endRow,arg.down,arg.up)

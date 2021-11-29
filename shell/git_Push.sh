@@ -1,7 +1,7 @@
 #!/bin/bash
 
 shellPath="/home/chengxiongzhu/Achievement/pythonscript/getgitpath.py"
-repoPath="/home/chengxiongzhu/Works/Repos/changan_c835/"
+repoPath=~/Works/Repos/changan_c835/
 cd $repoPath
 
 if [ $# -lt 1 ]; then

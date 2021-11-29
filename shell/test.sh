@@ -14,7 +14,9 @@
 # }
 # interact
 
-ssh chengxiongzhu@10.25.11.197 
-<<EOF 
-adb shell 
-EOF
+# ssh chengxiongzhu@10.25.11.197 
+# <<EOF 
+# adb shell 
+# EOF
+
+adb shell telnet cdc-qnx `speed 1` `root`
