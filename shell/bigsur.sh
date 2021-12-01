@@ -5,7 +5,6 @@ if [ $# -lt 1 ]; then
     exit 0
 fi
 tarFile="qfi_bin"
-tarBeFile="bigsur_hqx"
 cd ~/Works/changan_shuaji
 # for file in `ls` ;do
 #     if [ $file == $tarFile ]; then
@@ -21,18 +20,15 @@ cd ~/Works/changan_shuaji
 rm -r $tarFile
 
 wget $1 --http-user=chengxiong.zhu --http-password=@Huan2870244352
-for file in `ls` ;do
-    if [ $file == *$tarBeFile* ]; then
-        tar -zxvf $file
-        echo `date` $file >> version.txt
-        rm $file
-        break
-    fi
-done
+file=`basename $1`
+tar -zxvf $file
+echo `date` $file >> version.txt
+rm $file
 
 cd $tarFile/common/build/
 python3 fastboot_complete.py --pf=8155_la --st=ufs
 
 fastboot reboot
+cd ../../../
 rm -r $tarFile
 exit 0
