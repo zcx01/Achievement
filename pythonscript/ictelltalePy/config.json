@@ -13,11 +13,11 @@
             },
             "Ready",
             "MotorFault",
-            "PowerBatteryFault,PowerBatteryLowYellow,FuelCellSystemFailure_yellow",
+            "PowerBatteryFault,PowerBatteryLowYellow",
             "LVBatteryFault",
             "BrakeSystemFault",
             "PowerSystemFault",
-            "ChargeState,HydrogenLeakage_yellow",
+            "ChargeState",
             "ChargeConnect",
             "RearFogLamp",
             "PositionLamp",
@@ -35,16 +35,20 @@
             "FatigueDrivingLamp,FatigueDetectionOff",
             "TPMS",
             "LimitPower",
-            "ParkingBrakeFault",
-            "ABS",
+            "ParkingBrakeFault,ParkingBrakeActive",
             "AirBagFault",
-            "EPS"
+            "EPS",
+            "ABS"
         ],
         [
             {
-                "x": 296,
+                "x": 72,
                 "y": 80
             },
+            "FuelCellSystemFailure_yellow",
+            "HydrogenSurplusLow",
+            "HydrogenLeakage_yellow",
+            "ldw_green",
             "EngineOil",
             "EngineFault",
             "SteeringWheelHead_yellow",
@@ -58,12 +62,17 @@
                 "x": 1232,
                 "y": 80
             },
-            "ParkingBrakeActive",
+            "Cruise",
+            "ESCOFF,ESCActive",
             "AutoHold",
-            "ESCOFF",
-            "ESCFault,ESCActive",
-            "WaterTempWarn,HighStackTemperature",
-            "Cruise"
+            "FuelTankLow_yellow",
+            "WaterTempWarn",
+            "",
+            "",
+            "aeb_off",
+            "bsd",
+            "HighStackTemperature",
+            "FCWorkState,FCWorkStateLow"
         ]
     ]
 }

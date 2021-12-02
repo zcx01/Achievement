@@ -6,6 +6,8 @@ w_d=r'[a-zA-Z_]'
 in_i=r"-?\b[0x0-9]+\b"
 i_i=r"-?[0x0-9]"
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"
+d_t=r"\bIPC_\S+\b"
+s_i = r"CANSIG_.*_g"
 
 def sendMqtt(topic,value):
     topic=str(topic).replace(r'"','')
@@ -141,3 +143,10 @@ def getNoOx16(text):
     else:
         return str(hex(int(text))).replace('0x','').upper()
 
+def getClassNames(text):
+    n_i = r'new.*\('
+    m_i = r'<.*>'
+    classNames = re.findall(n_i,text,re.A)
+    if len(classNames) == 0:
+        classNames = re.findall(m_i,text,re.A)
+    return classNames

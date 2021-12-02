@@ -12,7 +12,6 @@ from xlsdbc import *
 
 
 def getSig(text):
-    s_i = r"CANSIG_.*_g"
     sigNames = re.findall(s_i, text, re.A)
     sigNames = list(set(sigNames))
     sigs=[]
@@ -37,10 +36,9 @@ def getSigValue(sig,sheel):
     return SigInfo()
 
 def getDefine(text):
-    t_i = r"\bIPC_\S+\b"
-    sigNames = re.findall(t_i, text, re.A)
-    sigNames = list(set(sigNames))
-    return sigNames
+    defines = re.findall(d_t, text, re.A)
+    defines = list(set(defines))
+    return defines
 
 def getTopic(lineContents,define):
     for lineContent in lineContents:

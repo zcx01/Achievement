@@ -4,6 +4,8 @@ import sys
 from key_mouse import *
 import argparse
 
+PrjectDir='changan_c835'
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='部署C385程序')
@@ -11,7 +13,7 @@ if __name__ == "__main__":
     #这个是要解析 -f 后面的参数
     parser.add_argument('-t','--timeSpace',help="sleep time",default=10)
     parser.add_argument('-c','--customfile',help='adb push custom file list',default=[], nargs='+',type=str)
-    parser.add_argument('-s','--slm',help='slay slm',default=True)
+    parser.add_argument('-k','--slm',help='slay slm',default=1)
     parser.add_argument('-q','--qnx',help='cp for qnx',nargs='*')
     args = parser.parse_args()
     timeSpace = int(args.timeSpace)
@@ -21,11 +23,11 @@ if __name__ == "__main__":
         print(proceesNames)
         if len(proceesNames) == 0:
             sys.exit()
-        keyStr("cd ~/Works/Repos/changan_c835/prebuilts")
+        keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts")
 
         if is_ssh:
             keyStr("rm -rf ic",1)
-            keyStr("scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/changan_c835/prebuilts/ic ./")
+            keyStr(f"scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/{PrjectDir}/prebuilts/ic ./")
             keyStr("123456")
             time.sleep(4)
         for proceesName in proceesNames:
@@ -39,13 +41,13 @@ if __name__ == "__main__":
 
         keyStr("telnet cdc-qnx",1)
         keyStr("root")
-        if args.slm:
-            keyStr("slay -f slm",2)
-        else:
-            for proceesName in proceesNames:
-                keyStr(f"slay {proceesName}")
-                keyStr(f"slay {proceesName}")
-                keyStr(f"slay {proceesName}")
+        # if args.slm==1:
+        #     keyStr("slay -f slm",2)
+        # else:
+        #     for proceesName in proceesNames:
+        keyStr(f"slay {proceesName}")
+        keyStr(f"slay {proceesName}")
+        keyStr(f"slay {proceesName}")
         time.sleep(1)
 
         for proceesName in proceesNames:
@@ -54,10 +56,10 @@ if __name__ == "__main__":
         sys.exit()
 
     if "-q" not in sys.argv:
-        keyStr("cd ~/Works/Repos/changan_c835/prebuilts")
+        keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts")
         if is_ssh:
             keyStr("rm -rf ic",1)
-            keyStr("scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/changan_c835/prebuilts/ic ./")
+            keyStr(f"scp -r chengxiongzhu@10.25.11.25:/home/chengxiongzhu/Works/Repos/{PrjectDir}/prebuilts/ic ./")
             keyStr("123456")
             time.sleep(4)
         keyStr("adb push ic/bin/ic_chime /sdcard",0)
