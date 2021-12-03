@@ -48,8 +48,10 @@ def analyDefine(deContent,contents,spaceIndex):
     return defines,topics,descs
 
 def getDefineByFile(deContent,topic):
-    define,topic,dec = analyDefine(deContent,topic,2)
-    return define
+    topiclist=[]
+    topiclist.append(topic)
+    define,topic,dec = analyDefine(deContent,topiclist,2)
+    return define[0]
 
 def getDefineBySelf(topic):
     topic = topic.replace('/','')

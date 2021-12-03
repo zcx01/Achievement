@@ -25,7 +25,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     }
     else
     {
-        power = raw_value.val_uint32_t;
+        power = raw_value.val_{4}_t;
     }
 
     status = CANSIG_{1}_g.GetValue.fpGetter( &raw_value,nullptr);
@@ -36,7 +36,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     }
     else
     {
-        result = raw_value.val_uint32_t;
+        result = raw_value.val_{4}_t;
     }
 
     TB_LOG_INFO("{classname}: %d", result);

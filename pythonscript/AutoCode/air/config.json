@@ -7,7 +7,7 @@
                 "    else if (topicId == {2})",
                 "    {",
                 "        /*value not change*/",
-                "        send_can_frame(&CANSIG_{1}_g, info.value, signal_value_type::eSigValType_uint32_t);",
+                "        send_can_frame(&CANSIG_{1}_g, info.value, signal_value_type::eSigValType_{4}_t);",
                 "        /*send value back to UI*/",
                 "        publish_status({2}, info.value);",
                 "    }"
