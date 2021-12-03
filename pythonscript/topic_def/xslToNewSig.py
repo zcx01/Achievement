@@ -48,9 +48,14 @@ def analyDefine(deContent,contents,spaceIndex):
     return defines,topics,descs
 
 def getDefineByFile(deContent,topic):
+<<<<<<< HEAD
     topiclist=[]
     topiclist.append(topic)
     define,topic,dec = analyDefine(deContent,topiclist,2)
+=======
+    define,topic,dec = analyDefine(deContent,topic,2)
+    assert isinstance(define,list)
+>>>>>>> 5f54de09dbd9b3d1b95a41fbcd1e9c3a71e89724
     return define[0]
 
 def getDefineBySelf(topic):
@@ -266,7 +271,6 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
             rowContent.append(comment)
             rowContent.append(className+'Status')
             rowContent.append(topicDefine)
-            rowContent.append('y')
             rowContent.append(relation)
             print(rowContent)
             sh.append(rowContent)
