@@ -1,6 +1,6 @@
 #!/bin/python
 import sys
-from key_mouse import *
+from execCmd import *
 
 import argparse
 
