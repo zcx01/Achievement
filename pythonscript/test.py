@@ -1,7 +1,8 @@
 #!/bin/python
 import os
 import sys
-from commonfun import*
+import pexpect
+import subprocess
 
 
 # temp=0x1ff
@@ -29,8 +30,18 @@ def getFileName(className):
     return fileName
 
 fileName = "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210713.dbc"
-lines = readFileLines(fileName)
-wirteFileDicts(fileName,lines,False)
 
 if __name__ == "__main__":
-    pass
+    p = pexpect.spawn("adb shell", encoding='utf-8', logfile=sys.stdout, timeout=300)
+    p.sendline("telnet 192.168.1.1")
+    login_index = p.expect(["login:", pexpect.EOF, pexpect.TIMEOUT])
+    if login_index != 0:
+        print("telnet qunx失败！")
+        exit(1)
+
+    print("telnet至qunx成功！")
+    p.sendline("root")
+    root_index = p.expect(["#", pexpect.EOF, pexpect.TIMEOUT])
+    if root_index != 0:
+        print("切换至root失败！")
+        exit(1)
