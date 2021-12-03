@@ -20,10 +20,9 @@ pip install openpyxl
 
 5.模拟键盘、鼠标
 linux
-sudo pip install pykeyboard 
+pip install PyUserInput
 sudo pip install pymouse
 win:
-pip install PyUserInput
 pip install pywin32
 
 6.jira库
