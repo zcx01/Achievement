@@ -47,7 +47,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     }
     else
     {
-        power = raw_value.val_uint32_t;
+        power = raw_value.val_{4}_t;
     }
 
     status = CANSIG_{1}_g.GetValue.fpGetter(nullptr, &raw_value);
@@ -58,7 +58,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     }
     else
     {
-        leakage = raw_value.val_uint32_t;
+        leakage = raw_value.val_{4}_t;
     }
 
     
