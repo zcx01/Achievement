@@ -2,6 +2,8 @@
 
 shellPath="/home/chengxiongzhu/Achievement/pythonscript/getgitpath.py"
 repoPath=~/Works/Repos/changan_c835/
+branch="mega/dev_hqx.1.2.1"
+
 cd $repoPath
 
 if [ $# -lt 1 ]; then
@@ -21,21 +23,21 @@ if [ $# -eq 1 ]; then
     git add -A
     git commit -s
     git fetch mega
-    git rebase mega/master
-    git push mega HEAD:refs/for/master
+    git rebase mega/$branch
+    git push mega HEAD:refs/for/$branch
 elif [ $2 == "-c" ];then
     git status
     git add -A
     git rebase --continue
-    git push mega HEAD:refs/for/master
+    git push mega HEAD:refs/for/$branch
 elif [ $2 == "-n" ];then
     git add -A
     git commit --amend --no-edit
-    git push mega HEAD:refs/for/master
+    git push mega HEAD:refs/for/$branch
 elif [ $2 == "-r" ];then
     repo forall -c "git clean -df" && repo forall -c "git reset --hard; git checkout ."
 elif [ $2 == "-a" ];then
     git add -A
     git commit --amend 
-    git push mega HEAD:refs/for/master
+    git push mega HEAD:refs/for/$branch
 fi

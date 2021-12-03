@@ -1,5 +1,5 @@
 import sys
-from key_mouse import *
+from execCmd import *
 
 keyStr('cd prebuilts/ic/')
 keyStr('ntoaarch64-gdb bin/ic_service ../../ic_service.core',10)
