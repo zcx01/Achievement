@@ -71,22 +71,24 @@ class useCase(object):
         #     if  self.sim.stopped:
         #         break
         #     time.sleep(1)
-        if not ignore_init_send:
-            time.sleep(5)
-        else:
-            time.sleep(1)
+        # if not ignore_init_send:
+        #     time.sleep(5)
+        # else:
+        #     time.sleep(1)
 
     def interactiveSendCanSig(self,sendSig):
-        print('-s：停止发送所有的信号')
-        print('-r：重新发送')
-        print('信号名 值：修改信号值和增加信号值')
-        print('值：修改上一个信号的发送值')
-        print('输入信号名:停止发送')
         preSigs = list(dict(sendSig).keys())
         preSig = preSigs[len(preSigs)-1]
         while(True):
             cmd=input()
             if len(cmd) == 0:
+                continue
+            if '-h' in cmd:
+                print('-s：停止发送所有的信号')
+                print('-r：重新发送')
+                print('信号名 值：修改信号值和增加信号值')
+                print('值：修改上一个信号的发送值')
+                print('输入信号名:停止发送')
                 continue
             cmd = cmd.split(" ")
             if isNumber(cmd[0]):
@@ -135,10 +137,8 @@ class useCase(object):
             self.MonitorSig(self.monitorSignals)
         self.interactiveSendCanSig(sendSig)
     
-    
     def SequenceSendInitValue(self,timeSpace=2):
-        sendSig={PowerSig:PowerSigValue}
-        self.startSig(sendSig)
+        self.SendPowerSig()
         temp = []
         for message in dbc.dbcMessage:
             me = dbc.dbcMessage[message]
@@ -151,6 +151,10 @@ class useCase(object):
                 self.sendSim.add_task(task)
                 time.sleep(timeSpace)
 
+    def SendPowerSig(self):
+        sendSig={PowerSig:PowerSigValue}
+        self.startSig(sendSig)
+
     def AddPowerSig(self):
         if PowerSig not in self.sendSignals:
             self.sendSignals[PowerSig]=PowerSigValue
@@ -158,7 +162,6 @@ class useCase(object):
     def MonitorSig(self,sigName):
         if self.monitorSim == None:
             self.monitorSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
-        # param = [sigName] #CdcAutoHeadLiSet
         Thread(target=self.monitorSim.begin_listening, args=(sigName,)).start()
     
     def find(self,name):
@@ -169,13 +172,6 @@ class useCase(object):
             if name == self.key:
                 return True
         return False
-
-def dealBug(dataPath):
-    book=xlrd.open_workbook(dataPath)
-    sheel=book.sheet_by_index(0)
-    for row in range(sheel.nrows):
-        for col in range(sheel.ncols):
-            text=sheel.cell_value(row,col)
 
 def ReMatchStr(text):
     case = useCase()
@@ -313,6 +309,7 @@ if __name__ == "__main__":
         use.AddPowerSig()
         use.SimulationCan()
     elif '-m' in sys.argv:
+        use.SendPowerSig()
         use.MonitorSig(arg.Monitor)
     elif '-d' in sys.argv:
         printSigTypes(arg.dataType)

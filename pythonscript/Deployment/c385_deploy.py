@@ -8,20 +8,25 @@ import argparse
 PrjectDir='changan_c835'
 
 
-def adbPush(proceesNames):
+def adbPush(proceesNames,excess):
     keyStr("adb shell")
     for proceesName in proceesNames:
         keyStr(f"curl -u root:root \"ftp://192.168.1.1/data/{proceesName}\" -T /sdcard/{proceesName}",0)
 
     keyStr("telnet cdc-qnx",1)
     keyStr("root")
-    keyStr("slay -f slm",2)
-    time.sleep(2)
-    keyStr("slay slm")
+    if '-a' not in sys.argv:
+        keyStr("slay -f slm",2)
+        time.sleep(2)
+        keyStr("slay slm")
 
-    for proceesName in proceesNames:
-        keyStr(f"cp /data/{proceesName} /usr/bin/",0)
-        keyStr(f"chmod +x /usr/bin/{proceesName}",0)
+        for proceesName in proceesNames:
+            keyStr(f"cp /data/{proceesName} /usr/bin/",0)
+            keyStr(f"chmod +x /usr/bin/{proceesName}",0)
+    
+    for cmd in excess:
+        keyStr(cmd,0)
+
     interact()
     sys.exit()
 
@@ -30,13 +35,12 @@ if __name__ == "__main__":
         description='部署C385程序')
     
     #这个是要解析 -f 后面的参数
-    parser.add_argument('-t','--timeSpace',help="sleep time",default=10)
     parser.add_argument('-c','--customfile',help='adb push custom file list',default=[], nargs='+',type=str)
     parser.add_argument('-a','--absolutePath',help='adb push absolute file list',default=[], nargs='+',type=str)
     parser.add_argument('-k','--slm',help='slay slm',default=1)
     parser.add_argument('-q','--qnx',help='cp for qnx',nargs='*')
+    parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     args = parser.parse_args()
-    timeSpace = int(args.timeSpace)
 
     if "-c" in sys.argv :
         proceesNames= args.customfile
@@ -46,7 +50,7 @@ if __name__ == "__main__":
 
         for proceesName in proceesNames:
             keyStr(f"adb push {proceesName}/{proceesName} /sdcard",0)
-        adbPush(proceesNames)
+        adbPush(proceesNames,args.excess)
 
     if '-a' in sys.argv:
         proceesNames= args.absolutePath
@@ -56,7 +60,7 @@ if __name__ == "__main__":
         for proceesName in proceesNames:
             keyStr(f"adb push {proceesName} /sdcard",0)
             adbNames.append(os.path.basename(proceesName))
-        adbPush(proceesNames)
+        adbPush(adbNames,args.excess)
 
     if "-q" not in sys.argv:
         keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts")
