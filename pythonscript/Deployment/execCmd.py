@@ -6,12 +6,19 @@ import pexpect
 
 
 process = None
-cmd_Prints={'telnet':'login:','ssh':'password','cd':'~','adb push':'in','curl':'100','slay slm':'slay'}
+cmd_Prints={'telnet':'login:','ssh':'password','cd':'~','adb push':'in','curl':'100'}
 new_spawn=['ssh','adb shell']
 shellCmds=[]
+is_close_spawn=False
 def keyStr(cmd, t=0.3):
     assert isinstance(cmd,str)
     global process
+    global is_close_spawn
+    if is_close_spawn and process != None:
+        process.close()
+        process=None
+        is_close_spawn = False
+
     if  process == None and len(getCommand(cmd,new_spawn)) !=0:
         process = pexpect.spawn(cmd, encoding='utf-8', logfile=sys.stdout, timeout=300)
         return
@@ -20,7 +27,6 @@ def keyStr(cmd, t=0.3):
         shellCmds.append(cmd)
         return
     elif len(shellCmds) !=0:
-        print(shellCmds)
         os.system('&&'.join(shellCmds))
         shellCmds.clear()
     # if cmdStart in new_spawn and currentSpawn != cmdStart:
@@ -50,6 +56,9 @@ def interact():
     if  process != None:
         process.logfile = None #在调用 interact() 之前, 要确保控制台日志输出为空,否则会出现异常   write() argument must be str, not bytes
         process.interact()
+    elif len(shellCmds) !=0:
+        os.system('&&'.join(shellCmds))
+        shellCmds.clear()
 
 def getCommand(cmd,arrys):
     for arry in arrys:
