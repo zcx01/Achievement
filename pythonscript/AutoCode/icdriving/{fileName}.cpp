@@ -15,8 +15,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
             return;
         }
 
-        TB_LOG_INFO("{1} Value %u", raw_value.val_uint32_t);
-        signalChange(raw_value.val_uint32_t, {2});
+        signalChange(raw_value.val_{4}_t, {2});
     }
 }
 
@@ -34,7 +33,7 @@ void {ClassName}::signalChange(float value,std::string topic)
 
 void {ClassName}::publishValue(float value,std::string topic)
 {
-    TB_LOG_INFO("ControlScreenAngleRange %s[%f]",topic.c_str(), value);
+    TB_LOG_INFO("{ClassName}  %s[%f]",topic.c_str(), value);
     SendDriveInfo(topic, PayloadInfo{value, true});
 }
 

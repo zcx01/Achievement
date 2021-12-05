@@ -25,7 +25,7 @@ TextWarnRuleManage::~TextWarnRuleManage()
     }
 }
 
-bool TextWarnRuleManage::addWarnInfo(const std::string &topic, const std::string &grade, const std::string &value,const int &key)
+bool TextWarnRuleManage::addWarnInfo(const std::string &grade,WarnInfo &info)
 {
     std::unique_lock<std::mutex> lock(m_mtx);
     if(m_GradeStr.count(grade) == 0) return false;
@@ -35,10 +35,6 @@ bool TextWarnRuleManage::addWarnInfo(const std::string &topic, const std::string
     
     if(rule != nullptr)
     {
-        WarnInfo info;
-        info.topic=topic;
-        info.key=key;
-        info.value=value;
         info.grade=rule->grade();
         bool status=rule->addWarnInfo(info);
         if(status && m_currentRule == nullptr)
@@ -129,7 +125,7 @@ TextWarnRule *TextWarnRuleManage::getRuleByGrade(const int &grade)
     return nullptr;
 }
 
-void TextWarnRuleManage::TextWarnRuleManage::timer_thread_function() 
+void TextWarnRuleManage::TextWarnRuleManage::.timer_thread_function() 
 {
     while(m_start)
     {
@@ -158,7 +154,7 @@ void TextWarnRuleManage::setCurrentRule(TextWarnRule *r)
         else if(m_currentRule != nullptr)
         {
             WarnInfo info=m_currentRule->getPrevValue();
-            info.key=0;
+            info.value=0;
             m_callFun(info);
         }
         

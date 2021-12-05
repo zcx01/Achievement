@@ -16,7 +16,7 @@ TextTipAdapter::TextTipAdapter()
         std::ifstream(GLOBAL_CONFIG_PATH) >> j;
         for(auto d = j.begin(); d != j.end();d++)
         {
-            std::unordered_map<std::string,std::string> temp;
+            std::unordered_map<std::string, nlohmann::json> temp;
             for(auto iter = d.value().begin(); iter != d.value().end(); iter++)
             {
                 temp[iter.key()]=iter.value();
@@ -30,7 +30,7 @@ TextTipAdapter::TextTipAdapter()
     }
 }
 
-std::unordered_map<std::string,std::string> TextTipAdapter::getData(const std::string & topic)
+std::unordered_map<std::string,nlohmann::json>  TextTipAdapter::getData(const std::string & topic)
 {
     if(m_data.count(topic) != 0)
     {
@@ -47,30 +47,36 @@ std::unordered_map<std::string,std::string> TextTipAdapter::getData(const std::s
     catch (...)
     {
     }
-    return std::unordered_map<std::string,std::string>();
+    return std::unordered_map<std::string,nlohmann::json>();
 }
 
 void TextTipAdapter::addWarnInfo(std::string topic, int value) 
 {
-    std::unordered_map<std::string, std::string> config = getData(topic);
+    std::unordered_map<std::string, nlohmann::json> config = getData(topic);
     if (config.empty())
     {
-        COUT(topic);
-        for(auto key = m_data.begin();key != m_data.end();key++)
-        {
-            COUT(key->first);
-        }
+        COUT("config file no exit topic: %s"<< topic.c_str());
         return;
     }
-    const std::string &grade=config["grade"];
-    const std::string &text=config[std::to_string(value)];
-    m_rule.addWarnInfo(topic,grade,text,value);
 
+    WarnInfo info;
+    info.topic = topic;
+    info.value = value;
+    const std::string &grade=config["grade"].get<std::string>();
+    try
+    {
+        info.text =config[std::to_string(value)].get<std::string>();
+    }
+    catch(...)
+    {
+    }
+    
+    bool status=m_rule.addWarnInfo(grade,info);
 }
 
 void TextTipAdapter::sendWarnInfo(const WarnInfo &info) 
 {
-    COUT(info.topic<<"  "<<info.key<<"  "<<info.isCancel)   
+    COUT(info.topic<<"  "<<info.value<<"  "<<info.isCancel)   
 }
 
 TextTipAdapterTest::TextTipAdapterTest() 

@@ -19,7 +19,7 @@ public:
     explicit TextWarnRuleManage();
     ~TextWarnRuleManage();
 
-    bool addWarnInfo(const std::string &topic, const std::string &grade, const std::string &value,const int &key);
+    bool addWarnInfo(const std::string &grade,WarnInfo &info);
 
     void SetCallWarnInfoFun(CallWarnInfoFun fun);
 

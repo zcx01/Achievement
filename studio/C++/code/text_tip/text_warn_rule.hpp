@@ -22,10 +22,13 @@ public:
     //得到上一个值
     WarnInfo getPrevValue();
     
+    //增加警告信息
     bool addWarnInfo(const WarnInfo &info);
-
+    
+    //移除第一个
     void removeFirst();
 
+    //第一个移动最后一个
     void move();
 
     //时间改变
@@ -40,7 +43,7 @@ public:
     bool isEmpty();
 protected:
     //自动隐藏的时间(s)
-    virtual int autoHideTime()=0;
+    virtual int autoHideTime();
     virtual bool newWarnInfo();
     virtual TimeChangeResult timeChange()=0;
 
