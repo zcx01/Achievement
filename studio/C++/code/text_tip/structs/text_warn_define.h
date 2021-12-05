@@ -4,14 +4,18 @@
 #include <string>
 #include <vector>
 #include <functional>
+
 struct WarnInfo
 {
-    std::string topic;
-    std::string value;
-    int         grade=0;
-    int         key=0;
-    bool    isNew=true;
-    bool    isCancel=false;
+    std::string topic;  
+    std::string text;               //文本
+    int         grade=0;            //等级
+    int         value=0;            //值
+    int         immediately=false;  //立即打断
+    int         autoHideTime=0;     //自动隐藏的时间,为-1时不自动取消,0时启用最小显示时间
+    int         delay;              //延迟显示时间
+    bool        isNew=true;         //是否新消息
+    bool        isCancel=false;     //是否是自动取消
     bool operator==(const WarnInfo &other)
     {
         return other.topic == topic;
@@ -37,6 +41,7 @@ enum WarnGrade
     D,
     count
 };
+
 
 enum TimeChangeResult
 {

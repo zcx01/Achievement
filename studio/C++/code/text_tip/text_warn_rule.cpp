@@ -25,9 +25,9 @@ WarnInfo TextWarnRule::TextWarnRule::getPrevValue()
 bool TextWarnRule::addWarnInfo(const WarnInfo &info)
 {
     newWarnInfo();
-    //取消显示 value 是空的取消显示
+    //取消显示 text 是空的取消显示
     int infoIndex = Ve::getIndex(warns, info);
-    if(info.value.empty())
+    if(info.text.empty())
     {
         if(infoIndex!= -1)
         {
@@ -122,6 +122,19 @@ bool TextWarnRule::isNewWarn(int index)
 bool TextWarnRule::isEmpty()
 {
     return warns.empty();
+}
+
+int TextWarnRule::autoHideTime()
+{
+    if(!isEmpty())
+    {
+        auto info = getValue();
+        if(info.autoHideTime != 0)
+        {
+            return info.autoHideTime;
+        }
+    }
+    return showMinTime();
 }
 
 bool TextWarnRule::newWarnInfo()
@@ -241,8 +254,7 @@ TimeChangeResult B1TextWarnRule::timeChange()
 {
     if(alreadyTime >= showMinTime())
     {
-        if(warns.size() >= 1)
-            removeFirst();
+        removeFirst();
         return TimeChangeResult::MinTime;
     }
     return TimeChangeResult::Runing;
