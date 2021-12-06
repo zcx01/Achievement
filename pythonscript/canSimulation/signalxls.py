@@ -295,6 +295,7 @@ if __name__ == "__main__":
     parser.add_argument('-c','--casexlsx',help="generate case xlsx file")
     parser.add_argument('-s', '--Send',help="Send CAN",nargs='*')
     parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
+    parser.add_argument('-p', '--SendPowerSig', help="Send Power Sig", nargs='*', type=int,default=1)
     parser.add_argument('-d', '--dataType',help="get sig data type", default=[], nargs='+', type=str)
     parser.add_argument('-i', '--SequenceSendInitValue',help="按照指定的间隔发送信号初始值",type=int,default=2)
 
@@ -309,7 +310,8 @@ if __name__ == "__main__":
         use.AddPowerSig()
         use.SimulationCan()
     elif '-m' in sys.argv:
-        use.SendPowerSig()
+        if arg.SendPowerSig==1:
+            use.SendPowerSig()
         use.MonitorSig(arg.Monitor)
     elif '-d' in sys.argv:
         printSigTypes(arg.dataType)

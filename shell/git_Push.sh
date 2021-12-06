@@ -2,7 +2,7 @@
 
 shellPath="/home/chengxiongzhu/Achievement/pythonscript/getgitpath.py"
 repoPath=~/Works/Repos/changan_c835/
-branch="mega/dev_hqx.1.2.1"
+branch="dev_hqx.1.2.1"
 
 cd $repoPath
 
