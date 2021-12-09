@@ -2,37 +2,69 @@
 #define DERIVE_RULE
 #include "text_warn_rule.hpp"
 
-//循坏
-class LoopTextWarnRule : public TextWarnRule
+class W1TextWarnRule : public LoopTextWarnRule
 {
 public:
-    using TextWarnRule::TextWarnRule;
-
-protected:
-    bool newWarnInfo();
-    TimeChangeResult timeChange();
+    using LoopTextWarnRule::LoopTextWarnRule;
+    int grade(){return WarnGrade::W1;}
 };
 
-//单次
-class SingleTextWarnRule  : public TextWarnRule
+class W2TextWarnRule : public TimeLoopTextWarnRule
 {
-private:
-    /* data */
 public:
-    using TextWarnRule::TextWarnRule;
-protected:
-    TimeChangeResult timeChange();
+    using TimeLoopTextWarnRule::TimeLoopTextWarnRule;
+    int grade(){return WarnGrade::W2;}
+    int autoHideTime(){return 8;}
 };
 
-//保留最后一个
-class LastTextWarnRule  : public TextWarnRule
+class OP1TextWarnRule : public TimeLoopTextWarnRule
 {
-private:
-    /* data */
 public:
-    using TextWarnRule::TextWarnRule;
-protected:
-    TimeChangeResult timeChange();
+    using TimeLoopTextWarnRule::TimeLoopTextWarnRule;
+    int grade(){return WarnGrade::OP1;}
+    int autoHideTime(){return 8;}
 };
 
+class D1TextWarnRule : public SingleTextWarnRule
+{
+public:
+    using SingleTextWarnRule::SingleTextWarnRule;
+    int grade(){return WarnGrade::D1;}
+};
+
+class D2TextWarnRule : public SingleTextWarnRule
+{
+public:
+    using SingleTextWarnRule::SingleTextWarnRule;
+    int grade(){return WarnGrade::D2;}
+};
+
+class OP2TextWarnRule : public SingleTextWarnRule
+{
+public:
+    using SingleTextWarnRule::SingleTextWarnRule;
+    int grade(){return WarnGrade::OP2;}
+    int showMinTime(){return 5;}
+};
+
+class OP3TextWarnRule : public SingleTextWarnRule
+{
+public:
+    using SingleTextWarnRule::SingleTextWarnRule;
+    int grade(){return WarnGrade::OP3;}
+};
+
+class OP4TextWarnRule : public SingleTextWarnRule
+{
+public:
+    using SingleTextWarnRule::SingleTextWarnRule;
+    int grade(){return WarnGrade::OP4;}
+};
+
+class OP5TextWarnRule : public SingleTextWarnRule
+{
+public:
+    using SingleTextWarnRule::SingleTextWarnRule;
+    int grade(){return WarnGrade::OP5;}
+};
 #endif // DERIVE_RULE

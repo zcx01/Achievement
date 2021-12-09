@@ -3,7 +3,7 @@
 
 int TextWarnRule::showMinTime()
 {
-    return 3;
+    return 2;
 }
 
 std::vector<int> TextWarnRule::Interrupt()
@@ -76,6 +76,7 @@ void TextWarnRule::move()
     if(!warns.empty())
     {
         warns[0].isNew = false;
+        warns[0].alreadyloopNum++;
         Ve::move(warns,0,warns.size()-1);
         alreadyTime=0;
     }
@@ -89,8 +90,15 @@ TimeChangeResult TextWarnRule::changed()
     }
     else
     {
+        WarnInfo &info = warns[0];
+        //延迟显示，时间不累计
+        if (info.delay > 0)
+        {
+            info.delay--;
+            return TimeChangeResult::Runing;
+        }
+        
         alreadyTime++;
-        WarnInfo info = warns[0];
         if(info.isCancel && alreadyTime >= showMinTime())
         {
             removeFirst();
@@ -99,7 +107,7 @@ TimeChangeResult TextWarnRule::changed()
         else
         {
             auto reslut = timeChange();
-            alreadyTime = std::min(alreadyTime, autoHideTime());
+            alreadyTime = std::min(alreadyTime,std::max(autoHideTime(),showMinTime()));
             return reslut;
         }
     }
@@ -147,68 +155,8 @@ bool TextWarnRule::newWarnInfo()
     return false;
 }
 
-
-///
-/// \brief CTextWarnRule::CTextWarnRule
-///
-CTextWarnRule::CTextWarnRule()
-{
-    m_Interrupts.push_back(WarnGrade::B1);
-    m_Interrupts.push_back(WarnGrade::B2);
-    m_Interrupts.push_back(WarnGrade::C);
-}
-
-int CTextWarnRule::autoHideTime()
-{
-    return 5;
-}
-
-int CTextWarnRule::grade()
-{
-    return WarnGrade::C;
-}
-
-TimeChangeResult CTextWarnRule::timeChange()
-{
-    if(alreadyTime >= autoHideTime())
-    {
-        removeFirst();
-        return TimeChangeResult::Finish;
-    }
-    else if(alreadyTime >= showMinTime())
-    {
-        if(isNewWarn(1))
-        {
-            removeFirst();
-        }
-        return TimeChangeResult::MinTime;
-    }
-    return TimeChangeResult::Runing;
-}
-
-
-///
-/// \brief B2TextWarnRule::B2TextWarnRule
-///
-B2TextWarnRule::B2TextWarnRule()
-{
-    m_Interrupts.push_back(WarnGrade::B2);
-    m_Interrupts.push_back(WarnGrade::A);
-    m_Interrupts.push_back(WarnGrade::C);
-    m_Interrupts.push_back(WarnGrade::D);
-}
-
-int B2TextWarnRule::autoHideTime()
-{
-    return 3;
-}
-
-int B2TextWarnRule::grade()
-{
-    return WarnGrade::B2;
-}
-
-bool B2TextWarnRule::newWarnInfo()
+//-------------------------------------
+bool TimeLoopTextWarnRule::newWarnInfo()
 {
     if(alreadyTime > showMinTime())
     {
@@ -218,7 +166,39 @@ bool B2TextWarnRule::newWarnInfo()
     return false;
 }
 
-TimeChangeResult B2TextWarnRule::timeChange()
+TimeChangeResult TimeLoopTextWarnRule::timeChange()
+{
+    if(alreadyTime >= showMinTime())
+    {
+        if (!isEmpty())
+        {
+            WarnInfo info = getValue();
+            if(info.alreadyloopNum >= autoHideTime() / 2)
+            {
+                removeFirst();
+            }
+            else
+            {
+                move();
+            }
+        }
+        return TimeChangeResult::MinTime;
+    }
+    return TimeChangeResult::Runing;
+}
+
+//-------------------------------------
+bool LoopTextWarnRule::newWarnInfo()
+{
+    if(alreadyTime > showMinTime())
+    {
+        move();
+        return true;
+    }
+    return false;
+}
+
+TimeChangeResult LoopTextWarnRule::timeChange()
 {
     if(alreadyTime >= showMinTime())
     {
@@ -228,86 +208,43 @@ TimeChangeResult B2TextWarnRule::timeChange()
     return TimeChangeResult::Runing;
 }
 
-///
-/// \brief B1TextWarnRule::grade
-/// \return
-///
-B1TextWarnRule::B1TextWarnRule()
+//-------------------------------------
+TimeChangeResult SingleTextWarnRule::timeChange()
 {
-    m_Interrupts.push_back(WarnGrade::B1);
-    m_Interrupts.push_back(WarnGrade::A);
-    m_Interrupts.push_back(WarnGrade::C);
-    m_Interrupts.push_back(WarnGrade::D);
-}
-
-int B1TextWarnRule::grade()
-{
-    return WarnGrade::B1;
-}
-
-int B1TextWarnRule::autoHideTime()
-{
-    return 3;
-}
-
-TimeChangeResult B1TextWarnRule::timeChange()
-{
-    if(alreadyTime >= showMinTime())
+    if(autoHideTime() != showMinTime())
     {
-        removeFirst();
-        return TimeChangeResult::MinTime;
+        if(alreadyTime >= autoHideTime())
+        {
+            removeFirst();
+            return TimeChangeResult::Finish;
+        }
+        else if(alreadyTime >= showMinTime())
+        {
+            if(isNewWarn(1))
+            {
+                removeFirst();
+            }
+            return TimeChangeResult::MinTime;
+        }
+    }
+    else
+    {
+        if(alreadyTime >= showMinTime())
+        {
+            removeFirst();
+            return TimeChangeResult::MinTime;
+        }
     }
     return TimeChangeResult::Runing;
 }
 
-///
-/// \brief ATextWarnRule::ATextWarnRule
-///
-ATextWarnRule::ATextWarnRule()
+int SingleTextWarnRule::showMinTime() 
 {
-
+    return 3;    
 }
 
-int ATextWarnRule::grade()
-{
-    return WarnGrade::A;
-}
-
-int ATextWarnRule::autoHideTime()
-{
-    return 3;
-}
-
-TimeChangeResult ATextWarnRule::timeChange()
-{
-    if(alreadyTime > showMinTime())
-    {
-        removeFirst();
-        return TimeChangeResult::Finish;
-    }
-    return TimeChangeResult::Runing;
-}
-
-///
-/// \brief DTextWarnRule::grade
-/// \return
-///
-DTextWarnRule::DTextWarnRule()
-{
-    m_Interrupts.push_back(WarnGrade::D);
-}
-
-int DTextWarnRule::grade()
-{
-    return WarnGrade::D;
-}
-
-int DTextWarnRule::autoHideTime()
-{
-    return 3;
-}
-
-TimeChangeResult DTextWarnRule::timeChange()
+//---------------------------------------
+TimeChangeResult LastTextWarnRule::timeChange()
 {
     if(alreadyTime >= showMinTime())
     {

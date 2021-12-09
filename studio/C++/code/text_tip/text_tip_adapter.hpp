@@ -2,6 +2,7 @@
 #define TEXT_TIP_ADAPTER
 #include <unordered_map>
 #include <string>
+#include <algorithm>
 #include "nlohmann/json.hpp"
 #include "text_warn_rule_manage.hpp"
 
@@ -21,11 +22,4 @@ private:
     TextWarnRuleManage m_rule;
 };
 
-class TextTipAdapterTest
-{
-public:
-    TextTipAdapterTest();
-private:
-    TextTipAdapter d;
-};
 #endif // TEXT_TIP_ADAPTER

@@ -11,9 +11,6 @@ public:
     //显示的最短时间(s)
     virtual int showMinTime();
     
-    //等级
-    virtual int grade() = 0;
-    
     std::vector<int> Interrupt();
 
     //得到显示的值
@@ -41,9 +38,13 @@ public:
     bool isNewWarn(int index=0);
 
     bool isEmpty();
+
+    //等级
+    virtual int grade() = 0;
 protected:
     //自动隐藏的时间(s)
     virtual int autoHideTime();
+
     virtual bool newWarnInfo();
     virtual TimeChangeResult timeChange()=0;
 
@@ -53,62 +54,48 @@ protected:
     WarnInfo                m_PrevValue;  //上一个值
 };
 
-class CTextWarnRule : public TextWarnRule
+
+class LoopTextWarnRule : public TextWarnRule
 {
-    // TextWarnRule interface
 public:
-    CTextWarnRule();
-    int autoHideTime();
-    int grade();
+    using TextWarnRule::TextWarnRule;
+
+protected:
+    bool newWarnInfo();
     TimeChangeResult timeChange();
+
 };
 
-class B2TextWarnRule : public TextWarnRule
+class TimeLoopTextWarnRule : public TextWarnRule
 {
-    // TextWarnRule interface
 public:
-    B2TextWarnRule();
-    int autoHideTime();
-    int grade();
+    using TextWarnRule::TextWarnRule;
+
+protected:
     bool newWarnInfo();
     TimeChangeResult timeChange();
 };
 
-class B1TextWarnRule : public TextWarnRule
+//单次
+class SingleTextWarnRule  : public TextWarnRule
 {
-
-    // TextWarnRule interface
+private:
+    /* data */
 public:
-    B1TextWarnRule();
-    int grade();
-
+    using TextWarnRule::TextWarnRule;
 protected:
-    int autoHideTime();
     TimeChangeResult timeChange();
+    int showMinTime();
 };
 
-class ATextWarnRule : public TextWarnRule
+//保留最后一个
+class LastTextWarnRule  : public TextWarnRule
 {
-    // TextWarnRule interface
+private:
+    /* data */
 public:
-    ATextWarnRule();
-    int grade();
-
+    using TextWarnRule::TextWarnRule;
 protected:
-    int autoHideTime();
-    TimeChangeResult timeChange();
-};
-
-class DTextWarnRule : public TextWarnRule
-{
-
-    // TextWarnRule interface
-public:
-    DTextWarnRule();
-    int grade();
-
-protected:
-    int autoHideTime();
     TimeChangeResult timeChange();
 };
 

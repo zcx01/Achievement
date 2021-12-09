@@ -6,10 +6,15 @@ import pexpect
 
 
 process = None
-cmd_Prints={'telnet':'login:','ssh':'password','cd':'~','adb push':'in','curl':'100'}
+cmd_Outs={'telnet':'bigsur:/','ssh':'password','adb push':'in','curl':'100'}
 new_spawn=['ssh','adb shell']
 shellCmds=[]
 is_close_spawn=False
+
+def SetCloseSpawn(s):
+    global is_close_spawn
+    is_close_spawn = s
+
 def keyStr(cmd, t=0.3):
     assert isinstance(cmd,str)
     global process
@@ -21,11 +26,11 @@ def keyStr(cmd, t=0.3):
 
     if  process == None and len(getCommand(cmd,new_spawn)) !=0:
         process = pexpect.spawn(cmd, encoding='utf-8', logfile=sys.stdout, timeout=300)
-        return
+        return ''
 
     if process == None:
         shellCmds.append(cmd)
-        return
+        return ''
     elif len(shellCmds) !=0:
         os.system('&&'.join(shellCmds))
         shellCmds.clear()
@@ -39,7 +44,7 @@ def keyStr(cmd, t=0.3):
     #     except:
     #         process = pexpect.spawn("/bin/bash", encoding='utf-8', logfile=sys.stdout, timeout=300)
 
-    prompt=cmd_Prints.get(getCommand(cmd,cmd_Prints),'#')
+    prompt=cmd_Outs.get(getCommand(cmd,cmd_Outs),'#')
     process.sendline(cmd)
 
     if len(prompt) != 0:
@@ -49,6 +54,10 @@ def keyStr(cmd, t=0.3):
     if login_index != 0:
         print(f'执行{cmd}失败')
         exit(1)
+    if  process != None:
+        return process.before.strip()
+    else:
+        return ''
 
 
 def interact():

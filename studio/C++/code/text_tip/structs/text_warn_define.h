@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <base/enum.h>
 
 struct WarnInfo
 {
@@ -13,7 +14,9 @@ struct WarnInfo
     int         value=0;            //值
     int         immediately=false;  //立即打断
     int         autoHideTime=0;     //自动隐藏的时间,为-1时不自动取消,0时启用最小显示时间
-    int         delay;              //延迟显示时间
+    int         delay=0;            //延迟显示时间
+
+    int         alreadyloopNum=0;   //已经循环的次数
     bool        isNew=true;         //是否新消息
     bool        isCancel=false;     //是否是自动取消
     bool operator==(const WarnInfo &other)
@@ -32,16 +35,18 @@ struct WarnInfo
 };
 using  CallWarnInfoFun = std::function<void(const WarnInfo &)>;
 
-enum WarnGrade
-{
-    C,
-    B2,
-    B1,
-    A,
-    D,
+BETTER_ENUM(WarnGrade,int,
+    OP5,
+    OP4,
+    OP3,
+    OP2,
+    D2,
+    D1,
+    OP1,
+    W2,
+    W1,
     count
-};
-
+);
 
 enum TimeChangeResult
 {

@@ -16,21 +16,16 @@ if __name__ == "__main__":
 
     path = args.path
     files = args.fileNames
-    timeSpcae = args.time
-    print(timeSpcae) 
     keyStr(f'cd {path}')
     
+    print(files)
     for file in files:
-        keyStr(f"cp {file} /var/log/dltlogs/",timeSpcae)
+        keyStr(f"cp {file} /var/log/dltlogs/",0)
+        keyStr(f"chmod 777 /var/log/dltlogs/{file}",0)
     keyStr('exit')
-
-    for file in files:
-        keyStr(f'curl -u root:root "ftp://cdc-qnx/var/log/dltlogs/{file}" -o /sdcard/{file}',timeSpcae)
-
     keyStr('exit')
-
-    is_close_spawn = True
+    SetCloseSpawn(True)
     for file in files:
-        keyStr(f'adb pull /sdcard/{file} ./')
+        keyStr(f'adb pull /qlog/dltlogs/{file} ./')
 
     interact()

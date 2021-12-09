@@ -8,6 +8,13 @@
 #define COUT(V) std::cout <<__LINE__<<" ----  "<< V << std::endl;
 
 
+template<typename T0, typename... T>
+void TB_LOG_INFO(T0 t0, T... t) {
+    std::cout << t0;
+    if constexpr (sizeof...(t) > 0) TB_LOG_INFO(t...);
+    else std::cout<< __LINE__ <<std::endl;
+}
+
 template<typename T>
 void COUTI(T c)
 {

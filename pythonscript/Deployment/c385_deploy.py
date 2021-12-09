@@ -16,10 +16,6 @@ def adbPush(proceesNames,excess):
     keyStr("telnet cdc-qnx",1)
     keyStr("root")
     if '-a' not in sys.argv:
-        keyStr("slay -f slm",2)
-        time.sleep(2)
-        keyStr("slay slm")
-
         for proceesName in proceesNames:
             keyStr(f"cp /data/{proceesName} /usr/bin/",0)
             keyStr(f"chmod +x /usr/bin/{proceesName}",0)
@@ -46,6 +42,8 @@ if __name__ == "__main__":
         proceesNames= args.customfile
         if len(proceesNames) == 0:
             sys.exit()
+        for proceesName in proceesNames:
+            os.system(f'python3 ./adb_qnx.py -k {proceesName}')
         keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts/ic")
 
         for proceesName in proceesNames:
@@ -76,7 +74,6 @@ if __name__ == "__main__":
 
         keyStr(f"adb push ic/qt/config/screen_layout_config.json /sdcard",0)
         keyStr(f"adb push ic/qt/config/icadas_config.json /sdcard",0)
-        keyStr(f"adb push ic/qt/config/icdriving_config.json /sdcard",0)
         keyStr(f"adb push ic/qt/config/icscreencast_config.json /sdcard",0)
         keyStr(f"adb push ic/qt/config/ictelltale_config.json /sdcard",0)
         keyStr(f"adb push ic/qt/config/icwarning_config.json /sdcard",0)
@@ -93,14 +90,18 @@ if __name__ == "__main__":
         keyStr("curl -u root:root \"ftp://192.168.1.1/data/libresources_plugin.so\" -T /sdcard/libresources_plugin.so",0)
         keyStr("curl -u root:root \"ftp://192.168.1.1/data/screen_layout_config.json\" -T /sdcard/screen_layout_config.json",0)
         keyStr("curl -u root:root \"ftp://192.168.1.1/data/icadas_config.json\" -T /sdcard/icadas_config.json",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/icdriving_config.json\" -T /sdcard/icdriving_config.json",0)
         keyStr("curl -u root:root \"ftp://192.168.1.1/data/icscreencast_config.json\" -T /sdcard/icscreencast_config.json",0)
         keyStr("curl -u root:root \"ftp://192.168.1.1/data/ictelltale_config.json\" -T /sdcard/ictelltale_config.json",0)
         keyStr("curl -u root:root \"ftp://192.168.1.1/data/icwarning_config.json\" -T /sdcard/icwarning_config.json",0)
 
         keyStr("telnet cdc-qnx",1)
         keyStr("root")
-        keyStr("slay -f slm",2)
+        # keyStr("slay -f slm",2)
+        # slay_cmd = f"slay ic_service"
+        # slay_out = keyStr(slay_cmd)
+        # while 'slay:' not in slay_out:
+        #     keyStr(slay_cmd)
+        #     time.sleep(100)
 
     keyStr("cp /data/ic_chime /usr/bin/",0)
     keyStr("cp /data/ic_service /usr/bin/",0)
@@ -113,7 +114,6 @@ if __name__ == "__main__":
     keyStr("cp /data/libresources_plugin.so /opt/qt/qml/Resources/libresources_plugin.so",0)
     keyStr("cp /data/screen_layout_config.json /opt/qt/config",0)
     keyStr("cp /data/icadas_config.json /opt/qt/config",0)
-    keyStr("cp /data/icdriving_config.json /opt/qt/config",0)
     keyStr("cp /data/icscreencast_config.json /opt/qt/config",0)
     keyStr("cp /data/ictelltale_config.json /opt/qt/config",0)
     keyStr("cp /data/icwarning_config.json /opt/qt/config",0)

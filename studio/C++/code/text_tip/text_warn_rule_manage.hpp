@@ -39,7 +39,6 @@ private:
     void setCurrentRule(TextWarnRule *r);
 
     std::vector<TextWarnRule*>    m_warnRule;
-    std::map<std::string,int>     m_GradeStr;
     TextWarnRule*                 m_currentRule=nullptr;
     std::thread*                  timer_thread=nullptr;
     bool                          m_start=false;

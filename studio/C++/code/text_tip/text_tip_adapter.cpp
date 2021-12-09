@@ -1,12 +1,13 @@
-#include "text_tip_adapter.hpp"
-#include "../nlohmann/json.hpp"
+#include "text_tip_adapter.hpp" 
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include "../commondefine.hpp"
-#include "../ObjectFactory.h"
 
-#define GLOBAL_CONFIG_PATH  "/home/chengxiongzhu/Works/Repos/changan_c835//qt/ic_qt/resources/config/icwarning_config.json"
+#define GLOBAL_CONFIG_PATH  "/opt/qt/config/icwarning_config.json"
+#define CONFIG_GRADE        "grade"
+#define CONFIG_FALUTMASK    "falutMask"
+#define CONFIG_IMMEDIATELY  "immediately"
 TextTipAdapter::TextTipAdapter() 
 {
     m_rule.SetCallWarnInfoFun(std::bind(&TextTipAdapter::sendWarnInfo,this,std::placeholders::_1));
@@ -26,7 +27,7 @@ TextTipAdapter::TextTipAdapter()
     }
     catch (...)
     {
-        COUT("icwarning_config file no exist");
+        TB_LOG_INFO("icwarning_config file no exist");
     }
 }
 
@@ -55,50 +56,59 @@ void TextTipAdapter::addWarnInfo(std::string topic, int value)
     std::unordered_map<std::string, nlohmann::json> config = getData(topic);
     if (config.empty())
     {
-        COUT("config file no exit topic: %s"<< topic.c_str());
+        TB_LOG_INFO("config file no exit topic: %s", topic.c_str());
         return;
     }
 
+    std::string valueStr = std::to_string(value);
+    std::string grade;
     WarnInfo info;
     info.topic = topic;
     info.value = value;
-    const std::string &grade=config["grade"].get<std::string>();
     try
     {
-        info.text =config[std::to_string(value)].get<std::string>();
+        if (config[CONFIG_GRADE].is_string())
+        {
+            grade = config[CONFIG_GRADE].get<std::string>();
+        }
+        else
+        {
+            grade = config[CONFIG_GRADE].get<std::map<std::string, std::string>>()[valueStr];
+        }
+        info.text =config[valueStr].get<std::string>();
+
+        if(config.count(CONFIG_FALUTMASK))
+        {
+            // auto falutMask = config.
+        }
+
+        if(config.count(CONFIG_IMMEDIATELY))
+        {
+            if (config[CONFIG_IMMEDIATELY].is_boolean())
+            {
+                info.immediately = config[CONFIG_IMMEDIATELY].get<bool>();
+            }
+
+            else
+            {
+                auto immediatelys = config[CONFIG_IMMEDIATELY].get<std::vector<std::string>>();
+                info.immediately = std::find(immediatelys.begin(),immediatelys.end(),valueStr) != immediatelys.end();
+            }
+        }
+
     }
     catch(...)
     {
+        TB_LOG_INFO("config file has error topic: %s", topic.c_str());
+        return;
     }
     
     bool status=m_rule.addWarnInfo(grade,info);
 }
 
+
 void TextTipAdapter::sendWarnInfo(const WarnInfo &info) 
 {
-    COUT(info.topic<<"  "<<info.value<<"  "<<info.isCancel)   
+     TB_LOG_INFO("sendWarnInfo:%s",info.topic.c_str());   
 }
 
-TextTipAdapterTest::TextTipAdapterTest() 
-{
-    std::map<std::string,std::string> k;
-    // d.addWarnInfo("icwarning/DoorOpenSts", 1);
-    // d.addWarnInfo("icwarning/DoorOpenSts", 0);
-    // d.addWarnInfo("icwarning/DoorOpenSts", 0);
-    // d.addWarnInfo("icwarning/DoorOpenSts", 0);
-    // d.addWarnInfo("icwarning/DoorOpenSts", 0);
-    // d.addWarnInfo("icwarning/DoorOpenSts", 1);
-    // d.addWarnInfo("icwarning/DoorOpenSts", 0);
-    // d.addWarnInfo("icwarning/DoorOpenSts", 1);
-
-    d.addWarnInfo("icwarning/DoorOpenSts", 1);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    d.addWarnInfo("icwarning/DoorOpenSts", 0);
-    while (true)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(600));
-    }
-    
-
-}
-MYREGISTER(TextTipAdapterTest)
