@@ -75,7 +75,10 @@ void TextTipAdapter::addWarnInfo(std::string topic, int value)
         {
             grade = config[CONFIG_GRADE].get<std::map<std::string, std::string>>()[valueStr];
         }
-        info.text =config[valueStr].get<std::string>();
+        if (config.count(valueStr))
+        {
+            info.text = config[valueStr].get<std::string>();
+        }
 
         if(config.count(CONFIG_FALUTMASK))
         {
@@ -99,16 +102,17 @@ void TextTipAdapter::addWarnInfo(std::string topic, int value)
     }
     catch(...)
     {
-        TB_LOG_INFO("config file has error topic: %s", topic.c_str());
+        TB_LOG_INFO("value error: %s", topic.c_str());
         return;
     }
     
     bool status=m_rule.addWarnInfo(grade,info);
+    TB_LOG_INFO("grade:%s text :%s topic:%s key:%d add:%d", grade.c_str(), info.text.c_str(), topic.c_str(), value,status);
 }
 
 
 void TextTipAdapter::sendWarnInfo(const WarnInfo &info) 
 {
-     TB_LOG_INFO("sendWarnInfo:%s",info.topic.c_str());   
+    TB_LOG_INFO("sendWarnInfo:%s",info.topic.c_str());   
 }
 

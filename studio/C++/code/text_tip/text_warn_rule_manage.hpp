@@ -23,6 +23,8 @@ public:
 
     void SetCallWarnInfoFun(CallWarnInfoFun fun);
 
+    int getAlreadyTime(); 
+
 private:
     void timer_thread_function();
 

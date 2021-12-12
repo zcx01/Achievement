@@ -41,6 +41,8 @@ public:
 
     //等级
     virtual int grade() = 0;
+
+    int getAlreadyTime();
 protected:
     //自动隐藏的时间(s)
     virtual int autoHideTime();

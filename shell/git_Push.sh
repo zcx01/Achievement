@@ -8,12 +8,13 @@ cd $repoPath
 
 if [ $# -lt 1 ]; then
     echo "选择路径:"
-    repo status
-    # branch=`python3 $shellPath`
-    # for f in $branch;
-    # do
-    #     echo $f
-    # done
+    project=`repo status -q`
+    for f in $project;
+    do
+        if [ $f != "prebuilts/" ] && [ $f != "project" ];then
+            repo status $f
+        fi
+    done
     exit 0
 else
     cd $1

@@ -155,6 +155,11 @@ bool TextWarnRule::newWarnInfo()
     return false;
 }
 
+int TextWarnRule::TextWarnRule::getAlreadyTime() 
+{
+    return alreadyTime;    
+}
+
 //-------------------------------------
 bool TimeLoopTextWarnRule::newWarnInfo()
 {
@@ -254,3 +259,4 @@ TimeChangeResult LastTextWarnRule::timeChange()
     }
     return TimeChangeResult::Runing;
 }
+

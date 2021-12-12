@@ -7,6 +7,15 @@ class TextTipAdapterTest
 public:
     TextTipAdapterTest();
 private:
+
+    void OneTest();
+
+    void sendWarnInfo(const WarnInfo &info);
+
+    void addWarn(std::string topic, int value);
+
+    bool is_one_finish = true;
+
     TextTipAdapter d;
 };
 #endif // TEXT_TIP_ADAPTER_TEXT

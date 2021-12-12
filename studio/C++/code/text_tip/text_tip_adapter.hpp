@@ -8,6 +8,7 @@
 
 class TextTipAdapter 
 {
+    friend class TextTipAdapterTest;
 public:
     TextTipAdapter();
 

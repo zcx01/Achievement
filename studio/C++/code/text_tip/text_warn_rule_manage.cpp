@@ -4,7 +4,7 @@
 
 TextWarnRuleManage::TextWarnRuleManage()
 {
-    for (int i = WarnGrade::count - 1; i >= WarnGrade::OP5; i--)
+    for (int i = WarnGrade::OP5; i < WarnGrade::count; i++)
     {
         m_warnRule.push_back(createRule(i));
     }
@@ -43,6 +43,16 @@ bool TextWarnRuleManage::addWarnInfo(const std::string &grade, WarnInfo &info)
     }
     return false;
 }
+
+int TextWarnRuleManage::getAlreadyTime() 
+{
+    if(m_currentRule != nullptr)
+    {
+        return m_currentRule->getAlreadyTime();
+    }    
+    return -1;
+}
+
 
 void TextWarnRuleManage::timeOut()
 {

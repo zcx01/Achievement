@@ -1,5 +1,7 @@
 {
     "files.associations": {
+        "*.txt": "plaintext",
+        "*.cpp": "cpp",
         "hash_map": "cpp",
         "array": "cpp",
         "atomic": "cpp",
@@ -45,6 +47,17 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "chrono": "cpp",
+        "condition_variable": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "forward_list": "cpp",
+        "map": "cpp",
+        "mutex": "cpp",
+        "ratio": "cpp",
+        "thread": "cpp",
+        "valarray": "cpp",
+        "iomanip": "cpp"
     }
 }

@@ -43,7 +43,7 @@ if __name__ == "__main__":
         if len(proceesNames) == 0:
             sys.exit()
         for proceesName in proceesNames:
-            os.system(f'python3 ./adb_qnx.py -k {proceesName}')
+            os.system(f'adb_qnx -k {proceesName}')
         keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts/ic")
 
         for proceesName in proceesNames:
