@@ -44,15 +44,6 @@ bool TextWarnRuleManage::addWarnInfo(const std::string &grade, WarnInfo &info)
     return false;
 }
 
-int TextWarnRuleManage::getAlreadyTime() 
-{
-    if(m_currentRule != nullptr)
-    {
-        return m_currentRule->getAlreadyTime();
-    }    
-    return -1;
-}
-
 
 void TextWarnRuleManage::timeOut()
 {

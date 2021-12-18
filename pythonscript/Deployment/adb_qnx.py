@@ -14,6 +14,7 @@ if __name__ == "__main__":
     parser.add_argument('-m','--subtopic',help='su btopic',nargs='*',default=[])
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     parser.add_argument('-k','--slay', help='slay process',default=str,nargs='*')
+    parser.add_argument('-l','--log', help='taif log',default=str,)
     args = parser.parse_args()
 
     for j in range(120):
@@ -32,6 +33,13 @@ if __name__ == "__main__":
     isExit = False
     if "-m" in sys.argv:
         keyStr("mosquitto_sub -h cdc-qnx -v -t \"#\" ")
+
+    if "-l" in sys.argv:
+        try:
+            keyStr(f' tail -f /var/log/dltlogs/log.dlt | grep \'{args.log}\' ')
+        except:
+            pass
+        
 
     if '-r' in sys.argv:
         keyStr("mcu_tool -g 2")

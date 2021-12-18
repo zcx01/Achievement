@@ -94,8 +94,8 @@ void TextTipAdapter::addWarnInfo(std::string topic, int value)
 
             else
             {
-                auto immediatelys = config[CONFIG_IMMEDIATELY].get<std::vector<std::string>>();
-                info.immediately = std::find(immediatelys.begin(),immediatelys.end(),valueStr) != immediatelys.end();
+                auto immediatelys = config[CONFIG_IMMEDIATELY].get<std::vector<int>>();
+                info.immediately = std::find(immediatelys.begin(),immediatelys.end(),value) != immediatelys.end();
             }
         }
 

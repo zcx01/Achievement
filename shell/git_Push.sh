@@ -1,10 +1,10 @@
 #!/bin/bash
 
 shellPath="/home/chengxiongzhu/Achievement/pythonscript/getgitpath.py"
-repoPath=~/Works/Repos/changan_c835/
+# repoPath=~/Works/Repos/changan_c835/
+# cd $repoPath
 branch="dev_hqx.1.2.1"
 
-cd $repoPath
 
 if [ $# -lt 1 ]; then
     echo "选择路径:"

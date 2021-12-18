@@ -1,6 +1,11 @@
 #!/bin/bash
 
 repoPath="/home/chengxiongzhu/Works/Repos/changan_c835/"
+
+# if [ $# -lt 2 ]; then
+#     repoPath="./"
+# fi
+
 cd $repoPath
 cd "build"
 index=0

@@ -266,6 +266,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
             rowContent.append(comment)
             rowContent.append(className+'Status')
             rowContent.append(topicDefine)
+            rowContent.append('y')
             rowContent.append(relation)
             print(rowContent)
             sh.append(rowContent)

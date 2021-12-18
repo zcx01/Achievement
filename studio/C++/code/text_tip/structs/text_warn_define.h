@@ -16,9 +16,11 @@ struct WarnInfo
     int         autoHideTime=0;     //自动隐藏的时间,为-1时不自动取消,0时启用最小显示时间
     int         delay=0;            //延迟显示时间
 
+    //-----------无须赋值
     int         alreadyloopNum=0;   //已经循环的次数
     bool        isNew=true;         //是否新消息
     bool        isCancel=false;     //是否是自动取消
+    int         alreadyTime=0;          //已经做过的时间
     bool operator==(const WarnInfo &other)
     {
         return other.topic == topic;

@@ -1,0 +1,600 @@
+--------------统计--------------
+存在差异的信号有53个
+在原来的矩阵是不存在的有434个
+具体如下:
+ 
+-------------- HU_BranchInfo 3C4 --------------
+信号名称:HU_BranchInfo 3C4 --- HU_BranchI 3C4
+
+-------------- HU_BridgeInfo 3AF --------------
+信号名称:HU_BridgeInfo 3AF --- HU_BridgeI 3AF
+
+-------------- HU_Construction_Info 3C4 --------------
+信号名称:HU_Construction_Info 3C4 --- HU_Construction_I 3C4
+
+-------------- HU_EnterCurveInfo 3AF --------------
+信号名称:HU_EnterCurveInfo 3AF --- HU_EnterCurveI 3AF
+
+-------------- HU_EnterRampInfo 3AF --------------
+信号名称:HU_EnterRampInfo 3AF --- HU_EnterRampI 3AF
+
+-------------- HU_EnterSlopeInfo 3C4 --------------
+信号名称:HU_EnterSlopeInfo 3C4 --- HU_EnterSlopeI 3C4
+
+-------------- HU_EnterTunnelInfo 3C4 --------------
+信号名称:HU_EnterTunnelInfo 3C4 --- HU_EnterTunnelI 3C4
+
+-------------- HU_FallingRockInfo 3C4 --------------
+信号名称:HU_FallingRockInfo 3C4 --- HU_FallingRockI 3C4
+
+-------------- HU_IntervalVelocityInfo 3AF --------------
+信号名称:HU_IntervalVelocityInfo 3AF --- HU_IntervalVelocityI 3AF
+
+-------------- HU_RampInfo 3AF --------------
+信号名称:HU_RampInfo 3AF --- HU_RampI 3AF
+
+-------------- HU_TollInfo 3C4 --------------
+信号名称:HU_TollInfo 3C4 --- HU_TollI 3C4
+
+-------------- HU_TrafficAccident_Info 3C4 --------------
+信号名称:HU_TrafficAccident_Info 3C4 --- HU_TrafficAccident_I 3C4
+
+-------------- BlebondStsID 593 --------------
+信号名称:BlebondStsID 593 --- BleCnctStsID 593
+
+-------------- CdcDistToCross 2E2 --------------
+长度:18 --- 10
+
+-------------- ACC_AEBTextInfo 31A --------------
+信号名称:ACC_AEBTextInfo 31A --- ACC_AEBTextI 31A
+
+-------------- ACC_Voiceinfo 31A --------------
+信号名称:ACC_Voiceinfo 31A --- ACC_VoiceI 31A
+
+-------------- ACC_IACCHWATextInfoForDriver 31A --------------
+信号名称:ACC_IACCHWATextInfoForDriver 31A --- ACC_IACCHWATextIForDriver 31A
+
+-------------- DsmRespiteModSeatStorgSts 352 --------------
+长度:2 --- 1
+结束位:54 --- 55
+
+-------------- CdcCourtesyPedSet 2D2 --------------
+信号名称:CdcCourtesyPedSet 2D2 --- CdcRainDetectWinClostSet 2D2
+
+-------------- HU_ASPModeSelect 3BD --------------
+最大值:7 --- 8
+
+-------------- HU_ASPRemindEnable 3BD --------------
+最大值:3 --- 4
+
+-------------- HU_ASPSwitch 3BD --------------
+最大值:3 --- 4
+
+-------------- HU_CrossParkingModeSet 3BD --------------
+最大值:3 --- 4
+
+-------------- BdcMirrMemSt 5FF --------------
+信号名称:BdcMirrMemSt 5FF --- BdcMirrMEmst 5FF
+
+-------------- VcuEvDrvResiMilg 309 --------------
+最大值:819.1 --- 819.2
+
+-------------- VCUShiftPostionValid 2A1 --------------
+信号名称:VCUShiftPostionValid 2A1 --- Vcu_ShiftPostionValid 2A1
+
+-------------- VcuCCModeTextDispReq 2A1 --------------
+信号名称:VcuCCModeTextDispReq 2A1 --- VcuCCModeTextDispReq2 2A1
+
+-------------- VcuCCModeSpd 2A1 --------------
+最大值:254 --- 255
+
+-------------- CDCSteerHeatStsCount 614 --------------
+信号名称:CDCSteerHeatStsCount 614 --- CdcSteerHeatStsCount 614
+
+-------------- CDCFaceAuthentStsOKCount 614 --------------
+信号名称:CDCFaceAuthentStsOKCount 614 --- CdcFaceAuthentStsOKCount 614
+
+-------------- CDCFaceAuthentStsNGCount 614 --------------
+信号名称:CDCFaceAuthentStsNGCount 614 --- CdcFaceAuthentStsNGCount 614
+
+-------------- CDCFaceRegistStsCount 614 --------------
+信号名称:CDCFaceRegistStsCount 614 --- CdcFaceRegistStsCount 614
+
+-------------- CDCDrvrFatigueWarnReqCount 614 --------------
+信号名称:CDCDrvrFatigueWarnReqCount 614 --- CdcDrvrFatigueWarnReqCount 614
+
+-------------- CDCSentryModeCount 614 --------------
+信号名称:CDCSentryModeCount 614 --- CdcSentryModeCount 614
+
+-------------- CdcOffgasDetnSetSts 2D2 --------------
+信号名称:CdcOffgasDetnSetSts 2D2 --- CdcEmsTestFctSetReq 2D2
+
+-------------- CDCBackupCameraSetSts 2D2 --------------
+信号名称:CDCBackupCameraSetSts 2D2 --- CdcBackupCameraSetSts 2D2
+
+-------------- CDCDrvrFatigueDetdSts 2D2 --------------
+信号名称:CDCDrvrFatigueDetdSts 2D2 --- CdcDrvrFatigueDetdSts 2D2
+
+-------------- CDCDrvrFatigueWarnReq 2D2 --------------
+信号名称:CDCDrvrFatigueWarnReq 2D2 --- CdcDrvrFatigueWarnReq 2D2
+
+-------------- CDCFaceRegistSts 2D2 --------------
+信号名称:CDCFaceRegistSts 2D2 --- CdcFaceRegistSts 2D2
+
+-------------- CDCKeySts 2D2 --------------
+信号名称:CDCKeySts 2D2 --- CdcKeySts 2D2
+
+-------------- CdcChrgSocSet 2D2 --------------
+最大值:100 --- 102.3
+
+-------------- CdcMirrMemStReq 2D2 --------------
+信号名称:CdcMirrMemStReq 2D2 --- CdcMirrMEmstReq 2D2
+
+-------------- HU_CSLAEnable 3BD --------------
+最大值:3 --- 4
+
+-------------- HU_ELKEnable 3BD --------------
+最大值:3 --- 4
+
+-------------- HU_TLAEnable 3BD --------------
+最大值:3 --- 4
+
+-------------- BcmTrDoorOpenDeg 3B1 --------------
+最大值:100 --- 31
+
+-------------- BcmTrDoorOpenDegStFb 3B1 --------------
+最大值:100 --- 31
+
+-------------- ACC_TextInfoForDriver 307 --------------
+信号名称:ACC_TextInfoForDriver 307 --- ACC_TextIForDriver 307
+
+-------------- VCUGearShiftPositon 2A1 --------------
+信号名称:VCUGearShiftPositon 2A1 --- Vcu_GearShiftPositon 2A1
+
+-------------- DsmParkSpaceStorg 352 --------------
+长度:2 --- 1
+
+-------------- HU_APAActive2 507 --------------
+最大值:3 --- 4
+
+-------------- HU_DVRVideoPlayUserTime 507 --------------
+最大值:511 --- 512
+
+-------------- VcuFulLimdDrvgDst 309 --------------
+信号名称:VcuFulLimdDrvgDst 309 --- VcuElecResiMilgNEDC 309
+
+--------------不在存在的信号--------------
+ACC_Target2Detection 382
+ACC_Target2ID 382
+ACC_Target2Type 382
+ACC_Target2LngRange 382
+ACC_Target2LatRange 382
+ACC_Target2Direction 382
+ACC_Target2HeadingAngle 382
+ACC_Target2ZoneID 382
+ACC_Target3Detection 382
+ACC_Target3ID 382
+ACC_Target3Type 382
+ACC_Target3LngRange 382
+ACC_Target3LatRange 382
+ACC_Target3Direction 382
+ACC_Target3HeadingAngle 382
+ACC_Target3ZoneID 382
+ACC_Target4Detection 382
+ACC_Target4ID 382
+ACC_Targe4Type 382
+ACC_Target4LngRange 382
+ACC_Target4LatRange 382
+ACC_Target4Direction 382
+ACC_Target4HeadingAngle 382
+ACC_Target4ZoneID 382
+ACC_Target5Detection 382
+ACC_Target5ID 382
+ACC_Target5Type 382
+ACC_Target5LngRange 382
+ACC_Target5LatRange 382
+ACC_Target5Direction 382
+ACC_Target5HeadingAngle 382
+ACC_Target5ZoneID 382
+ACC_Target6Detection 307
+ACC_Target6ID 307
+ACC_Target6Type 307
+ACC_Target6LngRange 307
+ACC_Target6LatRange 307
+ACC_Target6Direction 307
+ACC_Target6HeadingAngle 307
+ACC_Target6ZoneID 307
+ACC_Target7Detection 307
+ACC_Target7ID 307
+ACC_Target7Type 307
+ACC_Target7LngRange 307
+ACC_Target7LatRange 307
+ACC_Target7Direction 307
+ACC_Target7HeadingAngle 307
+ACC_Target7ZoneID 307
+BLEChrgPileCnctStsID 593
+RRC_CRCCheck_2A4 2A4
+CdcNextRoadWordCode 2E2
+CdcPhoneInfoWordCode 2F2
+CdcPhoneNum 2F2
+CdcParkSpaceStorg 2D2
+CdcNavJourneySetSts 356
+VcuUphillSlopeLenCal 2A1
+VcuDownhillSlopeLenCal 2A1
+VcuCongstLenCal 2A1
+VcuHighspeedLenCal 2A1
+VcuUpDownhillSlopeCal 2A1
+VcuCongstLvlCal 2A1
+VcuRoadCdnIntervalCal 2A1
+CdcLeMuteKeySts 37A
+CdcResiTolMilgLowWarnReq 2F2
+CdcResiTolMilg 2F2
+CdcVehSpd 2F2
+CdcSmartEnyMagtModSetSts 2D2
+VcuWintrModActvSts 2A1
+HudSwtSts 3E9
+HudLiBriLvlSts 3E9
+HudLiBriLvlAutoSts 3E9
+HudHiLvlSts 3E9
+HudDispModeSts 3E9
+HudVideoSts 3E9
+ACC_IACCHWAEnable 31A
+ACC_LASModeSelectionStatus 31A
+ACC_LASWarningModeSelectionSts 31A
+CDCFaceAuthentSts 356
+HudEngDistSwSts 3E9
+RRS_DTC1_HighByte 69F
+RRS_DTC1_MiddByte 69F
+RRS_DTC1_LowByte 69F
+RRS_DTC1_Status 69F
+RRS_DTC2_HighByte 69F
+RRS_DTC2_MiddByte 69F
+RRS_DTC2_LowByte 69F
+RRS_DTC2_Status 69F
+RRS_DTC1_HighByte 69F
+RRS_DTC1_MiddByte 69F
+RRS_DTC1_LowByte 69F
+RRS_DTC1_Status 69F
+RRS_DTC2_HighByte 69F
+RRS_DTC2_MiddByte 69F
+RRS_DTC2_LowByte 69F
+RRS_DTC2_Status 69F
+RRS_LRMDistance 2E0
+RRS_RRMDistance 2E0
+RRS_LRCDistance 2E0
+RRS_RRCDistance 2E0
+RRS_LFCDistance 2E0
+RRS_RFCDistance 2E0
+RRS_RFMDistance 2E0
+RRS_LFMDistance 2E0
+RRS_RFCRealDistance 2E0
+RRS_WarningFrequency 2E0
+RRS_FrontRadarActiveStatus 2E0
+RRS_WarningType 2E0
+RRS_ctrlModulErrFlag 2E0
+RRS_BattVoltErrFlag 2E0
+RRS_RRMidSnsErrFlag 2E0
+RRS_LRMidSnsErrFlag 2E0
+RRS_RRCSnsErrFlag 2E0
+RRS_LRCSnsErrFlag 2E0
+RRS_RFCSnsErrFlag 2E0
+RRS_LFCSnsErrFlag 2E0
+RRS_SpkErrFlag 2E0
+RRS_RFMSnsErrFlag 2E0
+RRS_LFMSnsErrFlag 2E0
+RRS_SystemFailureFlag 2E0
+RRS_SwitchIndicatorError 2E0
+LRM_Sector_Dist 2E1
+RRM_Sector_Dist 2E1
+LRC_Sector_Dist 2E1
+RRC_Sector_Dist 2E1
+LFC_Sector_Dist 2E1
+RFC_Sector_Dist 2E1
+LFM_Sector_Dist 2E1
+RFM_Sector_Dist 2E1
+ACC_FCWLatentWarning 244
+ADS_UDLCLeftStatus 312
+ADS_RoadSlopeShapeC3 36F
+ADS_RoadSlopeShapeC2 36F
+ADS_RoadSlopeShapeC1 36F
+ADS_RoadSlopeFlag 36F
+ADS_RoadMergeLatRange 36F
+ADS_RoadMergeFlag 36F
+ADS_RemoteRoadShapeC3 36F
+ADS_RemoteRoadShapeC2 36F
+ADS_RemoteRoadShapeC1 36F
+CdcDrvrModSetSts 2D2
+ACC_VehicleStartRemindSts 312
+ADS_UDLCRightStatus 312
+EspAutoHoldAvl 1C2
+CdcPowerOffVirtualButtonSts 2D2
+BcuDcOutDischrgSts 1E5
+BcuDcboxDcU 1E5
+BcuDcboxDcI 1E5
+BcuDcboxDischrgPwr 1E5
+CdcSmokeACStartReq 356
+AcChrgCnctrSts 1E5
+BcuBattHeatActv 1E5
+BcuBattI 1E5
+BcuBattSocUnderLamp 1E5
+BcuBattU 1E5
+BcuChrgMod 1E5
+BcuChrgSts 1E5
+BcuPwrBattErrLamp 1E5
+BcuTextDispReq 1E5
+BcuThermRunawaySts 1E5
+DcacOperSts 1E5
+DcChrgCnctrSts 1E5
+ItmsAutoDefrstDefogFctSts 1E5
+ObcChrgInpAcIL1 1E5
+ObcChrgInpAcIL2 1E5
+ObcChrgInpAcIL3 1E5
+ObcChrgInpAcUL1 1E5
+ObcChrgInpAcUL2 1E5
+ObcChrgInpAcUL3 1E5
+PduTextDispReq 1E5
+ReMotSpd 1E5
+ReMotSpdVld 1E5
+TmsAcSysErr 1E5
+TmsAcVentnOnMod 1E5
+TmsAirCleanStsRemind 1E5
+TmsAutowindSet1Sts 1E5
+TmsAutowindSet2Sts 1E5
+TmsAutWindWorkSts 1E5
+TmsCycMod 1E5
+TmsDrvrAutT 1E5
+TmsFrntBlowMod 1E5
+TmsFrntDefroster 1E5
+TmsFrntWindLvl 1E5
+TmsPassAutT 1E5
+TmsPlasmaSts 1E5
+TmsWorkSpaceSyncSts 1E5
+TmsFrAutSts 1E5
+ObcAcChrgMod 1E5
+BcuChrgTiDisp 1E5
+ITMSAirOutSwtSts1 1E5
+ITMSAirOutSwtSts2 1E5
+ITMSAirOutSwtSts3 1E5
+ITMSAirOutSwtSts4 1E5
+ITMSAirOutLatSetFb1 1E5
+ITMSAirOutLatSetFb2 1E5
+ITMSAirOutLatSetFb3 1E5
+ITMSAirOutLatSetFb4 1E5
+ITMSAirOutLgtSetFb1 1E5
+ITMSAirOutLgtSetFb2 1E5
+ITMSAirOutLgtSetFb3 1E5
+ITMSAirOutLgtSetFb4 1E5
+ITMSAirOutModFb 1E5
+TmsAirCleanAcoustWarn 1E5
+TmsAcEnvtlTVld 1E5
+TmsAcEnvtlT 1E5
+ItmsBacktWindLvlSet 1E5
+ItmsHotColdModFb 1E5
+BcuDrvHeatSetSts 1E5
+TmsFrntAutModOpenSetSts 1E5
+TmsAirQlyInCarLvl 1E5
+TmsAirQlyOutCarLvl 1E5
+TmsPm25InCarDens 1E5
+TmsPm25OutCarDens 1E5
+BcuBattTMin 1E5
+BcuOperMod 1E5
+BcuDboxCabCrrtMax 1E5
+VcuVehAvrgEgyCnseDrivingCyc 309
+BcuPlsHeatTiRem 1E5
+ITMSBackSeatAirOutSwtSts 1E5
+BcuBattPlsHeatgGearReq 1E5
+BCUBattPlsHeagStsFb 1E5
+CdcDrvgCycMilg 356
+CdcAftPwrSplyMilg 356
+VcuSmartEgyMagtActv 2A1
+CdcSurveillanceCamera 509
+CdcPathPlanPointPacketIndex 509
+CdcPathPlanPointPacketEnd 509
+CdcPathPlanPoint 509
+CdcCarFrontdirection 509
+CdcCarLon 509
+CdcCarLat 509
+CdcDirectPointLon 509
+CdcDirectPointLat 509
+CdcDirectPointType 509
+CdcIsIsInTheRoundabout 509
+CdcConfluxLon 509
+CdcConfluxLat 509
+RRC_RollingCounter_2A4 2A4
+SRS_CrashOut_Front 51
+SRS_CrashOut_Left 51
+SRS_CrashOut_Right 51
+SRS_CrashOut_Rear 51
+SRS_CrashOut_Micro 51
+SRS_CrashOut_Cedr 51
+LCDAR_RCTBEnable 2A4
+EpsFaild 2F3
+EpsSteerModFb 2F3
+IBBrkPedlModSts 2F3
+IbBrkPedlStsGb 2F3
+IbBrkPedlStsGbVld 2F3
+IbWrng 2F3
+EpsSasSteerAg 2F3
+EpsSasSteerAgVld 2F3
+ACC_Target1Detection 382
+ACC_Target1ID 382
+ACC_Target1Type 382
+ACC_Target1LngRange 382
+ACC_Target1LatRange 382
+ACC_Target1Direction 382
+ACC_Target1HeadingAngle 382
+ACC_Target1ZoneID 382
+ADS_AutoDriveState 307
+ACC_LLLaneDis 307
+ACC_RRLaneDis 307
+ACC_LLaneDistanceFus 307
+ACC_RLaneDistanceFus 307
+BcmEmgyLiSts 288
+SrsCrashOutpStsChks 50
+SrsCrashOutpSts 50
+EpbTextDispReq 2F3
+EpbTextDispReqBkp 1E5
+EpbSts 2F3
+EpbStsBkp 1E5
+EpbFctLamp 2F3
+EpbFctLampBkp 1E5
+EpbFailrLamp 2F3
+EpbFailrLampBkp 1E5
+RRS_LoudspeakersPosition 2E1
+EspVehSpdVld 522
+EspVehSpd 522
+VCUShiftPostionValid 522
+CDCTotMilg 522
+BcmPwrStsFb 522
+CDC_MediaVolSET 519
+CDC_SoundFieldSET 519
+CDC_TELBCALLVolSET 519
+CDC_TTSVRVolSET 519
+CDC_NAVIVolSET 519
+CDC_SoundEffectSET 519
+CDC_CustomEffectSET 519
+CDC_CustomTrebleSET 519
+CDC_CustomMidrangeSET 519
+CDC_CustomBassSET 519
+CDC_FRBalanceSET 519
+CDC_LRBalanceSET 529
+CDC_HeadSPKNIVISET 529
+CDC_HeadSPKTelSET 529
+CDC_HeadSPKMediaSET 529
+CDC_HeadSPKVolSET 529
+CDC_AlarmVolSET 529
+CDC_LRHeadSPKBalanceSET 529
+CDC_TouchVolSET 529
+CDC_SPKChannelSET 529
+CDC_MUTESET 529
+AMP_MediaVolSETStatus 52B
+AMP_SoundFieldSETStatus 52B
+AMP_TELBCALLVolSETStatus 52B
+AMP_TTSVRVolSETStatus 52B
+AMP_NAVIVolSETStatus 52B
+AMP_SoundEffectSETStatus 52B
+AMP_CustomEffectSETStatus 52B
+AMP_CustomTrebleSETStatus 52B
+AMP_CustomMidrangeSETStatus 52B
+AMP_CustomBassSETStatus 52B
+AMP_FRBalanceSETStatus 53B
+AMP_LRBalanceSETStatus 53B
+AMP_HeadSPKNIVISETStatus 53B
+AMP_HeadSPKTelSETStatus 53B
+AMP_HeadSPKMediaSETStatus 53B
+AMP_HeadSPKVolSETStatus 53B
+AMP_AlarmVolSETStatus 53B
+AMP_LRHeadSPKBalanceSETStatus 53B
+AMP_TouchVolSETStatus 53B
+AMP_SPKChannelSETStatus 53B
+AMP_MUTESETStatus 53B
+CDC_LFReq 529
+CDC_RFReq 529
+CDC_LRReq 529
+CDC_RRReq 529
+CDC_MediaSoundSourceStatus 529
+CDC_TELBcallEcallSoundSourceStatus 529
+CDC_VRSoundSourceStatus 529
+CDC_TouchSoundSourceStatus 529
+CDCHU_TTSSoundSourceStatus 529
+CDC_NAVISoundSourceStatus 529
+AMP_AllAlarmFailureStatus 53B
+AMP_WakeUp 423
+AMP_NotSleep 423
+BcuSocDisp 1E5
+DmsSmokeWinDownReq 356
+AMP_DTC1_HighByte 6C4
+AMP_DTC1_MiddByte 6C4
+AMP_DTC1_LowByte 6C4
+AMP_DTC1_Status 6C4
+AMP_DTC2_HighByte 6C4
+AMP_DTC2_MiddByte 6C4
+AMP_DTC2_LowByte 6C4
+AMP_DTC2_Status 6C4
+AMP_DTC1_HighByte 6C4
+AMP_DTC1_MiddByte 6C4
+AMP_DTC1_LowByte 6C4
+AMP_DTC1_Status 6C4
+AMP_DTC2_HighByte 6C4
+AMP_DTC2_MiddByte 6C4
+AMP_DTC2_LowByte 6C4
+AMP_DTC2_Status 6C4
+ACC_LaneEquationC1 382
+ACC_LaneEquationC2 382
+ACC_LaneEquationC3 382
+VCUGearShiftPositon 522
+CdcFireModSts 2D2
+CdcResiSocDisp 2F2
+BleLckAcsAllwdSts 3B5
+DsmDrvrHeatSts 3B5
+DsmPassHeatSts 3B5
+WLCMWirelsChrgnSts 3B5
+BleChrgPileCnctSetSts 3B5
+BCM_MirrLockSts 5F1
+BdcCourtesyPedSts 5F1
+ESP_AEBdecActive 2F3
+CdcCtrlTarAg 52C
+CdcStsSyncReq 52C
+CdcMotorScreenWakeup 52C
+MotorScreenAgFb 53C
+MotorScreenStsSyncReq 53C
+MotorScreenPrecisionCtrl 53C
+MotorScreenNegAgCtrl 53C
+MotorScreenPosAgCtrl 53C
+ADS_RoadLngRange 36F
+CdcLaneInfo 509
+EmsMilLamp 1E5
+EmsSvsLamp 1E5
+EmsGpfSt 1E5
+EmsEngTyp 1E5
+EmsFuCns 1E5
+EmsClrDiagcInfo 1E5
+EmsEngSts 1E5
+EmsCoolanTErr 1E5
+EmsEngCoolanT 1E5
+VcuEngineOilPressureLowSts 309
+VcuFuelLow 309
+VcuFuelLevelPercent 309
+VcuFuLeoverVld 309
+VcuFulLi 309
+VcuFuLeover 309
+VcuFuLeoverAD 309
+VcuDrvgCycFuCns 309
+VcuAftPwrSplyFuCns 309
+VcuLongTimeAvrgFuCns 309
+VcuTripAFuCns 309
+CdcEnyMagtModMEmsetSts 309
+CdcCurrentRoadCdn 356
+CdcCurrentWorkCdnLeftDst 356
+CdcCurrentWorkCdnLeftTi 356
+CdcFirstRoadCdn 356
+CdcFirstRoadCdnLen 356
+CdcFirstRoadCdnSlope 356
+CdcCurrentPosFirstRoadCdnDst 356
+CdcFirstRoadCdnAvrgSpd 356
+CdcFirstRoadCdnEstimdTi 356
+CdcCurrentPosFirstRoadCdnTi 356
+CdcSecRoadCdn 356
+CdcSecRoadCdnLen 356
+CdcSecRoadCdnSlope 356
+CdcSecRoadCdnAvrgSpd 356
+CdcSecRoadCdnEstimdTi 356
+CdcCurrentPosSecRoadCdnDst 356
+CdcCurrentPosSecRoadCdnTi 356
+CdcThrdRoadCdn 356
+CdcThrdRoadCdnLen 356
+CdcThrdRoadCdnSlope 356
+CdcThrdRoadCdnAvrgSpd 356
+CdcThrdRoadCdnEstimdTi 356
+CdcCurrentPosThrdRoadCdnDst 356
+CdcCurrentPosThrdRoadCdnTi 356
+CdcFirstRoadCdnCongstLvl 356
+CdcSecRoadCdnCongstLvl 356
+CdcThrdRoadCdnCongstLvl 356
+CdcSmokeOuterCircReq 356
+CdcMirrUpKeySts 37A
+CdcMirrDownKeySts 37A
+CdcMirrRiTurnKeySts 37A
+CdcMirrLeTurnKeySts 37A
+RmipuPlsHeatgSts 1E5
+HU_FrontRadarActive 552

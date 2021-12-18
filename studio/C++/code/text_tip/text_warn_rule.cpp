@@ -99,6 +99,7 @@ TimeChangeResult TextWarnRule::changed()
         }
         
         alreadyTime++;
+        info.alreadyTime = alreadyTime;
         if(info.isCancel && alreadyTime >= showMinTime())
         {
             removeFirst();

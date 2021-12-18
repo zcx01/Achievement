@@ -15,25 +15,25 @@ def SetCloseSpawn(s):
     global is_close_spawn
     is_close_spawn = s
 
-def keyStr(cmd, t=0.3):
+def keyStr(cmd, t=0.3,out=''):
     assert isinstance(cmd,str)
     global process
     global is_close_spawn
     if is_close_spawn and process != None:
         process.close()
         process=None
-        is_close_spawn = False
+    is_close_spawn = False
 
     if  process == None and len(getCommand(cmd,new_spawn)) !=0:
+        if len(shellCmds) !=0:
+            os.system('&&'.join(shellCmds))
+            shellCmds.clear()
         process = pexpect.spawn(cmd, encoding='utf-8', logfile=sys.stdout, timeout=300)
         return ''
 
     if process == None:
         shellCmds.append(cmd)
         return ''
-    elif len(shellCmds) !=0:
-        os.system('&&'.join(shellCmds))
-        shellCmds.clear()
     # if cmdStart in new_spawn and currentSpawn != cmdStart:
     #     currentSpawn = cmdStart
     #     if  process != None:
@@ -43,8 +43,10 @@ def keyStr(cmd, t=0.3):
     #         return
     #     except:
     #         process = pexpect.spawn("/bin/bash", encoding='utf-8', logfile=sys.stdout, timeout=300)
-
-    prompt=cmd_Outs.get(getCommand(cmd,cmd_Outs),'#')
+    if len(out) == 0:
+        prompt=cmd_Outs.get(getCommand(cmd,cmd_Outs),'#')
+    else:
+        prompt=out
     process.sendline(cmd)
 
     if len(prompt) != 0:

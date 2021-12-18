@@ -21,11 +21,13 @@ if __name__ == "__main__":
     print(files)
     for file in files:
         keyStr(f"cp {file} /var/log/dltlogs/",0)
-        keyStr(f"chmod 777 /var/log/dltlogs/{file}",0)
-    keyStr('exit')
-    keyStr('exit')
+        # keyStr(f"chmod 777 /var/log/dltlogs/{file}",0)
+        keyStr('exit',0,'bigsur')
+        keyStr(f'curl -u root:root -o /sdcard/{file} "ftp://192.168.1.1/var/log/dltlogs/{file}"')
+
     SetCloseSpawn(True)
     for file in files:
-        keyStr(f'adb pull /qlog/dltlogs/{file} ./')
+        # keyStr(f'adb pull /qlog/dltlogs/{file} ./')
+        keyStr(f'adb pull /sdcard/{file} ./')
 
     interact()

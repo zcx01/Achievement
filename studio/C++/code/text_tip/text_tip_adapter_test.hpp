@@ -14,6 +14,10 @@ private:
 
     void addWarn(std::string topic, int value);
 
+    void COUT_Topic();
+
+    void add_Test_Topic();
+
     bool is_one_finish = true;
 
     TextTipAdapter d;

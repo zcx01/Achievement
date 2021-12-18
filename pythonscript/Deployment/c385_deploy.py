@@ -2,30 +2,60 @@
 from os import system
 import time
 import sys
+import subprocess
 from execCmd import *
 import argparse
+from commonfun import *
 
 PrjectDir='changan_c835'
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/qnx_config/"
+jsConfig=getJScontent(pyFileDir+"config.json")
 
-
-def adbPush(proceesNames,excess):
+def adbPush(proceesNames,excess,argv):
     keyStr("adb shell")
     for proceesName in proceesNames:
         keyStr(f"curl -u root:root \"ftp://192.168.1.1/data/{proceesName}\" -T /sdcard/{proceesName}",0)
 
     keyStr("telnet cdc-qnx",1)
     keyStr("root")
-    if '-a' not in sys.argv:
+    if '-a' not in argv:
         for proceesName in proceesNames:
             keyStr(f"cp /data/{proceesName} /usr/bin/",0)
             keyStr(f"chmod +x /usr/bin/{proceesName}",0)
-    
+    else:
+        for proceesName in proceesNames:
+            keyStr(f"cp /data/{proceesName} {getKeyPath(proceesName,jsConfig)}",0)
     for cmd in excess:
         keyStr(cmd,0)
 
-    interact()
-    sys.exit()
+def copAbsolutePath(proceesNames):
+    if len(proceesNames) == 0:
+        exit() 
+    adbNames=[]
+    for proceesName in proceesNames:
+        keyStr(f"adb push {proceesName} /sdcard",0)
+        adbNames.append(os.path.basename(proceesName))
+    adbPush(adbNames,args.excess,['-a'])
 
+def copyStartfile(path,isWait):
+    SetCloseSpawn(True)
+    copAbsolutePath([path])
+    keyStr("reset")
+    SetCloseSpawn(True)
+    if isWait:
+        time.sleep(5)
+        for j in range(120):
+            adb_out = subprocess.getoutput("adb devices").split('\n')
+            if len(adb_out) >= 3:
+                if j >=3:
+                    time.sleep(20)
+                break
+            print(f"车机重启中...等待{j+1}秒")
+            time.sleep(1)
+
+def main(args,argv):
+    pass
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='部署C385程序')
@@ -33,34 +63,33 @@ if __name__ == "__main__":
     #这个是要解析 -f 后面的参数
     parser.add_argument('-c','--customfile',help='adb push custom file list',default=[], nargs='+',type=str)
     parser.add_argument('-a','--absolutePath',help='adb push absolute file list',default=[], nargs='+',type=str)
-    parser.add_argument('-k','--slm',help='slay slm',default=1)
     parser.add_argument('-q','--qnx',help='cp for qnx',nargs='*')
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
+    parser.add_argument('-r','--not',help='excess commad',nargs='*')
     args = parser.parse_args()
+    argv = sys.argv
+    main(args,sys.argv)
+    if '-a' in argv:
+        copAbsolutePath(args.absolutePath)
+        interact()
+        exit()
 
-    if "-c" in sys.argv :
+    if "-r" not in argv :
+        copyStartfile(f'{pyFileDir}not_apps/startup.sh',True)
+        
+    if "-c" in argv :
         proceesNames= args.customfile
         if len(proceesNames) == 0:
-            sys.exit()
-        for proceesName in proceesNames:
-            os.system(f'adb_qnx -k {proceesName}')
+            exit()
         keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts/ic")
 
         for proceesName in proceesNames:
             keyStr(f"adb push {proceesName}/{proceesName} /sdcard",0)
-        adbPush(proceesNames,args.excess)
+        adbPush(proceesNames,args.excess,argv)
+        copyStartfile(f'{pyFileDir}startup.sh',False)
+        exit()
 
-    if '-a' in sys.argv:
-        proceesNames= args.absolutePath
-        if len(proceesNames) == 0:
-            sys.exit() 
-        adbNames=[]
-        for proceesName in proceesNames:
-            keyStr(f"adb push {proceesName} /sdcard",0)
-            adbNames.append(os.path.basename(proceesName))
-        adbPush(adbNames,args.excess)
-
-    if "-q" not in sys.argv:
+    if "-q" not in argv:
         keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts")
         keyStr(f"adb push ic/ic_chime/ic_chime /sdcard",0)
         keyStr(f"adb push ic/ic_service/ic_service /sdcard",0)
@@ -96,12 +125,6 @@ if __name__ == "__main__":
 
         keyStr("telnet cdc-qnx",1)
         keyStr("root")
-        # keyStr("slay -f slm",2)
-        # slay_cmd = f"slay ic_service"
-        # slay_out = keyStr(slay_cmd)
-        # while 'slay:' not in slay_out:
-        #     keyStr(slay_cmd)
-        #     time.sleep(100)
 
     keyStr("cp /data/ic_chime /usr/bin/",0)
     keyStr("cp /data/ic_service /usr/bin/",0)
@@ -122,6 +145,7 @@ if __name__ == "__main__":
     keyStr("chmod +x /usr/bin/mcu_service",0)
     keyStr("chmod +x /usr/bin/ivi_compositor")
     keyStr("chmod +x /usr/bin/ic_telltale")
-    interact()
-    # keyStr("reset",0)
+
+    copyStartfile(f'{pyFileDir}startup.sh',False)
+   
 
