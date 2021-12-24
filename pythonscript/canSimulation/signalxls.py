@@ -90,7 +90,7 @@ class useCase(object):
                 print('值：修改上一个信号的发送值')
                 print('输入信号名:停止发送')
                 continue
-            cmd = cmd.split(" ")
+            cmd = re.findall(e_i,cmd,re.A)
             if isNumber(cmd[0]):
                 cmd.insert(0,preSig)
             if '-s' in cmd:
@@ -100,9 +100,9 @@ class useCase(object):
                 self.stopAllsig()
                 self.startSig(sendSig)
             elif len(cmd) == 1:
-                if  not dbc.sigExist(cmd[0]):
-                    print("输入的信号在dbc不存在")
-                    continue
+                # if  not dbc.sigExist(cmd[0]):
+                #     print("输入的信号在dbc不存在")
+                #     continue
                 self.sendSim.stop_task(cmd[0])
             elif len(cmd) % 2 == 0:
                 sigNames = {}
@@ -111,10 +111,11 @@ class useCase(object):
                 while(index < len(cmd)):
                     sigName = cmd[index]
                     sigValue = cmd[index+1]
-                    if  not dbc.sigExist(sigName):
-                        print("输入的信号在dbc不存在")
-                    elif not isNumber(sigValue):
+
+                    if not isNumber(sigValue):
                         print("输入信号值错误")
+                    # elif  not dbc.sigExist(sigName):
+                    #     print("输入的信号在dbc不存在")
                     else:
                         sigNames[sigName]=sigValue
                         preSig = sigName

@@ -85,13 +85,16 @@ void TextTipAdapter::addWarnInfo(std::string topic, int value)
             // auto falutMask = config.
         }
 
-        if(config.count(CONFIG_IMMEDIATELY))
+        if( WarnGrade::_from_string(grade.c_str())._to_index() == WarnGrade::W1)
+        {
+            info.immediately = true;
+        }
+        else if(config.count(CONFIG_IMMEDIATELY))
         {
             if (config[CONFIG_IMMEDIATELY].is_boolean())
             {
                 info.immediately = config[CONFIG_IMMEDIATELY].get<bool>();
             }
-
             else
             {
                 auto immediatelys = config[CONFIG_IMMEDIATELY].get<std::vector<int>>();

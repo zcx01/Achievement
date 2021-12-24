@@ -22,6 +22,6 @@ if __name__ == "__main__":
             if os.path.splitext(mcu_bin)[1] == '.bin':
                 mcu_bins.append( f'{dirpath}/{mcu_bin}')
     mcu_bin = ' '.join(mcu_bins)
-    os.system(f'python3 c385_deploy.py -a {mcu_bin} -e \'mcu_flasher -p /data/\' \'rm /data/*.bin\'')
+    os.system(f'python3 c385_deploy.py -a {mcu_bin} -e \'mcu_flasher -p /data/\' \'rm /data/*.bin\' \'mcu_tool -s\'')
     
 

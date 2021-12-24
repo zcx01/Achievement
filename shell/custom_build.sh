@@ -1,12 +1,11 @@
 #!/bin/bash
-
-repoPath="/home/chengxiongzhu/Works/Repos/changan_c835/"
+currentPath=$(cd `dirname ./`;pwd)
+# repoPath="/home/chengxiongzhu/Works/Repos/changan_c835/"
 
 # if [ $# -lt 2 ]; then
 #     repoPath="./"
 # fi
 
-cd $repoPath
 cd "build"
 index=0
 if [ $# -lt 1 ]; then
@@ -39,6 +38,6 @@ else
 fi
 make -j8
 make install
-cd $repoPath
+cd $currentPath
 cd "build_script"
 ./install_prebuilts.sh

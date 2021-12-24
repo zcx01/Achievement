@@ -16,6 +16,16 @@ class WriteDBCResult(Enum):
     WriteComplete=3     #写入完成
     NoMessage=4         #没有message
 
+class CompareResult(Enum):
+    No=0            #没有相同的地方
+    Bit=1           #字节相同
+    Name=2          #名字相同,包括message名称也相同
+    SigName=3       #仅仅信号名相同
+
+class SigSendType(Enum):
+    Normal = 0      #正常
+    Event  = 1      #时间
+    Three  = 2      #三帧反转
 class SigInfo(object):
     def __init__(self) :
         self.messageId = ""
@@ -33,14 +43,17 @@ class SigInfo(object):
         self.initValue=0#十进制
         self.invalidValue=0
         self.useBit=[]
+        self.sendType = SigSendType.Normal #发送的类型是事件还是周期 1表示事件 2 表示三帧反转
         #-------message--------
         self.Recevier=""
         self.Sender=""
-        self.cycle=0
+        self.cycle=0 
         #----------dbc中独有的------------
         self.Row=0
         self.initRow=0
         self.enumRow=0
+        self.sendTypeRow = 0
+        self.isdbcEnum = False #是否是dbc中的枚举，如果True枚举就是不转化
     
     def getMId(self):
         return int(self.messageId,16)
@@ -49,14 +62,19 @@ class SigInfo(object):
         return f' SG_ {self.name} : {self.startBit}|{self.length}@0{self.dataType} ({self.factor},{self.Offset}) [{self.min}|{self.max}] {self.Unit}  {self.Recevier}'
     
     def getEnum(self):
-        enumS = self.enum.replace("\n",':')
-        enumS = enumS.split(':')
-        enumStr = self.getEnumBylist(enumS)
-        if len(enumStr) == 0:
-            enumS=re.findall(e_i,self.enum,re.A)
+        if self.isdbcEnum:
+            if len(self.enum) != 0:
+                return f'VAL_ {self.getMId()} {self.name} {self.enum};'
+        else:
+            enumS = self.enum.replace("\n",':')
+            enumS = enumS.split(':')
             enumStr = self.getEnumBylist(enumS)
-        return enumStr
-
+            if len(enumStr) == 0:
+                enumS=re.findall(e_i,self.enum,re.A)
+                enumStr = self.getEnumBylist(enumS)
+            return enumStr
+        return ''
+        
     def getEnumBylist(self,enumS):
         try:
             enumStrA=[]
@@ -75,6 +93,9 @@ class SigInfo(object):
 
     def getStartValue(self):
         return f'BA_ \"GenSigStartValue\" SG_  {self.getMId()} {self.name} {self.initValue};'
+
+    def getSigSendType(self):
+        return f'BA_ \"GenSigSendType\" SG_  {self.getMId()} {self.name} {self.sendType.value};'
 
     def getMessage_Id(self):
         return f'{self.Sender}_{self.messageId}'
@@ -160,11 +181,11 @@ class SigInfo(object):
     def compare(self,other):
         assert isinstance(other,SigInfo)
         result=[]
-        isSame=False
+        isSame=CompareResult.No
         link=' --- '
         if self.startBit == other.startBit and self.endBit == other.endBit and self.messageId == other.messageId:
-            isSame = True
-            if self.name.replace(' ','') != other.name.replace(' ',''):
+            isSame = CompareResult.Bit
+            if self.name.replace(' ','').lower() != other.name.replace(' ','').lower():
                 result.append(f"信号名称:{other.name}{link}{self.name}")
             if self.dataType != other.dataType:
                 result.append(f'类型:{other.dataType}{link}{self.dataType}')
@@ -178,21 +199,24 @@ class SigInfo(object):
                 result.append(f'最大值:{other.max}{link}{self.max}')
             if self.initValue != other.initValue:
                 result.append(f'初始值:{other.initValue}{link}{self.initValue}')
+            if self.sendType != other.sendType:
+                result.append(f'类型:{other.sendType}{link}{self.sendType}')
             if self.cycle != other.cycle:
                 result.append(f'周期:{other.cycle}{link}{self.cycle}')
             # if len(result) != 0:
             #     result.insert(0,f'{other.name}和原来的{self.name}在同一个message{self.messageId},具体的差别如下:')
-        elif self.name == other.name:
-            isSame = True
-            # result.append(f"{self.name}信号名称和message相同,具体的差别如下:")
+        elif self.name+self.messageId == other.name+other.messageId:
+            isSame = CompareResult.Name
+            # result.append(f"{self.name}名称和message相同,具体的差别如下:")
             if  self.length != other.length:
                 result.append(f"长度:{other.length}{link}{self.length}")
             if self.endBit != other.endBit:
                 result.append(f"结束位:{other.endBit}{link}{self.endBit}")
             if self.messageId != other.messageId:
                 result.append(f"messageId:{other.messageId}{link}{self.messageId}")
-            # if len(result) != 0:
-            #     result.append(f"{self.name}信号名称相同,具体的差别如下:")
+        # elif self.name == other.name:
+        #     isSame = CompareResult.SigName
+        #     result.append(f"name:{self.name},message:{self.messageId} {other.messageId}")
         
         return isSame,result
 
@@ -202,17 +226,21 @@ class MessageInfo(object):
         self.messageId = 0
         self.sender=''
         self.cycle = 0
+        self.threeCycle = 0 #三帧反转的周期
         self.frame=0
         self.subNet=''
         self.Recevier=''
         self.lenght=0
+        self.sendType=0
         #---------dbc专有
         self.message_Id=''
         self.sigs=[]
         self.Row=-1
         self.cycleRow=0
         self.frameRow=0
+        self.sendTypeRow=0
         self.sigMaxRow=-1
+        self.threeCycleRow=0
 
     def getMessage_Id(self):
         if len(self.message_Id) !=0:
@@ -235,8 +263,19 @@ class MessageInfo(object):
     def getMessageCycle(self):
         return f'BA_ \"GenMsgCycleTime\" BO_ {self.getMId()} {self.cycle};'
 
+    def getMsgCycleTimeFast(self):
+        threeCycle = self.threeCycle
+        if threeCycle == 0:
+            threeCycle = self.cycle
+        if threeCycle !=0:
+            return f'BA_ \"GenMsgCycleTimeFast\" BO_ {self.getMId()} {threeCycle};'
+        return ''
+
     def getMessageVFrameFormat(self):
         return f'BA_ \"VFrameFormat\" BO_ {self.getMId()} {self.frame};'
+
+    def getMessageSendType(self):
+        return f'BA_ \"GenMsgSendType\" BO_ {self.getMId()} {self.sendType};'
 
     def CopyXls(self,other):
         assert isinstance(other,MessageInfo)
@@ -247,6 +286,8 @@ class MessageInfo(object):
         self.subNet= other.subNet
         self.Recevier= other.Recevier
         self.lenght= other.lenght
+        self.sendType = other.sendType
+        self.threeCycle = other.threeCycle
         
 
 class Analyze(object):
@@ -278,6 +319,7 @@ class Analyze(object):
                     if not isStart: isStart = True
                     try:
                         self.control = splitSpace(text.split(":")[1])
+                        self.maxSigRow = rowIndex
                     except:
                         pass
                 if not isStart: continue
@@ -314,6 +356,18 @@ class Analyze(object):
                     except:
                         # print(f'初始值 {text} 信号不在定义中')
                         pass
+                elif "GenSigSendType" in text:
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        sigName = texts[4]
+                        sigValue = int(texts[5])
+                        sig = self.dbcSigs[sigName]
+                        assert isinstance(sig,SigInfo)
+                        sig.sendType = sigValue
+                        sig.sendTypeRow = rowIndex
+                    except:
+                        # print(f'初始值 {text} 信号不在定义中')
+                        pass
                 elif "GenMsgCycleTime" in text:
                     try:
                         texts = re.findall(e_i,text,re.A)
@@ -322,6 +376,17 @@ class Analyze(object):
                         assert isinstance(me,MessageInfo)
                         me.cycle = int(texts[4])
                         me.cycleRow = rowIndex
+                    except:
+                        # print(f'周期 {text} 不在定义中')
+                        pass
+                elif "GenMsgCycleTimeFast" in text:
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        messageId = getNoOx16(texts[3])
+                        me = self.dbcMessage[messageId]
+                        assert isinstance(me,MessageInfo)
+                        me.threeCycle = int(texts[4])
+                        me.threeCycleRow = rowIndex
                     except:
                         # print(f'周期 {text} 不在定义中')
                         pass
@@ -336,6 +401,17 @@ class Analyze(object):
                     except:
                         # print(f'frame {text} 不在定义中')
                         pass
+                elif 'GenMsgSendType' in text:
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        messageId = getNoOx16(texts[3])
+                        me = self.dbcMessage[messageId]
+                        assert isinstance(me,MessageInfo)
+                        me.sendType = int(texts[4])
+                        me.sendTypeRow = rowIndex
+                    except:
+                        # print(f'frame {text} 不在定义中')
+                        pass
                 elif text.startswith('VAL_'):
                     try:
                         texts = re.findall(e_i,text,re.A)
@@ -344,6 +420,7 @@ class Analyze(object):
                         assert isinstance(sig,SigInfo)
                         try:
                             sig.enum = text.split(sigName)[1].strip()
+                            sig.isdbcEnum = True
                         except:
                             pass
                         sig.enumRow = rowIndex
@@ -437,16 +514,38 @@ class Analyze(object):
         sig.getEndBit()
         return sig
 
+    @staticmethod
+    def appendKey(linelist,key,defalut=-1):
+        assert isinstance(linelist,list)
+        linelistSize = len(linelist)
+        keys = re.findall(e_i,key,re.A)
+        for row in range(linelistSize):
+            lastStr = str(linelist[linelistSize-1-row])
+            if lastStr.startswith(keys[0]+' '):
+                lastStrs = re.findall(e_i,lastStr,re.A)
+                if len(lastStrs) >1 and lastStrs[1] == keys[1]:
+                    linelist.insert(linelistSize-row,key)
+                    return linelistSize-row+1
+        if defalut != -1:
+            linelist.insert(defalut,key)
+            return defalut+1
+        linelist.append(key)
+        return linelistSize+1
+
     def writeSig(self,sig,msg):
         assert isinstance(sig,SigInfo)
         assert isinstance(msg,MessageInfo)
         linelist=readFileLines(self.dbcPath)
         linelistSize=len(linelist)
         if sig.name in self.dbcSigs:
-            print(f"{sig.name}信号已经存在")
-            return WriteDBCResult.AlreadyExists
+            dbcSig = self.dbcSigs[sig.name]
+            assert isinstance(dbcSig,SigInfo)
+            if sig.messageId == dbcSig.messageId:
+                print(f"{sig.name}信号已经存在")
+                return WriteDBCResult.AlreadyExists
         try:
             dm = self.dbcMessage.get(sig.messageId)
+            assert isinstance(dm,MessageInfo)
             startRow = dm.Row+1
             insertRowIndex=-1
             try:
@@ -470,14 +569,9 @@ class Analyze(object):
                                 return WriteDBCResult.SignalCoverage
 
                 linelist.insert(insertRowIndex,sig.getSG())
-                for row in range(linelistSize):
-                    if "GenSigStartValue" in str(linelist[linelistSize-1-row]):
-                        linelist.insert(linelistSize-row,sig.getStartValue())
-                        break
-                #写入枚举
-                enumStr=sig.getEnum()
-                if len(enumStr) != 0:
-                    linelist.append(enumStr) 
+                insertRow = Analyze.appendKey(linelist,sig.getStartValue())
+                if sig.sendType != SigSendType.Normal:
+                    Analyze.appendKey(linelist,sig.getSigSendType(),insertRow)
  
                 #写入BU
                 if sig.Sender not in self.control:
@@ -487,6 +581,11 @@ class Analyze(object):
                             linelist[row]=linelist[row].replace(linelist[row],self.getBU())
                             break
                  
+                #写入枚举
+                enumStr=sig.getEnum()
+                if len(enumStr) != 0:
+                    linelist.append(enumStr) 
+
                 wirteFileDicts(self.dbcPath,linelist,False)
                 print(f"{sig.name} 写入完成")
             except Exception as e:
@@ -500,6 +599,21 @@ class Analyze(object):
             self.analy()
             self.writeSig(sig,msg)
         return WriteDBCResult.WriteComplete
+    
+    def repalceContent(self,linelist,row,content):
+        if len(content) != 0:
+            linelist[row] = content
+
+    def repalceSig(self,sigs):
+        linelist = readFileLines(self.dbcPath)
+        for sig in sigs:
+            assert isinstance(sig,SigInfo)
+            # linelist[sig.Row] = sig.getSG()
+            # linelist[sig.initRow] = sig.getStartValue()
+            # linelist[sig.sendTypeRow] = sig.getSigSendType()
+            self.repalceContent(linelist,sig.enumRow,sig.getEnum())
+            print(sig.name)
+        wirteFileDicts(self.dbcPath, linelist, False)
 
     def writeMessage(self,msg,linelist):
         assert isinstance(linelist,list)
@@ -508,16 +622,14 @@ class Analyze(object):
             return False
         linelist.insert(self.maxSigRow+1,"\n")
         linelist.insert(self.maxSigRow+2,msg.getMessageRowContent())
-        linelistSize=len(linelist)
-        for row in range(linelistSize):
-            if "GenMsgCycleTime" in str(linelist[linelistSize-1-row]):
-                linelist.insert(linelistSize-row,msg.getMessageCycle())
-                break
-
-        for row in range(linelistSize):
-            if "VFrameFormat" in str(linelist[linelistSize-1-row]):
-                linelist.insert(linelistSize-row,msg.getMessageVFrameFormat())
-                break
+        Analyze.appendKey(linelist,msg.getMessageVFrameFormat())
+        Analyze.appendKey(linelist,msg.getMessageSendType())
+        appCycleRow = -1
+        if msg.cycle != 0:
+            appCycleRow = Analyze.appendKey(linelist,msg.getMessageCycle())
+        msgCycleTimeFast = msg.getMsgCycleTimeFast()
+        if len(msgCycleTimeFast) != 0:
+            Analyze.appendKey(linelist,msgCycleTimeFast,appCycleRow)
         wirteFileDicts(self.dbcPath,linelist,False)
         return True
          
@@ -526,10 +638,28 @@ class Analyze(object):
         for msg in msgs:
             assert isinstance(msg,MessageInfo)
             linelist[msg.Row] = msg.getMessageRowContent()
-            linelist[msg.cycleRow] = msg.getMessageCycle()
             linelist[msg.frameRow] =  msg.getMessageVFrameFormat()
+            linelist[msg.sendTypeRow] = msg.getMessageSendType()
+            deleteRow = 1
+            if msg.cycle != 0:
+                linelist[msg.cycleRow] = msg.getMessageCycle()
+            elif msg.cycleRow !=0:
+                del linelist[msg.cycleRow]
+                deleteRow = msg.cycleRow
+
+            if msg.threeCycle != 0:
+                linelist[msg.threeCycleRow] = msg.getMsgCycleTimeFast()
+            elif msg.threeCycleRow !=0:
+                realDeleteRow = msg.threeCycleRow
+                if deleteRow < msg.threeCycleRow: realDeleteRow = realDeleteRow -1
+                del linelist[realDeleteRow]
+                deleteRow = realDeleteRow
+            
             # print(f'替换 {msg.messageId} {msg.Row} {msg.cycleRow} {msg.frameRow}')
         wirteFileDicts(self.dbcPath, linelist, False)
+
+
+
 
 
 

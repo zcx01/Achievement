@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import inspect
 import sys
 import os
 import xlrd
@@ -10,6 +11,8 @@ import argparse
 SETSTR='/Set'
 
 def sigExist(sheel,row,col,CallFun):
+    if type(col) == str:
+        col = ord(col) - ord('A')
     sig = str(getValue(CallFun,sheel,row,col))
     relation=''
     if ',' in sig:
@@ -43,7 +46,7 @@ def analyDefine(deContent,contents,spaceIndex):
                 defines.append(define)
                 topics.append(topic)
                 descs.append(desc)
-    if len(define) == 0:
+    if len(defines) == 0:
         print(f'没有找到 {contents} ')
     return defines,topics,descs
 
@@ -87,12 +90,12 @@ def getTopicByXls(CallFun,sheel,row):
         COLNUM=3
         while col < COLNUM:
             topic = CallFun(sheel,findRow,col)
+            assert isinstance(topic,str)
             if col == COLNUM-1 and len(topic) == 0:
                 break
             if len(topic) != 0:
                 #去除第一个topic中的/
-                if len(topics) == 0:
-                    topic = EesyStr.removeAt(topic,len(topic)-1)
+                topic = topic.replace('/','')
                 topics.append(topic)
                 findRow = row
                 col+=1
@@ -243,7 +246,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
         commentSet,comment =  getComments(CallFun,sheel,startRow)
         topicStrSet, topicStr = getTopicByXls(CallFun, sheel, startRow)
         className = getValue(CallFun,sheel,startRow,1)+ getValue(CallFun,sheel,startRow,2)
-        sig,isExist,relation = sigExist(sheel,startRow,7,CallFun)
+        sig,isExist,relation = sigExist(sheel,startRow,'M',CallFun)
         if isExist:
             rowContent=[]
             topicDefine = getDefineByFile(defineContents,topicStrSet)
@@ -257,7 +260,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
             print(rowContent)
             sh.append(rowContent)
 
-        sig,isExist,relation = sigExist(sheel,startRow,8,CallFun)
+        sig,isExist,relation = sigExist(sheel,startRow,'N',CallFun)
         if isExist:
             rowContent=[]
             topicDefine = getDefineByFile(defineContents,topicStr)

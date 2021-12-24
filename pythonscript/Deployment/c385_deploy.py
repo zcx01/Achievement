@@ -7,7 +7,7 @@ from execCmd import *
 import argparse
 from commonfun import *
 
-PrjectDir='changan_c835'
+# PrjectDir='changan_c835'
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/qnx_config/"
 jsConfig=getJScontent(pyFileDir+"config.json")
 
@@ -58,7 +58,7 @@ def main(args,argv):
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='部署C385程序')
+        description='部署C385程序,部署release c385_deploy -c ic_service -d bin -p changan_c835_release -r')
     
     #这个是要解析 -f 后面的参数
     parser.add_argument('-c','--customfile',help='adb push custom file list',default=[], nargs='+',type=str)
@@ -66,8 +66,11 @@ if __name__ == "__main__":
     parser.add_argument('-q','--qnx',help='cp for qnx',nargs='*')
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     parser.add_argument('-r','--not',help='excess commad',nargs='*')
+    parser.add_argument('-d','--dir',help='exe dir',default='',type=str)
+    parser.add_argument('-p','--PrjectDir',help='prject dir',default='changan_c835',type=str)
     args = parser.parse_args()
     argv = sys.argv
+    PrjectDir = args.PrjectDir
     main(args,sys.argv)
     if '-a' in argv:
         copAbsolutePath(args.absolutePath)
@@ -82,9 +85,12 @@ if __name__ == "__main__":
         if len(proceesNames) == 0:
             exit()
         keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts/ic")
-
+    
         for proceesName in proceesNames:
-            keyStr(f"adb push {proceesName}/{proceesName} /sdcard",0)
+            execbin=proceesName
+            if len(args.dir) != 0:
+                execbin = args.dir
+            keyStr(f"adb push {execbin}/{proceesName} /sdcard",0)
         adbPush(proceesNames,args.excess,argv)
         copyStartfile(f'{pyFileDir}startup.sh',False)
         exit()

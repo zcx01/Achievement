@@ -1,6 +1,7 @@
 # from typing import List
 import json
 import re
+import sys
 word=r"\b[a-zA-Z_]+\b"
 w_d=r'[a-zA-Z_]'
 in_i=r"-?\b[0x0-9]+\b"
@@ -89,7 +90,8 @@ def splitSpace(text):
 
 def getFullPath(path,jsConfig):
     # path=str(path)
-    if path.startswith("/"):
+    assert isinstance(path,str)
+    if path.startswith("/") or path.startswith("./") or path.startswith("../"):
         return path
     else:
         projectPath=jsConfig.get("projectPath","")
@@ -118,7 +120,6 @@ def eConverf(value):
         valueStrs = valueStr.split('e')
         if valueStrs[1].startswith('-'):
             digit = abs(int(valueStrs[1]))
-            digit += len(valueStrs[0])-2
             head='{:.%df}' % digit
             return head.format(value)
     return value

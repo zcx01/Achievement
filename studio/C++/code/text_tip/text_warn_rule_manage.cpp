@@ -35,7 +35,7 @@ bool TextWarnRuleManage::addWarnInfo(const std::string &grade, WarnInfo &info)
     {
         info.grade = rule->grade();
         bool status = rule->addWarnInfo(info);
-        if (status && (m_currentRule == nullptr || info.immediately))
+        if (status && (m_currentRule == nullptr || (info.immediately && !m_currentRule->getValue().immediately) ) )
         {
             setCurrentRule(rule);
         }

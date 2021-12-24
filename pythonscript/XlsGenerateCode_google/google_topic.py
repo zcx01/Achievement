@@ -15,7 +15,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
 SAMPLE_SPREADSHEET_ID = '1paIMJgPVcFIohJDAsrnRmFchWjxrkmeNhMOTGEm2F0Y'
-SAMPLE_RANGE_NAME = 'A:I'
+SAMPLE_RANGE_NAME = 'A:Z'
 
 
 def getShellValueDrive():
