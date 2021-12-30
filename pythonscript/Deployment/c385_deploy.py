@@ -10,30 +10,29 @@ from commonfun import *
 # PrjectDir='changan_c835'
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/qnx_config/"
 jsConfig=getJScontent(pyFileDir+"config.json")
+androidQnx=AndroidQnx()
 
 def adbPush(proceesNames,excess,argv):
-    keyStr("adb shell")
-    for proceesName in proceesNames:
-        keyStr(f"curl -u root:root \"ftp://192.168.1.1/data/{proceesName}\" -T /sdcard/{proceesName}",0)
-
     keyStr("telnet cdc-qnx",1)
     keyStr("root")
+    fileDict={}
     if '-a' not in argv:
         for proceesName in proceesNames:
-            keyStr(f"cp /data/{proceesName} /usr/bin/",0)
-            keyStr(f"chmod +x /usr/bin/{proceesName}",0)
+            fileDict[proceesName] = "/usr/bin/"
+        androidQnx.qnx_cp(fileDict,True)
     else:
         for proceesName in proceesNames:
-            keyStr(f"cp /data/{proceesName} {getKeyPath(proceesName,jsConfig)}",0)
+            fileDict[proceesName] = getKeyPath(proceesName,jsConfig)
+        androidQnx.qnx_cp(fileDict,False)
     for cmd in excess:
         keyStr(cmd,0)
 
 def copAbsolutePath(proceesNames):
     if len(proceesNames) == 0:
         exit() 
+    androidQnx.pc_android_qnx(proceesNames)
     adbNames=[]
     for proceesName in proceesNames:
-        keyStr(f"adb push {proceesName} /sdcard",0)
         adbNames.append(os.path.basename(proceesName))
     adbPush(adbNames,args.excess,['-a'])
 
@@ -71,6 +70,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     argv = sys.argv
     PrjectDir = args.PrjectDir
+    keyStr('adb root')
     main(args,sys.argv)
     if '-a' in argv:
         copAbsolutePath(args.absolutePath)
@@ -78,79 +78,68 @@ if __name__ == "__main__":
         exit()
 
     if "-r" not in argv :
-        copyStartfile(f'{pyFileDir}not_apps/startup.sh',True)
+        copyStartfile(f'{pyFileDir}/dev1.1/not_apps/startup.sh',True)
         
+    keyStr('adb root')
     if "-c" in argv :
         proceesNames= args.customfile
         if len(proceesNames) == 0:
             exit()
         keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts/ic")
-    
+
+        exe_proceesNames=[]
         for proceesName in proceesNames:
             execbin=proceesName
             if len(args.dir) != 0:
                 execbin = args.dir
-            keyStr(f"adb push {execbin}/{proceesName} /sdcard",0)
+            exe_proceesNames.append(f'{execbin}/{proceesName}')
+        androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
-        copyStartfile(f'{pyFileDir}startup.sh',False)
+        copyStartfile(f'{pyFileDir}/dev1.1/startup.sh',False)
         exit()
 
     if "-q" not in argv:
+        
         keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts")
-        keyStr(f"adb push ic/ic_chime/ic_chime /sdcard",0)
-        keyStr(f"adb push ic/ic_service/ic_service /sdcard",0)
-        keyStr(f"adb push ic/mcu_service/mcu_service  /sdcard",0)
-        keyStr(f"adb push ic/lib/lib_base.so  /sdcard",0)
-        keyStr(f"adb push ic/lib/lib_mega_ipc.so  /sdcard",0)
-        keyStr(f"adb push ic/qt/bin/ivi_compositor  /sdcard",0)
-        keyStr(f"adb push ic/qt/bin/ic_telltale  /sdcard",0)
-        keyStr(f"adb push ic/qt/qml/MegaIC/libmega_ic_plugin.so  /sdcard",0)
-        keyStr(f"adb push ic/qt/qml/Resources/libresources_plugin.so  /sdcard",0)
+        androidQnx.pc_android_qnx([
+        "ic/ic_chime/ic_chime",
+        "ic/ic_service/ic_service",
+        "ic/mcu_service/mcu_service ",
+        "ic/lib/lib_base.so ",
+        "ic/lib/lib_mega_ipc.so ",
+        "ic/qt/bin/ivi_compositor ",
+        "ic/qt/bin/ic_telltale ",
+        "ic/qt/qml/MegaIC/libmega_ic_plugin.so ",
+        "ic/qt/qml/Resources/libresources_plugin.so ",
 
-        keyStr(f"adb push ic/qt/config/screen_layout_config.json /sdcard",0)
-        keyStr(f"adb push ic/qt/config/icadas_config.json /sdcard",0)
-        keyStr(f"adb push ic/qt/config/icscreencast_config.json /sdcard",0)
-        keyStr(f"adb push ic/qt/config/ictelltale_config.json /sdcard",0)
-        keyStr(f"adb push ic/qt/config/icwarning_config.json /sdcard",0)
+        "ic/qt/config/screen_layout_config.json",
+        "ic/qt/config/icadas_config.json",
+        "ic/qt/config/icscreencast_config.json",
+        "ic/qt/config/ictelltale_config.json",
+        "ic/qt/config/icwarning_config.json"])
 
-        keyStr("adb shell")
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/ic_chime\" -T /sdcard/ic_chime",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/ic_service\" -T /sdcard/ic_service",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/mcu_service\" -T /sdcard/mcu_service",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/lib_base.so\" -T /sdcard/lib_base.so",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/lib_mega_ipc.so\" -T /sdcard/lib_mega_ipc.so",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/ivi_compositor\" -T /sdcard/ivi_compositor",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/ic_telltale\" -T /sdcard/ic_telltale",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/libmega_ic_plugin.so\" -T /sdcard/libmega_ic_plugin.so",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/libresources_plugin.so\" -T /sdcard/libresources_plugin.so",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/screen_layout_config.json\" -T /sdcard/screen_layout_config.json",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/icadas_config.json\" -T /sdcard/icadas_config.json",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/icscreencast_config.json\" -T /sdcard/icscreencast_config.json",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/ictelltale_config.json\" -T /sdcard/ictelltale_config.json",0)
-        keyStr("curl -u root:root \"ftp://192.168.1.1/data/icwarning_config.json\" -T /sdcard/icwarning_config.json",0)
-
-        keyStr("telnet cdc-qnx",1)
+        keyStr("telnet cdc-qnx")
         keyStr("root")
 
-    keyStr("cp /data/ic_chime /usr/bin/",0)
-    keyStr("cp /data/ic_service /usr/bin/",0)
-    keyStr("cp /data/mcu_service /usr/bin/",0)
-    keyStr("cp /data/lib_base.so /usr/lib64/",0)
-    keyStr("cp /data/lib_mega_ipc.so /usr/lib64/",0)
-    keyStr("cp /data/ivi_compositor /usr/bin/ivi_compositor",0)
-    keyStr("cp /data/ic_telltale /usr/bin/ic_telltale",0)
-    keyStr("cp /data/libmega_ic_plugin.so /opt/qt/qml/MegaIC/libmega_ic_plugin.so",0)
-    keyStr("cp /data/libresources_plugin.so /opt/qt/qml/Resources/libresources_plugin.so",0)
-    keyStr("cp /data/screen_layout_config.json /opt/qt/config",0)
-    keyStr("cp /data/icadas_config.json /opt/qt/config",0)
-    keyStr("cp /data/icscreencast_config.json /opt/qt/config",0)
-    keyStr("cp /data/ictelltale_config.json /opt/qt/config",0)
-    keyStr("cp /data/icwarning_config.json /opt/qt/config",0)
-    keyStr("chmod +x /usr/bin/ic_chime",0)
-    keyStr("chmod +x /usr/bin/ic_service",0)
-    keyStr("chmod +x /usr/bin/mcu_service",0)
-    keyStr("chmod +x /usr/bin/ivi_compositor")
-    keyStr("chmod +x /usr/bin/ic_telltale")
+    fileDict={}
+    fileDict['ic_chime']='/usr/bin/'
+    fileDict['ic_service']='/usr/bin/'
+    fileDict['mcu_service']='/usr/bin/'
+    fileDict['ivi_compositor'] = '/usr/bin/ivi_compositor'
+    fileDict['ic_telltale'] = '/usr/bin/ic_telltale'
+    androidQnx.qnx_cp(fileDict,True)
+
+    fileDict.clear()
+    fileDict['lib_base.so']='/usr/lib64/'
+    fileDict['lib_mega_ipc.so']='/usr/lib64/'
+    fileDict['libmega_ic_plugin.so']='/opt/qt/qml/MegaIC/libmega_ic_plugin.so'
+    fileDict['libresources_plugin.so']='/opt/qt/qml/Resources/libresources_plugin.so'
+    fileDict['screen_layout_config.json']='/opt/qt/config'
+    fileDict['icadas_config.json']='/opt/qt/config'
+    fileDict['icscreencast_config.json']='/opt/qt/config'
+    fileDict['ictelltale_config.json']='/opt/qt/config'
+    fileDict['icwarning_config.json']='/opt/qt/config'
+    androidQnx.qnx_cp(fileDict,False)
 
     copyStartfile(f'{pyFileDir}startup.sh',False)
    

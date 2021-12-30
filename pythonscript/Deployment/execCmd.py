@@ -2,6 +2,7 @@
 import time
 import sys
 import os
+from typing import Dict
 import pexpect
 
 
@@ -34,15 +35,6 @@ def keyStr(cmd, t=0.3,out=''):
     if process == None:
         shellCmds.append(cmd)
         return ''
-    # if cmdStart in new_spawn and currentSpawn != cmdStart:
-    #     currentSpawn = cmdStart
-    #     if  process != None:
-    #         process.close()
-    #     try:
-    #         process = pexpect.spawn(cmd, encoding='utf-8', logfile=sys.stdout, timeout=300)
-    #         return
-    #     except:
-    #         process = pexpect.spawn("/bin/bash", encoding='utf-8', logfile=sys.stdout, timeout=300)
     if len(out) == 0:
         prompt=cmd_Outs.get(getCommand(cmd,cmd_Outs),'#')
     else:
@@ -81,3 +73,26 @@ is_ssh = "-s" in sys.argv
 if is_ssh:
     keyStr("ssh chengxiongzhu@10.25.11.197")
     keyStr("123456")
+
+class AndroidQnx(object):
+    def __init__(self):
+        super().__init__()
+        self.androidDir = "/data"
+        self.android_qnxDir = "/ota"
+        self.qnxDir = "/ota/android"
+    
+    def pc_android_qnx(self,filePaths):
+        fileNames=[]
+        for path in filePaths:
+            keyStr(f'adb push {path} {self.androidDir}')
+            fileNames .append(os.path.basename(path))
+
+        keyStr('adb shell')
+        for fileName in fileNames:
+            keyStr(f'cp {self.androidDir}/{fileName} {self.android_qnxDir}',0,"#")
+
+    def qnx_cp(self,fileDict,chmod):
+        for file in fileDict:
+            keyStr(f"cp {self.qnxDir}/{file} {fileDict[file]}")
+            if chmod:
+                keyStr(f"chmod +x {fileDict[file]}/{file}",0)

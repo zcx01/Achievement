@@ -2,20 +2,22 @@
 import json
 import re
 import sys
-word=r"\b[a-zA-Z_]+\b"
+word=r"\b[a-zA-Z]+\b"
 w_d=r'[a-zA-Z_]'
 in_i=r"-?\b[0x0-9]+\b"
 i_i=r"-?[0x0-9]"
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"
 d_t=r"\bIPC_\S+\b"
 s_i = r"CANSIG_.*_g"
+s_i_e = r"CANSIG.\w+" 
+m_s = r"[a-zA-Z0x0-9]+"
 
 def sendMqtt(topic,value):
     topic=str(topic).replace(r'"','')
-    return f'mosquitto_pub -h cdc-qnx -t  \'{topic}\'  -m \''+'{'+f'\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":{value}'+'}\''
+    return f'on -T ic_apps_t -u ic_apps mega_ipc_pub -t  \'{topic}\'  -m \''+'{'+f'\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":{value}'+'}\''
 
 def subMqtt(topic):
-    return f'mosquitto_sub -h cdc-qnx -v -t {topic}'
+    return f'on -T ic_apps_t -u ic_apps mega_ipc_sub -t {topic}'
     
 class EesyStr():
     @staticmethod
@@ -72,6 +74,15 @@ def wirteFileDicts(file,data,replace=True):
 def readFileLines(file):
     with open(file, "r") as cr:
         return cr.read().splitlines()
+
+def writeFileAll(file,data):
+    cr = open(file, "w")
+    cr.write(data)
+    cr.close()
+
+def readFileAll(file):
+    with open(file, "r") as cr:
+        return cr.read()
 
 def getValueByIndex(names,index,defaultValue=""):
     try:
@@ -137,6 +148,7 @@ def behindStr(lines,behind,content):
     if content not in behinds:
         lines.insert(row,content)
 
+#
 def getNoOx16(text):
     content = str(text)
     if content.startswith('0x'):

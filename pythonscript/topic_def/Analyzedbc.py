@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import enum
 import sys
 import os
 import re
@@ -54,7 +55,14 @@ class SigInfo(object):
         self.enumRow=0
         self.sendTypeRow = 0
         self.isdbcEnum = False #是否是dbc中的枚举，如果True枚举就是不转化
+        #----------can矩阵独有------------
+        self.chineseName=''
     
+    def SetUnit(self,value):
+        if value == r"/" or len(value) == 0:
+            self.Unit = "\"\""
+        self.Unit = f'\"{value}\"'
+
     def getMId(self):
         return int(self.messageId,16)
 
@@ -64,7 +72,7 @@ class SigInfo(object):
     def getEnum(self):
         if self.isdbcEnum:
             if len(self.enum) != 0:
-                return f'VAL_ {self.getMId()} {self.name} {self.enum};'
+                return f'VAL_ {self.getMId()} {self.name} {self.enum}'
         else:
             enumS = self.enum.replace("\n",':')
             enumS = enumS.split(':')
@@ -277,25 +285,12 @@ class MessageInfo(object):
     def getMessageSendType(self):
         return f'BA_ \"GenMsgSendType\" BO_ {self.getMId()} {self.sendType};'
 
-    def CopyXls(self,other):
-        assert isinstance(other,MessageInfo)
-        self.messageId = other.messageId
-        self.sender= other.sender
-        self.cycle =  other.cycle
-        self.frame=  other.frame
-        self.subNet= other.subNet
-        self.Recevier= other.Recevier
-        self.lenght= other.lenght
-        self.sendType = other.sendType
-        self.threeCycle = other.threeCycle
-        
-
 class Analyze(object):
     def __init__(self,dbc_file=None) :
         if len(dbc_file) ==0:
             return
-        self.dbcSigs={}
-        self.dbcMessage={}
+        self.dbcSigs={} #以 十进制ID+名称 为key
+        self.dbcMessage={} # 以 十六进制ID 为key
         self.dbcPath=dbc_file
         self.maxSigRow=0
         self.control=[]
@@ -337,7 +332,7 @@ class Analyze(object):
                     ds.Sender = currentdbcMessage.sender
                     ds.messageId = currentdbcMessage.messageId
                     ds.Row=rowIndex
-                    self.dbcSigs[ds.name] = ds
+                    self.dbcSigs[str(ds.getMId())+ds.name] = ds
                     self.maxSigRow = rowIndex
                     try: 
                         currentdbcMessage.sigMaxRow = rowIndex+1
@@ -347,9 +342,10 @@ class Analyze(object):
                 elif "GenSigStartValue" in text:
                     try:
                         texts = re.findall(e_i,text,re.A)
+                        messageIdS = texts[3]
                         sigName = texts[4]
                         sigValue = int(texts[5])
-                        sig = self.dbcSigs[sigName]
+                        sig = self.dbcSigs[messageIdS+sigName]
                         assert isinstance(sig,SigInfo)
                         sig.initValue = sigValue
                         sig.initRow = rowIndex
@@ -359,11 +355,12 @@ class Analyze(object):
                 elif "GenSigSendType" in text:
                     try:
                         texts = re.findall(e_i,text,re.A)
+                        messageIdS = texts[3]
                         sigName = texts[4]
                         sigValue = int(texts[5])
-                        sig = self.dbcSigs[sigName]
+                        sig = self.dbcSigs[messageIdS+sigName]
                         assert isinstance(sig,SigInfo)
-                        sig.sendType = sigValue
+                        sig.sendType = SigSendType(sigValue)
                         sig.sendTypeRow = rowIndex
                     except:
                         # print(f'初始值 {text} 信号不在定义中')
@@ -415,8 +412,9 @@ class Analyze(object):
                 elif text.startswith('VAL_'):
                     try:
                         texts = re.findall(e_i,text,re.A)
+                        messageIdS = texts[1]
                         sigName = texts[2]
-                        sig = self.dbcSigs[sigName]
+                        sig = self.dbcSigs[messageIdS+sigName]
                         assert isinstance(sig,SigInfo)
                         try:
                             sig.enum = text.split(sigName)[1].strip()
@@ -427,13 +425,23 @@ class Analyze(object):
                     except:
                         print(f'枚举值 {text} 信号不在定义中')
                         pass
+    
+    def getSig(self,sigName):
+        if sigName in self.dbcSigs:
+            return self.dbcSigs[sigName]
+        for messageSig in self.dbcSigs:
+            sig = self.dbcSigs[messageSig]
+            assert isinstance(sig,SigInfo)
+            if sig.name == sigName or sig.getMessage_Sig() == sigName:
+                return sig
+        return None
 
     def sigExist(self,sigName):
-        return sigName in self.dbcSigs
+        return self.getSig(sigName) != None
 
     def sender(self,sigName):
         try:
-            sig = self.dbcSigs[sigName]
+            sig = self.getSig(sigName)
             assert isinstance(sig,SigInfo)
             return sig.Sender 
         except:
@@ -441,7 +449,7 @@ class Analyze(object):
 
     def getMessage_Id_BySig(self,sigName):
         try:
-            sig = self.dbcSigs[sigName]
+            sig = self.getSig(sigName)
             assert isinstance(sig,SigInfo)
             return sig.getMessage_Id()
         except:
@@ -451,7 +459,7 @@ class Analyze(object):
 
     def getMessage_Id_Sig(self,sigName):
         try:
-            sig = self.dbcSigs[sigName]
+            sig = self.getSig(sigName)
             assert isinstance(sig,SigInfo)
             return sig.getMessage_Sig()
         except:
@@ -460,7 +468,7 @@ class Analyze(object):
     def getSigDataType(self,sigName):
         dataTypeStr=""
         try:
-            sig = self.dbcSigs.get(sigName)
+            sig = self.getSig(sigName)
             assert isinstance(sig,SigInfo)
             dayaType = sig.dataType
             if dayaType == '-':
@@ -496,6 +504,7 @@ class Analyze(object):
     @staticmethod
     def analySG(text):
         sig=SigInfo()
+        assert isinstance(text,str)
         signals=re.findall(e_i,text,re.A)
         if signals== None:
             return sig
@@ -509,6 +518,10 @@ class Analyze(object):
                 sig.dataType = '-'
             sig.min=signals[7]
             sig.max=signals[8]
+            
+            texts = text.split(r'"')
+            sig.SetUnit(texts[1])
+            sig.Recevier = texts[2].strip()
         except:
             pass
         sig.getEndBit()
@@ -537,12 +550,9 @@ class Analyze(object):
         assert isinstance(msg,MessageInfo)
         linelist=readFileLines(self.dbcPath)
         linelistSize=len(linelist)
-        if sig.name in self.dbcSigs:
-            dbcSig = self.dbcSigs[sig.name]
-            assert isinstance(dbcSig,SigInfo)
-            if sig.messageId == dbcSig.messageId:
-                print(f"{sig.name}信号已经存在")
-                return WriteDBCResult.AlreadyExists
+        if str(sig.getMId())+sig.name in self.dbcSigs:
+            print(f"{sig.name}信号已经存在")
+            return WriteDBCResult.AlreadyExists
         try:
             dm = self.dbcMessage.get(sig.messageId)
             assert isinstance(dm,MessageInfo)
@@ -559,14 +569,14 @@ class Analyze(object):
 
                 if insertRowIndex == -1:
                     insertRowIndex = dm.sigMaxRow
-                else:
-                    #判断信号是否合理
-                    sigUsrIndexs=sig.useBit
-                    for user in userIndex:
-                        for sigUsrIndex in sigUsrIndexs:
-                            if sigUsrIndex in userIndex[user]:
-                                print(f"{sig.name} 信号有覆盖:开始字节{sig.startBit},结束的字节{sig.endBit}，占用的字节{sigUsrIndexs},与{user}覆盖字节")
-                                return WriteDBCResult.SignalCoverage
+              
+                #判断信号是否合理
+                sigUsrIndexs=sig.useBit
+                for user in userIndex:
+                    for sigUsrIndex in sigUsrIndexs:
+                        if sigUsrIndex in userIndex[user]:
+                            print(f"{sig.name} 信号有覆盖:开始字节{sig.startBit},结束的字节{sig.endBit}，占用的字节{sigUsrIndexs},与{user}覆盖字节 {userIndex[user]}")
+                            return WriteDBCResult.SignalCoverage
 
                 linelist.insert(insertRowIndex,sig.getSG())
                 insertRow = Analyze.appendKey(linelist,sig.getStartValue())
@@ -604,15 +614,20 @@ class Analyze(object):
         if len(content) != 0:
             linelist[row] = content
 
-    def repalceSig(self,sigs):
+    def repalceSigEnum(self,sigs):
         linelist = readFileLines(self.dbcPath)
         for sig in sigs:
             assert isinstance(sig,SigInfo)
             # linelist[sig.Row] = sig.getSG()
             # linelist[sig.initRow] = sig.getStartValue()
             # linelist[sig.sendTypeRow] = sig.getSigSendType()
-            self.repalceContent(linelist,sig.enumRow,sig.getEnum())
-            print(sig.name)
+            enumStr = sig.getEnum()
+            if len(enumStr) !=0:
+                if sig.enumRow == 0:
+                    linelist.append(enumStr)
+                else:
+                    linelist[sig.enumRow] = enumStr
+            print(sig.name,'-------',enumStr)
         wirteFileDicts(self.dbcPath, linelist, False)
 
     def writeMessage(self,msg,linelist):

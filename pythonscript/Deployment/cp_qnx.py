@@ -10,6 +10,7 @@ if __name__ == "__main__":
     parser.add_argument('-p','--path',help='文件路径',default='/var/log')
     parser.add_argument('-f','--fileNames',help='文件名',nargs='+',default=['ic_service.core'])  
     args = parser.parse_args()
+    keyStr('adb root')
     keyStr('adb shell')
     keyStr("telnet cdc-qnx",1)
     keyStr("root")
@@ -21,13 +22,10 @@ if __name__ == "__main__":
     print(files)
     for file in files:
         keyStr(f"cp {file} /var/log/dltlogs/",0)
-        # keyStr(f"chmod 777 /var/log/dltlogs/{file}",0)
-        keyStr('exit',0,'bigsur')
-        keyStr(f'curl -u root:root -o /sdcard/{file} "ftp://192.168.1.1/var/log/dltlogs/{file}"')
+        keyStr(f"chmod 777 /var/log/dltlogs/{file}",0)
 
     SetCloseSpawn(True)
     for file in files:
-        # keyStr(f'adb pull /qlog/dltlogs/{file} ./')
-        keyStr(f'adb pull /sdcard/{file} ./')
+        keyStr(f'adb pull /qlog/dltlogs/{file} ./')
 
     interact()
