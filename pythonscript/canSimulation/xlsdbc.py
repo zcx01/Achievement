@@ -51,7 +51,7 @@ def getSigInfo(sheel, row):
     temps = re.findall(e_i,temp,re.A)
     sig.name = "_".join(temps)
     sig.chineseName = str(getValue(sheel, row, 3))
-    sig.messageId = getNoOx16(str(getValue(sheel, row, 4)).split(".")[0])
+    sig.messageId = str(getValue(sheel, row, 4)).split(".")[0].replace('0x', '')
     sig.cycle = getValueInt(sheel, row, 5)
     if sig.cycle == 0:  # 没有周期，就解析为0
         sig.sendType = SigSendType.Event
@@ -149,6 +149,7 @@ def conversion(configPath, wirteSigName, canmatrix=""):
     print(canmatrix)
 
     dbcfile = getKeyPath("dbcfile", jsConfig)
+    print(dbcfile)
     book = xlrd.open_workbook(canmatrix)
     assert isinstance(book, Book)
 

@@ -230,8 +230,16 @@ def getTopicAndDefineBySig(sigName):
 
 
 def generate(sheel,startRow,endRow,down,up,CallFun,rows):
-    startRow-=1
-    endRow-=1
+    if startRow == 0:
+        endRow = rows
+    else:
+        startRow-=1
+
+    if endRow == -1:
+        endRow = startRow
+    else:
+        endRow-=1
+
     if startRow >= rows or endRow >= rows or startRow > endRow:
         print('输入的行号不合法')
         return
@@ -286,9 +294,9 @@ if __name__ == "__main__":
     parse = argparse.ArgumentParser(description='这个是通过topic表格生成生成newSig表格')
     parse.add_argument('-d','--down',help='下行信号的类型',default="vehctrl")
     parse.add_argument('-u','--up',help='上行信号的类型',default="vehctrl_status")
-    parse.add_argument('-x','--xlsPath',help='topic表格路径')
-    parse.add_argument('-s','--startRow',help='开始的行号',type=int)
-    parse.add_argument('-e','--endRow',help='结束的行号',type=int)
+    parse.add_argument('-x','--xlsPath',help='topic表格路径',default='/home/chengxiongzhu/Works/newsig/topic.xls')
+    parse.add_argument('-s','--startRow',help='开始的行号',type=int,default=0)
+    parse.add_argument('-e','--endRow',help='结束的行号',type=int,default=-1)
     parse.add_argument('-f','--findSigName',help='信号名称',type=str)
     arg = parse.parse_args()
     if '-f' in sys.argv:

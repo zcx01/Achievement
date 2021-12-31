@@ -13,8 +13,9 @@ if __name__ == "__main__":
     parser.add_argument('-r','--reset',help='reset -f',nargs='*')
     parser.add_argument('-m','--subtopic',help='su btopic',nargs='*',default=[])
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
-    parser.add_argument('-k','--slay', help='slay process',default=str,nargs='*')
-    parser.add_argument('-l','--log', help='taif log',default=str,)
+    parser.add_argument('-k','--slay', help='slay process',type=str,nargs='*')
+    parser.add_argument('-l','--log', help='taif log',type=str)
+    parser.add_argument('-i','--interact', help='interact',default=1,type=int)
     args = parser.parse_args()
 
     for j in range(120):
@@ -30,7 +31,8 @@ if __name__ == "__main__":
     keyStr("telnet cdc-qnx")
     keyStr("root")
 
-    isExit = False
+    isExit = (args.interact == 0)
+
     if "-m" in sys.argv:
         keyStr("mosquitto_sub -h cdc-qnx -v -t \"#\" ")
 
@@ -61,7 +63,9 @@ if __name__ == "__main__":
 
     if '-e' in sys.argv:
         for cmd in args.excess:
-            keyStr(cmd,0)
+            print(args.excess)
+            out = keyStr(cmd)
+            print('excess out:\n',out)
 
     if not isExit:
         interact()

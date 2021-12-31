@@ -8,8 +8,9 @@ import argparse
 from commonfun import *
 
 # PrjectDir='changan_c835'
-pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/qnx_config/"
-jsConfig=getJScontent(pyFileDir+"config.json")
+pyFileDir = os.path.dirname(os.path.abspath(__file__))
+pyFileQNXDir = pyFileDir+"/qnx_config/"
+jsConfig=getJScontent(pyFileQNXDir+"config.json")
 androidQnx=AndroidQnx()
 
 def adbPush(proceesNames,excess,argv):
@@ -54,6 +55,15 @@ def copyStartfile(path,isWait):
 
 def main(args,argv):
     pass
+
+def getDev():
+    out = subprocess.getoutput(f"python3 {pyFileDir}/adb_qnx.py -e \'cat etc/version\' -i 0").splitlines()
+    if len(out) != 0:
+        return out[len(out)-1].split("=")[1]
+    return 'Other'
+
+def getDevDir():
+    return jsConfig.get(getDev(),'')
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -77,8 +87,9 @@ if __name__ == "__main__":
         interact()
         exit()
 
+    devDir = getDevDir()
     if "-r" not in argv :
-        copyStartfile(f'{pyFileDir}/dev1.1/not_apps/startup.sh',True)
+        copyStartfile(f'{pyFileQNXDir}{devDir}/not_apps/startup.sh',True)
         
     keyStr('adb root')
     if "-c" in argv :
@@ -95,7 +106,7 @@ if __name__ == "__main__":
             exe_proceesNames.append(f'{execbin}/{proceesName}')
         androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
-        copyStartfile(f'{pyFileDir}/dev1.1/startup.sh',False)
+        copyStartfile(f'{pyFileQNXDir}{devDir}/startup.sh',False)
         exit()
 
     if "-q" not in argv:
@@ -141,6 +152,6 @@ if __name__ == "__main__":
     fileDict['icwarning_config.json']='/opt/qt/config'
     androidQnx.qnx_cp(fileDict,False)
 
-    copyStartfile(f'{pyFileDir}startup.sh',False)
+    copyStartfile(f'{pyFileQNXDir}{devDir}/startup.sh',False)
    
 

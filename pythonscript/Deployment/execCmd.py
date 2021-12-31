@@ -7,7 +7,7 @@ import pexpect
 
 
 process = None
-cmd_Outs={'telnet':'bigsur:/','ssh':'password','adb push':'in','curl':'100'}
+cmd_Outs={'telnet':':/','ssh':'password','adb push':'in','curl':'100'}
 new_spawn=['ssh','adb shell']
 shellCmds=[]
 is_close_spawn=False

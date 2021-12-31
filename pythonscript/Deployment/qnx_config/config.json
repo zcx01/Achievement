@@ -1,4 +1,6 @@
 {
-    "startup.sh":"/scripts/"
+    "startup.sh":"/scripts/",
+    "release-bigsur_hqx.1.1_20211108":"hqx.1.1",
+    "Other":"hqx.1.2"
 }
  

@@ -221,6 +221,7 @@ if __name__ == "__main__":
     parse.add_argument('-r','--CanParseWhitelistReturn', help='在can的白名单中存在就不生成代码',type=int,default=0)
     parse.add_argument('-p','--power',help='是否加入电源信号',default=0,type=int)
     parse.add_argument('-w','--whitelist',nargs='+')
+    parse.add_argument('-g','--Parser',help='tool_Parser生成代码',default=0,type=int)
     arg = parse.parse_args()
 
     if judgeCommad('-w'):
@@ -233,4 +234,6 @@ if __name__ == "__main__":
 
         if isXls:
             os.system(f"TestCaseGenerate -s {arg.shell} -p {arg.power}")
+
+    if arg.Parser ==1:
         os.system("Parser")
