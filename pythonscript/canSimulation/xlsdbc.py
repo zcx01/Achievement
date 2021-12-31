@@ -41,7 +41,7 @@ def getValueInt(src, row, col, lenght=-1):
     except:
         if(lenght == -1):
             return 0
-        return pow(2, lenght)
+        return pow(2, lenght-1)
 
 
 def getSigInfo(sheel, row):
@@ -170,22 +170,24 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             sig = getSigInfo(sheel, row)
             if sig.name in threeFrames:
                 sig.sendType = SigSendType.Three
-            # if sig.initValue < sig.min or sig.initValue > sig.max or sig.min == sig.max:
-            #     print(f'{sig.name} 写入失败 最大值最小值或者初始值不合理,初始值为{sig.initValue},最小值为{sig.min},最大值为{sig.max}')
-            #     return
-            # initPy = sig.initValue * sig.factor + sig.Offset
-            # if initPy < sig.min or initPy > sig.max:
-            #     print(f'{sig.name} 缩放偏移或者初始值物理值不合理,初始值物理值为{sig.initValue},最小值为{sig.min},最大值为{sig.max},缩放为{sig.factor},偏移为{sig.Offset}')
-            #     print('是否继续写入(y/n)')
-            #     if input() != 'y':
-            #         return
+            realMin = sig.min * sig.factor + sig.Offset
+            realMax = sig.max * sig.factor + sig.Offset
+            if realMin < 0 or realMax > pow(2, sig.length) or sig.min == sig.max:
+                print(f'{sig.name} 缩放偏移或者极值不合理,最小值为{sig.min},最大值为{sig.max},缩放为{sig.factor},偏移为{sig.Offset}')
+                continue
             isFind = True
             dbc = Analyze(dbcfile)
             msg = msgs.get(sig.messageId, None)
             if msg == None:
                 print(f' {sig.name} 对应的 {sig.messageId} message不存在')
                 continue
-            dbc.writeSig(sig, msg)
+
+            writedbcresult = dbc.writeSig(sig, msg)
+            if  writedbcresult == WriteDBCResult.AlreadyExists:
+                isRepalce = input('是否替換 y/n ')
+                if 'y' in isRepalce:
+                    dbc.repalceSig(sig)
+                   
             can_parse_whitelistPath = getKeyPath(
                 "can_parse_whitelist", jsConfig)
             if os.path.isfile(can_parse_whitelistPath):

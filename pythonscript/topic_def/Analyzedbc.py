@@ -556,6 +556,10 @@ class Analyze(object):
         try:
             dm = self.dbcMessage.get(sig.messageId)
             assert isinstance(dm,MessageInfo)
+            #如果大小不一致，取最大的值
+            if msg.lenght > dm.lenght:
+                linelist[dm.Row] = msg.getMessageRowContent()
+
             startRow = dm.Row+1
             insertRowIndex=-1
             try:
@@ -599,7 +603,6 @@ class Analyze(object):
                 wirteFileDicts(self.dbcPath,linelist,False)
                 print(f"{sig.name} 写入完成")
             except Exception as e:
-                print()
                 print(f"{sig.name} 写入失败:{str(e)}")
         except:
             print(f'{sig.name} 正在写入message')
@@ -618,17 +621,45 @@ class Analyze(object):
         linelist = readFileLines(self.dbcPath)
         for sig in sigs:
             assert isinstance(sig,SigInfo)
-            # linelist[sig.Row] = sig.getSG()
-            # linelist[sig.initRow] = sig.getStartValue()
-            # linelist[sig.sendTypeRow] = sig.getSigSendType()
+            ori_sig = self.getSig(str(sig.getMId())+sig.name)
+            if ori_sig == None:
+                print(f'{sig.name} 不存在')
+                continue
+
             enumStr = sig.getEnum()
             if len(enumStr) !=0:
-                if sig.enumRow == 0:
+                if ori_sig.enumRow == 0:
                     linelist.append(enumStr)
                 else:
-                    linelist[sig.enumRow] = enumStr
+                    linelist[ori_sig.enumRow] = enumStr
             print(sig.name,'-------',enumStr)
         wirteFileDicts(self.dbcPath, linelist, False)
+
+    def repalceSig(self,sigs):
+        if type(sigs) != list:
+            temp = []
+            temp.append(sigs)
+            sigs=list(sigs)
+
+        linelist = readFileLines(self.dbcPath)
+        for sig in sigs:
+            assert isinstance(sig,SigInfo)
+            ori_sig = self.getSig(str(sig.getMId())+sig.name)
+            if ori_sig == None:
+                print(f'{sig.name} 不存在')
+                continue
+
+            linelist[ori_sig.Row] = sig.getSG()
+            linelist[ori_sig.initRow] = sig.getStartValue()
+            linelist[ori_sig.sendTypeRow] = sig.getSigSendType()
+            enumStr = sig.getEnum()
+            if len(enumStr) !=0:
+                if ori_sig.enumRow == 0:
+                    linelist.append(enumStr)
+                else:
+                    linelist[ori_sig.enumRow] = enumStr
+        wirteFileDicts(self.dbcPath, linelist, False)
+    
 
     def writeMessage(self,msg,linelist):
         assert isinstance(linelist,list)
@@ -652,21 +683,26 @@ class Analyze(object):
         linelist = readFileLines(self.dbcPath)
         for msg in msgs:
             assert isinstance(msg,MessageInfo)
-            linelist[msg.Row] = msg.getMessageRowContent()
-            linelist[msg.frameRow] =  msg.getMessageVFrameFormat()
-            linelist[msg.sendTypeRow] = msg.getMessageSendType()
+            ori_msg = self.dbcMessage.get(msg.messageId,None)
+            assert isinstance(ori_msg,MessageInfo)
+            if ori_msg == None:
+                print(f'{msg.messageId} 不存在')
+                continue
+            linelist[ori_msg.Row] = msg.getMessageRowContent()
+            linelist[ori_msg.frameRow] =  msg.getMessageVFrameFormat()
+            linelist[ori_msg.sendTypeRow] = msg.getMessageSendType()
             deleteRow = 1
             if msg.cycle != 0:
-                linelist[msg.cycleRow] = msg.getMessageCycle()
-            elif msg.cycleRow !=0:
-                del linelist[msg.cycleRow]
-                deleteRow = msg.cycleRow
+                linelist[ori_msg.cycleRow] = msg.getMessageCycle()
+            elif ori_msg.cycleRow !=0:
+                del linelist[ori_msg.cycleRow]
+                deleteRow = ori_msg.cycleRow
 
             if msg.threeCycle != 0:
-                linelist[msg.threeCycleRow] = msg.getMsgCycleTimeFast()
-            elif msg.threeCycleRow !=0:
-                realDeleteRow = msg.threeCycleRow
-                if deleteRow < msg.threeCycleRow: realDeleteRow = realDeleteRow -1
+                linelist[ori_msg.threeCycleRow] = msg.getMsgCycleTimeFast()
+            elif ori_msg.threeCycleRow !=0:
+                realDeleteRow = ori_msg.threeCycleRow
+                if deleteRow < ori_msg.threeCycleRow: realDeleteRow = realDeleteRow -1
                 del linelist[realDeleteRow]
                 deleteRow = realDeleteRow
             
