@@ -41,7 +41,7 @@ def getValueInt(src, row, col, lenght=-1):
     except:
         if(lenght == -1):
             return 0
-        return pow(2, lenght-1)
+        return pow(2, lenght)-1
 
 
 def getSigInfo(sheel, row):
@@ -172,7 +172,7 @@ def conversion(configPath, wirteSigName, canmatrix=""):
                 sig.sendType = SigSendType.Three
             realMin = sig.min * sig.factor + sig.Offset
             realMax = sig.max * sig.factor + sig.Offset
-            if realMin < 0 or realMax > pow(2, sig.length) or sig.min == sig.max:
+            if realMin < 0 or realMax > pow(2, sig.length)-1 or sig.min == sig.max:
                 print(f'{sig.name} 缩放偏移或者极值不合理,最小值为{sig.min},最大值为{sig.max},缩放为{sig.factor},偏移为{sig.Offset}')
                 continue
             isFind = True
@@ -534,6 +534,7 @@ if __name__ == "__main__":
     parse.add_argument('-m', '--modifyMessageInfo',
                        help='替换message信息,有m就会替换', default=1, type=int, nargs='*')
     parse.add_argument('-d', '--dbcPath', help='比较新旧两个dbc,输入的是被比较的')
+    parse.add_argument('-rm', '--rm sig', help='删除信号')
     parse.add_argument('-u', '--isfilterNoUser',
                        help='是否过滤掉没有使用过的信号', nargs='*')
     arg = parse.parse_args()

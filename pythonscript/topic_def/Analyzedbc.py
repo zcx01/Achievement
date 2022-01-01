@@ -50,10 +50,10 @@ class SigInfo(object):
         self.Sender=""
         self.cycle=0 
         #----------dbc中独有的------------
-        self.Row=0
-        self.initRow=0
-        self.enumRow=0
-        self.sendTypeRow = 0
+        self.Row=-1
+        self.initRow=-1
+        self.enumRow=-1
+        self.sendTypeRow = -1
         self.isdbcEnum = False #是否是dbc中的枚举，如果True枚举就是不转化
         #----------can矩阵独有------------
         self.chineseName=''
@@ -244,11 +244,11 @@ class MessageInfo(object):
         self.message_Id=''
         self.sigs=[]
         self.Row=-1
-        self.cycleRow=0
-        self.frameRow=0
-        self.sendTypeRow=0
+        self.cycleRow=-1
+        self.frameRow=-1
+        self.sendTypeRow=-1
         self.sigMaxRow=-1
-        self.threeCycleRow=0
+        self.threeCycleRow=-1
 
     def getMessage_Id(self):
         if len(self.message_Id) !=0:
@@ -614,9 +614,15 @@ class Analyze(object):
         return WriteDBCResult.WriteComplete
     
     def repalceContent(self,linelist,row,content):
-        if len(content) != 0:
+        if len(content) != 0 and row > 0:
             linelist[row] = content
+        else:
+            print(f'{content}内容为空, {row} 行号小于等于0')
 
+    def RowContent(self,rowIndexs,row):
+        if row > 0:
+            rowIndexs.append(row)
+    
     def repalceSigEnum(self,sigs):
         linelist = readFileLines(self.dbcPath)
         for sig in sigs:
@@ -628,19 +634,14 @@ class Analyze(object):
 
             enumStr = sig.getEnum()
             if len(enumStr) !=0:
-                if ori_sig.enumRow == 0:
+                if ori_sig.enumRow <= 0:
                     linelist.append(enumStr)
                 else:
                     linelist[ori_sig.enumRow] = enumStr
             print(sig.name,'-------',enumStr)
         wirteFileDicts(self.dbcPath, linelist, False)
 
-    def repalceSig(self,sigs):
-        if type(sigs) != list:
-            temp = []
-            temp.append(sigs)
-            sigs=list(sigs)
-
+    def repalceSig(self,*sigs):
         linelist = readFileLines(self.dbcPath)
         for sig in sigs:
             assert isinstance(sig,SigInfo)
@@ -648,19 +649,30 @@ class Analyze(object):
             if ori_sig == None:
                 print(f'{sig.name} 不存在')
                 continue
-
-            linelist[ori_sig.Row] = sig.getSG()
-            linelist[ori_sig.initRow] = sig.getStartValue()
-            linelist[ori_sig.sendTypeRow] = sig.getSigSendType()
+            self.repalceContent(linelist,ori_sig.Row, sig.getSG())
+            self.repalceContent(linelist,ori_sig.initRow, sig.getStartValue())
+            self.repalceContent(linelist,ori_sig.sendTypeRow, sig.getSigSendType())
             enumStr = sig.getEnum()
             if len(enumStr) !=0:
-                if ori_sig.enumRow == 0:
+                if ori_sig.enumRow <= 0:
                     linelist.append(enumStr)
                 else:
                     linelist[ori_sig.enumRow] = enumStr
-        wirteFileDicts(self.dbcPath, linelist, False)
+        wirteFileDicts(self.dbcPath, linelist, False)                        
     
+    def removeSig(self,*sigs):
+        removeIndex = []
+        for sig in sigs:
+            assert isinstance(sig,SigInfo)
+            self.RowContent(removeIndex,sig.Row)
+            self.RowContent(removeIndex,sig.initRow)
+            self.RowContent(removeIndex,sig.sendTypeRow)
+            self.RowContent(removeIndex,sig.enumRow)
 
+        linelist = readFileLines(self.dbcPath)
+        removeListIndexs(linelist,removeIndex)
+        wirteFileDicts(self.dbcPath, linelist, False)
+        
     def writeMessage(self,msg,linelist):
         assert isinstance(linelist,list)
         assert isinstance(msg,MessageInfo)
@@ -681,6 +693,7 @@ class Analyze(object):
          
     def repalceMessage(self,msgs):
         linelist = readFileLines(self.dbcPath)
+        deleteRows = []
         for msg in msgs:
             assert isinstance(msg,MessageInfo)
             ori_msg = self.dbcMessage.get(msg.messageId,None)
@@ -688,24 +701,22 @@ class Analyze(object):
             if ori_msg == None:
                 print(f'{msg.messageId} 不存在')
                 continue
-            linelist[ori_msg.Row] = msg.getMessageRowContent()
-            linelist[ori_msg.frameRow] =  msg.getMessageVFrameFormat()
-            linelist[ori_msg.sendTypeRow] = msg.getMessageSendType()
-            deleteRow = 1
+            self.repalceContent(linelist,ori_msg.Row, msg.getMessageRowContent())
+            self.repalceContent(linelist,ori_msg.frameRow, msg.getMessageVFrameFormat())
+            self.repalceContent(linelist,ori_msg.sendTypeRow, msg.getMessageSendType())
+
             if msg.cycle != 0:
-                linelist[ori_msg.cycleRow] = msg.getMessageCycle()
-            elif ori_msg.cycleRow !=0:
-                del linelist[ori_msg.cycleRow]
-                deleteRow = ori_msg.cycleRow
+                self.repalceContent(linelist,ori_msg.cycleRow, msg.getMessageCycle())
+            elif ori_msg.cycleRow < 0:
+                self.RowContent(deleteRows,ori_msg.cycleRow)
 
             if msg.threeCycle != 0:
-                linelist[ori_msg.threeCycleRow] = msg.getMsgCycleTimeFast()
-            elif ori_msg.threeCycleRow !=0:
-                realDeleteRow = ori_msg.threeCycleRow
-                if deleteRow < ori_msg.threeCycleRow: realDeleteRow = realDeleteRow -1
-                del linelist[realDeleteRow]
-                deleteRow = realDeleteRow
-            
+                self.repalceContent(linelist,ori_msg.threeCycleRow, msg.getMsgCycleTimeFast())
+            elif ori_msg.threeCycleRow < 0:
+                self.RowContent(deleteRows,ori_msg.threeCycleRow)
+        
+        if len(deleteRows) != 0:
+            removeListIndexs(linelist,deleteRows)
             # print(f'替换 {msg.messageId} {msg.Row} {msg.cycleRow} {msg.frameRow}')
         wirteFileDicts(self.dbcPath, linelist, False)
 

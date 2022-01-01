@@ -163,3 +163,17 @@ def getClassNames(text):
     if len(classNames) == 0:
         classNames = re.findall(m_i,text,re.A)
     return classNames
+
+def removeListIndexs(linelist,Indexs):
+    temp = []
+    for index in range(len(linelist)):
+        if index not in Indexs:
+            temp.append(linelist[index])
+    return temp
+# print(removeListIndexs([12,23,56],[0,2]))
+
+# def Temp(linelist):
+#     linelist.append('ddd')
+# linelist=['ww']
+# Temp(linelist)
+# print(linelist)
