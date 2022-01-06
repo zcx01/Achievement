@@ -10,17 +10,8 @@ from commonfun import*
 from Analyzedbc import *
 from projectInI import *
 
-
 def getValue(src, row, col):
     return src.cell_value(row, col)
-
-
-def getValueKong(src, row, col):
-    value = str(src.cell_value(row, col))
-    if value == r"/" or len(value) == 0:
-        return "\"\""
-    return f'\"{value}\"'
-
 
 def getValueInt(src, row, col, lenght=-1):
     try:
@@ -43,15 +34,15 @@ def getValueInt(src, row, col, lenght=-1):
             return 0
         return pow(2, lenght)-1
 
-
 def getSigInfo(sheel, row):
     sig = SigInfo()
     sig.Sender = str(getValue(sheel, row, 1)).upper()
     temp = str(getValue(sheel, row, 2))
-    temps = re.findall(e_i,temp,re.A)
+    temps = re.findall(e_i, temp, re.A)
     sig.name = "_".join(temps)
     sig.chineseName = str(getValue(sheel, row, 3))
-    sig.messageId = str(getValue(sheel, row, 4)).split(".")[0].replace('0x', '')
+    sig.messageId = str(getValue(sheel, row, 4)).split(".")[
+        0].replace('0x', '')
     sig.cycle = getValueInt(sheel, row, 5)
     if sig.cycle == 0:  # 没有周期，就解析为0
         sig.sendType = SigSendType.Event
@@ -78,7 +69,6 @@ def getSigInfo(sheel, row):
     sig.Recevier = getValue(sheel, row, 20)
     sig.getStartBit()
     return sig
-
 
 def getMessageInfo(sheel):
     msgs = {}
@@ -121,7 +111,6 @@ def getMessageInfo(sheel):
             pass
     return msgs
 
-
 def getThreeFrame(jsConfig):
     srcSendType = getKeyPath("srcSendType", jsConfig)
     threeFrames = []
@@ -138,7 +127,6 @@ def getThreeFrame(jsConfig):
             except:
                 pass
     return threeFrames
-
 
 def conversion(configPath, wirteSigName, canmatrix=""):
     jsConfig = getJScontent(configPath)
@@ -173,7 +161,8 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             realMin = sig.min * sig.factor + sig.Offset
             realMax = sig.max * sig.factor + sig.Offset
             if realMin < 0 or realMax > pow(2, sig.length)-1 or sig.min == sig.max:
-                print(f'{sig.name} 缩放偏移或者极值不合理,最小值为{sig.min},最大值为{sig.max},缩放为{sig.factor},偏移为{sig.Offset}')
+                print(
+                    f'{sig.name} 缩放偏移或者极值不合理,最小值为{sig.min},最大值为{sig.max},缩放为{sig.factor},偏移为{sig.Offset}')
                 continue
             isFind = True
             dbc = Analyze(dbcfile)
@@ -183,11 +172,11 @@ def conversion(configPath, wirteSigName, canmatrix=""):
                 continue
 
             writedbcresult = dbc.writeSig(sig, msg)
-            if  writedbcresult == WriteDBCResult.AlreadyExists:
+            if writedbcresult == WriteDBCResult.AlreadyExists:
                 isRepalce = input('是否替換 y/n ')
                 if 'y' in isRepalce:
                     dbc.repalceSig(sig)
-                   
+
             can_parse_whitelistPath = getKeyPath(
                 "can_parse_whitelist", jsConfig)
             if os.path.isfile(can_parse_whitelistPath):
@@ -195,7 +184,6 @@ def conversion(configPath, wirteSigName, canmatrix=""):
                     f"topic_Parser -w {can_parse_whitelistPath} {sig.getMessage_Id()} {sig.getMessage_Sig()}")
     if not isFind:
         print(f"{wirteSigName} 在CAN矩阵中不存在")
-
 
 def conversionByOtherdbc(configPath, wirteSigNames, dbcfilPath=""):
     assert isinstance(wirteSigNames, list)
@@ -214,14 +202,18 @@ def conversionByOtherdbc(configPath, wirteSigNames, dbcfilPath=""):
             wirteSigNames.pop(wirteSigNames.index(ori_sig.name))
 
     if len(wirteSigNames):
-        print('没有找到的信号-------',wirteSigNames)
+        print('没有找到的信号-------', wirteSigNames)
 
+def RemoveSigs(configPath, sigNames):
+    jsConfig = getJScontent(configPath)
+    dbcfile = getKeyPath("dbcfile", jsConfig)
+    dbc = Analyze(dbcfile)
+    dbc.removeSig(sigNames)
 
 def addHeadEnd(text, name):
     text.insert(0, f'{name}')
     text.append("")
     return text
-
 
 def getUseMessage_Sig(jsConfig):
     can_parse_whitelistPath_sig = []
@@ -231,7 +223,6 @@ def getUseMessage_Sig(jsConfig):
         texts = text.split(" ")
         can_parse_whitelistPath_sig.append(texts[0])
     return can_parse_whitelistPath_sig
-
 
 def filterNoUser(no_use, sig_results, use_sig):
     sig_results_cpoy = []
@@ -245,7 +236,6 @@ def filterNoUser(no_use, sig_results, use_sig):
         except:
             sig_results_cpoy.append(sig_result)
     return sig_results_cpoy
-
 
 def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser):
     jsConfig = getJScontent(configPath)
@@ -337,7 +327,6 @@ def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser
 
     print("比较完成!")
 
-
 def getNameChangedDict(nameChangeds):
     sigNameDict = {}
     for sigName in nameChangeds:
@@ -396,7 +385,6 @@ def repalceSrcSig(nameChangeds, jsConfig):
     wirteFileDicts(can_parse_whitelistPath,
                    can_parse_whitelistPath_contents, False)
 
-
 def sigNameChanged(configPath, dbcPath, resultPath, canMatrix):
     jsConfig = getJScontent(configPath)
     dbc = Analyze(dbcPath)
@@ -413,7 +401,7 @@ def sigNameChanged(configPath, dbcPath, resultPath, canMatrix):
             if newSig != None:
                 assert isinstance(newSig, SigInfo)
                 if sig.getMessage_Sig() != newSig.getMessage_Sig():
-                    print(newSig.name,'-----------')
+                    print(newSig.name, '-----------')
                     nameChanged.append(
                         f'{sig.getMessage_Sig()} : {newSig.getMessage_Sig()}')
             else:
@@ -422,7 +410,7 @@ def sigNameChanged(configPath, dbcPath, resultPath, canMatrix):
                     assert isinstance(newSig, SigInfo)
                     isSame, result = sig.compare(newSig)
                     if isSame == CompareResult.Bit:
-                        print(newSig.name,'+++++++++++++++++')
+                        print(newSig.name, '+++++++++++++++++')
                         nameChanged.append(
                             f'{sig.getMessage_Sig()} : {newSig.getMessage_Sig()}')
                         break
@@ -442,8 +430,7 @@ def sigNameChanged(configPath, dbcPath, resultPath, canMatrix):
                 continue
             info = getSigInfo(sheel1, row)
             sigInfos[info.chineseName] = info
-            print(info.getMessage_Sig(),info.chineseName)
-
+            print(info.getMessage_Sig(), info.chineseName)
 
         for row in range(sheel2.nrows):
             if row == 0:
@@ -461,19 +448,18 @@ def sigNameChanged(configPath, dbcPath, resultPath, canMatrix):
         wirteFileDicts(resultPath, nameChanged+resetName, False)
         print(f"分析完成")
 
-
-def CopyEnum(configPath, dbcPath,resultPath):
+def CopyEnum(configPath, dbcPath, resultPath):
     print('赋值枚举...')
     jsConfig = getJScontent(configPath)
     dbc = Analyze(dbcPath)
     newdbc = Analyze(getKeyPath("dbcfile", jsConfig))
     sigEnums = []
     sigNameDict = {}
-    if len(resultPath) !=0:
+    if len(resultPath) != 0:
         nameChangeds = readFileLines(resultPath)
         sigNameDict = getNameChangedDict(nameChangeds)
-        sigNameDict = dict(zip(sigNameDict.values(),sigNameDict.keys()))
-        
+        sigNameDict = dict(zip(sigNameDict.values(), sigNameDict.keys()))
+
     for messageSigName in newdbc.dbcSigs:
         newsig = newdbc.dbcSigs[messageSigName]
         assert isinstance(newsig, SigInfo)
@@ -487,7 +473,6 @@ def CopyEnum(configPath, dbcPath,resultPath):
             newsig.enum = sig.enum
             sigEnums.append(newsig)
     newdbc.repalceSigEnum(sigEnums)
-
 
 def modifyMessageInfo(configPath):
     jsConfig = getJScontent(configPath)
@@ -509,7 +494,6 @@ def modifyMessageInfo(configPath):
 
     dbc.repalceMessage(dbc.dbcMessage.values())
 
-
 # conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Works/文档/C样/C385-EVE项目整车通讯协议_V2.2.0_20211203.xlsx")
 # conversion(pyFileDir+"config.json",'HU_CurrentLocationLongitude')
 # sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
@@ -517,7 +501,7 @@ if __name__ == "__main__":
     parse = argparse.ArgumentParser(
         description='''
         这个脚本是用来通过生成dbc,比较CAN矩阵,
-        d+s：从其他的dbc添加信号,
+        d+s:从其他的dbc添加信号,
         d+r+t:信号名称的改变，并且修改配置的中源码的信号名称,
         d+r/d:从指定的dbc复制枚举到新的dbc中 r是输入比较后的结果
         ''')
@@ -534,7 +518,7 @@ if __name__ == "__main__":
     parse.add_argument('-m', '--modifyMessageInfo',
                        help='替换message信息,有m就会替换', default=1, type=int, nargs='*')
     parse.add_argument('-d', '--dbcPath', help='比较新旧两个dbc,输入的是被比较的')
-    parse.add_argument('-rm', '--rm sig', help='删除信号')
+    parse.add_argument('-rm', '--rmsigs', help='删除信号')
     parse.add_argument('-u', '--isfilterNoUser',
                        help='是否过滤掉没有使用过的信号', nargs='*')
     arg = parse.parse_args()
@@ -543,6 +527,8 @@ if __name__ == "__main__":
         sigNameChanged(arg.config, arg.dbcPath, arg.resultPath, arg.twoMatrix)
     elif '-d' in sys.argv and '-s' in sys.argv:
         conversionByOtherdbc(arg.config, arg.sigNames, arg.dbcPath)
+    elif '-rm' in sys.argv:
+        RemoveSigs(arg.config, arg.rmsigs)
     elif "-a" in sys.argv:
         conversion(arg.config, "", arg.append)
     elif '-s' in sys.argv:
@@ -554,4 +540,4 @@ if __name__ == "__main__":
         diffCanMatrix(arg.fristMatrix, arg.twoMatrix, arg.config,
                       arg.resultPath, '-u' in sys.argv)
     elif '-d' in sys.argv:
-        CopyEnum(arg.config, arg.dbcPath,arg.resultPath)
+        CopyEnum(arg.config, arg.dbcPath, arg.resultPath)

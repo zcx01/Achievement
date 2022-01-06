@@ -41,6 +41,7 @@ def copyStartfile(path,isWait):
     SetCloseSpawn(True)
     copAbsolutePath([path])
     keyStr("reset")
+    time.sleep(1)
     SetCloseSpawn(True)
     if isWait:
         time.sleep(5)
@@ -60,10 +61,13 @@ def getDev():
     out = subprocess.getoutput(f"python3 {pyFileDir}/adb_qnx.py -e \'cat etc/version\' -i 0").splitlines()
     if len(out) != 0:
         return out[len(out)-1].split("=")[1]
-    return 'Other'
+    return ''
 
 def getDevDir():
-    return jsConfig.get(getDev(),'')
+    dev = jsConfig.get(getDev(),'') 
+    if len(dev)== 0:
+        return jsConfig['Other']
+    return dev
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -88,6 +92,7 @@ if __name__ == "__main__":
         exit()
 
     devDir = getDevDir()
+    print('所在分支-------',devDir)
     if "-r" not in argv :
         copyStartfile(f'{pyFileQNXDir}{devDir}/not_apps/startup.sh',True)
         

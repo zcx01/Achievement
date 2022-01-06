@@ -14,7 +14,7 @@ void {ClassName}::addSignalAndTop(struct veh_signal * s, const std::string &t)
     subscribe(s);
     signal=s;
     topic = t;
-    subscribe((struct veh_signal *)&CANSIG_GW_288__BcmPwrStsFb_g);
+    //  subscribe((struct veh_signal *)&CANSIG_GW_288__BcmPwrStsFb_g);
 }
 
 
@@ -26,13 +26,13 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     veh_signal_value  raw_value;
     signal_status status;
 
-	uint32_t bcmPwrStsFbValue = 0;
+	//  uint32_t bcmPwrStsFbValue = 0;
 
-    if (1 != fds::GetBcmPwrStsFbValue(bcmPwrStsFbValue))
-    {
-        TB_LOG_INFO("{ClassName} powerSts: %d", bcmPwrStsFbValue);
-        return;
-    }
+    // if (1 != fds::GetBcmPwrStsFbValue(bcmPwrStsFbValue))
+    // {
+    //     TB_LOG_INFO("{ClassName} powerSts: %d", bcmPwrStsFbValue);
+    //     return;
+    // }
     if(signal == nullptr)
     {
         return;

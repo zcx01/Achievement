@@ -45,13 +45,18 @@ def getClassName(fileName):
 def getFileName(className):
     fileName=""
     index=0
+    count = 0
     for c in className:
         if str(c).isupper():
             temp =""
-            if index !=0:
+            if index !=0 and count ==0:
                 temp = "_"
+            count+=1
+            if count >= 3:
+                count =0
             fileName+=temp + str(c).lower()
         else:
+            count=0
             fileName+=c
         index+=1
     return fileName

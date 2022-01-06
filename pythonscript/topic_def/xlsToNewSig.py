@@ -1,8 +1,8 @@
 #!/usr/bin/python
-import inspect
 import sys
 import os
 import xlrd
+import time
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 from commonfun import *
 import openpyxl 
@@ -247,8 +247,40 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
     defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
     xlsNewSigPath = getKeyPath("xlsNewSigPath",jsConfig)
     book = openpyxl.Workbook()
-    sh = book.active
     rowContent=[]
+    sh = None
+
+    if os.path.isfile(xlsNewSigPath):
+        book = openpyxl.load_workbook(xlsNewSigPath)
+        sheetsSize = len(book.sheetnames)
+        sh = book[book.sheetnames[0]]
+
+        if sheetsSize > 1:
+            old_sh = book[book.sheetnames[sheetsSize-1]]
+            old_sh.append([time.time()])
+            for row in range(sh.max_row):
+                if row == 0:
+                    continue
+                temp = []
+                for col in range(sh.max_column):
+                    temp.append(sh.cell(row+1,col+1).value)
+
+                old_sh.append(temp)
+            sh.delete_rows(0,sh.max_row+1)
+    else:
+        book = openpyxl.Workbook()
+        sh = book.active
+
+    rowContent=[]
+    rowContent.append('信号')
+    rowContent.append('类型')
+    rowContent.append('中文名称(d)')
+    rowContent.append('类名(x)')
+    rowContent.append('topic(x表示自动搜索)')
+    rowContent.append('上行信号')
+    rowContent.append('关联信号')
+    rowContent.append('-A(不生成代码)')
+    sh.append(rowContent)
 
     while(startRow <= endRow):
         commentSet,comment =  getComments(CallFun,sheel,startRow)
@@ -283,7 +315,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
             sh.append(rowContent)
         startRow+=1
 
-    saveFileName=xlsNewSigPath+'.xlsx'
+    saveFileName=xlsNewSigPath
     book.save(saveFileName)
     book.close()
     print("生成完成")

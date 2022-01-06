@@ -8,7 +8,7 @@ import argparse
 from projectInI import *
 
 from commonfun import*
-from xlsdbc import *
+from Analyzedbc import *
 
 
 def getSig(text):
@@ -24,16 +24,6 @@ def getSig(text):
             sigStartIndex+=1
         sigs.append('_'.join(sig))
     return sigs
-
-def getSigValue(sig,sheel):
-    for row in range(sheel.nrows):
-        sigName = str(getValue(sheel, row, 2))
-        if  row == 0:
-            continue
-        if sigName.strip() == sig:
-            sig = getSigInfo(sheel,row)
-            return sig
-    return SigInfo()
 
 def getDefine(text):
     defines = re.findall(d_t, text, re.A)
@@ -109,7 +99,7 @@ def autoCaseGenerate(configPath=pyFileDir+"config.json",shellIndex=0,isAddPowerS
         generateTest('\n'.join(caseAim),xlsFileName,configPath,'',isSendCan,row == sheel.nrows-1)
 
 
-def generate(contents,defineContents,isSendCan,canmatrixSheel,sh):
+def generate(contents,defineContents,isSendCan,dbc,sh):
     sigNames = getSig(contents)
     expectedResults=[]
     topicDefines = getDefine(contents)
@@ -117,19 +107,21 @@ def generate(contents,defineContents,isSendCan,canmatrixSheel,sh):
     if len(topicDefines) > 0:
         desc =getDesc(defineContents,topicDefines[len(topicDefines)-1])
     if isSendCan:
+        assert isinstance(dbc,Analyze)
         sigInfos = []
         if len(sigNames) == 0:
             print('没有检测到信号')
             return
         for sigName in sigNames:
-            info = getSigValue(sigName,canmatrixSheel)
-            if len(info.name) == 0:
+            info = dbc.getSig(sigName)
+            if info == None:
                 print(f' canmatrix 中没有 {sigName}信号')
                 continue
             sigInfos.append(info)
         
         sigCombinations=[]
         for info in sigInfos:
+            assert isinstance(info,SigInfo)
             minStr = f'{info.name}:{info.min}'
             maxStr = f'{info.name}:{info.max}'
             # mid = (info.min + info.max) // 2
@@ -163,7 +155,7 @@ def generateTest(caseAim,xlsFileName,jsConfigPath,variable,isSendCan=False,isOPe
     jsConfig = getJScontent(jsConfigPath)
     casePath = getKeyPath("casePath",jsConfig)+"/"+xlsFileName+'.xlsx'
     defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
-    canmatrixSheel= xlrd.open_workbook(getKeyPath("canmatrix",jsConfig)).sheet_by_name(Sig_Matrix)
+    dbc = Analyze(getKeyPath("dbcfile",jsConfig))
 
     # 创建一个Excel workbook 对象
     if os.path.isfile(casePath):
@@ -186,16 +178,16 @@ def generateTest(caseAim,xlsFileName,jsConfigPath,variable,isSendCan=False,isOPe
                 if "SignalMsg" in cppFileContet:
                     isSendCan = True
                     break
-            generate('\n'.join(cppFileContet),defineContents,isSendCan,canmatrixSheel,sh)
+            generate('\n'.join(cppFileContet),defineContents,isSendCan,dbc,sh)
         else:
             moduleContents = getModuleContent(caseAim,variable)
             print(moduleContents)
             for moduleContent in moduleContents:
                 if len(getSig(moduleContent)) !=0:
                     isSendCan = True
-            generate('\n'.join(moduleContents),defineContents,isSendCan,canmatrixSheel,sh)
+            generate('\n'.join(moduleContents),defineContents,isSendCan,dbc,sh)
     else:
-        generate(caseAim,defineContents,isSendCan,canmatrixSheel,sh)
+        generate(caseAim,defineContents,isSendCan,dbc,sh)
 
     book.save(casePath)
     print("生成完成")

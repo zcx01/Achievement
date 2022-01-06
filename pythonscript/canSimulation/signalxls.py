@@ -158,7 +158,7 @@ class useCase(object):
 
     def AddPowerSig(self):
         if PowerSig not in self.sendSignals:
-            self.sendSignals[PowerSig]=PowerSigValue
+            self.sendSignals[PowerSig]=[PowerSigValue]
 
     def MonitorSig(self,sigName):
         if self.monitorSim == None:

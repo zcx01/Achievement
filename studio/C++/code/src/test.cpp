@@ -28,19 +28,58 @@ struct PayloadInfo
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(PayloadInfo, value, valid, relative, time, extension);
 };
 
-TestTest::TestTest(/* args */) 
+void publish_uartpc(const std::vector<int>& values)
 {
-    std::string content = "{\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":[1,2,3]}";
-    nlohmann::json j = nlohmann::json::parse(content);
-    PayloadInfo info = j.get<PayloadInfo>();
-    std::vector<int> value =info.value.get<std::vector<int>>();
-    COUTI(value);
-    
-    content = "{\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":1}";
-    j = nlohmann::json::parse(content);
-    info = j.get<PayloadInfo>();
-    int in = info.value.get<int>();
-    COUT(in)
+    if (values.empty())
+    {
+        TB_LOG_INFO("publish_uartpc: values is empty");
+        return;
+    }
+    const int &size = values.size();
+    uint8_t *data = new uint8_t[size];
+    for (int i = 0; i < size; i++)
+    {
+        data[i] = values[i];
+    }
+
+    // IpcMessage msg = {(uint32_t)sizeof(data), data};
+    // megaipc::MegaIpcApi::instance().publish(UARTRPC_SVC_IPC_TOPIC_DOWNLINK, msg);
+    for (int i = 0; i < size; i++)
+    {
+        if (data[i] == 0x26)
+        {
+           COUT("dddddddddd")
+        }
+        
+        printf("%02x\n", data[i]);
+    }
+    delete[] data;
 }
 
-CUSTOMEGISTER(Test,TestTest)
+
+TestTest::TestTest(/* args */)
+{
+    // std::string content = "{\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":[1,2,3]}";
+    // nlohmann::json j = nlohmann::json::parse(content);
+    // PayloadInfo info = j.get<PayloadInfo>();
+    // std::vector<int> value =info.value.get<std::vector<int>>();
+    // COUTI(value);
+
+    // content = "{\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":1}";
+    // j = nlohmann::json::parse(content);
+    // info = j.get<PayloadInfo>();
+    // int in = info.value.get<int>();
+    // COUT(in)
+
+    // std::string feedbackTopic = "AC/VentilationTimer/Set";
+    // feedbackTopic = feedbackTopic.substr(0,feedbackTopic.find_last_of('/'));
+    // COUT(feedbackTopic)
+
+    std::vector<int> values;
+    values.push_back(0x26);
+    values.push_back(0x52);
+    values.push_back(0x10);
+    publish_uartpc(values);
+}
+
+CUSTOMEGISTER(Test, TestTest)

@@ -8,7 +8,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 sys.path.append(os.path.dirname(os.path.abspath(__file__))+"/../")
-from topic_def.xslToNewSig import *
+from topic_def.xlsToNewSig import *
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -76,8 +76,8 @@ if __name__ == '__main__':
     parse = argparse.ArgumentParser(description='这个是通过topic表格生成生成newSig表格')
     parse.add_argument('-d', '--down', help='下行信号的类型', default="vehctrl")
     parse.add_argument('-u', '--up', help='上行信号的类型', default="vehctrl_status")
-    parse.add_argument('-s', '--startRow', help='开始的行号', type=int)
-    parse.add_argument('-e', '--endRow', help='结束的行号', type=int)
+    parse.add_argument('-s','--startRow',help='开始的行号',type=int,default=0)
+    parse.add_argument('-e','--endRow',help='结束的行号',type=int,default=-1)
     parse.add_argument('-f', '--findArg',
                        help='查找topic和define的行号列表', nargs='+')
     arg = parse.parse_args()

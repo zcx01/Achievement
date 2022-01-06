@@ -100,7 +100,7 @@ def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_pars
         if  findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
             if can_parse_whitelist_return:
                 print(f'{can_parse_whitelistPath} 文件存在，跳过')
-                return False
+                return 0
         else:
             print(f"写入 {can_parse_whitelistPath} 文件")
             can_parse_whitelist_read=open(can_parse_whitelistPath,"r")
@@ -115,7 +115,8 @@ def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_pars
             
             can_parse_whitelist_content_line.append(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
             wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_line,False)
-    return True
+            return 2
+    return 1
 
 def dealnewSig(can_parse_whitelist_return=False):
     jsConfig=getJScontent(pyFileDir+"config.json")
@@ -166,12 +167,13 @@ def dealnewSig(can_parse_whitelist_return=False):
                 break
             messagesig=analy.getMessage_Id_Sig(sig)
             can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
-            if not WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return):
+            WriteCan = WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return)
+            if WriteCan == 0:
                 isWriteCanContinue = True
                 break
         
-        if not isWriteCanContinue and not is_Parser:
-            is_Parser = True
+            if WriteCan == 2 and not is_Parser:
+                is_Parser = True
 
         if isWriteCanContinue or judgeCommad("-A",names):
             continue

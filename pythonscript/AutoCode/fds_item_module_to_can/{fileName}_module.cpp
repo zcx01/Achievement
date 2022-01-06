@@ -6,8 +6,13 @@
 
 void {ClassName}Module::start()
 {
-    MegaIpcApi::instance().subscribe(VEHCTRL_TOPIC);
-    MegaIpcApi::instance().setListener(this);
+    auto api = MegaIpcApi::createInstance();
+    api->init();
+    for (auto &it:topic_items_map)
+    {
+        api->subscribe(it.first);
+    }
+    api->setListener(this);
 }
 
 void {ClassName}Module::add_item(const string &topic, std::shared_ptr<{ClassName}Item> item)
