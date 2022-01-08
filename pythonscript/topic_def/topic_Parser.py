@@ -133,16 +133,18 @@ def dealnewSig(can_parse_whitelist_return=False):
             continue
         text=text.replace("\t"," ")
         names=text.split(" ")
+        if judgeCommad('-b',names):
+            continue
         sigs=getValueByIndex(names,0).split(',')
         for sig in sigs:
             if  not analy.sigExist(sig):
                 desc=getValueByIndex(names,2)
                 addDbcSigNames[sig] = desc
 
-    print('正在写入dbc...')
     for sig in addDbcSigNames:
         print(f'{sig:<10} {addDbcSigNames[sig]}')
     if len(addDbcSigNames):
+        print('正在写入dbc...')
         addDbcSigName=' '.join(addDbcSigNames.keys())
         os.system(f'xlsdbc -s {addDbcSigName}')
 
@@ -156,30 +158,38 @@ def dealnewSig(can_parse_whitelist_return=False):
         alreadyText.append(text)
         text=text.replace("\t"," ")
         names=text.split(" ")
-        sigs=getValueByIndex(names,0).split(",")
-        isWriteCanContinue = False
-        for sig in sigs:
-            message=analy.getMessage_Id_BySig(sig)
-            if len(message)==0:
-                print(f'{sig} 对应的message不存在')
-                failWrite.append(sig)
-                isWriteCanContinue = True
-                break
-            messagesig=analy.getMessage_Id_Sig(sig)
-            can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
-            WriteCan = WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return)
-            if WriteCan == 0:
-                isWriteCanContinue = True
-                break
-        
-            if WriteCan == 2 and not is_Parser:
-                is_Parser = True
+    
+        if not judgeCommad('-b',names):
+            sigs=getValueByIndex(names,0).split(",")
+            isWriteCanContinue = False
+            for sig in sigs:
+                message=analy.getMessage_Id_BySig(sig)
+                if len(message)==0:
+                    print(f'{sig} 对应的message不存在')
+                    failWrite.append(sig)
+                    isWriteCanContinue = True
+                    break
+                messagesig=analy.getMessage_Id_Sig(sig)
+                can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
+                WriteCan = WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return)
+                if WriteCan == 0:
+                    isWriteCanContinue = True
+                    break
+            
+                if WriteCan == 2 and not is_Parser:
+                    is_Parser = True
 
-        if isWriteCanContinue or judgeCommad("-A",names):
-            continue
-        
-        sig = sigs[0]
-        messagesig=analy.getMessage_Id_Sig(sig)
+            if isWriteCanContinue:
+                continue
+            
+            sig = sigs[0]
+            messagesig=analy.getMessage_Id_Sig(sig)
+            dataTypeStr=analy.getSigDataType(sig)
+            successWrite.append(sig)
+        else:
+            messagesig = getValueByIndex(names,0)
+            dataTypeStr = "int"
+
         sigType = getValueByIndex(names, 1)
         desc=getValueByIndex(names,2)
         className=getValueByIndex(names,3,"x")
@@ -189,18 +199,10 @@ def dealnewSig(can_parse_whitelist_return=False):
             define = getDefine(jsConfig, desc)
 
         #写入 cpp 文件 #创建 .h .cpp 文件
-        dataTypeStr=analy.getSigDataType(sig)
         desc=addEscape(desc)
         print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
         os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
-        successWrite.append(sig)
-    #     elif judgeCommad("-m",names):
-    #         print('\
-    #     //%s\n\
-    #     else if (topicId == %s) \n\
-	# {\n\
-    #     sig=&CANSIG_%s_g;\n\
-	# }'% (desc,define,messagesig))
+       
     if is_Parser:
         os.system("Parser")
     

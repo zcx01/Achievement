@@ -17,7 +17,12 @@ if [ $# -lt 1 ]; then
     done
     exit 0
 else
-    cd $1
+    if [ $1 == "-r" ];then
+        repo forall -c "git clean -df" && repo forall -c "git reset --hard; git checkout ."
+        exit 0
+    else
+        cd $1
+    fi
 fi
 
 if [ $# -eq 1 ]; then
@@ -34,9 +39,7 @@ elif [ $2 == "-c" ];then
 elif [ $2 == "-n" ];then
     git add -A
     git commit --amend --no-edit
-    git push mega HEAD:refs/for/$branch
-elif [ $2 == "-r" ];then
-    repo forall -c "git clean -df" && repo forall -c "git reset --hard; git checkout ."
+    git push mega HEAD:refs/for/$branch 
 elif [ $2 == "-a" ];then
     git add -A
     git commit --amend 

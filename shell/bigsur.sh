@@ -17,13 +17,15 @@ cd ~/Works/changan_shuaji
 #     fi
 # done
 
-rm -r $tarFile
+if [ $1 != "-s" ];then
+    rm -r $tarFile
 
-wget $1 --http-user=chengxiong.zhu --http-password=@Huan2870244352
-file=`basename $1`
-tar -zxvf $file
-echo `date` $file >> version.txt
-rm $file
+    wget $1 --http-user=chengxiong.zhu --http-password=@Huan2870244352
+    file=`basename $1`
+    tar -zxvf $file
+    echo `date` $file >> version.txt
+    rm $file
+fi
 
 #qnx 进入fastboot模式
 adb_qnx -r

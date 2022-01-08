@@ -11,8 +11,6 @@ import argparse
 SETSTR='/Set'
 
 def sigExist(sheel,row,col,CallFun):
-    if type(col) == str:
-        col = ord(col) - ord('A')
     sig = str(getValue(CallFun,sheel,row,col))
     relation=''
     if ',' in sig:
@@ -21,8 +19,8 @@ def sigExist(sheel,row,col,CallFun):
         del sigs[0]
         relation = ','.join(sigs)
     exist = len(sig)>3 and sig!='None'
-    if not exist:
-        print(row+1,chr(col+65),'信号不存在')
+    # if not exist:
+    #     print(row+1,chr(col+65),'信号不存在')
     return sig,exist,relation
  
 #返回 define topic desc
@@ -77,6 +75,8 @@ def xlsVaule(sheel,row,col):
 
 def getValue(CallFun,sheel,row,col):
     try:
+        if type(col) == str:
+            col = ord(col) - ord('A')
         return CallFun(sheel,row,col)
     except:
         # print(row+1,chr(col+65),'值不存在')
@@ -257,7 +257,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
 
         if sheetsSize > 1:
             old_sh = book[book.sheetnames[sheetsSize-1]]
-            old_sh.append([time.time()])
+            old_sh.append([time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())])
             for row in range(sh.max_row):
                 if row == 0:
                     continue
@@ -277,9 +277,8 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
     rowContent.append('中文名称(d)')
     rowContent.append('类名(x)')
     rowContent.append('topic(x表示自动搜索)')
-    rowContent.append('上行信号')
+    rowContent.append('上行信号/topic')
     rowContent.append('关联信号')
-    rowContent.append('-A(不生成代码)')
     sh.append(rowContent)
 
     while(startRow <= endRow):
@@ -287,7 +286,9 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
         topicStrSet, topicStr = getTopicByXls(CallFun, sheel, startRow)
         className = getValue(CallFun,sheel,startRow,1)+ getValue(CallFun,sheel,startRow,2)
         sig,isExist,relation = sigExist(sheel,startRow,'M',CallFun)
+        isTopic = True
         if isExist:
+            isTopic = False
             rowContent=[]
             topicDefine = getDefineByFile(defineContents,topicStrSet)
             rowContent.append(sig)
@@ -302,6 +303,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
 
         sig,isExist,relation = sigExist(sheel,startRow,'N',CallFun)
         if isExist:
+            isTopic = False
             rowContent=[]
             topicDefine = getDefineByFile(defineContents,topicStr)
             rowContent.append(sig)
@@ -310,6 +312,28 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
             rowContent.append(className+'Status')
             rowContent.append(topicDefine)
             rowContent.append('y')
+            rowContent.append(relation)
+            print(rowContent)
+            sh.append(rowContent)
+
+        if isTopic:
+            rowContent=[]
+            tempSet = str(getValue(CallFun,sheel,startRow,'H'))
+            if isNumber(tempSet):
+                topicStrSet, tempStr = getTopicByXls(CallFun, sheel, tempSet)
+                topicDefineSet = getDefineByFile(defineContents,topicStrSet)
+            elif len(tempSet) == 0:
+                topicDefineSet = getDefineByFile(defineContents,tempSet)
+            else:
+                topicDefineSet = tempSet
+
+            topicDefine = getDefineByFile(defineContents,topicStr)
+            rowContent.append(topicDefineSet)
+            rowContent.append(down)
+            rowContent.append(comment)
+            rowContent.append(className)
+            rowContent.append(topicDefine)
+            rowContent.append('-b')
             rowContent.append(relation)
             print(rowContent)
             sh.append(rowContent)

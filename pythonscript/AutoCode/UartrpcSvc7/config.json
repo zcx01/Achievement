@@ -1,0 +1,27 @@
+{
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/uartrpc_svc7",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/uartrpc_svc7",
+    "M":[
+        {
+            "content":"#include \"{fileName}.hpp\"",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/uartrpc_svc7/ua_item_def.hpp",
+            "pos":""
+        },
+        {
+            "content":"    std::shared_ptr<UARTPC::{ClassName}> {fileName} = nullptr;",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/uartrpc_svc7_module.hpp",
+            "pos":"PubSubListenerInterface"
+        },
+        {
+            "content":[
+                "",
+                "    {fileName} = std::make_shared<UARTPC::{ClassName}>(shared_from_this());",
+                "    {fileName}->subscribe({1});"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/uartrpc_svc7_module.cpp",
+            "pos":"link_signal_item"
+        }
+    ],
+    "desc":"shiyou"
+}
+ 

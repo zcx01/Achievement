@@ -497,7 +497,7 @@ class Analyze(object):
         ms = MessageInfo()
         ms.messageId =  getNoOx16(messages[1])
         ms.message_Id = messages[2]
-        ms.lenght = messages[3]
+        ms.lenght = int(messages[3])
         ms.sender = messages[4]
         return ms
         

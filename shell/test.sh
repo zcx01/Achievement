@@ -19,4 +19,6 @@
 # adb shell 
 # EOF
 
-adb shell telnet cdc-qnx `speed 1` `root`
+#adb shell telnet cdc-qnx `speed 1` `root`
+
+echo $2
