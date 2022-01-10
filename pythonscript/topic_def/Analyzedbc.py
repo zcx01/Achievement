@@ -472,9 +472,9 @@ class Analyze(object):
             assert isinstance(sig,SigInfo)
             dayaType = sig.dataType
             if dayaType == '-':
-                dataTypeStr="int32" 
+                dataTypeStr="int32_t" 
             elif dayaType == '+':
-                dataTypeStr="uint32"
+                dataTypeStr="uint32_t"
             if '.' in str(sig.min) or '.' in str(sig.max):
                 dataTypeStr='float'
         except:

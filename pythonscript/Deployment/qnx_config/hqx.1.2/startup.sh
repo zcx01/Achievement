@@ -879,10 +879,23 @@ start_backlightsrv()
     backlight_resmgr &
 }
 
+start_tempsrv()
+{
+    log_launch "tempsrv"
+    temp_resmgr &
+}
+
 setup_diag_service_pps()
 {
     log_launch  "setup diag_service_pps"
     touch  /var/pps/diag_service_pps
+}
+
+create_syslog () {
+    if [ -f /var/log/syslog ]; then
+        rm -rf /var/log/syslog
+    fi
+    touch -m 0666 /var/log/syslog
 }
 
 start_iceoryx()
@@ -924,8 +937,13 @@ start_health_monitor()
 start_chime_service()
 {
     log_launch "chime_service"
-    #on -T chime_service_t /bin/chime_service -d 122 -v 301 -U 803:803,819
-    on -T chime_service_t /bin/chime_service -d 106 -v 302 -U 803:803,819
+    on -T chime_service_t /bin/chime_service -U 803:803,819
+}
+
+start_ecu_config_utility()
+{
+    log_launch "ecu_config_utility"
+    on -T ecu_config_utility_t -u 805:805,819 /bin/ecu_config_utility -g
 }
 
 start_mcurpc()
@@ -935,7 +953,7 @@ start_mcurpc()
 
     # wait for the SPI device file created by spi_service
     waitfor /dev/spi9
-    on -T spirpc_t -p 40 -u spirpc /usr/bin/spirpc -s 143 -m 148 -p 9 &
+    on -T spirpc_t -p 10 -u spirpc /usr/bin/spirpc -s 143 -m 148 -p 9 &
 
     # wait for the UART RPC device file created by spi_service
     waitfor /dev/uartrpc7
@@ -1053,7 +1071,7 @@ waitfor_if()
     log_ready netconfig:if_up-$1
 }
 
-[ -f /etc/system/config/display_mapping.json ] || ln -s /etc/system/config/display_maping_$(uname -m | awk -F '_' '{print $4}').json /etc/system/config/display_mapping.json
+[ -f /etc/system/config/display_mapping.json ] || ln -s /etc/system/config/display_mapping_$(uname -m | awk -F '_' '{print $4}').json /etc/system/config/display_mapping.json
 
 uname_m=`uname -m`
 . /scripts/platform_variables.sh
@@ -1089,6 +1107,9 @@ usb_hub_power
 
 # mount log partition
 mount_log
+
+# create file /var/log/syslog
+create_syslog
 
 echo "Starting iceoryx iox-roudi ..."
 start_iceoryx

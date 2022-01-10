@@ -3,6 +3,7 @@
 #include "drvinfo_item.hpp"
 #include "parser_can_api.h"
 
+//{3}
 class {ClassName} : public DrvInfoItem
 {
 public:
@@ -16,4 +17,5 @@ private:
     
     void publishInvalid(std::string topic);
 };
+
 

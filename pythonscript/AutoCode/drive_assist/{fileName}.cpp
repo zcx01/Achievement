@@ -11,7 +11,7 @@ void {ClassName}::state_process(const std::string &topic, const std::string &con
 	PayloadInfo info = fds::ParseAndLogPayloadInfo(topic, content);
 	float value = info.value.get<float>();
 
-	fds::SendCanFrame(&CANSIG_{1}_g, value, signal_value_type::eSigValType_{4}_t);
+	fds::SendCanFrame(&CANSIG_{1}_g, value, signal_value_type::eSigValType_{4});
 }
 
 }

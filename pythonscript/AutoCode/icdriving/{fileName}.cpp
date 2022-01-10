@@ -15,7 +15,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
             return;
         }
 
-        signalChange(raw_value.val_{4}_t, {2});
+        signalChange(raw_value.val_{4}, {2});
     }
 }
 

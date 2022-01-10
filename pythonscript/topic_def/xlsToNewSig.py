@@ -329,7 +329,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
 
             topicDefine = getDefineByFile(defineContents,topicStr)
             rowContent.append(topicDefineSet)
-            rowContent.append(down)
+            rowContent.append(up)
             rowContent.append(comment)
             rowContent.append(className)
             rowContent.append(topicDefine)
