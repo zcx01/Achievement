@@ -65,50 +65,49 @@ void TextTipAdapter::addWarnInfo(std::string topic, int value)
     WarnInfo info;
     info.topic = topic;
     info.value = value;
-    try
+    if (config.count(valueStr))
     {
-        if (config[CONFIG_GRADE].is_string())
+        try
         {
-            grade = config[CONFIG_GRADE].get<std::string>();
-        }
-        else
-        {
-            grade = config[CONFIG_GRADE].get<std::map<std::string, std::string>>()[valueStr];
-        }
-        if (config.count(valueStr))
-        {
-            info.text = config[valueStr].get<std::string>();
-        }
-
-        if(config.count(CONFIG_FALUTMASK))
-        {
-            // auto falutMask = config.
-        }
-
-        if( WarnGrade::_from_string(grade.c_str())._to_index() == WarnGrade::W1)
-        {
-            info.immediately = true;
-        }
-        else if(config.count(CONFIG_IMMEDIATELY))
-        {
-            if (config[CONFIG_IMMEDIATELY].is_boolean())
+            if (config[CONFIG_GRADE].is_string())
             {
-                info.immediately = config[CONFIG_IMMEDIATELY].get<bool>();
+                grade = config[CONFIG_GRADE].get<std::string>();
             }
             else
             {
-                auto immediatelys = config[CONFIG_IMMEDIATELY].get<std::vector<int>>();
-                info.immediately = std::find(immediatelys.begin(),immediatelys.end(),value) != immediatelys.end();
+                grade = config[CONFIG_GRADE].get<std::map<std::string, std::string>>()[valueStr];
+            }
+
+            info.text = config[valueStr].get<std::string>();
+
+            if (config.count(CONFIG_FALUTMASK))
+            {
+                // auto falutMask = config.
+            }
+
+            if (WarnGrade::_from_string(grade.c_str())._to_index() == WarnGrade::W1)
+            {
+                info.immediately = true;
+            }
+            else if (config.count(CONFIG_IMMEDIATELY))
+            {
+                if (config[CONFIG_IMMEDIATELY].is_boolean())
+                {
+                    info.immediately = config[CONFIG_IMMEDIATELY].get<bool>();
+                }
+                else
+                {
+                    auto immediatelys = config[CONFIG_IMMEDIATELY].get<std::vector<int>>();
+                    info.immediately = std::find(immediatelys.begin(), immediatelys.end(), value) != immediatelys.end();
+                }
             }
         }
-
+        catch (...)
+        {
+            TB_LOG_INFO("value error: %s", topic.c_str());
+            return;
+        }
     }
-    catch(...)
-    {
-        TB_LOG_INFO("value error: %s", topic.c_str());
-        return;
-    }
-    
     bool status=m_rule.addWarnInfo(grade,info);
     TB_LOG_INFO("grade:%s text :%s topic:%s key:%d add:%d", grade.c_str(), info.text.c_str(), topic.c_str(), value,status);
 }

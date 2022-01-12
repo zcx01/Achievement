@@ -61,6 +61,13 @@ bool TextWarnRule::addWarnInfo(const WarnInfo &info)
     return false;
 }
 
+int TextWarnRule::removeWarnInfo(const WarnInfo &info)
+{
+    int infoIndex = Ve::getIndex(warns, info);
+    if(infoIndex == -1) return -1;
+    Ve::removeOne(warns, info);
+    return grade();
+}
 void TextWarnRule::removeFirst()
 {
     if(!warns.empty())

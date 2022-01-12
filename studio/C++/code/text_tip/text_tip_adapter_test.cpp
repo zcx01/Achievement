@@ -24,6 +24,7 @@ std::vector<std::string> str_split(const std::string &strtem, const std::string 
 TextTipAdapterTest::TextTipAdapterTest()
 {
     d.m_rule.SetCallWarnInfoFun(std::bind(&TextTipAdapterTest::sendWarnInfo, this, std::placeholders::_1));
+    d.addWarnInfo("icwarning/DoorOpenSts",1);
     add_Test_Topic();
 }
 
@@ -54,7 +55,7 @@ void TextTipAdapterTest::OneTest()
 
 void TextTipAdapterTest::add_Test_Topic()
 {
-    COUT_Topic();
+    // COUT_Topic();
     while (true)
     {
         std::string c1;
@@ -110,7 +111,7 @@ void TextTipAdapterTest::addWarn(std::string topic, int value)
 
 void TextTipAdapterTest::sendWarnInfo(const WarnInfo &info)
 {
-    TB_LOG_INFO("TextTipAdapterTest ", info.topic.c_str(), info.text.c_str(),info.alreadyTime);
+    TB_LOG_INFO("TextTipAdapterTest ", info.topic.c_str(),info.value,info.text.c_str(),info.alreadyTime);
     if (info.text.empty() || info.isCancel) 
     {
         is_one_finish = true;

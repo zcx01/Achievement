@@ -38,15 +38,15 @@ struct WarnInfo
 using  CallWarnInfoFun = std::function<void(const WarnInfo &)>;
 
 BETTER_ENUM(WarnGrade,int,
-    OP5,
-    OP4,
-    OP3,
-    OP2,
-    D2,
-    D1,
-    OP1,
-    W2,
     W1,
+    W2,
+    OP1,
+    D1,
+    D2,
+    OP2,
+    OP3,
+    OP4,
+    OP5,
     count
 );
 

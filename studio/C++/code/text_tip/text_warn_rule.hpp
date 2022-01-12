@@ -21,6 +21,9 @@ public:
     
     //增加警告信息
     bool addWarnInfo(const WarnInfo &info);
+
+    //移除警告信息,如果存在返回等级，不存在返回-1
+    int removeWarnInfo(const WarnInfo &info);
     
     //移除第一个
     void removeFirst();

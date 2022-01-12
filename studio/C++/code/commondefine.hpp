@@ -1,4 +1,6 @@
-#pragma once
+#ifndef COMMONDEFINE
+#define COMMONDEFINE
+
 #include <iostream>
 #include <vector>
 #include <list>
@@ -38,7 +40,7 @@ void COUTMAP(std::map<T, U> c)
     std::cout << "\n";
 }
 
-void printHex(const uint8_t *data, uint8_t len)
+static void printHex(const uint8_t *data, uint8_t len)
 {
     char buff[512] = {0};
     for (int i = 0; i < len; i++)
@@ -48,3 +50,5 @@ void printHex(const uint8_t *data, uint8_t len)
     printf("%s\n", buff);
 }
 // vector<string> v = split(s, ",*"); //可按多个字符来分隔;
+
+#endif  //COMMONDEFINE

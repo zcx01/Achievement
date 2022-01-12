@@ -1,0 +1,27 @@
+{
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/chime",
+    "M":[
+        {
+            "content":"#include \"{fileName}.hpp\"",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/chime/ch_item_def.hpp",
+            "pos":""
+        },
+        {
+            "content":"    std::shared_ptr<{ClassName}> {fileName} = nullptr;",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/chime_module.hpp",
+            "pos":"ChimeModule"
+        },
+        {
+            "content":[
+                "",
+                "    //{3}",
+                "    {fileName}= std::make_shared<{ClassName}>(shared_from_this());",
+                "    {fileName}->subscribe((struct veh_signal *)&CANSIG_{1}_g);"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime_module.cpp",
+            "pos":"link_signal_item"
+        }
+    ],
+    "desc":"chime(蜂鸣)音  1:信号名称"
+}

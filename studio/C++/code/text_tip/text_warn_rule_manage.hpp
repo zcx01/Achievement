@@ -38,6 +38,8 @@ private:
 
     void setCurrentRule(TextWarnRule *r);
 
+    int updateTopic(WarnInfo &info);
+
     std::vector<TextWarnRule*>    m_warnRule;
     TextWarnRule*                 m_currentRule=nullptr;
     std::thread*                  timer_thread=nullptr;

@@ -118,6 +118,25 @@ def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_pars
             return 2
     return 1
 
+def addCan_parse_whitelist(sigs):
+    is_Parser = False
+    jsConfig=getJScontent(pyFileDir+"config.json")
+    analy=Analyze(getKeyPath("dbcfile",jsConfig))
+    for sig in sigs:
+        message=analy.getMessage_Id_BySig(sig)
+        if len(message)==0:
+            print(f'{sig} 对应的message不存在')
+            break
+        messagesig=analy.getMessage_Id_Sig(sig)
+        can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
+        WriteCan = WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,False)
+
+        if WriteCan == 2 and not is_Parser:
+            is_Parser = True
+
+    if is_Parser:
+        os.system("Parser")
+        
 def dealnewSig(can_parse_whitelist_return=False):
     jsConfig=getJScontent(pyFileDir+"config.json")
     newSigFile=open(getKeyPath("newSig",jsConfig),"r")
@@ -229,11 +248,14 @@ if __name__ == "__main__":
     parse.add_argument('-t','--text',help='文本生成')
     parse.add_argument('-r','--CanParseWhitelistReturn', help='在can的白名单中存在就不生成代码',type=int,default=0)
     parse.add_argument('-p','--power',help='是否加入电源信号',default=0,type=int)
-    parse.add_argument('-w','--whitelist',nargs='+')
+    parse.add_argument('-w','--whitelist',nargs='+',help='向白名单中加入信号并且要输入路径')
+    parse.add_argument('-a','--Autowhite',nargs='+',help='向自动白名单中加入信号')
     arg = parse.parse_args()
 
     if judgeCommad('-w'):
         WriteCan_parse_whitelist(arg.whitelist[0],arg.whitelist[1],arg.whitelist[2],False)
+    elif judgeCommad('-a'):
+        addCan_parse_whitelist(arg.Autowhite)
     else:
         isXls = judgeCommad('-s') or not judgeCommad('-t')
         if isXls:

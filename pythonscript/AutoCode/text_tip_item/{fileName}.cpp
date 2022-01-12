@@ -15,6 +15,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
 
     int power=0;
     int result=0;
+    signal_status status;
     union veh_signal_value raw_value;
 
     status = CANSIG_GW_288__BcmPwrStsFb_g.GetValue.fpGetter(nullptr, &raw_value);

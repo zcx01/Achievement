@@ -4,7 +4,7 @@
 
 TextWarnRuleManage::TextWarnRuleManage()
 {
-    for (int i = WarnGrade::OP5; i < WarnGrade::count; i++)
+    for (int i = WarnGrade::W1; i < WarnGrade::count; i++)
     {
         m_warnRule.push_back(createRule(i));
     }
@@ -28,7 +28,8 @@ bool TextWarnRuleManage::addWarnInfo(const std::string &grade, WarnInfo &info)
     }
     catch (...)
     {
-        return false;
+        index = updateTopic(info);
+        if(index == -1) return false;
     }
     auto rule = m_warnRule[index];
     if (rule != nullptr)
@@ -190,4 +191,21 @@ void TextWarnRuleManage::stopThread()
         delete timer_thread;
         timer_thread = nullptr;
     }
+}
+
+
+int TextWarnRuleManage::updateTopic(WarnInfo &info) 
+{
+    for (auto rule : m_warnRule)
+    {
+        if (rule != nullptr && !rule->isEmpty())
+        {
+            auto grade = rule->removeWarnInfo(info);
+            if (grade != -1)
+            {
+                return grade;
+            }
+        }
+    }
+    return -1;
 }
