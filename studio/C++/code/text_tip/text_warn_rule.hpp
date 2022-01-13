@@ -90,7 +90,7 @@ public:
     using TextWarnRule::TextWarnRule;
 protected:
     TimeChangeResult timeChange();
-    int showMinTime();
+    int autoHideTime();
 };
 
 //保留最后一个

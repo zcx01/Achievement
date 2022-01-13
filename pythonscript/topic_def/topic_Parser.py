@@ -136,7 +136,7 @@ def addCan_parse_whitelist(sigs):
 
     if is_Parser:
         os.system("Parser")
-        
+
 def dealnewSig(can_parse_whitelist_return=False):
     jsConfig=getJScontent(pyFileDir+"config.json")
     newSigFile=open(getKeyPath("newSig",jsConfig),"r")
@@ -184,7 +184,7 @@ def dealnewSig(can_parse_whitelist_return=False):
             for sig in sigs:
                 message=analy.getMessage_Id_BySig(sig)
                 if len(message)==0:
-                    print(f'{sig} 对应的message不存在')
+                    print(f'{sig} 对应的message不存在 {getKeyPath("dbcfile",jsConfig)}')
                     failWrite.append(sig)
                     isWriteCanContinue = True
                     break

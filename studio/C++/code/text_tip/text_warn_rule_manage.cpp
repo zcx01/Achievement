@@ -55,6 +55,10 @@ void TextWarnRuleManage::timeOut()
         //打断rule
         if (result == TimeChangeResult::MinTime)
         {
+            /***
+             * 
+             * interrupt 如果是为空，不会return，会走优先级的打断
+             * */
             std::vector<int> interrupt = m_currentRule->Interrupt();
             std::sort(interrupt.begin(), interrupt.end(), [](const int &f, const int &t)
                       { return t < f; });

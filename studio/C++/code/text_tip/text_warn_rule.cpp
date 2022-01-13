@@ -251,7 +251,7 @@ TimeChangeResult SingleTextWarnRule::timeChange()
     return TimeChangeResult::Runing;
 }
 
-int SingleTextWarnRule::showMinTime() 
+int SingleTextWarnRule::autoHideTime() 
 {
     return 3;    
 }

@@ -24,7 +24,8 @@ std::vector<std::string> str_split(const std::string &strtem, const std::string 
 TextTipAdapterTest::TextTipAdapterTest()
 {
     d.m_rule.SetCallWarnInfoFun(std::bind(&TextTipAdapterTest::sendWarnInfo, this, std::placeholders::_1));
-    d.addWarnInfo("icwarning/DoorOpenSts",1);
+    d.addWarnInfo("icwarning/BcmVehLckAlrm",3);
+    d.addWarnInfo("Fault/GearControl",1);
     add_Test_Topic();
 }
 

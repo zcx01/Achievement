@@ -44,7 +44,7 @@ class OP2TextWarnRule : public SingleTextWarnRule
 public:
     using SingleTextWarnRule::SingleTextWarnRule;
     int grade(){return WarnGrade::OP2;}
-    int showMinTime(){return 5;}
+    int autoHideTime(){return 5;}
 };
 
 class OP3TextWarnRule : public SingleTextWarnRule

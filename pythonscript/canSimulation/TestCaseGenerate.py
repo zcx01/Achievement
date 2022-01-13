@@ -115,7 +115,7 @@ def generate(contents,defineContents,isSendCan,dbc,sh):
         for sigName in sigNames:
             info = dbc.getSig(sigName)
             if info == None:
-                print(f' canmatrix 中没有 {sigName}信号')
+                print(f' dbc 中没有 {sigName}信号')
                 continue
             sigInfos.append(info)
         
