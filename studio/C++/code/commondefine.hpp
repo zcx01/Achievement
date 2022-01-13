@@ -15,7 +15,7 @@ void TB_LOG_INFO(T0 t0, T... t)
     if constexpr (sizeof...(t) > 0)
         TB_LOG_INFO(t...);
     else
-        std::cout << " ----  " << __LINE__ << std::endl;
+        std::cout << std::endl;
 }
 
 template <typename T>

@@ -63,9 +63,10 @@ def sendBugCan(bugId):
     appendUseCases(descriptionCase)
         
     for comment in issue.fields.comment.comments:
+        print(comment.body)
         case = ReMatchStr(comment.body)
-        if descriptionCase.isSame(case):
-            continue
+        # if descriptionCase.isSame(case):
+        #     continue
         appendUseCases(case)
     if len(useCases) == 0:
         print("没有信号的存在")

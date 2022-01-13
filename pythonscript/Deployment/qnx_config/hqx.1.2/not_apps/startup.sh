@@ -844,7 +844,7 @@ start_pm_event_preprocess()
 {
     log_launch "start_pm_event_preprocess"
 
-    on -T pm_event_preprocess_t -u pm_event_preprocess pm_event_preprocess -config=/var/megapm_topics_config.cfg &
+    on -T pm_event_preprocess_t -u pm_event_preprocess pm_event_preprocess &
 }
 
 start_input_service()
@@ -870,7 +870,7 @@ start_nfsd()
 start_message_service()
 {
     log_launch "message center"
-    #/bin/slm -V /slm/msg_center.xml
+    # /bin/slm -V /slm/msg_center.xml
 }
 
 start_backlightsrv()
@@ -896,6 +896,12 @@ create_syslog () {
         rm -rf /var/log/syslog
     fi
     touch -m 0666 /var/log/syslog
+}
+
+create_icapps_version () {
+    if [ ! -f /etc/icapps_version ]; then
+        touch -m 0666 /etc/icapps_version
+    fi
 }
 
 start_iceoryx()
@@ -1111,6 +1117,9 @@ mount_log
 # create file /var/log/syslog
 create_syslog
 
+# create file /etc/icapps_version
+create_icapps_version
+
 echo "Starting iceoryx iox-roudi ..."
 start_iceoryx
 
@@ -1220,9 +1229,9 @@ $ON $IOAUDIO_ON_ARGS io-audio -o sw_mixer_ms=16 -d qc skip_device_disable=0,bmet
 $ON $NPU_SERVICE_ON_ARGS $NPU_SERVICE_BINARY $NPU_SERVICE_ARGS
 waitfor /dev/msm_npu
 
-LOCAL_IPADDR=192.168.1.1
-GATEWAY_IPADDR=192.168.1.3
-GVM_IPADDR=192.168.1.3
+LOCAL_IPADDR=192.168.0.1
+GATEWAY_IPADDR=192.168.0.3
+
 
 common_netdbgservices;
 
@@ -1321,7 +1330,7 @@ start_mosquitto
 
 echo "start ic_apps"
 setup_qt_env
-#/bin/slm -V /slm/service_apps.xml
+# /bin/slm -V /slm/service_apps.xml
 
 
 LSM_IPADDR=`cat /etc/hosts | grep 'cdc-android' | awk -F ' ' '{printf $1}'`

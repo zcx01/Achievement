@@ -233,10 +233,6 @@ TimeChangeResult SingleTextWarnRule::timeChange()
         }
         else if(alreadyTime >= showMinTime())
         {
-            if(isNewWarn(1))
-            {
-                removeFirst();
-            }
             return TimeChangeResult::MinTime;
         }
     }

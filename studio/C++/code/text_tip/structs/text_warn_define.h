@@ -12,7 +12,7 @@ struct WarnInfo
     std::string text;               //文本
     int         grade=0;            //等级
     int         value=0;            //值
-    int         immediately=false;  //立即打断
+    bool        immediately=false;  //立即打断
     int         autoHideTime=0;     //自动隐藏的时间,为-1时不自动取消,0时启用最小显示时间
     int         delay=0;            //延迟显示时间
 

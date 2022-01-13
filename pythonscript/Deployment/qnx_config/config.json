@@ -1,5 +1,8 @@
 {
     "startup.sh":"/scripts/",
+    "icwarning_config.json":"/opt/qt/config/",
+    "libmega_ic_plugin.so":"/opt/qt/qml/MegaIC/",
+    "ic_telltale":"/usr/bin/",
     "release-bigsur_hqx.1.1_20211108":"hqx.1.1",
     "Other":"hqx.1.2"
 }

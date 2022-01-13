@@ -93,6 +93,10 @@ void TextWarnRuleManage::timeOut()
             {
                 rule->changed();
             }
+            if (m_currentRule != rule)
+            {
+
+            }
             setCurrentRule(rule);
             return;
         }
