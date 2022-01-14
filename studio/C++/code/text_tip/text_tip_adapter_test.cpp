@@ -24,8 +24,8 @@ std::vector<std::string> str_split(const std::string &strtem, const std::string 
 TextTipAdapterTest::TextTipAdapterTest()
 {
     d.m_rule.SetCallWarnInfoFun(std::bind(&TextTipAdapterTest::sendWarnInfo, this, std::placeholders::_1));
-    d.addWarnInfo("C385/EpbTextDisp/OP3",4); //请重新入P挡再切换挡位
-    d.addWarnInfo("icwarning/VcuVehStartInfo",1); //起动时请先拔充电枪
+    d.addWarnInfo("icwarning/TboxRemDrvWoKeyReq",1); //起动时请先拔充电枪
+    d.addWarnInfo("C385/HudFaultSts",1); //请重新入P挡再切换挡位
     add_Test_Topic();
 }
 

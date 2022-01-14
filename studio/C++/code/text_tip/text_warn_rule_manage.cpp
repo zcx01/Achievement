@@ -93,10 +93,6 @@ void TextWarnRuleManage::timeOut()
             {
                 rule->changed();
             }
-            if (m_currentRule != rule)
-            {
-
-            }
             setCurrentRule(rule);
             return;
         }
@@ -161,7 +157,10 @@ void TextWarnRuleManage::setCurrentRule(TextWarnRule *r)
     {
         startThread(); //新的信息显示重启定时器
     }
-
+    if (m_currentRule != nullptr && m_currentRule != r)
+    {
+        m_currentRule->dealInterrupt();
+    }
     if (m_callFun != nullptr)
     {
         if (r != nullptr)

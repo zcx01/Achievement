@@ -11,7 +11,11 @@ public:
     //显示的最短时间(s)
     virtual int showMinTime();
     
+    //获取能够打断的等级
     std::vector<int> Interrupt();
+
+    //当打断的时候，调用此函数
+    void dealInterrupt();
 
     //得到显示的值
     WarnInfo getValue();
@@ -46,6 +50,8 @@ public:
     virtual int grade() = 0;
 
     int getAlreadyTime();
+
+
 protected:
     //自动隐藏的时间(s)
     virtual int autoHideTime();

@@ -11,6 +11,15 @@ std::vector<int> TextWarnRule::Interrupt()
     return m_Interrupts;
 }
 
+void TextWarnRule::TextWarnRule::dealInterrupt() 
+{
+    int lastTime = autoHideTime() - alreadyTime;
+    if (lastTime < showMinTime())
+    {
+        alreadyTime = std::max(autoHideTime() - showMinTime(),0);
+    }
+}
+
 WarnInfo TextWarnRule::getValue()
 {
     if(warns.empty()) return WarnInfo();
@@ -263,4 +272,5 @@ TimeChangeResult LastTextWarnRule::timeChange()
     }
     return TimeChangeResult::Runing;
 }
+
 
