@@ -1,6 +1,5 @@
 #include "{fileName}.hpp"
 #include <iostream>
-#include "structs/text_info.h"
 #include "structs/ipc_message.h"
 #include "ipc/megaipc_api.h"
 #include "topic/ipc_topic_new_def.h"
