@@ -34,7 +34,7 @@ if __name__ == "__main__":
     isExit = (args.interact == 0)
 
     if "-m" in sys.argv:
-        keyStr("mosquitto_sub -h cdc-qnx -v -t \"#\" ")
+        keyStr("on -T ic_apps_t -u ic_apps mega_ipc_sub -t  \"#\" ")
 
     if "-l" in sys.argv:
         try:
