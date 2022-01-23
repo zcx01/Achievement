@@ -959,11 +959,29 @@ start_mcurpc()
 
     # wait for the SPI device file created by spi_service
     waitfor /dev/spi9
-    on -T spirpc_t -p 10 -u spirpc /usr/bin/spirpc -s 143 -m 148 -p 9 &
+    on -T spirpc_t -p 40 -R 0x04 -u spirpc /usr/bin/spirpc -s 143 -m 148 -p 9 &
 
     # wait for the UART RPC device file created by spi_service
     waitfor /dev/uartrpc7
     on -T uartrpc_service_t -u uartrpc_service /usr/bin/uartrpc_service &
+}
+
+
+start_misc_service()
+{
+    #####start misc_service#####
+    log_launch "misc_service"
+    on -T misc_service_t -u misc_service misc_service &
+
+}
+
+set_ic_apps_cpu_runmask()
+{
+    ### set the CPU runmask of the ic related processes ###
+    slay -R 0x02 -i ic_service
+    slay -R 0x02 -i ic_chime
+    slay -R 0x02 -i ivi_compositor
+    slay -R 0x02 -i mcu_service
 }
 
 start_max20086()
@@ -1146,11 +1164,11 @@ log_launch "GVM(s)"
 #$ON $DEFAULT_ROOT_T qnetconfig -b 2 -c /etc/early-net.cfg &
 #common_netdbgservices;
 
-echo "start chime_service"
-start_chime_service
-
 echo "start MCU RPC daemon"
 start_mcurpc
+
+echo "start chime_service"
+start_chime_service
 
 echo "start MAX20086 daemon"
 start_max20086
@@ -1173,9 +1191,6 @@ start_dltlog_app
 
 echo "start ais_vision_server service"
 start_ais_vision_server
-
-echo "start ais_dms_server service"
-#start_ais_dms_server
 
 chmod a+w /etc/system/config
 
@@ -1432,6 +1447,14 @@ start_health_monitor
 
 echo "start thermal_ctrl service"
 start_thermal_ctrl
+
+echo "start misc_service"
+start_misc_service
+
+echo "start ais_dms_server service"
+start_ais_dms_server
+
+set_ic_apps_cpu_runmask
 
 echo 0 > /dev/pdbg/qcore/power/dynamic_offline_en
 echo "Startup complete"

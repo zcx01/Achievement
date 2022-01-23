@@ -1,0 +1,48 @@
+-----------------c385_deploy部署程序的脚本-----------------
+
+首次使用修改默认的项目路径 PrjectDir 的默认值
+
+#更新所有的文件
+#替换的文件时候会替换开始启动脚本
+#自动重启qnx
+c385_deploy
+
+#单独更新ic_service
+#-c 更新编译代码生成的可执行文件
+#替换的文件时候会替换开始启动脚本
+#自动重启qnx
+c385_deploy -c ic_service
+
+#单独更新绝对路径的文件
+#-a 是更加config.json文件复制到指定路径
+c385_deploy -a /home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/icwarning_config.json
+
+#获取更多信息
+c385_deploy -h
+
+-----------------adb_qnx.py 自动进入qnx-----------------
+只进入
+adb_qnx
+
+#过滤ic_service的log
+adb_qnx -l ic_service
+
+#订阅topic
+adb_qnx -m DrivingInfo/Gear
+
+#进入fastbook模式
+adb_qnx -r
+
+#进入fastbook模式
+adb_qnx -h
+
+----------------mcu_deploy.py 升级mcu----------------------
+首次使用修改脚本的这行的用户名和密码
+--http-user=chengxiong.zhu --http-password=@Huan2870244352
+
+#使用
+mcu_deploy mcu的网址
+
+-----------------cp_qnx.py 拷贝qnx文件到当前目前--------------
+#使用
+cp_qnx -p 文件路径 -f 文件名

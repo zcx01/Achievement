@@ -9,6 +9,7 @@ if __name__ == "__main__":
         description='拷贝qnx文件')
     parser.add_argument('-p','--path',help='文件路径',default='/var/log')
     parser.add_argument('-f','--fileNames',help='文件名',nargs='+',default=['ic_service.core'])  
+    parser.add_argument('-a','--aimDir',help='目标目录',default='./',type=str)  
     args = parser.parse_args()
     keyStr('adb root')
     keyStr('adb shell')
@@ -26,6 +27,6 @@ if __name__ == "__main__":
 
     SetCloseSpawn(True)
     for file in files:
-        keyStr(f'adb pull /qlog/dltlogs/{file} ./')
+        keyStr(f'adb pull /qlog/dltlogs/{file} {args.aimDir}')
 
     interact()

@@ -1,5 +1,7 @@
 #!/bin/python
+import inspect
 from os import system
+from traceback import print_exc
 import time
 import sys
 import subprocess
@@ -9,8 +11,8 @@ from commonfun import *
 
 # PrjectDir='changan_c835'
 pyFileDir = os.path.dirname(os.path.abspath(__file__))
-pyFileQNXDir = pyFileDir+"/qnx_config/"
-jsConfig=getJScontent(pyFileQNXDir+"config.json")
+qnxConfigDir = pyFileDir+"/qnx_config/"
+jsConfig=getJScontent(qnxConfigDir+"config.json")
 androidQnx=AndroidQnx()
 
 def adbPush(proceesNames,excess,argv):
@@ -69,6 +71,17 @@ def getDevDir():
         return jsConfig['Other']
     return dev
     
+
+def updateStartUp(qnxConfig_hqx):
+    assert isinstance(qnxConfig_hqx,str)
+    os.system(f'python3 cp_qnx.py -p /scripts/ -f startup.sh -a {qnxConfig_hqx}')
+    not_appsStartUp=qnxConfig_hqx+'not_apps/startup.sh'
+    os.system(f'cp {qnxConfig_hqx}startup.sh {not_appsStartUp}')
+    print(f'正在修改{not_appsStartUp}文件')
+    content = readFileAll(not_appsStartUp)
+    content = content.replace('/bin/slm','# /bin/slm')
+    writeFileAll(not_appsStartUp,content)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='部署C385程序,部署release c385_deploy -c ic_service -d bin -p changan_c835_release -r')
@@ -80,7 +93,7 @@ if __name__ == "__main__":
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     parser.add_argument('-r','--not',help='excess commad',nargs='*')
     parser.add_argument('-d','--dir',help='exe dir',default='',type=str)
-    parser.add_argument('-p','--PrjectDir',help='prject dir',default='changan_c835',type=str)
+    parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c835/prebuilts/ic',type=str)
     args = parser.parse_args()
     argv = sys.argv
     PrjectDir = args.PrjectDir
@@ -93,15 +106,16 @@ if __name__ == "__main__":
 
     devDir = getDevDir()
     print('所在分支-------',devDir)
+    updateStartUp(f'{qnxConfigDir}{devDir}/')
     if "-r" not in argv :
-        copyStartfile(f'{pyFileQNXDir}{devDir}/not_apps/startup.sh',True)
+        copyStartfile(f'{qnxConfigDir}{devDir}/not_apps/startup.sh',True)
         
     keyStr('adb root')
     if "-c" in argv :
         proceesNames= args.customfile
         if len(proceesNames) == 0:
             exit()
-        keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts/ic")
+        keyStr(f"cd {PrjectDir}")
 
         exe_proceesNames=[]
         for proceesName in proceesNames:
@@ -111,28 +125,27 @@ if __name__ == "__main__":
             exe_proceesNames.append(f'{execbin}/{proceesName}')
         androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
-        copyStartfile(f'{pyFileQNXDir}{devDir}/startup.sh',False)
+        copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
         exit()
 
     if "-q" not in argv:
-        
-        keyStr(f"cd ~/Works/Repos/{PrjectDir}/prebuilts")
+        keyStr(f"cd {PrjectDir}")
         androidQnx.pc_android_qnx([
-        "ic/ic_chime/ic_chime",
-        "ic/ic_service/ic_service",
-        "ic/mcu_service/mcu_service ",
-        "ic/lib/lib_base.so ",
-        "ic/lib/lib_mega_ipc.so ",
-        "ic/qt/bin/ivi_compositor ",
-        "ic/qt/bin/ic_telltale ",
-        "ic/qt/qml/MegaIC/libmega_ic_plugin.so ",
-        "ic/qt/qml/Resources/libresources_plugin.so ",
+        "ic_chime/ic_chime",
+        "ic_service/ic_service",
+        "mcu_service/mcu_service ",
+        "lib/lib_base.so",
+        "lib/lib_mega_ipc.so",
+        "qt/bin/ivi_compositor",
+        "qt/bin/ic_telltale",
+        "qt/qml/MegaIC/libmega_ic_plugin.so",
+        "qt/qml/Resources/libresources_plugin.so",
 
-        "ic/qt/config/screen_layout_config.json",
-        "ic/qt/config/icadas_config.json",
-        "ic/qt/config/icscreencast_config.json",
-        "ic/qt/config/ictelltale_config.json",
-        "ic/qt/config/icwarning_config.json"])
+        "qt/config/screen_layout_config.json",
+        "qt/config/icadas_config.json",
+        "qt/config/icscreencast_config.json",
+        "qt/config/ictelltale_config.json",
+        "qt/config/icwarning_config.json"])
 
         keyStr("telnet cdc-qnx")
         keyStr("root")
@@ -141,13 +154,13 @@ if __name__ == "__main__":
     fileDict['ic_chime']='/usr/bin/'
     fileDict['ic_service']='/usr/bin/'
     fileDict['mcu_service']='/usr/bin/'
-    fileDict['ivi_compositor'] = '/usr/bin/ivi_compositor'
-    fileDict['ic_telltale'] = '/usr/bin/ic_telltale'
+    fileDict['ivi_compositor'] = '/usr/bin/'
+    fileDict['ic_telltale'] = '/usr/bin/'
     androidQnx.qnx_cp(fileDict,True)
 
     fileDict.clear()
-    fileDict['lib_base.so']='/usr/lib64/'
-    fileDict['lib_mega_ipc.so']='/usr/lib64/'
+    fileDict['lib_base.so']='/lib64/'
+    fileDict['lib_mega_ipc.so']='/lib64/'
     fileDict['libmega_ic_plugin.so']='/opt/qt/qml/MegaIC/libmega_ic_plugin.so'
     fileDict['libresources_plugin.so']='/opt/qt/qml/Resources/libresources_plugin.so'
     fileDict['screen_layout_config.json']='/opt/qt/config'
@@ -157,6 +170,6 @@ if __name__ == "__main__":
     fileDict['icwarning_config.json']='/opt/qt/config'
     androidQnx.qnx_cp(fileDict,False)
 
-    copyStartfile(f'{pyFileQNXDir}{devDir}/startup.sh',False)
+    copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
    
 

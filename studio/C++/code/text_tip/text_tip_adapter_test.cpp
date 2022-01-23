@@ -25,7 +25,9 @@ TextTipAdapterTest::TextTipAdapterTest()
 {
     d.m_rule.SetCallWarnInfoFun(std::bind(&TextTipAdapterTest::sendWarnInfo, this, std::placeholders::_1));
     // d.addWarnInfo("C385/HudFaultSts",1); //请重新入P挡再切换挡位
-    d.addWarnInfo("Fault/VehicleSerious",1); //起动时请先拔充电枪
+    d.addWarnInfo("Fault/GearControl",1); 
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    d.addWarnInfo("Fault/GearControl",0); 
     add_Test_Topic();
 }
 

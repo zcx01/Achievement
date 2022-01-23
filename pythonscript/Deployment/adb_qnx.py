@@ -11,7 +11,7 @@ if __name__ == "__main__":
         description='qnx ')
 
     parser.add_argument('-r','--reset',help='reset -f',nargs='*')
-    parser.add_argument('-m','--subtopic',help='su btopic',nargs='*',default=[])
+    parser.add_argument('-m','--subtopic',help='su btopic',type=str,default=[])
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     parser.add_argument('-k','--slay', help='slay process',type=str,nargs='*')
     parser.add_argument('-l','--log', help='taif log',type=str)
@@ -34,7 +34,10 @@ if __name__ == "__main__":
     isExit = (args.interact == 0)
 
     if "-m" in sys.argv:
-        keyStr("on -T ic_apps_t -u ic_apps mega_ipc_sub -t  \"#\" ")
+        try:
+            keyStr(f"on -T ic_apps_t -u ic_apps mega_ipc_sub -t  \"{args.subtopic}\" ")
+        except:
+            pass
 
     if "-l" in sys.argv:
         try:
@@ -45,7 +48,7 @@ if __name__ == "__main__":
 
     if '-r' in sys.argv:
         keyStr("mcu_tool -g 2")
-        keyStr("reset -f")
+        keyStr("reset -f",0.3,'PON_SOFT_RB_SPARE')
         isExit=True
 
     if '-k' in sys.argv:

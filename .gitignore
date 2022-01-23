@@ -87,3 +87,5 @@ CMakeCache*
 .vscode/c_cpp_properties.json
 *signal_listened.csv
 *signal_value_choices.csv
+pythonscript/Deployment/qnx/ic_service.core
+pythonscript/Deployment/qnx/ic_service
