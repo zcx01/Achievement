@@ -23,7 +23,7 @@ def qnx_screen_video(serial, video_path, branch='bigsur'):
     :param video_path:
     :return:
     """
-    p = pexpect.spawn("adb -s %s shell" % serial, encoding='utf-8', logfile=sys.stdout, timeout=30)
+    p = pexpect.spawn("adb shell" , encoding='utf-8', logfile=sys.stdout, timeout=30)
     index = p.expect([branch, pexpect.EOF, pexpect.TIMEOUT])
     if index != 0:
         logging.error("%s is not connected!" % serial)
@@ -96,7 +96,8 @@ def qnx_screenshot_1_2_1(serial, image_path, branch='bigsur'):
     """
 
     # 登录android
-    p = pexpect.spawn("adb -s %s shell" % serial, encoding='utf-8', logfile=sys.stdout, timeout=30)
+    os.system("adb root")
+    p = pexpect.spawn("adb shell", encoding='utf-8', logfile=sys.stdout, timeout=30)
     index = p.expect([branch, pexpect.EOF, pexpect.TIMEOUT])
     if index != 0:
         logging.error("%s is not connected!" % serial)
@@ -130,7 +131,7 @@ def qnx_screenshot_1_2_1(serial, image_path, branch='bigsur'):
                     # img_tag = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
                     img1 = os.path.join(image_path, "screen.bmp")
                     # img2 = os.path.join(image_path, "screen_2_%s.bmp"%img_tag)
-                    os.system("adb -s %s pull %s %s" % (serial, "/ota/screen.bmp", img1))
+                    os.system("adb pull %s %s" % ("/ota/screen.bmp", img1))
                     # os.system("adb -s %s pull %s %s" % (serial, "/ota/screen_2.bmp", img2))
                     # 合并图片
                     # temp_img1 = Image.open(img1)
@@ -156,7 +157,7 @@ def qnx_screenshot_1_2_1(serial, image_path, branch='bigsur'):
 
 def qnx_screenshot_1_1_0(serial, image_path):
     #登录android
-    p = pexpect.spawn("adb -s %s shell" % serial, encoding='utf-8', logfile=sys.stdout, timeout=30)
+    p = pexpect.spawn("adb shell", encoding='utf-8', logfile=sys.stdout, timeout=30)
     index = p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT])
     if index != 0:
         logging.error("%s is not connected!" % serial)
@@ -221,6 +222,6 @@ def blend_two_images(img1, img2, output_img, ratio=0.4):
 
 
 if __name__ == "__main__":
-    # qnx_screenshot_1_2_1(serial="614467a7", image_path="./")
-    qnx_screen_video(serial="9a4472e9", video_path="/home/shengm/Pictures/test")
+    qnx_screenshot_1_2_1(serial="614467a7", image_path="./")
+    # qnx_screen_video(0, video_path="/home/shengm/Pictures/test")
 

@@ -263,7 +263,7 @@ def displayInfo(usecases):
             index += 1
 
 
-def dealTest(dataPath,keyIndex=1,signalIndex=4):
+def dealTest(dataPath,keyIndex=1,signalIndex=4,isApendPwer=True):
     book=xlrd.open_workbook(dataPath)
     sheel=book.sheet_by_index(0)
     useCases=[]
@@ -273,6 +273,8 @@ def dealTest(dataPath,keyIndex=1,signalIndex=4):
             continue
         case.key = sheel.cell_value(row, keyIndex)
         case.index = row+1
+        if(isApendPwer):
+            case.AddPowerSig()
         useCases.append(case)
     displayInfo(useCases)
 
@@ -304,9 +306,9 @@ if __name__ == "__main__":
 
     use = useCase()
     if "-b" in sys.argv:
-        dealTest(arg.bugxlsx,1,26)
+        dealTest(arg.bugxlsx,1,26,arg.SendPowerSig)
     elif '-c' in sys.argv:
-        dealTest(arg.casexlsx,0,1)
+        dealTest(arg.casexlsx,0,1,arg.SendPowerSig)
     elif '-s' in sys.argv:
         use.AddPowerSig()
         use.SimulationCan()

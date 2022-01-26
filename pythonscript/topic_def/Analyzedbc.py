@@ -475,7 +475,7 @@ class Analyze(object):
                 dataTypeStr="int32_t" 
             elif dayaType == '+':
                 dataTypeStr="uint32_t"
-            if '.' in str(sig.min) or '.' in str(sig.max):
+            if '.' in str(sig.min) or '.' in str(sig.max) or '.' in str(sig.Offset) or '.' in str(sig.factor):
                 dataTypeStr='float'
         except:
             pass
@@ -579,7 +579,7 @@ class Analyze(object):
                 for user in userIndex:
                     for sigUsrIndex in sigUsrIndexs:
                         if sigUsrIndex in userIndex[user]:
-                            print(f"{sig.name} 信号有覆盖:开始字节{sig.startBit},结束的字节{sig.endBit}，占用的字节{sigUsrIndexs},与{user}覆盖字节 {userIndex[user]}")
+                            printRed(f"{sig.name} 信号有覆盖:开始字节{sig.startBit},结束的字节{sig.endBit}，占用的字节{sigUsrIndexs},与{user}覆盖字节 {userIndex[user]}")
                             return WriteDBCResult.SignalCoverage
 
                 linelist.insert(insertRowIndex,sig.getSG())
@@ -601,9 +601,9 @@ class Analyze(object):
                     linelist.append(enumStr) 
 
                 wirteFileDicts(self.dbcPath,linelist,False)
-                print(f"{sig.name} 写入完成")
+                printGreen(f"{sig.name} 写入完成")
             except Exception as e:
-                print(f"{sig.name} 写入失败:{str(e)}")
+                printRed(f"{sig.name} 写入失败:{str(e)}")
         except:
             print(f'{sig.name} 正在写入message')
             if not self.writeMessage(msg,linelist):

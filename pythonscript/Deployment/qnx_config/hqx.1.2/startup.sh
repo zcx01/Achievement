@@ -851,7 +851,7 @@ start_input_service()
 {
     log_launch "input_service"
     waitfor /dev/uartrpc5
-    on -T input_service_t -u 815:815,68 /bin/input_service -p ivi_compositor
+    on -T input_service_t -u 815:815,68,819 /bin/input_service -p ivi_compositor
 }
 
 start_record_service()
@@ -961,7 +961,14 @@ start_mcurpc()
     waitfor /dev/spi9
     on -T spirpc_t -p 40 -R 0x04 -u spirpc /usr/bin/spirpc -s 143 -m 148 -p 9 &
 
-    # wait for the UART RPC device file created by spi_service
+    # wait for the UART RPC device file created by uartrpc
+    waitfor /dev/uartrpc0
+    waitfor /dev/uartrpc1
+    waitfor /dev/uartrpc2
+    waitfor /dev/uartrpc3
+    waitfor /dev/uartrpc4
+    waitfor /dev/uartrpc5
+    waitfor /dev/uartrpc6
     waitfor /dev/uartrpc7
     on -T uartrpc_service_t -u uartrpc_service /usr/bin/uartrpc_service &
 }
@@ -1018,18 +1025,14 @@ start_dltlog_app()
 {
     log_launch "dltlog"
 
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
-
-    on -T dltlog_t -p 10 -u dltlog /usr/bin/dlt_daemon -d
-    on -T dltlog_t -p 10 -u dltlog /usr/bin/dlt_qnx -d
-
     if [ ! -d /var/log/dltlogs ]; then
         mkdir -m 0666 -p /var/log/dltlogs;
     fi
 
     chown 832:832 /var/log/dltlogs
 
-    on -T dltlog_t -p 10 -u dltlog /usr/bin/dlt_receive -d -c /etc/dlt-receive.conf
+    on -T dltlog_t -p 10 -u dltlog /usr/bin/dlt-daemon -d -c /etc/dlt.conf
+    on -T dltlog_t -p 10 /usr/bin/dlt-qnx-system -d -c /etc/dlt-qnx-system.conf
 }
 
 

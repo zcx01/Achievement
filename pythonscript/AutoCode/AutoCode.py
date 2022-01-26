@@ -5,6 +5,8 @@ import sys
 import json
 from subprocess import Popen
 from typing import List
+
+from pythonscript.AutoCode.commonfun import printGreen
 # sys.path.append("..")
 # from commonfun import *
 
@@ -259,7 +261,7 @@ def createfile(fileName,type,replaceList):
     #通过 config 修改文件
     modifyFile(jsConfig,replaceList,className,fileName)
 
-    print("生存完成!")
+    printGreen("生成代码完成!")
 
 def showType():
     if len(sys.argv) == 2 :

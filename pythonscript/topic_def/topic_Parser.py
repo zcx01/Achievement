@@ -2,6 +2,7 @@
 import json
 import sys
 import os
+from pythonscript.AutoCode.commonfun import printRed
 import xlrd
 import subprocess
 import argparse
@@ -184,7 +185,7 @@ def dealnewSig(can_parse_whitelist_return=False):
             for sig in sigs:
                 message=analy.getMessage_Id_BySig(sig)
                 if len(message)==0:
-                    print(f'{sig} 对应的message不存在 {getKeyPath("dbcfile",jsConfig)}')
+                    printRed(f'{sig} 对应的message不存在 {getKeyPath("dbcfile",jsConfig)}')
                     failWrite.append(sig)
                     isWriteCanContinue = True
                     break

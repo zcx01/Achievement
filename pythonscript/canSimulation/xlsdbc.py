@@ -446,7 +446,7 @@ def sigNameChanged(configPath, dbcPath, resultPath, canMatrix):
     if len(resultPath) != 0:
         print(f"写入{resultPath}文件...")
         wirteFileDicts(resultPath, nameChanged+resetName, False)
-        print(f"分析完成")
+        printGreen(f"分析完成")
 
 def CopyEnum(configPath, dbcPath, resultPath):
     print('赋值枚举...')

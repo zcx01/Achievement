@@ -170,6 +170,20 @@ def removeListIndexs(linelist,Indexs):
         if index not in Indexs:
             temp.append(linelist[index])
     return temp
+
+def printRed(infoStr):
+    print('\033[31m'+infoStr)
+    print('\033[0m')
+
+def printGreen(infoStr):
+    print('\033[32m'+infoStr)
+    print('\033[0m')
+    
+def printYellow(infoStr):
+    print('\033[33m'+infoStr)
+    print('\033[0m')
+
+
 # print(removeListIndexs([12,23,56],[0,2]))
 
 # def Temp(linelist):

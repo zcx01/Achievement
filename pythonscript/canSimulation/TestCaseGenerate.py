@@ -190,7 +190,7 @@ def generateTest(caseAim,xlsFileName,jsConfigPath,variable,isSendCan=False,isOPe
         generate(caseAim,defineContents,isSendCan,dbc,sh)
 
     book.save(casePath)
-    print("生成完成")
+    printGreen("生成case完成")
     if isOPenCase:
         path = str(casePath).replace('(','\(')
         path = str(path).replace(')','\)')

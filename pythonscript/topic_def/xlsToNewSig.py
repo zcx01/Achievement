@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import sys
 import os
+
+from sqlalchemy import false, true
 import xlrd
 import time
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
@@ -125,8 +127,6 @@ def getTopicAndDefineByRow(sheel,CallFun,rows):
         topicStrSet, topicStr = getTopicByXls(CallFun, sheel, row)
         defineStrSet = getDefineBySelf(topicStrSet)
         defineStr = getDefineBySelf(topicStr)
-        print(f'{row:<5}{topicStr:<50}{defineStr:<70}{comment}')
-        print(f'{row:<5}{topicStrSet:<50}{defineStrSet:<70}{commentSet:}')
         subTopic.append(topicStr)
         pubTopic.append(topicStrSet)
         descs.append(comment)
@@ -140,9 +140,12 @@ def interactiveTopic(subTopic,pubTopic,descs,isTip=True):
         rowIndex = -1
         while True:
             if isTip:
-                m = input('是否生成消息(y/n/h)')
-                if  m == 'n':return
-                rowIndex = input('输入索引')
+                if len(subTopic) == 1:
+                    rowIndex  =0
+                else:
+                    m = input('是否生成消息(y/n/h)')
+                    if  m == 'n':return
+                    rowIndex = input('输入索引')
             for row in range(len(subTopic)):
                 if row == int(rowIndex) or rowIndex == -1:
                     if subTopic[row].endswith(SETSTR):
@@ -152,6 +155,7 @@ def interactiveTopic(subTopic,pubTopic,descs,isTip=True):
                     if row < len(pubTopic):
                         print(sendMqtt(f'{pubTopic[row]}',1))
             if not isTip:return
+            if len(subTopic) == 1:return
     except:
         pass
 

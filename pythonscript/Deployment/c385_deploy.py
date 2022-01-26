@@ -9,7 +9,6 @@ from execCmd import *
 import argparse
 from commonfun import *
 
-# PrjectDir='changan_c835'
 pyFileDir = os.path.dirname(os.path.abspath(__file__))
 qnxConfigDir = pyFileDir+"/qnx_config/"
 jsConfig=getJScontent(qnxConfigDir+"config.json")
@@ -74,7 +73,7 @@ def getDevDir():
 
 def updateStartUp(qnxConfig_hqx):
     assert isinstance(qnxConfig_hqx,str)
-    os.system(f'python3 cp_qnx.py -p /scripts/ -f startup.sh -a {qnxConfig_hqx}')
+    os.system(f'python3 {pyFileDir}/cp_qnx.py -p /scripts/ -f startup.sh -a {qnxConfig_hqx}')
     not_appsStartUp=qnxConfig_hqx+'not_apps/startup.sh'
     os.system(f'cp {qnxConfig_hqx}startup.sh {not_appsStartUp}')
     print(f'正在修改{not_appsStartUp}文件')
