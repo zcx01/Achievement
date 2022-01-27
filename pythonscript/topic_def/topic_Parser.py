@@ -2,7 +2,6 @@
 import json
 import sys
 import os
-from pythonscript.AutoCode.commonfun import printRed
 import xlrd
 import subprocess
 import argparse

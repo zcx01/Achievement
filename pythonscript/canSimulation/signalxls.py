@@ -86,6 +86,7 @@ class useCase(object):
             if '-h' in cmd:
                 print('-s：停止发送所有的信号')
                 print('-r：重新发送')
+                print('-e: 退出整个')
                 print('信号名 值：修改信号值和增加信号值')
                 print('值：修改上一个信号的发送值')
                 print('输入信号名:停止发送')
@@ -93,7 +94,9 @@ class useCase(object):
             cmd = re.findall(e_i,cmd,re.A)
             if isNumber(cmd[0]):
                 cmd.insert(0,preSig)
-            if '-s' in cmd:
+            if '-e' in cmd:
+                sys.exit()
+            elif '-s' in cmd:
                 self.stopAllsig()
                 return
             elif '-r' in cmd:
@@ -256,6 +259,7 @@ def displayInfo(usecases):
             isloop=False
         index=0
         for case in useCases:
+            assert isinstance(case,useCase)
             if case.find(in_s):
                 case.SimulationCan()
                 pyperclipCopy(case.Out())

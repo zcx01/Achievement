@@ -5,10 +5,8 @@ import sys
 import json
 from subprocess import Popen
 from typing import List
-
-from pythonscript.AutoCode.commonfun import printGreen
 # sys.path.append("..")
-# from commonfun import *
+from commonfun import *
 
 configFilePath = os.path.abspath(__file__)
 

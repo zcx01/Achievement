@@ -579,7 +579,7 @@ class Analyze(object):
                 for user in userIndex:
                     for sigUsrIndex in sigUsrIndexs:
                         if sigUsrIndex in userIndex[user]:
-                            printRed(f"{sig.name} 信号有覆盖:开始字节{sig.startBit},结束的字节{sig.endBit}，占用的字节{sigUsrIndexs},与{user}覆盖字节 {userIndex[user]}")
+                            printRed(f"{sig.name} 信号有覆盖:开始字节 {sig.startBit} ,结束的字节 {sig.endBit} ，占用的字节 {sigUsrIndexs} ,与 {user}     覆盖字节 {userIndex[user]}")
                             return WriteDBCResult.SignalCoverage
 
                 linelist.insert(insertRowIndex,sig.getSG())
