@@ -94,6 +94,7 @@ class AndroidQnx(object):
     def qnx_cp(self,fileDict,chmod):
         for file in fileDict:
             if len(fileDict[file]) != 0:
+                keyStr(f"rm {fileDict[file]}{file}")
                 keyStr(f"cp {self.qnxDir}/{file} {fileDict[file]}")
             if chmod:
                 keyStr(f"chmod +x {fileDict[file]}/{file}",0)

@@ -185,7 +185,6 @@ def printYellow(infoStr):
 
 
 # print(removeListIndexs([12,23,56],[0,2]))
-
 # def Temp(linelist):
 #     linelist.append('ddd')
 # linelist=['ww']

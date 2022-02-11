@@ -5,6 +5,10 @@
     "ic_telltale":"/usr/bin/",
     "lib_mega_ipc.so":"/lib64/",
     "release-bigsur_hqx.1.1_20211108":"hqx.1.1",
-    "Other":"hqx.1.2"
+    "Other":"hqx.1.2",
+    "PC":
+    {
+        "ivi_compositor": "qt/bin"
+    }
 }
  

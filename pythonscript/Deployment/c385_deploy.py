@@ -39,21 +39,22 @@ def copAbsolutePath(proceesNames):
     adbPush(adbNames,args.excess,['-a'])
 
 def copyStartfile(path,isWait):
-    SetCloseSpawn(True)
-    copAbsolutePath([path])
-    keyStr("reset")
-    time.sleep(1)
-    SetCloseSpawn(True)
-    if isWait:
-        time.sleep(5)
-        for j in range(120):
-            adb_out = subprocess.getoutput("adb devices").split('\n')
-            if len(adb_out) >= 3:
-                if j >=3:
-                    time.sleep(20)
-                break
-            print(f"车机重启中...等待{j+1}秒")
-            time.sleep(1)
+    pass
+    # SetCloseSpawn(True)
+    # copAbsolutePath([path])
+    # if isWait:
+    #     keyStr("reset")
+    #     time.sleep(1)
+    #     SetCloseSpawn(True)
+    #     time.sleep(5)
+    #     for j in range(120):
+    #         adb_out = subprocess.getoutput("adb devices").split('\n')
+    #         if len(adb_out) >= 3:
+    #             if j >=3:
+    #                 time.sleep(20)
+    #             break
+    #         print(f"车机重启中...等待{j+1}秒")
+    #         time.sleep(1)
 
 def main(args,argv):
     pass
@@ -81,6 +82,20 @@ def updateStartUp(qnxConfig_hqx):
     content = content.replace('/bin/slm','# /bin/slm')
     writeFileAll(not_appsStartUp,content)
 
+def getExecBin(defultDir,execName):
+    pcDirs = jsConfig.get("PC","")
+    tempDir = pcDirs.get(execName,"")
+    if len(tempDir) != 0:
+        return tempDir
+    return defultDir
+
+def printPCFile():
+    pcDirs = jsConfig.get("PC","")
+    assert isinstance(pcDirs,dict)
+    pcFiles = list(pcDirs.keys())
+    for pcFile in pcFiles:
+        print(pcFile)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='部署C385程序,部署release c385_deploy -c ic_service -d bin -p changan_c835_release -r')
@@ -92,9 +107,13 @@ if __name__ == "__main__":
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     parser.add_argument('-r','--not',help='excess commad',nargs='*')
     parser.add_argument('-d','--dir',help='exe dir',default='',type=str)
+    parser.add_argument('-f','-PcFileName',help="打印自带PC上文件的名称",nargs='*')
     parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c835/prebuilts/ic',type=str)
     args = parser.parse_args()
     argv = sys.argv
+    if '-f' in argv:
+        printPCFile()
+        sys.exit()
     PrjectDir = args.PrjectDir
     keyStr('adb root')
     main(args,sys.argv)
@@ -118,13 +137,15 @@ if __name__ == "__main__":
 
         exe_proceesNames=[]
         for proceesName in proceesNames:
-            execbin=proceesName
+            execbin = getExecBin(proceesName,proceesName)
             if len(args.dir) != 0:
                 execbin = args.dir
             exe_proceesNames.append(f'{execbin}/{proceesName}')
         androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
         copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
+        keyStr('reset')
+        time.sleep(1)
         exit()
 
     if "-q" not in argv:
@@ -136,7 +157,6 @@ if __name__ == "__main__":
         "lib/lib_base.so",
         "lib/lib_mega_ipc.so",
         "qt/bin/ivi_compositor",
-        "qt/bin/ic_telltale",
         "qt/qml/MegaIC/libmega_ic_plugin.so",
         "qt/qml/Resources/libresources_plugin.so",
 
@@ -154,7 +174,6 @@ if __name__ == "__main__":
     fileDict['ic_service']='/usr/bin/'
     fileDict['mcu_service']='/usr/bin/'
     fileDict['ivi_compositor'] = '/usr/bin/'
-    fileDict['ic_telltale'] = '/usr/bin/'
     androidQnx.qnx_cp(fileDict,True)
 
     fileDict.clear()
@@ -170,5 +189,7 @@ if __name__ == "__main__":
     androidQnx.qnx_cp(fileDict,False)
 
     copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
+    keyStr('reset')
+    time.sleep(1)
    
 

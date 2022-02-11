@@ -36,6 +36,7 @@ def getValueInt(src, row, col, lenght=-1):
 
 def getSigInfo(sheel, row):
     sig = SigInfo()
+    sig.subNet = str(getValue(sheel, row, 0)).upper()
     sig.Sender = str(getValue(sheel, row, 1)).upper()
     temp = str(getValue(sheel, row, 2))
     temps = re.findall(e_i, temp, re.A)
@@ -158,12 +159,18 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             sig = getSigInfo(sheel, row)
             if sig.name in threeFrames:
                 sig.sendType = SigSendType.Three
-            realMin = sig.min * sig.factor + sig.Offset
-            realMax = sig.max * sig.factor + sig.Offset
-            if realMin < 0 or realMax > pow(2, sig.length)-1 or sig.min == sig.max:
-                print(
-                    f'{sig.name} 缩放偏移或者极值不合理,最小值为{sig.min},最大值为{sig.max},缩放为{sig.factor},偏移为{sig.Offset}')
+            realMin = (sig.min+sig.Offset) / sig.factor
+            realMax = (sig.max+sig.Offset) / sig.factor 
+            if realMin < 0:
+                printRed(f'{sig.name} 极小值小于0,最小值为{sig.min},raw值{realMin}')
                 continue
+            if realMax > pow(2, sig.length)-1 and sig.max != pow(2, sig.length)-1:
+                printRed(f'{sig.name} 极大值大于长度,最小值为{sig.max},raw值{realMax}')
+                continue
+            if sig.min == sig.max:
+                printRed(f"{sig.name} 最大值和最小值相等最小值为{sig.min},最大值为{sig.max}")
+                continue
+
             isFind = True
             dbc = Analyze(dbcfile)
             msg = msgs.get(sig.messageId, None)

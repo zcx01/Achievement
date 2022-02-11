@@ -23,6 +23,6 @@ if __name__ == "__main__":
                 mcu_bins.append( f'{dirpath}/{mcu_bin}')
     mcu_bin = ' '.join(mcu_bins)
     muc_dir = '/ota/android/'
-    os.system(f'python3 c385_deploy.py -a {mcu_bin} -e \'mcu_flasher -p {muc_dir}\' \'rm /{muc_dir}/*.bin\' \'mcu_tool -s\'')
+    os.system(f'python3 c385_deploy.py -a {mcu_bin} -e \'flash_mcu.sh p {muc_dir}\' \'rm /{muc_dir}/*.bin\' \'flash_mcu.sh c\'')
     
 

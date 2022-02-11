@@ -49,6 +49,7 @@ if __name__ == "__main__":
     if '-r' in sys.argv:
         keyStr("mcu_tool -g 2")
         keyStr("reset -f",0.3,'PON_SOFT_RB_SPARE')
+        # keyStr("enter_fastoot_mode.sh")
         isExit=True
 
     if '-k' in sys.argv:

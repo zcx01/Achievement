@@ -1,11 +1,16 @@
 #!/usr/bin/python
 import enum
+from pickle import NONE
 import sys
 import os
 import re
 from enum import Enum
+
+from sqlalchemy import false
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 from commonfun import*
+
+SubNet_Channel={'ICAN':"CAN1",'RCAN':'CAN0','ISCAN':'CAN0',"Other":'CAN0'}
 
 class DataType(Enum):
     VINT=1
@@ -44,6 +49,7 @@ class SigInfo(object):
         self.initValue=0#十进制
         self.invalidValue=0
         self.useBit=[]
+        self.subNet=''
         self.sendType = SigSendType.Normal #发送的类型是事件还是周期 1表示事件 2 表示三帧反转
         #-------message--------
         self.Recevier=""
@@ -285,6 +291,133 @@ class MessageInfo(object):
     def getMessageSendType(self):
         return f'BA_ \"GenMsgSendType\" BO_ {self.getMId()} {self.sendType};'
 
+
+class AnalyzeDir(object):
+    def __init__(self,dbc_dir=None) :
+        AnalyzeDict={}
+        AnalyzeDictlist=[]
+        for (dirpath,dirnames,filenames) in os.walk(dbc_dir):
+            for oriName in filenames:
+                dbc_file = f'{dirpath}/{oriName}'
+                can_Channel = dbc_file.split("_")[0]
+                dbc =  Analyze(dbc_file)
+                AnalyzeDict[can_Channel] = dbc
+                AnalyzeDictlist.append(dbc)
+
+    def getAnalyzeSingleByName(self,sigName):
+        for dbc in self.AnalyzeDictlist:
+            assert isinstance(dbc,Analyze)
+            if dbc.sigExist(sigName):
+                return dbc
+        printRed(f"{sigName}没有对应的dbc")
+        return None
+
+    def getAnalyzeSingleBySigInfo(self,sig):
+        assert isinstance(sig,SigInfo)
+        can_Channel = SubNet_Channel.get(sig.subNet,SubNet_Channel.get("Other"))
+        dbc =  self.AnalyzeDict.get(can_Channel,None)
+        assert isinstance(dbc,Analyze)
+        return dbc
+
+    def GetChannelSig(self,*sigs):
+        channelSig={}
+        for sig in sigs:
+            assert isinstance(sig,SigInfo)
+            dbc = self.getAnalyzeSingleBySigInfo(sig)
+            if dbc not in channelSig:
+                channelSig[dbc] = []
+            channelSig[dbc].append(sig)
+        return channelSig
+
+
+    def getAnalyzeSingleByMsgInfo(self,msg):
+        assert isinstance(msg,MessageInfo)
+        can_Channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
+        dbc =  self.AnalyzeDict.get(can_Channel,None)
+        assert isinstance(dbc,Analyze)
+        return dbc
+
+    def GetChannelMsg(self,*msgs):
+        channelSig={}
+        for msg in msgs:
+            assert isinstance(msg,MessageInfo)
+            dbc = self.getAnalyzeSingleByMsgInfo(msg)
+            if dbc not in channelSig:
+                channelSig[dbc] = []
+            channelSig[dbc].append(msg)
+        return channelSig
+
+    def getSig(self,sigName):
+        dbc = self.getAnalyzeSingleByName(sigName)
+        if  dbc != None:
+            return dbc.getSig(sigName)
+        return None
+    
+    def sigExist(self,sigName):
+        dbc = self.getAnalyzeSingleByName(sigName)
+        if  dbc != None:
+            return dbc.sigExist(sigName)
+        return false
+
+    def sender(self,sigName):
+        dbc = self.getAnalyzeSingleByName(sigName)
+        if  dbc != None:
+            return dbc.sender(sigName)
+        return ''
+
+    def getMessage_Id_BySig(self,sigName):
+        dbc = self.getAnalyzeSingleByName(sigName)
+        if  dbc != None:
+            return dbc.getMessage_Id_BySig(sigName)
+        return ''
+
+    def getMessage_Id_Sig(self,sigName):
+        dbc = self.getAnalyzeSingleByName(sigName)
+        if  dbc != None:
+            return dbc.getMessage_Id_Sig(sigName)
+        return ''
+
+    def getSigDataType(self,sigName):
+        dbc = self.getAnalyzeSingleByName(sigName)
+        if  dbc != None:
+            return dbc.getSigDataType(sigName)
+        return ''
+    
+    def writeSig(self,sig,msg):
+        dbc = self.getAnalyzeSingleBySigInfo(sig)
+        if  dbc != None: 
+            return dbc.writeSig(sig,msg)
+        return WriteDBCResult.NoMessage
+    
+    def repalceSigEnum(self,*sigs):
+        channelSig= self.GetChannelSig(sigs)
+        for dbc in channelSig.keys():
+            if dbc != None:
+                assert isinstance(dbc,Analyze)
+                dbc.repalceSigEnum(channelSig.values())
+    
+    def repalceSig(self,*sigs):
+        channelSig= self.GetChannelSig(sigs)
+        for dbc in channelSig.keys():
+            if dbc != None:
+                assert isinstance(dbc,Analyze)
+                dbc.repalceSig(channelSig.values())
+
+    def removeSig(self,*sigs):
+        channelSig= self.GetChannelSig(sigs)
+        for dbc in channelSig.keys():
+            if dbc != None:
+                assert isinstance(dbc,Analyze)
+                dbc.removeSig(channelSig.values())
+
+    def repalceMessage(self,*msgs):
+        channelSig= self.GetChannelMsg(msgs)
+        for dbc in channelSig.keys():
+            if dbc != None:
+                assert isinstance(dbc,Analyze)
+                dbc.repalceMessage(channelSig.values())
+
+    
 class Analyze(object):
     def __init__(self,dbc_file=None) :
         if len(dbc_file) ==0:
@@ -295,7 +428,7 @@ class Analyze(object):
         self.maxSigRow=0
         self.control=[]
         self.analy()
-        
+    
     def analy(self):
         self.dbcSigs={}
         self.dbcMessage={}
@@ -426,6 +559,100 @@ class Analyze(object):
                         print(f'枚举值 {text} 信号不在定义中')
                         pass
     
+    @staticmethod
+    def analyMessage(text):
+        messages = re.findall(e_i,text,re.A)
+        if len(messages) < 4:
+            return None
+        ms = MessageInfo()
+        ms.messageId =  getNoOx16(messages[1])
+        ms.message_Id = messages[2]
+        ms.lenght = int(messages[3])
+        ms.sender = messages[4]
+        return ms
+
+    def getBU(self):
+        return f'BU_: {" ".join(self.control)}'
+        
+    @staticmethod
+    def analySG(text):
+        sig=SigInfo()
+        assert isinstance(text,str)
+        signals=re.findall(e_i,text,re.A)
+        if signals== None:
+            return sig
+        try:
+            sig.name=signals[1]
+            sig.startBit=int(signals[2])
+            sig.length=int(signals[3])
+            sig.factor=signals[5]
+            sig.Offset=signals[6]
+            if '0-' in text:
+                sig.dataType = '-'
+            sig.min=signals[7]
+            sig.max=signals[8]
+            
+            texts = text.split(r'"')
+            sig.SetUnit(texts[1])
+            sig.Recevier = texts[2].strip()
+        except:
+            pass
+        sig.getEndBit()
+        return sig
+
+    @staticmethod
+    def appendKey(linelist,key,defalut=-1):
+        assert isinstance(linelist,list)
+        linelistSize = len(linelist)
+        keys = re.findall(e_i,key,re.A)
+        for row in range(linelistSize):
+            lastStr = str(linelist[linelistSize-1-row])
+            if lastStr.startswith(keys[0]+' '):
+                lastStrs = re.findall(e_i,lastStr,re.A)
+                if len(lastStrs) >1 and lastStrs[1] == keys[1]:
+                    linelist.insert(linelistSize-row,key)
+                    return linelistSize-row+1
+        if defalut != -1:
+            linelist.insert(defalut,key)
+            return defalut+1
+        linelist.append(key)
+        return linelistSize+1
+    
+    def repalceContent(self,linelist,row,content):
+        if len(content) != 0 and row > 0:
+            linelist[row] = content
+        else:
+            print(f'{content}内容为空, {row} 行号小于等于0')
+
+    def RowContent(self,rowIndexs,row):
+        if row > 0:
+            rowIndexs.append(row)                       
+        
+    def writeMessage(self,msg,linelist):
+        assert isinstance(linelist,list)
+        assert isinstance(msg,MessageInfo)
+        if len(msg.messageId) == 0:
+            return False
+        linelist.insert(self.maxSigRow+1,"\n")
+        linelist.insert(self.maxSigRow+2,msg.getMessageRowContent())
+        Analyze.appendKey(linelist,msg.getMessageVFrameFormat())
+        Analyze.appendKey(linelist,msg.getMessageSendType())
+        appCycleRow = -1
+        if msg.cycle != 0:
+            appCycleRow = Analyze.appendKey(linelist,msg.getMessageCycle())
+        msgCycleTimeFast = msg.getMsgCycleTimeFast()
+        if len(msgCycleTimeFast) != 0:
+            Analyze.appendKey(linelist,msgCycleTimeFast,appCycleRow)
+        wirteFileDicts(self.dbcPath,linelist,False)
+        return True
+
+    #----------------------------------对外接口-----------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
     def getSig(self,sigName):
         if sigName in self.dbcSigs:
             return self.dbcSigs[sigName]
@@ -480,70 +707,6 @@ class Analyze(object):
         except:
             pass
         return dataTypeStr
-
-    def analyline(self,msg):
-        contents=msg.split(":")
-        contents=contents[0].strip().split(" ")
-        return contents[len(contents)-1]
-
-    def getBU(self):
-        return f'BU_: {" ".join(self.control)}'
-
-    @staticmethod
-    def analyMessage(text):
-        messages = re.findall(e_i,text,re.A)
-        if len(messages) < 4:
-            return None
-        ms = MessageInfo()
-        ms.messageId =  getNoOx16(messages[1])
-        ms.message_Id = messages[2]
-        ms.lenght = int(messages[3])
-        ms.sender = messages[4]
-        return ms
-        
-    @staticmethod
-    def analySG(text):
-        sig=SigInfo()
-        assert isinstance(text,str)
-        signals=re.findall(e_i,text,re.A)
-        if signals== None:
-            return sig
-        try:
-            sig.name=signals[1]
-            sig.startBit=int(signals[2])
-            sig.length=int(signals[3])
-            sig.factor=signals[5]
-            sig.Offset=signals[6]
-            if '0-' in text:
-                sig.dataType = '-'
-            sig.min=signals[7]
-            sig.max=signals[8]
-            
-            texts = text.split(r'"')
-            sig.SetUnit(texts[1])
-            sig.Recevier = texts[2].strip()
-        except:
-            pass
-        sig.getEndBit()
-        return sig
-
-    @staticmethod
-    def appendKey(linelist,key,defalut=-1):
-        assert isinstance(linelist,list)
-        linelistSize = len(linelist)
-        keys = re.findall(e_i,key,re.A)
-        for row in range(linelistSize):
-            lastStr = str(linelist[linelistSize-1-row])
-            if lastStr.startswith(keys[0]+' '):
-                lastStrs = re.findall(e_i,lastStr,re.A)
-                if len(lastStrs) >1 and lastStrs[1] == keys[1]:
-                    linelist.insert(linelistSize-row,key)
-                    return linelistSize-row+1
-        if defalut != -1:
-            linelist.insert(defalut,key)
-            return defalut+1
-        linelist.append(key)
-        return linelistSize+1
 
     def writeSig(self,sig,msg):
         assert isinstance(sig,SigInfo)
@@ -612,18 +775,8 @@ class Analyze(object):
             self.analy()
             self.writeSig(sig,msg)
         return WriteDBCResult.WriteComplete
-    
-    def repalceContent(self,linelist,row,content):
-        if len(content) != 0 and row > 0:
-            linelist[row] = content
-        else:
-            print(f'{content}内容为空, {row} 行号小于等于0')
 
-    def RowContent(self,rowIndexs,row):
-        if row > 0:
-            rowIndexs.append(row)
-    
-    def repalceSigEnum(self,sigs):
+    def repalceSigEnum(self,*sigs):
         linelist = readFileLines(self.dbcPath)
         for sig in sigs:
             assert isinstance(sig,SigInfo)
@@ -658,8 +811,8 @@ class Analyze(object):
                     linelist.append(enumStr)
                 else:
                     linelist[ori_sig.enumRow] = enumStr
-        wirteFileDicts(self.dbcPath, linelist, False)                        
-    
+        wirteFileDicts(self.dbcPath, linelist, False) 
+
     def removeSig(self,*sigs):
         removeIndex = []
         for sig in sigs:
@@ -672,26 +825,8 @@ class Analyze(object):
         linelist = readFileLines(self.dbcPath)
         removeListIndexs(linelist,removeIndex)
         wirteFileDicts(self.dbcPath, linelist, False)
-        
-    def writeMessage(self,msg,linelist):
-        assert isinstance(linelist,list)
-        assert isinstance(msg,MessageInfo)
-        if len(msg.messageId) == 0:
-            return False
-        linelist.insert(self.maxSigRow+1,"\n")
-        linelist.insert(self.maxSigRow+2,msg.getMessageRowContent())
-        Analyze.appendKey(linelist,msg.getMessageVFrameFormat())
-        Analyze.appendKey(linelist,msg.getMessageSendType())
-        appCycleRow = -1
-        if msg.cycle != 0:
-            appCycleRow = Analyze.appendKey(linelist,msg.getMessageCycle())
-        msgCycleTimeFast = msg.getMsgCycleTimeFast()
-        if len(msgCycleTimeFast) != 0:
-            Analyze.appendKey(linelist,msgCycleTimeFast,appCycleRow)
-        wirteFileDicts(self.dbcPath,linelist,False)
-        return True
-         
-    def repalceMessage(self,msgs):
+
+    def repalceMessage(self,*msgs):
         linelist = readFileLines(self.dbcPath)
         deleteRows = []
         for msg in msgs:
@@ -719,8 +854,12 @@ class Analyze(object):
             removeListIndexs(linelist,deleteRows)
             # print(f'替换 {msg.messageId} {msg.Row} {msg.cycleRow} {msg.frameRow}')
         wirteFileDicts(self.dbcPath, linelist, False)
-
-
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
 
 
 

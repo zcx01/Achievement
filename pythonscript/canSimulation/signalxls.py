@@ -218,9 +218,11 @@ def ReMatchStr(text):
                 if sig not in case.sendSignals:
                     case.sendSignals[sig] = []
                 for value in values:
-                        sendValue = str(value).replace("0x","")
-                        if sendValue not in case.sendSignals[sig]:
-                            case.sendSignals[sig].append(sendValue)
+                    sendValue = str(value)
+                    if "0x" in sendValue:
+                        sendValue = str(int(value,16))
+                    if sendValue not in case.sendSignals[sig]:
+                        case.sendSignals[sig].append(sendValue)
         except:
             pass
         index += 1

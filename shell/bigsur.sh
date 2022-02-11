@@ -25,15 +25,15 @@ if [ $1 != "-s" ];then
     tar -zxvf $file
     echo `date` $file >> version.txt
     rm $file
-fi
 
-#qnx 进入fastboot模式
-adb_qnx -r
+    #qnx 进入fastboot模式
+    adb_qnx -r
+fi
 
 cd $tarFile/common/build/
 python3 fastboot_complete.py --pf=8155_la --st=ufs
 
 fastboot reboot
-cd ../../../
-rm -r $tarFile
+
+
 exit 0

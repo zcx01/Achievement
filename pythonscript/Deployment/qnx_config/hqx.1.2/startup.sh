@@ -1029,6 +1029,7 @@ start_dltlog_app()
         mkdir -m 0666 -p /var/log/dltlogs;
     fi
 
+    ln -f -s /etc/dlt_logstorage.conf /var/log/dltlogs/dlt_logstorage.conf
     chown 832:832 /var/log/dltlogs
 
     on -T dltlog_t -p 10 -u dltlog /usr/bin/dlt-daemon -d -c /etc/dlt.conf
@@ -1045,6 +1046,11 @@ setup_qt_env() {
 
     export QT_DEBUG_PLUGINS=1
     export QT_LOGGIN_TO_CONSOLE=1
+
+    if [ ! -d /var/fontconfig ]; then
+        mkdir -m 0666 -p /var/fontconfig;
+    fi    
+    chown 834:834 /var/fontconfig    
 
     waitfor /dev/random
 }
