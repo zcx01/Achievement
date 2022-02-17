@@ -1,11 +1,17 @@
 #!/bin/bash
 
-if [ $# -lt 1 ]; then
+if [ $1 == "-h" ]; then
     echo "输入链接地址"
     exit 0
 fi
 tarFile="qfi_bin"
-cd ~/Works/changan_shuaji
+tarDir="~/Works/changan_shuaji"
+
+if [ ! -d $tarDir ];then
+  mkdir $tarDir
+fi
+
+cd $tarDir
 # for file in `ls` ;do
 #     if [ $file == $tarFile ]; then
 #         read -p "是否都替换(y/n)?" yesoron
@@ -17,7 +23,7 @@ cd ~/Works/changan_shuaji
 #     fi
 # done
 
-if [ $1 != "-s" ];then
+if [ $# -lt 1 ];then
     rm -r $tarFile
 
     wget $1 --http-user=chengxiong.zhu --http-password=@Huan2870244352
@@ -27,13 +33,11 @@ if [ $1 != "-s" ];then
     rm $file
 
     #qnx 进入fastboot模式
-    adb_qnx -r
+    # adb_qnx -r
 fi
 
 cd $tarFile/common/build/
 python3 fastboot_complete.py --pf=8155_la --st=ufs
 
 fastboot reboot
-
-
 exit 0

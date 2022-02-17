@@ -24,6 +24,8 @@ issue.fields.issuetype
 issue.fields.reporter '''
 
 import sys
+
+from matplotlib.pyplot import text
 from commonfun import *
 from jira import JIRA
 from signalxls import *
@@ -69,10 +71,27 @@ def sendBugCan(bugId):
         #     continue
         appendUseCases(case)
     if len(useCases) == 0:
-        print("没有信号的存在")
+        printYellow("没有信号的存在")
+        getLogPath(bugId)
         return
     pyperclipCopy(useCases[0].Out())
     displayInfo(useCases)
+
+
+def getLogPath(bugId):
+    texts=[]
+    bugId=getBugId(bugId)
+    issue=jira.issue(bugId)
+    texts.append(issue.fields.summary)
+    texts.append(str(issue.fields.description))
+    for comment in issue.fields.comment.comments:
+        texts.append(comment.body)
+    for text in texts:
+        if "smb:" in text:
+            smb = re.findall(r"\bsmb:\S+\b",text,re.A)[0]
+            smb=smb.replace("smb:","")
+            smb=smb.replace('/','\\')
+            print(smb)
 
 def displayIssue(issue,arg):
     print(f'{issue.key}')

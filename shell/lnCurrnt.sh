@@ -22,7 +22,7 @@ EOF
 }
 
 if [ $# -lt 1 ]; then
-    echo "输入文件名:"
+    echo "输入路径名:"
     for s in `ls` ;do
         echo "$( cd "$( dirname "./" )" && pwd )"/$s
     done

@@ -269,13 +269,16 @@ def showType():
             index=1
             for dirname in os.listdir(dirPath):
                 typePath = dirPath+'/'+dirname
-                if(os.path.isdir(typePath)):
-                    js = getJScontent(typePath)
-                    if "desc" in js:
-                        # print(f'{dirname:<35}')
-                        print(f'{str(index):<6}{dirname:<35}'+js["desc"])
-                    else:
-                        print(f'{str(index):<6}{dirname:<35}')
+                if os.path.isdir(typePath):
+                    try:
+                        js = getJScontent(typePath)
+                        if "desc" in js:
+                            # print(f'{dirname:<35}')
+                            print(f'{str(index):<6}{dirname:<35}'+js["desc"])
+                        else:
+                            print(f'{str(index):<6}{dirname:<35}')
+                    except:
+                        pass
                 index+=1
             exit()
 

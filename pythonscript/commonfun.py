@@ -2,15 +2,14 @@
 import json
 import re
 import sys
-word=r"\b[a-zA-Z]+\b"
-w_d=r'[a-zA-Z_]'
-in_i=r"-?\b[0x0-9]+\b"
-i_i=r"-?[0x0-9]"
-e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"
-d_t=r"\bIPC_\S+\b"
-s_i = r"CANSIG_.*_g"
-s_i_e = r"CANSIG.\w+" 
-m_s = r"[a-zA-Z0x0-9]+"
+
+w_d=r'[a-zA-Z_]'                #匹配单词
+i_i=r"-?[0x0-9]"                #匹配数字
+e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"   #匹配单词和数字(包括小数和负数)
+d_t=r"\bIPC_\S+\b"              #匹配以IPC开头一句话
+s_i = r"CANSIG_.*_g"    
+s_i_e = r"CANSIG.\w+"           #匹配CANSIG开头的单词
+m_s = r"[a-zA-Z0x0-9]+"         #匹配单词和数字
 
 def sendMqtt(topic,value):
     topic=str(topic).replace(r'"','')
@@ -172,16 +171,13 @@ def removeListIndexs(linelist,Indexs):
     return temp
 
 def printRed(infoStr):
-    print('\033[31m'+infoStr)
-    print('\033[0m')
+    print('\033[31m'+infoStr+'\033[0m')
 
 def printGreen(infoStr):
-    print('\033[32m'+infoStr)
-    print('\033[0m')
+    print('\033[32m'+infoStr+'\033[0m')
     
 def printYellow(infoStr):
-    print('\033[33m'+infoStr)
-    print('\033[0m')
+    print('\033[33m'+infoStr+'\033[0m')
 
 
 # print(removeListIndexs([12,23,56],[0,2]))

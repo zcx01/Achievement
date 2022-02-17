@@ -5,7 +5,7 @@ import os
 from sqlalchemy import false, true
 import xlrd
 import time
-pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/AnalyzeCan/"
 from commonfun import *
 import openpyxl 
 import argparse

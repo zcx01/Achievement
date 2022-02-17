@@ -41,14 +41,14 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     if(signal->is_timeout)
     {
         publish_status(topic,value,false);
-        TB_LOG_ERROR("{1} time out.");
+        TB_LOG_ERROR("%s time out.",signal->sig_name);
         return;
     }
     
     status = signal->GetValue.fpGetter(&raw_value,nullptr);
     if (status != eSigStatus_Ok)
     {
-        TB_LOG_ERROR("{1} signal get error.");
+        TB_LOG_ERROR("%s signal get error.",signal->sig_name);
         return;
     }    
     value = raw_value.val_{4};

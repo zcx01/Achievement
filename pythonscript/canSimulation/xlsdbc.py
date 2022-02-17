@@ -7,8 +7,8 @@ import argparse
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 from commonfun import*
-from Analyzedbc import *
-from projectInI import *
+from AnalyzeCan.Analyzedbc import *
+from AnalyzeCan.projectInI import *
 
 def getValue(src, row, col):
     return src.cell_value(row, col)
@@ -502,7 +502,7 @@ def modifyMessageInfo(configPath):
     dbc.repalceMessage(dbc.dbcMessage.values())
 
 # conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Works/文档/C样/C385-EVE项目整车通讯协议_V2.2.0_20211203.xlsx")
-# conversion(pyFileDir+"config.json",'HU_CurrentLocationLongitude')
+# conversion(pyFileDir+"config.json",'ACC_TakeOverReq')
 # sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
