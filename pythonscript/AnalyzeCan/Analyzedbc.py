@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+from re import S
 import sys
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 sys.path.append(pyFileDir)
@@ -13,7 +14,7 @@ class Analyze(object):
         self.AnalyzeDictlist=[]
         for (dirpath,dirnames,filenames) in os.walk(dbc_dir):
             for oriName in filenames:
-                if ".dbc" in oriName:
+                if ".dbc" in oriName and dirpath == dbc_dir:
                     dbc_file = f'{dirpath}/{oriName}'
                     oriBaseName = oriName.split(".")[0]
                     can_Channel = oriBaseName.split("_")[0]
@@ -42,12 +43,28 @@ class Analyze(object):
 
     def GetChannelSig(self,*sigs):
         channelSig={}
+        allSigs=[]
         for sig in sigs:
-            assert isinstance(sig,SigInfo)
-            dbc = self.getAnalyzeSingleBySigInfo(sig)
+            if type(sig) == tuple:
+                for childSig in sig:
+                    if type(childSig) == list:
+                        allSigs.extend(list(childSig))
+                    else:
+                        allSigs.append(childSig)
+            else:
+                allSigs.append(sig)
+
+        for sig in allSigs:
+            if type(sig) == SigInfo:
+                assert isinstance(sig,SigInfo)
+                dbc = self.getAnalyzeSingleBySigInfo(sig)
+                sigInfo = sig
+            else:
+                dbc = self.getAnalyzeSingleByName(sig)
+                sigInfo = dbc.getSig(sig)
             if dbc not in channelSig:
                 channelSig[dbc] = []
-            channelSig[dbc].append(sig)
+            channelSig[dbc].append(sigInfo)
         return channelSig
 
     def getAnalyzeSingleByMsgInfo(self,msg):
@@ -114,25 +131,25 @@ class Analyze(object):
         for dbc in channelSig.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
-                dbc.repalceSigEnum(channelSig.values())
+                dbc.repalceSigEnum(channelSig[dbc])
     
     def repalceSig(self,*sigs):
         channelSig= self.GetChannelSig(sigs)
         for dbc in channelSig.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
-                dbc.repalceSig(channelSig.values())
+                dbc.repalceSig(channelSig[dbc])
 
     def removeSig(self,*sigs):
         channelSig= self.GetChannelSig(sigs)
         for dbc in channelSig.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
-                dbc.removeSig(channelSig.values())
+                dbc.removeSig(channelSig[dbc])
 
     def repalceMessage(self,*msgs):
         channelSig= self.GetChannelMsg(msgs)
         for dbc in channelSig.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
-                dbc.repalceMessage(channelSig.values())
+                dbc.repalceMessage(channelSig[dbc])

@@ -70,9 +70,9 @@ def sendBugCan(bugId):
         # if descriptionCase.isSame(case):
         #     continue
         appendUseCases(case)
+    getLogPath(bugId)
     if len(useCases) == 0:
         printYellow("没有信号的存在")
-        getLogPath(bugId)
         return
     pyperclipCopy(useCases[0].Out())
     displayInfo(useCases)

@@ -90,7 +90,8 @@ def autoCaseGenerate(configPath=pyFileDir+"config.json",shellIndex=0,isAddPowerS
             continue
         caseAim=[]
         if isAddPowerSig:
-            caseAim.append(f'CANSIG_S_I_{PowerSig}_g')
+            for p in PowerSig:
+                caseAim.append(f'CANSIG_S_I_{p}_g')
         caseAim.append(f'CANSIG_S_I_{sheel.cell_value(row,0)}_g')
         caseAim.append(sheel.cell_value(row,4))
         if len(xlsFileName) == 0:

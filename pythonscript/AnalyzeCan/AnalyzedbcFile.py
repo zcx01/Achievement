@@ -513,6 +513,10 @@ class AnalyzeFile(object):
         wirteFileDicts(self.dbcPath,linelist,False)
         return True
 
+    @staticmethod
+    def getValueType(sig,flag):
+        assert isinstance(sig,SigInfo)
+        return flag in str(sig.min) or flag in str(sig.max) or flag in str(sig.Offset) or flag in str(sig.factor)
     #----------------------------------对外接口-----------------------------------------
     #------------------------------------------------------------------------------------
     #------------------------------------------------------------------------------------
@@ -565,12 +569,12 @@ class AnalyzeFile(object):
             sig = self.getSig(sigName)
             assert isinstance(sig,SigInfo)
             dayaType = sig.dataType
-            if dayaType == '-':
-                dataTypeStr="int32_t" 
-            elif dayaType == '+':
-                dataTypeStr="uint32_t"
-            if '.' in str(sig.min) or '.' in str(sig.max) or '.' in str(sig.Offset) or '.' in str(sig.factor):
+            if AnalyzeFile.getValueType(sig,'.'):
                 dataTypeStr='float'
+            elif dayaType == '-' or  AnalyzeFile.getValueType(sig,'-'):
+                dataTypeStr="int32_t" 
+            else:
+                dataTypeStr="uint32_t"
         except:
             pass
         return dataTypeStr
@@ -643,7 +647,7 @@ class AnalyzeFile(object):
             self.writeSig(sig,msg)
         return WriteDBCResult.WriteComplete
 
-    def repalceSigEnum(self,*sigs):
+    def repalceSigEnum(self,sigs):
         linelist = readFileLines(self.dbcPath)
         for sig in sigs:
             assert isinstance(sig,SigInfo)
@@ -661,7 +665,7 @@ class AnalyzeFile(object):
             print(sig.name,'-------',enumStr)
         wirteFileDicts(self.dbcPath, linelist, False)
 
-    def repalceSig(self,*sigs):
+    def repalceSig(self,sigs):
         linelist = readFileLines(self.dbcPath)
         for sig in sigs:
             assert isinstance(sig,SigInfo)
@@ -680,7 +684,7 @@ class AnalyzeFile(object):
                     linelist[ori_sig.enumRow] = enumStr
         wirteFileDicts(self.dbcPath, linelist, False) 
 
-    def removeSig(self,*sigs):
+    def removeSig(self,sigs):
         removeIndex = []
         for sig in sigs:
             assert isinstance(sig,SigInfo)
@@ -688,12 +692,12 @@ class AnalyzeFile(object):
             self.RowContent(removeIndex,sig.initRow)
             self.RowContent(removeIndex,sig.sendTypeRow)
             self.RowContent(removeIndex,sig.enumRow)
-
         linelist = readFileLines(self.dbcPath)
-        removeListIndexs(linelist,removeIndex)
+        linelist=removeListIndexs(linelist,removeIndex)
         wirteFileDicts(self.dbcPath, linelist, False)
+        printGreen("移除信号完成")
 
-    def repalceMessage(self,*msgs):
+    def repalceMessage(self,msgs):
         linelist = readFileLines(self.dbcPath)
         deleteRows = []
         for msg in msgs:
@@ -718,7 +722,7 @@ class AnalyzeFile(object):
                 self.RowContent(deleteRows,ori_msg.threeCycleRow)
         
         if len(deleteRows) != 0:
-            removeListIndexs(linelist,deleteRows)
+            linelist=removeListIndexs(linelist,deleteRows)
             # print(f'替换 {msg.messageId} {msg.Row} {msg.cycleRow} {msg.frameRow}')
         wirteFileDicts(self.dbcPath, linelist, False)
     #------------------------------------------------------------------------------------

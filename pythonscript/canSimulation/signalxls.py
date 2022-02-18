@@ -150,18 +150,21 @@ class useCase(object):
             task = me.getAllSigInitValue()
             if str(me.messageId) in temp:
                 continue
-            elif PowerSig not in task  and me.sender not in local_machine_Sender and len(task) !=0:
+            elif me.sender not in local_machine_Sender and len(task) !=0:
+                for p in PowerSig:
+                    if p not in task:
+                        self.sendSignals[p] = PowerSig[p]
                 print(me.messageId,task)
                 self.sendSim.add_task(task)
                 time.sleep(timeSpace)
 
     def SendPowerSig(self):
-        sendSig={PowerSig:PowerSigValue}
-        self.startSig(sendSig)
+        self.startSig(PowerSig)
 
     def AddPowerSig(self):
-        if PowerSig not in self.sendSignals:
-            self.sendSignals[PowerSig]=[PowerSigValue]
+        for p in PowerSig:
+            if p not in self.sendSignals:
+                self.sendSignals[p] = PowerSig[p]
 
     def MonitorSig(self,sigName):
         if self.monitorSim == None:

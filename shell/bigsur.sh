@@ -5,7 +5,7 @@ if [ $1 == "-h" ]; then
     exit 0
 fi
 tarFile="qfi_bin"
-tarDir="~/Works/changan_shuaji"
+tarDir=~/Works/changan_shuaji
 
 if [ ! -d $tarDir ];then
   mkdir $tarDir
@@ -22,8 +22,7 @@ cd $tarDir
 #         fi
 #     fi
 # done
-
-if [ $# -lt 1 ];then
+if [ $# -eq 1 ]; then
     rm -r $tarFile
 
     wget $1 --http-user=chengxiong.zhu --http-password=@Huan2870244352
@@ -37,6 +36,7 @@ if [ $# -lt 1 ];then
 fi
 
 cd $tarFile/common/build/
+
 python3 fastboot_complete.py --pf=8155_la --st=ufs
 
 fastboot reboot
