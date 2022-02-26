@@ -5,6 +5,7 @@
 #include "ipc/megaipc_api.h"
 #include "topic/ipc_topic_def.h"
 #include "telltale_common.hpp"
+#include "structs/telltale_info.h"
 
 using namespace megaipc;
 
@@ -18,11 +19,11 @@ using namespace megaipc;
     }
     else
     {
-        if (signal == eCANSIG__{1}_off_0)
+        if (signal == 0)
         {
             result = LAMP_OFF;
         }
-        else if (signal == eCANSIG__{1}_on_1)
+        else if (signal == 1)
         {
             result = LAMP_ON;
         }
@@ -72,12 +73,10 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     switch (result)
     {
     case LAMP_OFF:
-        j = PayloadInfo{LampState::TELLTALE_OFF};
+        j = PayloadInfo{LampState::TELLTALE_OFF, true, false,  0, TelltaleInfo{}};
         break;
     case LAMP_ON:
-        j = PayloadInfo{LampState::TELLTALE_ON};
-    case LAMP_FLASH:
-        j = PayloadInfo{LampState::TELLTALE_ON, LampColor::DEFAULT, 1000, 0.5};
+        j = PayloadInfo{LampState::TELLTALE_ON, true, false,  0, TelltaleInfo{}};
         break;
     }
 

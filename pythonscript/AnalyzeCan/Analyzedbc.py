@@ -120,6 +120,12 @@ class Analyze(object):
             return dbc.getSigDataType(sigName)
         return ''
     
+    def physicalValueVaild(self,sigName,value):
+        dbc = self.getAnalyzeSingleByName(sigName)
+        if  dbc != None:
+            return dbc.physicalValueVaild(sigName,value)
+        return False
+        
     def writeSig(self,sig,msg):
         dbc = self.getAnalyzeSingleBySigInfo(sig)
         if  dbc != None: 
@@ -153,3 +159,9 @@ class Analyze(object):
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
                 dbc.repalceMessage(channelSig[dbc])
+
+    def isLocateSend(self,sigName):
+        dbc = self.getAnalyzeSingleByName(sigName)
+        if dbc != None:
+            return dbc.isLocateSend(sigName)
+        return False

@@ -10,12 +10,16 @@ d_t=r"\bIPC_\S+\b"              #匹配以IPC开头一句话
 s_i = r"CANSIG_.*_g"    
 s_i_e = r"CANSIG.\w+"           #匹配CANSIG开头的单词
 m_s = r"[a-zA-Z0x0-9]+"         #匹配单词和数字
+'''
+[a-zA-Z_]+::                    #匹配以::结束的单词
+'''
 
 def sendMqtt(topic,value):
     topic=str(topic).replace(r'"','')
     return f'on -T ic_apps_t -u ic_apps mega_ipc_pub -t  \'{topic}\'  -m \''+'{'+f'\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":{value}'+'}\''
 
 def subMqtt(topic):
+    topic=str(topic).replace(r'"','')
     return f'on -T ic_apps_t -u ic_apps mega_ipc_sub -t {topic}'
     
 class EesyStr():
@@ -155,13 +159,34 @@ def getNoOx16(text):
     else:
         return str(hex(int(text))).replace('0x','').upper()
 
-def getClassNames(text):
+#得到关联的类名
+def getRelationClassName(text):
     n_i = r'new.*\('
     m_i = r'<.*>'
+    className=''
     classNames = re.findall(n_i,text,re.A)
     if len(classNames) == 0:
         classNames = re.findall(m_i,text,re.A)
-    return classNames
+    if len(classNames) != 0:
+        className = classNames[0]
+        assert isinstance(className,str)
+        className= className.replace('<','')
+        className= className.replace('>','')
+        if len(re.findall(r"-?\b[a-zA-Z_::0x0-9.]+\b",className,re.A)) != 1:
+            className=''
+        if "::" in className:
+            className = re.findall(e_i,className,re.A)[1]
+    return className
+
+#得到本文件的类名
+def getSelfClassName(text):
+    m_i = r'[a-zA-Z_]+::'
+    classNames = re.findall(m_i,text,re.A)
+    className= ''
+    if len(classNames) != 0:
+        className = classNames[0]
+    className = className.replace('::','')
+    return className
 
 def removeListIndexs(linelist,Indexs):
     temp = []

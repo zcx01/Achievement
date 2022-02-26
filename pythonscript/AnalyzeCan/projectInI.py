@@ -9,3 +9,4 @@ VFrameFormat={'StandardCAN':0,'ExtendedCAN':1,'StandardCAN_FD':14,'ExtendedCAN_F
 Sig_Matrix='5_Matrix'
 Message_Matrix='4_OverView'
 SubNet_Channel={'ICAN':"CAN1",'RCAN':'CAN0','ISCAN':'CAN0',"Other":'CAN1'}
+Jira_Project = "BGS"

@@ -8,8 +8,8 @@ from xlrd.book import Book
 from xlrd.sheet import Sheet
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *
-from AnalyzeCan.projectInI import *
 
+from AnalyzeCan.projectInI import *
 def getValue(src, row, col):
     return src.cell_value(row, col)
 
@@ -392,6 +392,12 @@ def repalceSrcSig(nameChangeds, jsConfig):
     wirteFileDicts(can_parse_whitelistPath,
                    can_parse_whitelistPath_contents, False)
 
+'''
+configPath : 配置文件的路径
+dbcPath : 原来的dbc目录        
+resultPath : 比较的结果的路径 （output）
+canMatrix : 原来的CAN矩阵用路径，通过中文来替换
+'''
 def sigNameChanged(configPath, dbcPath, resultPath, canMatrix):
     jsConfig = getJScontent(configPath)
     dbc = Analyze(dbcPath)
@@ -544,7 +550,6 @@ if __name__ == "__main__":
     elif '-m' in sys.argv:
         modifyMessageInfo(arg.config)
     elif '-t' in sys.argv:
-        diffCanMatrix(arg.fristMatrix, arg.twoMatrix, arg.config,
-                      arg.resultPath, '-u' in sys.argv)
+        diffCanMatrix(arg.fristMatrix, arg.twoMatrix, arg.config,arg.resultPath, '-u' in sys.argv)
     elif '-d' in sys.argv:
         CopyEnum(arg.config, arg.dbcPath, arg.resultPath)

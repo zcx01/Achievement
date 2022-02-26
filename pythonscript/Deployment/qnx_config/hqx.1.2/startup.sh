@@ -550,7 +550,7 @@ common_netdbgservices () {
 
     on -ae $INETD_ON_ARGS $INETD_BINARY $INETD_ARGS
 
-    on -ae $QCONN_ON_ARGS $QCONN_BINARY $QCONN_ARGS
+#    on -ae $QCONN_ON_ARGS $QCONN_BINARY $QCONN_ARGS
 }
 
 common_pps () {

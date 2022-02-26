@@ -12,8 +12,7 @@ private:
     enum result_type
     {
         LAMP_OFF = 0,
-        LAMP_ON,
-        LAMP_FLASH
+        LAMP_ON
     };
     result_type normal_logic(int power, int signal);
 };

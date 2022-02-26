@@ -1,0 +1,239 @@
+{
+    "iTMSAirOutModFb": {
+        "topic": [
+            "\"AC/WindSweepMode/Front\""
+        ],
+        "desc": [
+            "//前排扫风模式"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "TmsFrntWindLvl": {
+        "topic": [
+            "\"AC/WindLevel/Front\""
+        ],
+        "desc": [
+            "//前排空调当前风速"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "TmsPassAutT": {
+        "topic": [
+            "\"AC/Temperature/FrontRight\""
+        ],
+        "desc": [
+            "//前排右空调当前温度"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "BcuDcboxDcU": {
+        "topic": [
+            "\"EnergyInfo/DischargeVoltage\""
+        ],
+        "desc": [
+            "//放电电压"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "BcuDcboxDcI": {
+        "topic": [
+            "\"EnergyInfo/DischargeCurrent\""
+        ],
+        "desc": [
+            "//放电电流"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "DcChrgCnctrSts": {
+        "topic": [
+            "\"VehicleCharge/DCChargePlugged\""
+        ],
+        "desc": [
+            "//直流充电口插线状态"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "BcuDcOutDischrgSts": {
+        "topic": [
+            "\"EnergyInfo/DischargeStatus\""
+        ],
+        "desc": [
+            "//放电状态"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "TmsWorkSpaceSyncSts": {
+        "topic": [
+            "\"AC/SyncMode\""
+        ],
+        "desc": [
+            "//温区同步模式"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "CdcDoorLiSwtSet": {
+        "topic": [
+            "\"Light/DoorLight/OpenWithDoor/Set\""
+        ],
+        "desc": [
+            "//顶灯(阅读灯) 跟随车门打开状态 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_toplamps_door.cpp"
+        ]
+    },
+    "ItmsBacktWindLvlSet": {
+        "topic": [
+            "\"AC/WindLevel/Rear\""
+        ],
+        "desc": [
+            "//后排空调当前风速"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "CdcPlasmaOpenSet": {
+        "topic": [
+            "\"AC/Plasma/Set\""
+        ],
+        "desc": [
+            "//离子发生器 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_lon_generator.cpp"
+        ]
+    },
+    "TmsPlasmaSts": {
+        "topic": [
+            "\"AC/Plasma\""
+        ],
+        "desc": [
+            "//离子发生器"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "DcacStsLamp": {
+        "topic": [
+            "\"Telltale/DischargeState\""
+        ],
+        "desc": [
+            "//220V放电状态工作指示灯状态"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/telltale/discharge_state_lamp.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/telltale_module.cpp"
+        ]
+    },
+    "AcChrgCnctrSts": {
+        "topic": [
+            "\"VehicleCharge/ACChargePlugged\""
+        ],
+        "desc": [
+            "//交流充电口插线状态"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/common_codes/fds_common_codes.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "BcmDoorLiSts": {
+        "topic": [
+            "\"Light/DoorLight/OpenWithDoor\""
+        ],
+        "desc": [
+            "//顶灯(阅读灯) 跟随车门打开状态"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "BcmLckAutoClsWinSetSts": {
+        "topic": [
+            "\"VehicleDoor/LeavingAutoLock\""
+        ],
+        "desc": [
+            "//离车自动闭锁关窗"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "VcuVehErrInfo": {
+        "topic": [
+            "\"Fault/VehicleSerious\""
+        ],
+        "desc": [
+            "//车辆严重故障"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip_module.cpp"
+        ]
+    },
+    "LCDAR_RCTAEnableStatus": {
+        "topic": [
+            "\"ADAS/RearTransverseBrakeWarning\""
+        ],
+        "desc": [
+            "//后侧横向制动报警开关"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "CdcDchaSocLimitSet": {
+        "topic": [
+            "\"EnergyInfo/DischargeSocThreshold/Set\""
+        ],
+        "desc": [
+            "//放电阈值 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_discharge_soc.cpp"
+        ]
+    },
+    "CdcDchaSocLimitset": {
+        "topic": [
+            "\"EnergyInfo/DischargeSocThreshold/Set\""
+        ],
+        "desc": [
+            "//放电阈值 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_discharge_soc.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
+        ]
+    },
+    "HudEngDistSwSts": {
+        "topic": [
+            "\"EnergyInfo/ResidualEnergyDisplayMode\""
+        ],
+        "desc": [
+            "//剩余能量百分比|距离显示选项"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    }
+}

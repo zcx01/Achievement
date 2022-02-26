@@ -134,7 +134,10 @@ class useCase(object):
                 index = int(input())
             else:
                 index=0
-            sendSig[sigName] = self.sendSignals[sigName][index]
+            try:
+                sendSig[sigName] = self.sendSignals[sigName][index]
+            except:
+                printYellow(f'{sigName} 没有合适的值')
         self.startSig(sendSig)
         if len(self.monitorSignals) !=0:
             print(self.monitorSignals)
@@ -164,7 +167,8 @@ class useCase(object):
     def AddPowerSig(self):
         for p in PowerSig:
             if p not in self.sendSignals:
-                self.sendSignals[p] = PowerSig[p]
+                self.sendSignals[p] = []
+                self.sendSignals[p].append(PowerSig[p])
 
     def MonitorSig(self,sigName):
         if self.monitorSim == None:
@@ -180,8 +184,9 @@ class useCase(object):
                 return True
         return False
 
-def ReMatchStr(text):
-    case = useCase()
+def ReMatchStr(text,case=None):
+    if case == None:
+        case = useCase()
     signals=re.findall(e_i,text,re.A)
     tempSignals=[]
     preStr=''
@@ -225,7 +230,8 @@ def ReMatchStr(text):
                     if "0x" in sendValue:
                         sendValue = str(int(value,16))
                     if sendValue not in case.sendSignals[sig]:
-                        case.sendSignals[sig].append(sendValue)
+                        if dbc.physicalValueVaild(sig,int(sendValue)):
+                            case.sendSignals[sig].append(sendValue)
         except:
             pass
         index += 1
@@ -305,7 +311,7 @@ if __name__ == "__main__":
     #这个是要解析 -f 后面的参数
     parser.add_argument('-b','--bugxlsx',help="jira xlsx file")
     parser.add_argument('-c','--casexlsx',help="generate case xlsx file")
-    parser.add_argument('-s', '--Send',help="Send CAN",nargs='*')
+    parser.add_argument('-s', '--Send',help="Send CAN",type=str,default='',nargs='?')
     parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
     parser.add_argument('-p', '--SendPowerSig', help="Send Power Sig", nargs='*', type=int,default=1)
     parser.add_argument('-d', '--dataType',help="get sig data type", default=[], nargs='+', type=str)
@@ -320,13 +326,15 @@ if __name__ == "__main__":
         dealTest(arg.casexlsx,0,1,arg.SendPowerSig)
     elif '-s' in sys.argv:
         use.AddPowerSig()
+        if arg.Send != None and len(arg.Send) != 0:
+            ReMatchStr(str(arg.Send),use)
         use.SimulationCan()
     elif '-m' in sys.argv:
         if arg.SendPowerSig==1:
             use.SendPowerSig()
         use.MonitorSig(arg.Monitor)
     elif '-d' in sys.argv:
-        printSigTypes(arg.dataType)
+        printSigTypes(arg.dataType)  
     elif '-i' in sys.argv:
         use.SequenceSendInitValue(arg.SequenceSendInitValue)
     else:

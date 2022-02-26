@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+from pickle import FALSE
 import re
 import sys
 from enum import Enum
@@ -26,6 +27,7 @@ class SigSendType(Enum):
     Normal = 0      #正常
     Event  = 1      #时间
     Three  = 2      #三帧反转
+
 class SigInfo(object):
     def __init__(self) :
         self.messageId = ""
@@ -530,7 +532,7 @@ class AnalyzeFile(object):
         for messageSig in self.dbcSigs:
             sig = self.dbcSigs[messageSig]
             assert isinstance(sig,SigInfo)
-            if sig.name == sigName or sig.getMessage_Sig() == sigName:
+            if sig.name.upper() == sigName.upper() or sig.getMessage_Sig().upper() == sigName.upper():
                 return sig
         return None
 
@@ -725,13 +727,29 @@ class AnalyzeFile(object):
             linelist=removeListIndexs(linelist,deleteRows)
             # print(f'替换 {msg.messageId} {msg.Row} {msg.cycleRow} {msg.frameRow}')
         wirteFileDicts(self.dbcPath, linelist, False)
-    #------------------------------------------------------------------------------------
-    #------------------------------------------------------------------------------------
-    #------------------------------------------------------------------------------------
-    #------------------------------------------------------------------------------------
-    #------------------------------------------------------------------------------------
-    #------------------------------------------------------------------------------------
 
+    #物理值是否有效
+    def physicalValueVaild(self,sigName,value):
+        sig = self.getSig(sigName)
+        if '.' in str(value) and not AnalyzeFile.getValueType(sig,'.'):
+            return False
+        if float(sig.min) <= float(value) <= float(sig.max):
+            return True
+        return False
+
+    #是否是本机发送
+    def isLocateSend(self,sigName):
+        sig = self.getSig(sigName)
+        if sig != None:
+            return sig.Sender in local_machine_Sender
+        return False
+
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
 
 
 

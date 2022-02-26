@@ -25,20 +25,19 @@ issue.fields.reporter '''
 
 import sys
 
-from matplotlib.pyplot import text
+import argparse
 from commonfun import *
 from jira import JIRA
 from signalxls import *
+# from AnalyzeCan.projectInI import *
          
 jira =JIRA("http://jira.i-tetris.com/",basic_auth=("chengxiong.zhu","@Huan2870244352"))
-
 useCases=[]
 
 def getBugId(bugId):
     bugId = str(bugId)
     if '-' not in bugId:
-        if(PROJECT_ID == 'c385ev'):
-            bugId = 'BGS-'+bugId
+        bugId = Jira_Project+'-'+bugId
     return bugId
 
 def appendUseCases(case):
@@ -94,7 +93,7 @@ def getLogPath(bugId):
             print(smb)
 
 def displayIssue(issue,arg):
-    print(f'{issue.key}')
+    printGreen(f'{jira.server_url}/projects/{Jira_Project}/issues/{issue.key}')
     if arg & 1:
         title='标题'
         print(f'{title:<10}{issue.fields.summary}')
@@ -124,10 +123,10 @@ def help():
     print("-a bugId 查看问题所有信息")
     print('-e: 退出')
 
-def getBugInfo():
+
+def getBugInfo(text):
     #fields = 'comment'不配置就没有备注,默认不存在
-    issues = jira.search_issues('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC'
-    ,fields = ['comment','summary','description'])
+    issues = jira.search_issues(text,fields = ['comment','summary','description'])
     for issue in issues:
         displayIssue(issue,1)    
     help()
@@ -149,11 +148,31 @@ def getBugInfo():
                 if getBugId(in_i) == issue.key:
                     sendBugCan(in_i)
 
+def getNoResolvedInfo():
+    #fields = 'comment'不配置就没有备注,默认不存在
+    getBugInfo('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC')
+
+def getToalResolvedJira():
+    getBugInfo(f'project = {Jira_Project}  AND  ( (status =Resolved AND resolution  = Fixed ) OR  status =Closed ) AND resolved >= startOfDay(-0d)  AND assignee in (currentUser()) order by updated DESC')
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
+
+    # parser = argparse.ArgumentParser(
+    # description='''
+    # 获取Jira上的信息，
+    # 用来发送信号
+    # ''')
+    
+    # #这个是要解析 -f 后面的参数
+    # parser.add_argument('-t', '--toal',help="今天解决的Jira",type=str,default='',nargs='?')
+    # arg=parser.parse_args()
+
+
+    if '-t' in sys.argv:
+        getToalResolvedJira()
+    elif len(sys.argv) == 2:
         sendBugCan(sys.argv[1])
     else:
-        getBugInfo()
+        getNoResolvedInfo()
     # getBugInfo("BGS-3771")
     # sendBugCan("BGS-4547")

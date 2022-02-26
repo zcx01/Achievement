@@ -17,6 +17,7 @@
                 "",
                 "    //{3}",
                 "    {fileName}= std::make_shared<{ClassName}>(shared_from_this());",
+                "    {fileName}->subscribe((struct veh_signal *)&CANSIG_GW_288__BcmPwrStsFb_g);",
                 "    {fileName}->subscribe((struct veh_signal *)&CANSIG_{1}_g);"
             ],
             "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip_module.cpp",

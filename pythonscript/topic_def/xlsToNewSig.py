@@ -2,30 +2,57 @@
 import sys
 import os
 
-from sqlalchemy import false, true
+
 import xlrd
 import time
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/AnalyzeCan/"
 from commonfun import *
 import openpyxl 
 import argparse
+import pyperclip
+from AnalyzeCan.Analyzedbc import *
 
 SETSTR='/Set'
+jsConfig = getJScontent(pyFileDir+"config.json",)
+dbc=Analyze(getKeyPath("dbcfile",jsConfig))
 
-def sigExist(sheel,row,col,CallFun):
-    sig = str(getValue(CallFun,sheel,row,col))
+#信号是否存在
+#sheel:所有值得集合 - 如一行一行组成的列表
+#row:行号
+#endCol:最后的列数
+#CallFun:得到值得函数
+#isUp:判断是否上行
+#返回 主信号名、是否存在，关联的信号
+def sigExist(sheel,row,endCol,CallFun,isUp):
+    sigs=[]
+    if type(endCol) == str:
+        end = ord(endCol) - ord('A')
+    for singCol in range(end):
+        sigs.append(str(getValue(CallFun,sheel,row,singCol)))
     relation=''
-    if ',' in sig:
-        sigs = sig.split(',')
-        sig = sigs[0]
-        del sigs[0]
-        relation = ','.join(sigs)
-    exist = len(sig)>3 and sig!='None'
-    # if not exist:
-    #     print(row+1,chr(col+65),'信号不存在')
-    return sig,exist,relation
- 
-#返回 define topic desc
+    exist = False
+    for sig in sigs:
+        if ',' in sig:
+            sigs = sig.split(',')
+            sig = sigs[0]
+            del sigs[0]
+            relation = ','.join(sigs)
+        if dbc.sigExist(sig):
+            if isUp:
+                exist = dbc.isLocateSend(sig)
+            else:
+                exist = not dbc.isLocateSend(sig)
+            # exist = len(sig)>3 and sig!='None'
+            # if not exist:
+            #     print(row+1,chr(col+65),'信号不存在')
+            return sig,exist,relation
+    return '',exist,relation
+
+#返回 define topic desc 
+#deContent:文件的内容
+#contents:匹配的字符串列表 -- 如果是desc就是一个字符串
+#spaceIndex:匹配空格的索引，
+#如 1匹配字符串被空格分割的第1一个字符,0匹配中文描述
 def analyDefine(deContent,contents,spaceIndex):
     desc=''
     defines=[]
@@ -35,9 +62,15 @@ def analyDefine(deContent,contents,spaceIndex):
         if not lineContent.startswith("#define"):
             desc=lineContent
             continue
-        spaceStr = splitSpaceGetValueByIndex(lineContent,spaceIndex)
-        spaceStr = spaceStr.replace('\"','')
-        if  spaceStr in  contents:
+        is_in = False
+        if spaceIndex == 0:
+            is_in = desc in contents
+        else:
+            spaceStr = splitSpaceGetValueByIndex(lineContent,spaceIndex)
+            spaceStr = spaceStr.replace('\"','')
+            is_in = spaceStr in  contents
+
+        if is_in:
             define=splitSpaceGetValueByIndex(lineContent, 1)
             topic = splitSpaceGetValueByIndex(lineContent, 2)
             if len(contents) == 0:
@@ -46,16 +79,19 @@ def analyDefine(deContent,contents,spaceIndex):
                 defines.append(define)
                 topics.append(topic)
                 descs.append(desc)
+
     if len(defines) == 0:
-        print(f'没有找到 {contents} ')
+        printYellow(f'没有找到 {str(contents)},请更新topic文件')
     return defines,topics,descs
 
+#得到define通过文件define.h
 def getDefineByFile(deContent,topic):
     topiclist=[]
     topiclist.append(topic)
     define,topic,dec = analyDefine(deContent,topiclist,2)
     return define[0]
 
+#通过字符串拼接成define
 def getDefineBySelf(topic):
     topic = topic.replace('/','')
     define = ''
@@ -67,6 +103,7 @@ def getDefineBySelf(topic):
             define+=t.upper()
     return 'IPC'+ define
 
+#生成参数通过表格
 def generateByXls(xlsPath,startRow,endRow,down,up):
     book=xlrd.open_workbook(xlsPath)
     sheel=book.sheet_by_index(0)
@@ -75,6 +112,7 @@ def generateByXls(xlsPath,startRow,endRow,down,up):
 def xlsVaule(sheel,row,col):
     return sheel.cell_value(row,col)
 
+#得到值
 def getValue(CallFun,sheel,row,col):
     try:
         if type(col) == str:
@@ -84,6 +122,7 @@ def getValue(CallFun,sheel,row,col):
         # print(row+1,chr(col+65),'值不存在')
         return
 
+#得到topic通过表格 3行拼接成topic
 def getTopicByXls(CallFun,sheel,row):
     topics = []
     try:
@@ -109,6 +148,7 @@ def getTopicByXls(CallFun,sheel,row):
     topic = '/'.join(topics)
     return topic+SETSTR,topic
 
+#在第5行获取备注(中文名称) - 状态
 def getComments(CallFun,sheel,startRow):
     comment = getValue(CallFun,sheel,startRow,5)
     statusStr='状态'
@@ -117,9 +157,13 @@ def getComments(CallFun,sheel,startRow):
         commentStatus=comment+statusStr
     return comment,commentStatus
 
+#得到topic和deine通过行号 来源:表格
+#sheel:所有值得集合 - 如一行一行组成的列表
+#CallFun:得到值得函数
+#desc:中文描述
+#rows:指定行号裂变
 def getTopicAndDefineByRow(sheel,CallFun,rows):
     subTopic=[]
-    pubTopic=[]
     descs=[]
     for row in rows:
         row-=1
@@ -128,15 +172,16 @@ def getTopicAndDefineByRow(sheel,CallFun,rows):
         defineStrSet = getDefineBySelf(topicStrSet)
         defineStr = getDefineBySelf(topicStr)
         subTopic.append(topicStr)
-        pubTopic.append(topicStrSet)
+        subTopic.append(topicStrSet)
         descs.append(comment)
+    interactiveTopic(subTopic,descs)
 
-    interactiveTopic(subTopic,pubTopic,descs)
-
-def interactiveTopic(subTopic,pubTopic,descs,isTip=True):
+def interactiveTopic(subTopic,descs,isTip=True,filePaths=[]):
     try:
         for row in range(len(subTopic)):
             print(f'{row:<5}{subTopic[row]:<50}{descs[row]}')
+        if len(filePaths) != 0:
+            print(filePaths)
         rowIndex = -1
         while True:
             if isTip:
@@ -148,17 +193,25 @@ def interactiveTopic(subTopic,pubTopic,descs,isTip=True):
                     rowIndex = input('输入索引')
             for row in range(len(subTopic)):
                 if row == int(rowIndex) or rowIndex == -1:
-                    if subTopic[row].endswith(SETSTR):
-                        print(sendMqtt(f'{pubTopic[row]}',1))
+                    singleTopic = str(subTopic[row]).replace(r'"','')
+                    sendTopic=''
+                    if singleTopic.endswith(SETSTR):
+                        sendTopic = sendMqtt(f'{singleTopic}',1)
                     else:
-                        print(subMqtt(f'\'{subTopic[row]}\''))
-                    if row < len(pubTopic):
-                        print(sendMqtt(f'{pubTopic[row]}',1))
+                        sendTopic = subMqtt(f'\'{singleTopic}\'')
+                    printGreen(sendTopic)
+                    pyperclip.copy(sendTopic)
             if not isTip:return
             if len(subTopic) == 1:return
     except:
         pass
 
+#得到topic和deine通过desc 来源:表格
+#通过topic表格的comment匹配desc找到行号,然后通过行号找topic和deine
+#sheel:所有值得集合 - 如一行一行组成的列表
+#CallFun:得到值得函数
+#desc:中文描述
+#rows:所有的行号
 def getTopicAndDefineByDesc(sheel,CallFun,desc,rows):
     findRows=[]
     for row in range(rows):
@@ -170,69 +223,129 @@ def getTopicAndDefineByDesc(sheel,CallFun,desc,rows):
             pass
     getTopicAndDefineByRow(sheel,CallFun,findRows)
 
-
+#在字符串查找define
+#defineSets:define的Set()集合
+#content:字符串
 def getDefineByContent(defineSets,content):
     defines =  re.findall(d_t, content, re.A)
     for define in defines:
         assert isinstance(define,str)
         defineSets.add(define)
-        return defineSets
+    return defineSets
 
-def getDefineBySig(sigName,srcPath):
+#在文件源码中得到define通过信号
+#sigName:信号名
+#srcPath:源码路径
+def getInSrcDefineBySig(sigName,srcPath):
     defineSets=set()
-    className = ''
+    classNames = set()
+    filePaths = set()
     for (dirpath,dirnames,filenames) in os.walk(srcPath):
         for fileName in filenames:
             if os.path.splitext(fileName)[1] == '.cpp': 
                 filePath = dirpath+'/'+fileName
                 contents = readFileLines(filePath)
+                # if fileName != "vc_discharge_soc.cpp": continue
                 for content in contents:
-                    classNames = getClassNames(content)
-                    if len(classNames) != 0:
-                        className = classNames[0]
-                    if sigName in content:
+                    className = getRelationClassName(content)
+                    if sigName.upper() in content.upper():
                         getDefineByContent(defineSets,content)
+                        if len(className) != 0:
+                            classNames.add(className)
                         if len(defineSets) != 0:
-                            return defineSets
+                            filePaths.add(filePath)
+                            return defineSets,filePaths
    
                 with open(filePath, "r") as cr:
                     content = cr.read()
-                    if sigName in content:
+                    if sigName.upper() in content.upper():
                         getDefineByContent(defineSets,content)
+                        filePaths.add(filePath)
+                        className = getSelfClassName(content)
+                        classNames.add(className)
 
-    if len(defineSets) == 0 and len(className) !=0:
+    if len(defineSets) == 0 and len(classNames) !=0:
         for (dirpath,dirnames,filenames) in os.walk(srcPath):
             for fileName in filenames:
                 if os.path.splitext(fileName)[1] == '.cpp': 
                     filePath = dirpath+'/'+fileName
+                    # if filePath != '/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp': continue
                     contents = readFileLines(filePath)
                     for contentIndex in range(len(contents)):
-                        classNames = getClassNames(contents[contentIndex])
-                        if len(classNames) != 0:
-                            if classNames[0] == className:
-                                while contentIndex < len(content):
-                                    getDefineByContent(defineSets,contents[contentIndex])
-                                    contentIndex+=1
-                                    classNames = getClassNames(contents[contentIndex])
-                                    if len(classNames) != 0:
-                                         return defineSets
+                        #if contentIndex != 300 : continue
+                        tempclassName = getRelationClassName(contents[contentIndex])
+                        if tempclassName in classNames:
+                            while contentIndex < len(content):
+                                getDefineByContent(defineSets,contents[contentIndex])
+                                contentIndex+=1
+                                classNames = getRelationClassName(contents[contentIndex])
+                                if len(classNames) != 0:
+                                        filePaths.add(filePath)
+                                        return defineSets,filePaths
                         contentIndex+=1
+    return defineSets,filePaths
 
-    return defineSets
-
+#通过信号名称topic和deine
 def getTopicAndDefineBySig(sigName):
-    jsConfig = getJScontent(pyFileDir+"config.json")
-    defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
-    srcPath = getKeyPath("srcPath",jsConfig)
-    topics=[]
-    defineSets=getDefineBySig(sigName,srcPath)
-    if len(defineSets) ==0:
-        print(f'没有找到')
-        return
-    defines,topics,decs = analyDefine(defineContents,defineSets,1)     
-    interactiveTopic(topics,[],decs,False)
+    topic_config_path = pyFileDir+"../topic_config.json"
+    print(topic_config_path)
+    topic_configs ={}
+    try:
+        topic_configs = getJScontent(topic_config_path)
+    except:
+        pass
+    realTopic = []
+    realDesc = []
+    filePaths = []
+    config_exist = False
+    topic_config = topic_configs.get(sigName,None)
+    if topic_config !=  None:
+        realTopic = topic_config['topic']
+        realDesc = topic_config['desc']
+        filePaths = topic_config['filePath']
+        config_exist = True
 
+    update = 'y'
+    if config_exist:
+        interactiveTopic(realTopic,realDesc,False,filePaths)
+        update=input("是否更新(y/n)")
 
+    if update == "y": 
+        jsConfig = getJScontent(pyFileDir+"config.json")
+        srcPath = getKeyPath("srcPath",jsConfig)
+        topics=[]
+        defineSets,filePaths=getInSrcDefineBySig(sigName,srcPath)
+        if len(defineSets) ==0:
+            print(f'没有找到')
+            return
+        defineContents = readFileLines(getKeyPath("definefile",jsConfig)) 
+        defines,topics,decs = analyDefine(defineContents,defineSets,1)    
+        if len(topics) > 1:
+            for row in range(len(topics)):
+                print(f'{row:<5}{topics[row]:<50}{decs[row]}')
+            rows = input("请输入<以特殊符号(如:,)分割的符号,-1为所有>topic的行号:\n")
+            rows = re.findall(e_i,rows,re.A)
+            for row in rows:
+                row = int(row)
+                if(row == -1):
+                    realTopic = topics
+                    realDesc = decs
+                    break
+                realTopic.append(topics[row])
+                realDesc.append(decs[row])
+        else:
+            realTopic = topics
+            realDesc = decs
+        topic_config={}
+        topic_config['topic'] = realTopic
+        topic_config['desc'] = realDesc
+        topic_config['filePath'] = list(filePaths)
+        topic_configs[sigName] = topic_config
+
+        writeJs(topic_config_path,topic_configs)
+        interactiveTopic(realTopic,realDesc,False,filePaths)
+
+#生成参数
 def generate(sheel,startRow,endRow,down,up,CallFun,rows):
     if startRow == 0:
         endRow = rows
@@ -289,7 +402,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
         commentSet,comment =  getComments(CallFun,sheel,startRow)
         topicStrSet, topicStr = getTopicByXls(CallFun, sheel, startRow)
         className = getValue(CallFun,sheel,startRow,1)+ getValue(CallFun,sheel,startRow,2)
-        sig,isExist,relation = sigExist(sheel,startRow,'M',CallFun)
+        sig,isExist,relation = sigExist(sheel,startRow,'N',CallFun,True)
         isTopic = True
         if isExist:
             isTopic = False
@@ -305,7 +418,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
             print(rowContent)
             sh.append(rowContent)
 
-        sig,isExist,relation = sigExist(sheel,startRow,'N',CallFun)
+        sig,isExist,relation = sigExist(sheel,startRow,'N',CallFun,False)
         if isExist:
             isTopic = False
             rowContent=[]
@@ -330,7 +443,6 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
                 topicDefineSet = getDefineByFile(defineContents,tempSet)
             else:
                 topicDefineSet = tempSet
-
             topicDefine = getDefineByFile(defineContents,topicStr)
             rowContent.append(topicDefineSet)
             rowContent.append(up)
@@ -349,7 +461,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
     print("生成完成")
     os.system(f'xdg-open {saveFileName}')
 
-# getTopicAndDefineBySig('ItmsAutoDefrstDefogFctSts')
+# getTopicAndDefineBySig('CdcDchaSocLimitSet')
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(description='这个是通过topic表格生成生成newSig表格')
     parse.add_argument('-d','--down',help='下行信号的类型',default="vehctrl")

@@ -8,7 +8,7 @@
     "position": [
         [
             {
-                "x": 72,
+                "x": 72,    
                 "y": 24
             },
             "Ready",
@@ -65,10 +65,11 @@
             "Cruise",
             "ESCOFF,ESCActive",
             "AutoHold",
+            "iacc_status_green",
             "FuelTankLow_yellow",
             "WaterTempWarn",
-            "",
-            "",
+            "WinterMode",
+            "EnergyActive",
             "aeb_off",
             "bsd",
             "HighStackTemperature",

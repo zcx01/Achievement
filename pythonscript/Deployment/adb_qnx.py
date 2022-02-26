@@ -4,6 +4,7 @@ import time
 from execCmd import *
 import argparse
 import subprocess
+from commonfun import *
 
 
 if __name__ == "__main__":
@@ -11,7 +12,8 @@ if __name__ == "__main__":
         description='qnx ')
 
     parser.add_argument('-r','--reset',help='reset -f',nargs='*')
-    parser.add_argument('-m','--subtopic',help='su btopic',type=str,default=[])
+    parser.add_argument('-m','--subtopic',help='sub topic',type=str,default=[])
+    parser.add_argument('-s','--sendtopic',help='send topic',type=str,default=[])
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     parser.add_argument('-k','--slay', help='slay process',type=str,nargs='*')
     parser.add_argument('-l','--log', help='taif log',type=str)
@@ -35,7 +37,15 @@ if __name__ == "__main__":
 
     if "-m" in sys.argv:
         try:
-            keyStr(f"on -T ic_apps_t -u ic_apps mega_ipc_sub -t  \"{args.subtopic}\" ")
+            # keyStr(f"on -T ic_apps_t -u ic_apps mega_ipc_sub -t  \"{args.subtopic}\" ")
+            keyStr(subMqtt(args.subtopic))
+        except:
+            pass
+
+    if "-s" in sys.argv:
+        try:
+            # keyStr(f"on -T ic_apps_t -u ic_apps mega_ipc_sub -t  \"{args.subtopic}\" ")
+            keyStr(sendMqtt(args.sendtopic,1))
         except:
             pass
 
