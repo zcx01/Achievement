@@ -461,7 +461,7 @@ def generate(sheel,startRow,endRow,down,up,CallFun,rows):
     print("生成完成")
     os.system(f'xdg-open {saveFileName}')
 
-# getTopicAndDefineBySig('CdcDchaSocLimitSet')
+# getTopicAndDefineBySig('CdcWiprSrvSig')
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(description='这个是通过topic表格生成生成newSig表格')
     parse.add_argument('-d','--down',help='下行信号的类型',default="vehctrl")
@@ -469,9 +469,9 @@ if __name__ == "__main__":
     parse.add_argument('-x','--xlsPath',help='topic表格路径',default='/home/chengxiongzhu/Works/newsig/topic.xls')
     parse.add_argument('-s','--startRow',help='开始的行号',type=int,default=0)
     parse.add_argument('-e','--endRow',help='结束的行号',type=int,default=-1)
-    parse.add_argument('-f','--findSigName',help='信号名称',type=str)
+    parse.add_argument('-f','--findName',help='信号和topic互转',type=str)
     arg = parse.parse_args()
     if '-f' in sys.argv:
-        getTopicAndDefineBySig(arg.findSigName)
+        getTopicAndDefineBySig(arg.findName)
     else:
         generateByXls(arg.xlsPath,arg.startRow,arg.endRow,arg.down,arg.up)

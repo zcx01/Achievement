@@ -828,8 +828,6 @@ start_megapm()
     #####start mega pm#####
     log_launch "megapm"
 
-    # wait for the uartrpc device file created by uartrpc_service
-    waitfor /dev/uartrpc4
     on -T megapm_t -u megapm megapm &
 }
 
@@ -837,14 +835,14 @@ start_pm_event_postprocess()
 {
     log_launch "start_pm_event_postprocess"
 
-    on -T pm_event_postprocess_t -u pm_event_postprocess pm_event_postprocess &
+    on -T pm_event_postprocess_t -u pm_event_postprocess -p 40 pm_event_postprocess &
 }
 
 start_pm_event_preprocess()
 {
     log_launch "start_pm_event_preprocess"
 
-    on -T pm_event_preprocess_t -u pm_event_preprocess pm_event_preprocess &
+    on -T pm_event_preprocess_t -u pm_event_preprocess -p 40 pm_event_preprocess &
 }
 
 start_input_service()
@@ -913,13 +911,19 @@ start_iceoryx()
         chmod 0666 /var/lock
         rm /var/lock/*.lock
     fi
-    on -T iceoryx_t -u iceoryx iox-roudi -m off -c /etc/iceoryx/roudi_config.toml &
+    on -T iceoryx_t -u iceoryx -p 63 iox-roudi -m off -c /etc/iceoryx/roudi_config.toml &
 }
 
 start_host_ota()
 {
     log_launch "host_otaService"
     on -T host_update_t -u host_update hostUpdate &
+}
+
+start_chk_luns_consistent()
+{
+    log_launch "check system slot luns consistent"
+    on -T chkslot_t -u chkslot chkslot &
 }
 
 start_factoryservice()
@@ -970,7 +974,7 @@ start_mcurpc()
     waitfor /dev/uartrpc5
     waitfor /dev/uartrpc6
     waitfor /dev/uartrpc7
-    on -T uartrpc_service_t -u uartrpc_service /usr/bin/uartrpc_service &
+    /bin/slm -V /slm/uartrpc_service.xml
 }
 
 
@@ -991,6 +995,11 @@ set_ic_apps_cpu_runmask()
     slay -R 0x02 -i mcu_service
 }
 
+config_sysctl_network()
+{
+    # Tuning for network throughput performance
+    sysctl -f /etc/sysctl.conf > /dev/null 2>&1
+}
 start_max20086()
 {
     #####start max20086 #####
@@ -1134,6 +1143,8 @@ fi
 #mount -T io-pkt /lib64/libdevnp-emac-eth.so
 
 
+# configuring the socket send / recv buffer size
+config_sysctl_network
 
 # init usb hub chip power
 usb_hub_power
@@ -1143,6 +1154,9 @@ mount_log
 
 # create file /var/log/syslog
 create_syslog
+
+echo "start check system slot luns consistent"
+start_chk_luns_consistent
 
 # create file /etc/icapps_version
 create_icapps_version
@@ -1443,7 +1457,6 @@ start_ecu_ota
 
 echo "setup diag_service_pps"
 setup_diag_service_pps
-echo "run_audio_diag::true" > /var/pps/diag_service_pps
 
 echo "start MCU heartbeat service"
 start_mcu_hb

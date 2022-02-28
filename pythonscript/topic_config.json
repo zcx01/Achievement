@@ -235,5 +235,41 @@
         "filePath": [
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
+    },
+    "CdcWasherSt": {
+        "topic": [
+            "\"VehicleWindow/Wiper/Front/Set\""
+        ],
+        "desc": [
+            "//前雨刷状态 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_washer_set.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
+        ]
+    },
+    "CdcEasyEntrySet": {
+        "topic": [
+            "\"VehicleSeat/EasyEntry/FrontLeft/Set\""
+        ],
+        "desc": [
+            "//座椅礼让(前排左侧) Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_courtesy_seats.cpp"
+        ]
+    },
+    "CdcWiprSrvSig": {
+        "topic": [
+            "\"BodyInfo/WiperServiceMode/Set\""
+        ],
+        "desc": [
+            "//雨刮器维修模式 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_wipr_srv.cpp"
+        ]
     }
 }

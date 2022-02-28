@@ -3,6 +3,8 @@ import json
 import re
 import sys
 
+from numpy import insert
+
 w_d=r'[a-zA-Z_]'                #匹配单词
 i_i=r"-?[0x0-9]"                #匹配数字
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"   #匹配单词和数字(包括小数和负数)
@@ -180,12 +182,14 @@ def getRelationClassName(text):
 
 #得到本文件的类名
 def getSelfClassName(text):
-    m_i = r'[a-zA-Z_]+::'
+    m_i = r'[a-zA-Z_::]+::'
     classNames = re.findall(m_i,text,re.A)
     className= ''
     if len(classNames) != 0:
         className = classNames[0]
-    className = className.replace('::','')
+        className.replace(" ",'')
+        className = className.split('::')
+        className = className[len(className)-2]
     return className
 
 def removeListIndexs(linelist,Indexs):
