@@ -69,11 +69,6 @@ def getCommand(cmd,arrys):
             return arry
     return ''
 
-is_ssh = "-s" in sys.argv
-if is_ssh:
-    keyStr("ssh chengxiongzhu@10.25.11.197")
-    keyStr("123456")
-
 class AndroidQnx(object):
     def __init__(self):
         super().__init__()

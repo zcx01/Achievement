@@ -115,7 +115,7 @@ def qnx_screenshot_1_2_1(serial, image_path, branch='bigsur'):
                 # 开始截屏
                 p.sendline("screenshot -display=1 -file=/ota/android/screen.bmp")
                 p.expect(["#", pexpect.EOF, pexpect.TIMEOUT])
-                # p.sendline("screenshot -display=2 -file=/ota/android/screen_2.bmp")
+                # p.sendline("screenshot -display=1 -file=/ota/android/screen_2.bmp")
                 # p.expect(["#", pexpect.EOF, pexpect.TIMEOUT])
                 p.sendline("exit")
                 logout_index = p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT])

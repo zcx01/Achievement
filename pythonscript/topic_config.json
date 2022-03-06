@@ -271,5 +271,72 @@
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_wipr_srv.cpp"
         ]
+    },
+    "CdcFrntWindLvlSet": {
+        "topic": [
+            "\"AC/WindLevel/Front/Set\""
+        ],
+        "desc": [
+            "//前排空调当前风速 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/air_conditioner.cpp"
+        ]
+    },
+    "CdcOffgasDetnSetSts": {
+        "topic": [
+            "\"BodyInfo/GasDetection/Set\""
+        ],
+        "desc": [
+            "//尾气检测开关 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
+        ]
+    },
+    "ItmsHotColdModFb": {
+        "topic": [
+            "\"AC/HeatingColdMode\""
+        ],
+        "desc": [
+            "//制热制冷模式"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "BcuDcboxDischrgPwr": {
+        "topic": [
+            "\"EnergyInfo/DischargePower\""
+        ],
+        "desc": [
+            "//放电电量"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "WLCMWirelsChrgnSts": {
+        "topic": [
+            "\"BodyInfo/WirelessCharge/Status\""
+        ],
+        "desc": [
+            "//无线充电状态"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_info/wireless_charge_status.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_module.cpp"
+        ]
+    },
+    "BcmLiHightManuSetSts": {
+        "topic": [
+            "\"Light/LightHeight\""
+        ],
+        "desc": [
+            "//大灯高度"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
     }
 }

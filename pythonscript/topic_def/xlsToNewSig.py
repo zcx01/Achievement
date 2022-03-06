@@ -42,10 +42,8 @@ def sigExist(sheel,row,endCol,CallFun,isUp):
                 exist = dbc.isLocateSend(sig)
             else:
                 exist = not dbc.isLocateSend(sig)
-            # exist = len(sig)>3 and sig!='None'
-            # if not exist:
-            #     print(row+1,chr(col+65),'信号不存在')
-            return sig,exist,relation
+            if exist:
+                return sig,exist,relation
     return '',exist,relation
 
 #返回 define topic desc 
@@ -198,7 +196,7 @@ def interactiveTopic(subTopic,descs,isTip=True,filePaths=[]):
                     if singleTopic.endswith(SETSTR):
                         sendTopic = sendMqtt(f'{singleTopic}',1)
                     else:
-                        sendTopic = subMqtt(f'\'{singleTopic}\'')
+                        sendTopic = subMqtt(f'{singleTopic}')
                     printGreen(sendTopic)
                     pyperclip.copy(sendTopic)
             if not isTip:return

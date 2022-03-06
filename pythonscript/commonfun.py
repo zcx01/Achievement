@@ -3,8 +3,6 @@ import json
 import re
 import sys
 
-from numpy import insert
-
 w_d=r'[a-zA-Z_]'                #匹配单词
 i_i=r"-?[0x0-9]"                #匹配数字
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"   #匹配单词和数字(包括小数和负数)
@@ -22,7 +20,7 @@ def sendMqtt(topic,value):
 
 def subMqtt(topic):
     topic=str(topic).replace(r'"','')
-    return f'on -T ic_apps_t -u ic_apps mega_ipc_sub -t {topic}'
+    return f'on -T ic_apps_t -u ic_apps mega_ipc_sub -t \'{topic}\''
     
 class EesyStr():
     @staticmethod
