@@ -25,4 +25,3 @@ if __name__ == "__main__":
     muc_dir = '/ota/android/'
     os.system(f'python3 c385_deploy.py -a {mcu_bin} -e \'flash_mcu.sh p {muc_dir}\' \'flash_mcu.sh c\'')
     
-

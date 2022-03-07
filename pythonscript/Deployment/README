@@ -37,8 +37,10 @@ adb_qnx -r
 adb_qnx -h
 
 ----------------mcu_deploy.py 升级mcu----------------------
+需要安装wget、unzip
 首次使用修改脚本的这行的用户名和密码
---http-user=chengxiong.zhu --http-password=@Huan2870244352
+--http-user=xxxxx --http-password=xxxx
+
 
 #使用
 mcu_deploy mcu的网址
