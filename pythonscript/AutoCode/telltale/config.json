@@ -21,7 +21,25 @@
             ],
             "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/telltale_module.cpp",
             "pos":"link_signal_item"
+        },
+        {
+            "content":[
+                "   \"{5}\": {",
+                "   \"value\": 1,",
+                "   \"pic\": \".png\",",
+                "   \"yellowPic\": \"\",",
+                "   \"redPic\": \"\",",
+                "   \"bluePic\": \"\",",
+                "   \"whitePic\": \"\",",
+                "   \"desc\": \"AEB系统状态\",",
+                "   \"left\": 0,",
+                "   \"top\": 0,",
+                "}"
+            ],
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/ictelltale_config.json",
+            "pos":"-1"
         }
     ],
     "desc":"C385指示灯  1:信号名称"
 }
+

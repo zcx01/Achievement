@@ -3,6 +3,8 @@ import json
 import re
 import sys
 
+from numpy import insert
+
 w_d=r'[a-zA-Z_]'                #匹配单词
 i_i=r"-?[0x0-9]"                #匹配数字
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"   #匹配单词和数字(包括小数和负数)
@@ -151,6 +153,14 @@ def behindStr(lines,behind,content):
     if content not in behinds:
         lines.insert(row,content)
 
+#在指定行后面添加contents
+def behindIndex(lines,pos,contents):
+    temp=[]
+    temp.extend(lines[0:pos])
+    temp.extend(contents)
+    temp.extend(lines[pos:len(lines)])
+    return temp
+
 #
 def getNoOx16(text):
     content = str(text)
@@ -190,6 +200,7 @@ def getSelfClassName(text):
         className = className[len(className)-2]
     return className
 
+#移除指定行 Indexs:索引集合
 def removeListIndexs(linelist,Indexs):
     temp = []
     for index in range(len(linelist)):

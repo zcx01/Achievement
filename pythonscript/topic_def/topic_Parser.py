@@ -82,14 +82,6 @@ def execCmd(cmd):
     ex.communicate()
     ex.wait()
 
-def getDefine(jsConfig,topic):
-    definefile=getKeyPath("definefile",jsConfig)
-    texts=readFileLines(definefile)
-    for text in texts:
-        if text.find(topic) != -1:
-            return splitSpaceGetValueByIndex(text,1)
-    print("没有找到"+topic)
-    sys.exit()
 
 def InvalidRow(text,alreadyText):
     return text.strip().startswith("#") or len(text) == 0 or text in alreadyText or text.strip().startswith("\n") or len(text.replace(' ',''))==0
@@ -213,14 +205,12 @@ def dealnewSig(can_parse_whitelist_return=False):
         desc=getValueByIndex(names,2)
         className=getValueByIndex(names,3,"x")
         define=getValueByIndex(names,4)
-        
-        if len(define)==0 or define == "x":
-            define = getDefine(jsConfig, desc)
+        topic=getValueByIndex(names,5)
 
         #写入 cpp 文件 #创建 .h .cpp 文件
         desc=addEscape(desc)
-        print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
-        os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr}')
+        print(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr} {topic}')
+        os.system(f'AutoCode {sigType} {className} {messagesig} {define} {desc} {dataTypeStr} {topic}')
        
     if is_Parser:
         os.system("Parser")

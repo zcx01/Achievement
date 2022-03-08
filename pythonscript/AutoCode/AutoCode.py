@@ -161,6 +161,16 @@ def modifyFile(jsConfig,replaceList,className,fileName):
         isStart=False
         isFinish=False
         bracketsNum=-1
+
+        #如果是数值，就写到指定的行中
+        if isNumber(pos):
+            pos = int(pos)
+            if pos < 0:
+                pos = len(lineContents) + int(pos)
+            w_in.writelines(behindIndex(lineContents,pos,newContentlist))
+            w_in.close()
+            continue
+
         #找到修改的位置
         for lineContent in lineContents:
             #如果没有写入就找位置，已经写入就不找位置
