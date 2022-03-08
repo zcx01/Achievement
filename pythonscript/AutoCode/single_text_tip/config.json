@@ -12,11 +12,12 @@
         },
         {
             "content":[
+                "   ,",
                 "       \"{5}\": {",
                 "           \"grade\": \"\",",
                 "           \"1\": \"{3}\",",
                 "           \"desc\": \"{3}\"",
-                "}"
+                "       }\n"
             ],
             "path":"/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/icwarning_config.json",
             "pos":"-1"

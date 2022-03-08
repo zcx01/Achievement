@@ -205,7 +205,7 @@ def dealnewSig(can_parse_whitelist_return=False):
         desc=getValueByIndex(names,2)
         className=getValueByIndex(names,3,"x")
         define=getValueByIndex(names,4)
-        topic=getValueByIndex(names,5)
+        topic=getValueByIndex(names,6)
 
         #写入 cpp 文件 #创建 .h .cpp 文件
         desc=addEscape(desc)
