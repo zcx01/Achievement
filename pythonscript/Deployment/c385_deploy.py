@@ -133,7 +133,7 @@ if __name__ == "__main__":
                 tmdir = os.path.dirname(tmpath)
                 if not os.path.isdir(tmdir):
                     os.system(f'mkdir -p {tmdir}')
-                os.system(f"scp -r {user}@{ssh_ip}:{tmpath}/* {tmdir}/")
+                os.system(f"scp -r {user}@{ssh_ip}:{tmpath} {tmdir}/")
 
     keyStr('adb root')
     main(args,sys.argv)
