@@ -25,6 +25,7 @@ void {ClassName}::signalChange(float value,std::string topic)
     if (1 != GetBcmPwrStsFbValue(bcmPwrStsFbValue))
     {
         TB_LOG_ERROR("GetBcmPwrStsFbValue error. return");
+        publishInvalid(topic);
         return;
     }
 
