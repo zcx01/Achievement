@@ -108,6 +108,7 @@ if __name__ == "__main__":
     parser.add_argument('-r','--not',help='excess commad',nargs='*')
     parser.add_argument('-d','--dir',help='exe dir',default='',type=str)
     parser.add_argument('-f','-PcFileName',help="打印自带PC上文件的名称",nargs='*')
+    parser.add_argument('-s','-sship',help="从远程复制",default=jsConfig.get("ssh_ip",""))
     parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c835/prebuilts/ic',type=str)
     args = parser.parse_args()
     argv = sys.argv
@@ -115,6 +116,16 @@ if __name__ == "__main__":
         printPCFile()
         sys.exit()
     PrjectDir = args.PrjectDir
+
+    if "-s" in sys.argv:
+        user=jsConfig.get("user",)
+        ip = jsConfig.get("ssh_ip","")
+        if '-a' in sys.argv:
+            os.system(f"scp -r {user}@{args.ip}:{args.absolutePath} {args.absolutePath}")
+    
+        if '-c' in sys.argv:
+            os.system(f"scp -r {user}@{args.ip}:{args.customfile}/* {args.customfile}/*")
+            
     keyStr('adb root')
     main(args,sys.argv)
     if '-a' in argv:
