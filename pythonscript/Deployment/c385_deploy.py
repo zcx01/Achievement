@@ -122,7 +122,7 @@ if __name__ == "__main__":
         user=jsConfig.get("user",)
         ip = jsConfig.get("ssh_ip","")
         if '-a' in sys.argv:
-            tmdir = os.path.dirname(args.absolutePath):
+            tmdir = os.path.dirname(args.absolutePath)
             if not os.path.isdir(tmdir):
                 os.system(f'mkdir -p {tmdir}')
             os.system(f"scp -r {user}@{args.ip}:{args.absolutePath} {tmdir}/")
