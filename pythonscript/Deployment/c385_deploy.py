@@ -125,9 +125,9 @@ if __name__ == "__main__":
             os.system(f"scp -r {user}@{args.ip}:{args.absolutePath} {tmdir}/")
     
         if '-c' in sys.argv:
-            if not os.path.isdir(args.customfile):
-                os.system(f'mkdir -p {args.customfile}')
-            os.system(f"scp -r {user}@{args.ip}:{args.customfile}/* {args.customfile}/")
+            if not os.path.isdir(PrjectDir):
+                os.system(f'mkdir -p {PrjectDir}')
+            os.system(f"scp -r {user}@{args.ip}:{PrjectDir}/* {PrjectDir}/")
 
     keyStr('adb root')
     main(args,sys.argv)
