@@ -117,17 +117,17 @@ if __name__ == "__main__":
 
     if "-s" in sys.argv:
         user=jsConfig.get("user",)
-        ip = jsConfig.get("ssh_ip","")
+        ssh_ip = jsConfig.get("ssh_ip","")
         if '-a' in sys.argv:
             tmdir = os.path.dirname(args.absolutePath)
             if not os.path.isdir(tmdir):
                 os.system(f'mkdir -p {tmdir}')
-            os.system(f"scp -r {user}@{args.ip}:{args.absolutePath} {tmdir}/")
+            os.system(f"scp -r {user}@{ssh_ip}:{args.absolutePath} {tmdir}/")
     
         if '-c' in sys.argv:
             if not os.path.isdir(PrjectDir):
                 os.system(f'mkdir -p {PrjectDir}')
-            os.system(f"scp -r {user}@{args.ip}:{PrjectDir}/* {PrjectDir}/")
+            os.system(f"scp -r {user}@{ssh_ip}:{PrjectDir}/* {PrjectDir}/")
 
     keyStr('adb root')
     main(args,sys.argv)
