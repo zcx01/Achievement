@@ -134,6 +134,8 @@ if __name__ == "__main__":
                 if not os.path.isdir(tmdir):
                     keyStr(f'mkdir -p {tmdir}')
                 keyStr(f"scp -r {user}@{ssh_ip}:{tmpath}/* {tmdir}/")
+                interact()
+
 
     keyStr('adb root')
     main(args,sys.argv)
