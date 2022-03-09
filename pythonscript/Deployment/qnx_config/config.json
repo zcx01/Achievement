@@ -8,6 +8,7 @@
     "Other":"hqx.1.2",
     "ssh_ip":"10.25.11.197",
     "user":"chengxiongzhu",
+    "pwd":"123456",
     "PC":
     {
         "ivi_compositor": "qt/bin"

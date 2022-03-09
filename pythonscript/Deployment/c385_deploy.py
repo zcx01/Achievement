@@ -118,6 +118,7 @@ if __name__ == "__main__":
     if "-s" in sys.argv:
         user=jsConfig.get("user",)
         ssh_ip = jsConfig.get("ssh_ip","")
+        pwd = jsConfig.get("pwd","")
         if '-a' in sys.argv:
             tmdir = os.path.dirname(args.absolutePath)
             if not os.path.isdir(tmdir):
@@ -125,10 +126,14 @@ if __name__ == "__main__":
             os.system(f"scp -r {user}@{ssh_ip}:{args.absolutePath} {tmdir}/")
     
         if '-c' in sys.argv:
-            if not os.path.isdir(PrjectDir):
-                os.system(f'mkdir -p {PrjectDir}')
-            print(f'scp -r {user}@{ssh_ip}:{PrjectDir}/* {PrjectDir}/')
-            os.system(f"scp -r {user}@{ssh_ip}:{PrjectDir}/* {PrjectDir}/")
+            proceesNames= args.customfile[0]
+            for proceesName in proceesNames:
+                execbin = getExecBin(proceesName,proceesName)
+                tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
+                tmdir = os.path.dirname(tmpath)
+                if not os.path.isdir(tmdir):
+                    keyStr(f'mkdir -p {tmdir}')
+                keyStr(f"scp -r {user}@{ssh_ip}:{tmpath}/* {tmdir}/")
 
     keyStr('adb root')
     main(args,sys.argv)
