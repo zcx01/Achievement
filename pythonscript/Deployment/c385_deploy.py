@@ -1,4 +1,5 @@
 #!/bin/python
+from importlib.resources import path
 import inspect
 from os import system
 from traceback import print_exc
@@ -121,11 +122,16 @@ if __name__ == "__main__":
         user=jsConfig.get("user",)
         ip = jsConfig.get("ssh_ip","")
         if '-a' in sys.argv:
-            os.system(f"scp -r {user}@{args.ip}:{args.absolutePath} {args.absolutePath}")
+            tmdir = os.path.dirname(args.absolutePath):
+            if not os.path.isdir(tmdir):
+                os.system(f'mkdir -p {tmdir}')
+            os.system(f"scp -r {user}@{args.ip}:{args.absolutePath} {tmdir}/")
     
         if '-c' in sys.argv:
-            os.system(f"scp -r {user}@{args.ip}:{args.customfile}/* {args.customfile}/*")
-            
+            if not os.path.isdir(args.customfile):
+                os.system(f'mkdir -p {args.customfile}')
+            os.system(f"scp -r {user}@{args.ip}:{args.customfile}/* {args.customfile}/")
+
     keyStr('adb root')
     main(args,sys.argv)
     if '-a' in argv:
