@@ -132,10 +132,8 @@ if __name__ == "__main__":
                 tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
                 tmdir = os.path.dirname(tmpath)
                 if not os.path.isdir(tmdir):
-                    keyStr(f'mkdir -p {tmdir}')
-                print(f"scp -r {user}@{ssh_ip}:{tmpath}/* {tmdir}/")
-                interact()
-
+                    os.system(f'mkdir -p {tmdir}')
+                os.system(f"scp -r {user}@{ssh_ip}:{tmpath}/* {tmdir}/")
 
     keyStr('adb root')
     main(args,sys.argv)
