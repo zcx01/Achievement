@@ -126,14 +126,14 @@ if __name__ == "__main__":
             os.system(f"scp -r {user}@{ssh_ip}:{args.absolutePath} {tmdir}/")
     
         if '-c' in sys.argv:
-            proceesNames= args.customfile[0]
+            proceesNames= args.customfile
             for proceesName in proceesNames:
                 execbin = getExecBin(proceesName,proceesName)
                 tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
                 tmdir = os.path.dirname(tmpath)
                 if not os.path.isdir(tmdir):
                     keyStr(f'mkdir -p {tmdir}')
-                keyStr(f"scp -r {user}@{ssh_ip}:{tmpath}/* {tmdir}/")
+                print(f"scp -r {user}@{ssh_ip}:{tmpath}/* {tmdir}/")
                 interact()
 
 
