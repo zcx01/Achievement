@@ -1,8 +1,5 @@
 #!/bin/python
-from importlib.resources import path
-import inspect
 from os import system
-from traceback import print_exc
 import time
 import sys
 import subprocess
