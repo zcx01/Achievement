@@ -60,7 +60,10 @@ def main(args,argv):
 def getDev():
     out = subprocess.getoutput(f"python3 {pyFileDir}/adb_qnx.py -e \'cat etc/version\' -i 0").splitlines()
     if len(out) != 0:
-        return out[len(out)-1].split("=")[1]
+        try:
+            return out[len(out)-1].split("=")[1]
+        except:
+            pass
     return ''
 
 def getDevDir():
@@ -132,8 +135,9 @@ if __name__ == "__main__":
                 tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
                 tmdir = os.path.dirname(tmpath)
                 if not os.path.isdir(tmdir):
-                    os.system(f'mkdir -p {tmdir}')
-                os.system(f"scp -r {user}@{ssh_ip}:{tmpath} {tmdir}/")
+                    keyStr(f'mkdir -p {tmdir}')
+                keyStr(f"scp -r {user}@{ssh_ip}:{tmpath} {tmdir}/")
+                interact()
 
     keyStr('adb root')
     main(args,sys.argv)

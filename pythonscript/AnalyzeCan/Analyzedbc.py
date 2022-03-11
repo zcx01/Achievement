@@ -20,7 +20,10 @@ class Analyze(object):
                     can_Channel = oriBaseName.split("_")[0]
                     dbc =  AnalyzeFile(dbc_file)
                     self.AnalyzeDict[can_Channel] = dbc
-                    self.AnalyzeDictlist.append(dbc)
+                    if can_Channel == main_can:
+                        self.AnalyzeDictlist.insert(0,dbc)
+                    else:
+                        self.AnalyzeDictlist.append(dbc)
 
     def getAnalyzeSingleByName(self,sigName):
         for dbc in self.AnalyzeDictlist:

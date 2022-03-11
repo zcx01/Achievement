@@ -8,7 +8,7 @@ tarFile="qfi_bin"
 tarDir=~/Works/changan_shuaji
 
 if [ ! -d $tarDir ];then
-  mkdir $tarDir
+  mkdir -p $tarDir
 fi
 
 cd $tarDir

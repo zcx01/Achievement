@@ -121,7 +121,8 @@ def splitSpaceGetValueByIndex(text,index,defaultValue=""):
 #判断字符串是否是数字(数字、小数、负数、负小数、0)
 def isNumber(text):
     assert isinstance(text,str)
-    text=text.replace("0x",'')
+    if '0x' in text:
+        text=str(int(text,16))
     if (text.split(".")[0]).isdigit() or text.isdigit() or  (text.split('-')[-1]).split(".")[-1].isdigit():
         if re.search(w_d,text,re.A) == None:
             return True

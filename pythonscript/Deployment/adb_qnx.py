@@ -18,6 +18,7 @@ if __name__ == "__main__":
     parser.add_argument('-k','--slay', help='slay process',type=str,nargs='*')
     parser.add_argument('-l','--log', help='taif log',type=str)
     parser.add_argument('-i','--interact', help='interact',default=1,type=int)
+    parser.add_argument('-us','--useSyslog', help='use Syslog',default=1,type=int)
     args = parser.parse_args()
 
     for j in range(120):
@@ -31,9 +32,17 @@ if __name__ == "__main__":
 
     keyStr("adb shell")
     keyStr("telnet cdc-qnx")
-    keyStr("root")
+    keyStr("root",0,"#")
 
     isExit = (args.interact == 0)
+
+    if '-us' in sys.argv:
+        if args.useSyslog == 1:
+            keyStr(r"echo -e '*.*\t/var/log/syslog' > /etc/syslog.conf")
+        else:
+            keyStr(r"echo -e '*.*\t/dev/console' > /etc/syslog.conf")
+        time.sleep(1)
+        keyStr('reset')
 
     if "-m" in sys.argv:
         try:

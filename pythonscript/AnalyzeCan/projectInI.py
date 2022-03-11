@@ -3,6 +3,7 @@ PROJECT_ID='c385ev'
 CHANNEL =0
 ignore_init_send =False
 PowerSig = {'BcmPwrStsFb':'2','IbBrkPedlStsGb':'101'}
+main_can = "CAN1"
 local_machine_Sender=['CDC']
 SubNet_Frame ={'ICAN':14,'RCAN':0,'ISCAN':0}
 VFrameFormat={'StandardCAN':0,'ExtendedCAN':1,'StandardCAN_FD':14,'ExtendedCAN_FD':15}

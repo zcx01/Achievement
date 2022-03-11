@@ -375,6 +375,8 @@ mount_ota() {
     chmod 0755 /ota
     mkdir -p /ota/android
     mkdir -p /ota/qnx
+    mkdir -p /ota/qnx/host
+    mkdir -p /ota/qnx/ecu
     chown -R 813:813 /ota/qnx
     chown -R 1000:1000 /ota/android
     chmod 0766 /ota/android
@@ -1064,6 +1066,12 @@ setup_qt_env() {
     waitfor /dev/random
 }
 
+unpack_resources() {
+    if [ ! -d /opt/qt/resources ]; then
+        tar -zxvf /opt/qt/resources.tar.gz -C /opt/qt;
+        rm /opt/qt/resources.tar.gz;
+    fi   
+}
 start_ais_vision_server()
 {
     #####start ais_vision_server #####
@@ -1368,6 +1376,10 @@ start_mosquitto
 
 echo "start ic_apps"
 setup_qt_env
+
+echo "unpack resources"
+unpack_resources
+
 /bin/slm -V /slm/service_apps.xml
 
 

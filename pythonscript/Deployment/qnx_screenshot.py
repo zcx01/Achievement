@@ -11,7 +11,7 @@ import logging
 import os
 import sys
 
-import numpy
+
 import pexpect
 from PIL import Image
 
