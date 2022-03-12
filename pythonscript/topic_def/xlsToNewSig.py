@@ -177,7 +177,10 @@ def getTopicAndDefineByRow(sheel,CallFun,rows):
 def interactiveTopic(subTopic,descs,isTip=True,filePaths=[]):
     try:
         for row in range(len(subTopic)):
-            print(f'{row:<5}{subTopic[row]:<50}{descs[row]}')
+            topic=subTopic[row]
+            assert isinstance(topic,str)
+            defineStr = getDefineBySelf(topic.replace("\"",""))
+            printGreen(f'{row:<5}{topic:<50}{defineStr:<50}{descs[row]}')
         if len(filePaths) != 0:
             print(filePaths)
         rowIndex = -1
