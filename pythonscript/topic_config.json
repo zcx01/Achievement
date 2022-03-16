@@ -338,5 +338,41 @@
         "filePath": [
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
+    },
+    "CdcLiHightManuSet": {
+        "topic": [
+            "\"Light/LightHeight/Set\""
+        ],
+        "desc": [
+            "//大灯高度 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_headlamps_height.cpp"
+        ]
+    },
+    "CdcBokgChrgStopTiMin": {
+        "topic": [
+            "\"EnergyInfo/ScheduledChargeTime/Set\""
+        ],
+        "desc": [
+            "//预约充电时间 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/charger.cpp"
+        ]
+    },
+    "BcuChrgMod": {
+        "topic": [
+            "\"EnergyInfo/ChargeType\""
+        ],
+        "desc": [
+            "//充电类型"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/common_codes/fds_common_codes.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
     }
 }
