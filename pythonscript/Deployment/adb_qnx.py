@@ -31,7 +31,7 @@ if __name__ == "__main__":
         time.sleep(1)
 
     keyStr("adb shell")
-    keyStr("telnet cdc-qnx")
+    keyStr("telnet cdc-qnx",0,"login:")
     keyStr("root",0,"#")
 
     isExit = (args.interact == 0)

@@ -864,7 +864,7 @@ start_nfsd()
 {
     log_launch "nfsd"
     on -T nfs_t rpcbind
-    on -T nfs_t -u 812:812,813 nfsd -t &
+    # /bin/slm -V /slm/nfsd.xml
 }
 
 start_message_service()
@@ -1002,6 +1002,31 @@ config_sysctl_network()
     # Tuning for network throughput performance
     sysctl -f /etc/sysctl.conf > /dev/null 2>&1
 }
+
+start_dumper()
+{
+    export COREFILES_DIR=/var/log
+    DUMPER_ARGS="-v -d /var/log -N 10 -S -z 9"
+
+    if [ -e $COREFILES_DIR ];then
+
+        for acore in /tmp/*.core*; do
+            if [ -f $acore ]; then
+                echo "Copying ${acore} to ${COREFILES_DIR}/early_boot_${acore##*/}"
+                # If file is already present then skip overwriting it.
+                cp -VX ${acore} ${COREFILES_DIR}/early_boot_${acore##*/}
+            fi;
+        done
+
+        slay -f -v dumper
+        if [ $SECPOL_ENABLE -eq 1 ];then
+            on -T dumper_t dumper -U dumper ${DUMPER_ARGS}
+        else
+            dumper ${DUMPER_ARGS}
+        fi
+    fi
+}
+
 start_max20086()
 {
     #####start max20086 #####
@@ -1043,8 +1068,8 @@ start_dltlog_app()
     ln -f -s /etc/dlt_logstorage.conf /var/log/dltlogs/dlt_logstorage.conf
     chown 832:832 /var/log/dltlogs
 
-    on -T dltlog_t -p 10 -u dltlog /usr/bin/dlt-daemon -d -c /etc/dlt.conf
-    on -T dltlog_t -p 10 /usr/bin/dlt-qnx-system -d -c /etc/dlt-qnx-system.conf
+    on -T dltlog_t -p 40 -u dltlog /usr/bin/dlt-daemon -d -c /etc/dlt.conf
+    on -T dltlog_t -p 40 /usr/bin/dlt-qnx-system -d -c /etc/dlt-qnx-system.conf
 }
 
 
@@ -1127,6 +1152,18 @@ uname_m=`uname -m`
 . /scripts/platform_variables.sh
 
 common_early;
+
+waitfor /dev/screen
+
+# start up ic_qt
+echo "setup_qt_env"
+setup_qt_env
+
+echo "unpack resources"
+unpack_resources
+
+echo "start up ic_qt"
+# /bin/slm -V /slm/ic_qt.xml
 
 mount -T io-pkt -o peer=/dev/qvm/la/la_to_host,bind=/dev/vdevpeer/vp0,mac=aaaaaaaaaaaa,mode=0660 /lib/dll/devnp-vdevpeer-net.so
 
@@ -1326,25 +1363,8 @@ sysctl -qw net.inet6.ip6.ifq.maxlen=1024
 sysctl -qw net.inet.ip.ifq.maxlen=1024
 sysctl -w net.inet.ip.forwarding=0
 
-export COREFILES_DIR=/var/log
-
-if [ -e $COREFILES_DIR ];then
-    
-    for acore in /tmp/*.core; do
-        if [ -f $acore ]; then
-                echo "Copying ${acore} to ${COREFILES_DIR}/early_boot_${acore##*/}"
-                # If file is already present then skip overwriting it.
-                cp -VX ${acore} ${COREFILES_DIR}/early_boot_${acore##*/}
-        fi;
-    done
-
-    slay -f -v dumper
-    if [ $SECPOL_ENABLE -eq 1 ];then
-       on -T dumper_t dumper -U dumper -v -d /var/log -n -S
-    else
-        dumper -v -d /var/log/ -n -S
-    fi
-fi
+echo "start dumper"
+start_dumper
 
 #starting veth ipa backend
 veth_ipa_be &
@@ -1375,11 +1395,6 @@ echo "start mosquitto"
 start_mosquitto
 
 echo "start ic_apps"
-setup_qt_env
-
-echo "unpack resources"
-unpack_resources
-
 # /bin/slm -V /slm/service_apps.xml
 
 
@@ -1486,7 +1501,7 @@ echo "start misc_service"
 start_misc_service
 
 echo "start ais_dms_server service"
-start_ais_dms_server
+#start_ais_dms_server
 
 set_ic_apps_cpu_runmask
 

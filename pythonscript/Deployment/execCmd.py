@@ -16,7 +16,7 @@ def SetCloseSpawn(s):
     global is_close_spawn
     is_close_spawn = s
 
-def keyStr(cmd, t=0.3,out=''):
+def keyStr(cmd, t=0.3,out='',auto_exit=True):
     assert isinstance(cmd,str)
     global process
     global is_close_spawn
@@ -45,7 +45,7 @@ def keyStr(cmd, t=0.3,out=''):
         login_index = process.expect([prompt, pexpect.EOF, pexpect.TIMEOUT])
     else:
         login_index = process.expect(pexpect.EOF)
-    if login_index != 0:
+    if auto_exit and login_index != 0:
         print(f'执行{cmd}失败')
         exit(1)
     if  process != None:
