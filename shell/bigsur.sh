@@ -32,7 +32,7 @@ if [ $# -eq 1 ]; then
     rm $file
 
     #qnx 进入fastboot模式
-    # adb_qnx -r
+    adb_qnx -r
 fi
 
 cd $tarFile/common/build/

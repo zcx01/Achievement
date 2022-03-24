@@ -374,5 +374,70 @@
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_module.cpp",
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
+    },
+    "BcmBuzWarnMod": {
+        "topic": [
+            "\"C385/Chime/KeyLearn\""
+        ],
+        "desc": [
+            "//钥匙学习成功蜂鸣提示"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime/door_open_chime.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime_module.cpp"
+        ]
+    },
+    "VcuBuzWarnMod": {
+        "topic": [],
+        "desc": [],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime/gear_shift_chime.cpp"
+        ]
+    },
+    "VcuDCACInfo": {
+        "topic": [
+            "\"Info/Discharge\""
+        ],
+        "desc": [
+            "//放电相关提示"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip_module.cpp"
+        ]
+    },
+    "TmsAirQlyOutCarLvl": {
+        "topic": [
+            "\"Sensor/OutsideAirLevel\""
+        ],
+        "desc": [
+            "//车外空气质量等级"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "TmsCycMod": {
+        "topic": [
+            "\"AC/CycleMode\""
+        ],
+        "desc": [
+            "//循环模式"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
+    },
+    "CdcMirrAutFoldSet": {
+        "topic": [
+            "\"VehicleWindow/RearViewMirrorAutoFold/Set\""
+        ],
+        "desc": [
+            "//后视镜停车自动折叠 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_mirror_auto_fold.cpp"
+        ]
     }
 }

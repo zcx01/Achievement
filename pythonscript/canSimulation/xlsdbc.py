@@ -8,7 +8,6 @@ from xlrd.book import Book
 from xlrd.sheet import Sheet
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *
-
 from AnalyzeCan.projectInI import *
 def getValue(src, row, col):
     return src.cell_value(row, col)
@@ -26,7 +25,7 @@ def getValueInt(src, row, col, lenght=-1):
                     isallZero = False
                     break
 
-        if not isallZero or 'e' in value:
+        if not isallZero or 'e' in value.lower():
             return eConverf(float(value))
         return int(values[0])
     except:
@@ -42,13 +41,16 @@ def getSigInfo(sheel, row):
     temps = re.findall(e_i, temp, re.A)
     sig.name = "_".join(temps)
     sig.chineseName = str(getValue(sheel, row, 3))
-    sig.messageId = str(getValue(sheel, row, 4)).split(".")[
-        0].replace('0x', '')
+    sig.messageId = str(getValue(sheel, row, 4)).split(".")[0].replace('0x', '')
     sig.cycle = getValueInt(sheel, row, 5)
     if sig.cycle == 0:  # 没有周期，就解析为0
         sig.sendType = SigSendType.Event
 
-    sig.endBit = getValueInt(sheel, row, 6)
+    posBit = getValueInt(sheel, row, 6)
+    if MSB == True:
+        sig.startBit = posBit
+    else:
+        sig.endBit = posBit
     sig.length = getValueInt(sheel, row, 7)
     sig.factor = getValueInt(sheel, row, 8)
     if sig.factor == float(0) and len(sig.name) != 0:
@@ -68,7 +70,10 @@ def getSigInfo(sheel, row):
         pass
     sig.invalidValue = getValue(sheel, row, 17)
     sig.Recevier = getValue(sheel, row, 20)
-    sig.getStartBit()
+    if sig.endBit != -1:
+        sig.getStartBit()
+    else:
+        sig.getEndBit()
     return sig
 
 def getMessageInfo(sheel):
@@ -131,7 +136,7 @@ def getThreeFrame(jsConfig):
 
 def conversion(configPath, wirteSigName, canmatrix=""):
     jsConfig = getJScontent(configPath)
-    isAllAdd = True
+    isAllAdd = (len(wirteSigName) == 0)
     if len(canmatrix) == 0:
         canmatrix = getKeyPath("canmatrix", jsConfig)
         isAllAdd = False
@@ -149,6 +154,9 @@ def conversion(configPath, wirteSigName, canmatrix=""):
 
     msgs = getMessageInfo(messageSheel)
     assert isinstance(msgs, dict)
+    if len(msgs) == 0:
+        printRed("messaage 不存在或者解析错误")
+        return
 
     threeFrames = getThreeFrame(jsConfig)
     for row in range(sheel.nrows):
@@ -159,8 +167,9 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             sig = getSigInfo(sheel, row)
             if sig.name in threeFrames:
                 sig.sendType = SigSendType.Three
-            realMin = (sig.min+sig.Offset) / sig.factor
-            realMax = (sig.max+sig.Offset) / sig.factor 
+            # print(type(sig.min),type(sig.max),type(sig.Offset),type(sig.factor))
+            realMin = (float(sig.min)-float(sig.Offset)) / float(sig.factor)
+            realMax = (float(sig.max)-float(sig.Offset)) / float(sig.factor)
             if realMin < 0:
                 printRed(f'{sig.name} 极小值小于0,最小值为{sig.min},raw值{realMin}')
                 continue
@@ -176,6 +185,7 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             msg = msgs.get(sig.messageId, None)
             if msg == None:
                 print(f' {sig.name} 对应的 {sig.messageId} message不存在')
+                printYellow("可能的原因是:message没有加0x")
                 continue
 
             writedbcresult = dbc.writeSig(sig, msg)
@@ -507,7 +517,7 @@ def modifyMessageInfo(configPath):
 
     dbc.repalceMessage(dbc.dbcMessage.values())
 
-# conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Works/文档/C样/C385-EVE项目整车通讯协议_V2.2.0_20211203.xlsx")
+# conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Achievement/pythonscript/canSimulation/temp.xls")
 # conversion(pyFileDir+"config.json",'ACC_TakeOverReq')
 # sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
 if __name__ == "__main__":
@@ -531,7 +541,7 @@ if __name__ == "__main__":
     parse.add_argument('-m', '--modifyMessageInfo',
                        help='替换message信息,有m就会替换', default=1, type=int, nargs='*')
     parse.add_argument('-d', '--dbcPath', help='比较新旧两个dbc,输入的是被比较的')
-    parse.add_argument('-rm', '--rmsigs', help='删除信号',nargs='+')
+    parse.add_argument('-rm', '--rmsigs', help='删除信号,是一个集合',nargs='+')
     parse.add_argument('-u', '--isfilterNoUser',
                        help='是否过滤掉没有使用过的信号', nargs='*')
     arg = parse.parse_args()
@@ -542,6 +552,9 @@ if __name__ == "__main__":
         conversionByOtherdbc(arg.config, arg.sigNames, arg.dbcPath)
     elif '-rm' in sys.argv:
         RemoveSigs(arg.config, arg.rmsigs)
+    elif "-a" in sys.argv and '-s' in sys.argv:
+        for sigName in arg.sigNames:
+            conversion(arg.config,sigName,arg.append)
     elif "-a" in sys.argv:
         conversion(arg.config, "", arg.append)
     elif '-s' in sys.argv:

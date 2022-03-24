@@ -6,7 +6,13 @@ import sys
 from enum import Enum
 from commonfun import *
 from projectInI import *
-
+'''
+    Motorola格式的dbc中保存的start Bit 是MSB（高字节）
+    CANdb++ 显示的是start Bit 是LSB（第字节）
+    MSB:表示CAN矩阵是不是高字节存储
+    标准CAN:超过8字节
+    CAN FD:最大64字节
+'''
 class DataType(Enum):
     VINT=1
     VFLOAT=2
@@ -32,8 +38,8 @@ class SigInfo(object):
     def __init__(self) :
         self.messageId = ""
         self.name=""
-        self.startBit=0
-        self.endBit=0
+        self.startBit=-1
+        self.endBit=-1
         self.length=0
         self.dataType="+"
         self.factor=0
@@ -120,7 +126,7 @@ class SigInfo(object):
     def getEndBit(self):
         return self.getMotorolaEndBit()
 
-    def getMotorolaStartBit(self):
+    def getMotorolaStartBit(self):# LSB -> MSB
         self.useBit.clear()
         startIndex=self.endBit
         self.useBit.append(startIndex)
@@ -137,7 +143,7 @@ class SigInfo(object):
         self.startBit = startIndex
         return startIndex
 
-    def getMotorolaEndBit(self):
+    def getMotorolaEndBit(self):# MSB -> LSB
         self.useBit.clear()
         endIndex=self.startBit
         self.useBit.append(endIndex)
@@ -265,7 +271,12 @@ class MessageInfo(object):
         return sig_value
 
     def getMId(self):
-        return int(self.messageId,16)
+        preStr=''
+        for i in range(len(self.messageId)):
+            if '0' != self.messageId[i]:
+                break
+            preStr+='0'
+        return preStr+str(int(self.messageId,16))
 
     def getMessageRowContent(self):
         return f'BO_  {self.getMId()} {self.getMessage_Id()}: {self.lenght} {self.sender}'
@@ -425,7 +436,8 @@ class AnalyzeFile(object):
                             pass
                         sig.enumRow = rowIndex
                     except:
-                        print(f'枚举值 {text} 信号不在定义中')
+                        print(f'枚举值 {sigName} {self.dbcPath} {text} 信号不在定义中')
+                        printYellow("可能是大小的写的问题")
                         pass
     
     @staticmethod

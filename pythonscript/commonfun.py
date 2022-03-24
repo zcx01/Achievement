@@ -134,7 +134,7 @@ def eConverf(value):
     if 'e' in valueStr:
         valueStrs = valueStr.split('e')
         if valueStrs[1].startswith('-'):
-            digit = abs(int(valueStrs[1]))
+            digit =len(valueStrs[0].split(".")[1]) + abs(int(valueStrs[1]))
             head='{:.%df}' % digit
             return head.format(value)
     return value
@@ -166,7 +166,12 @@ def getNoOx16(text):
     if content.startswith('0x'):
         return content.replace('0x', '').upper()
     else:
-        return str(hex(int(text))).replace('0x','').upper()
+        preStr=''
+        for i in range(len(text)):
+            if '0' != text[i]:
+                break
+            preStr+='0'
+        return preStr+str(hex(int(text))).replace('0x','').upper()
 
 #得到关联的类名
 def getRelationClassName(text):
@@ -216,6 +221,10 @@ def printGreen(infoStr):
 def printYellow(infoStr):
     print('\033[33m'+infoStr+'\033[0m')
 
+def XlsCharToInt(col):
+    if type(col) == str:
+        return ord(col) - ord('A')
+    return col
 
 # print(removeListIndexs([12,23,56],[0,2]))
 # def Temp(linelist):

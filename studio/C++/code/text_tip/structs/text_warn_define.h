@@ -76,6 +76,12 @@ namespace Ve
     }
 
     template <typename T,typename U>
+    int count(T &ts, const U &value)
+    {
+        return std::count(ts.begin(),ts.end(),value);
+    }
+
+    template <typename T,typename U>
     int getIndex(T ts, const U &value)
     {
         auto iter = std::find(ts.begin(),ts.end(),value);

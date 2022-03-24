@@ -113,3 +113,10 @@ git push mega HEAD:refs/for/master
 
 ---------------------更新文件索引-----------------------
 git update-index --assume-unchanged fileName
+
+---------------------更新作者---------------------
+git fetch xxxxx
+#修改下提交信息
+git commit --amend --reset-author
+
+git push mega HEAD:refs/for/master 

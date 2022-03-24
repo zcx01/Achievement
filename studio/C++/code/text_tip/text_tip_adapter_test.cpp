@@ -25,11 +25,14 @@ TextTipAdapterTest::TextTipAdapterTest()
 {
     d.m_rule.SetCallWarnInfoFun(std::bind(&TextTipAdapterTest::sendWarnInfo, this, std::placeholders::_1));
     // d.addWarnInfo("C385/HudFaultSts",1); //请重新入P挡再切换挡位
-    d.addWarnInfo("Fault/VehicleSerious",1);
-    std::this_thread::sleep_for(std::chrono::milliseconds(3*1000));
-    d.addWarnInfo("Fault/VehicleSerious",0); 
-    // d.addWarnInfo("icwarning/VcuTrlrModActvSts",1); 
-    // d.addWarnInfo("Fault/VehicleSerious",0);
+    d.addWarnInfo("icwarning/VcuVehStartInfo",2); 
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2*1000));
+    d.addWarnInfo("icwarning/VcuVehStartInfo",3); 
+    // d.addWarnInfo("Info/Discharge",1); 
+    // d.addWarnInfo("Info/Discharge",1);
+    // d.addWarnInfo("Info/Discharge",0);
+    // d.addWarnInfo("C385/IACCText",100);
+    // d.addWarnInfo("C385/IACCText",107);
     // d.addWarnInfo("Fault/GearControl",1);
     // d.setVariableText("Fault/GearControl",1,0,"测试");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -120,7 +123,7 @@ void TextTipAdapterTest::addWarn(std::string topic, int value)
 
 void TextTipAdapterTest::sendWarnInfo(const WarnInfo &info)
 {
-    TB_LOG_INFO(d.getVariableText(info.topic,info.value).dump(),"VariableText");
+    //TB_LOG_INFO(d.getVariableText(info.topic,info.value).dump(),"VariableText");
     TB_LOG_INFO("TextTipAdapterTest ", info.topic.c_str(),info.value,info.text.c_str(),info.alreadyTime);
     if (info.text.empty() || info.isCancel) 
     {

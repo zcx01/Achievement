@@ -44,6 +44,13 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
         TB_LOG_ERROR("%s time out.",signal->sig_name);
         return;
     }
+
+    if(NULL != signal->GetIsValueOutOfRange && signal->GetIsValueOutOfRange())
+    {
+        publish_status(topic,value,false);
+        TB_LOG_ERROR("status signal value out of range.");
+        return;
+    }
     
     status = signal->GetValue.fpGetter(&raw_value,nullptr);
     if (status != eSigStatus_Ok)

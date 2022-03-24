@@ -6,6 +6,8 @@ sudo apt-get install git
 
 sudo apt-get install vim
 
+sudo apt-get install cmake
+
 sudo apt install mosquitto mosquitto-dev mosquitto-clients
 
 #安装按照虚拟屏
@@ -24,3 +26,8 @@ sudo apt-get install libgl1-mesa-dev
 #点击任务栏中的图标隐藏
 #gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize-or-previews'
 #https://ywnz.com/linuxjc/5554.html
+
+#特有
+出现 cog not fount
+pip3 install cogapp numpy pillow
+

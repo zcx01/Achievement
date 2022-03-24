@@ -67,7 +67,8 @@ def getDev():
     return ''
 
 def getDevDir():
-    dev = jsConfig.get(getDev(),'') 
+    # dev = jsConfig.get(getDev(),'') 
+    dev=''
     if len(dev)== 0:
         return jsConfig['Other']
     return dev
@@ -97,6 +98,36 @@ def printPCFile():
     for pcFile in pcFiles:
         print(pcFile)
 
+
+def zip(absolutePath,user,ssh_ip):
+    assert isinstance(absolutePath,str)
+    filename = os.path.basename(absolutePath)
+    tempdir = os.path.dirname(absolutePath)
+    linux_end ='$'
+    printYellow("如果是长时间等待不退出，就修改结尾符")
+    keyStr(f'ssh {user}@{ssh_ip}')
+    keyStr(f'cd {tempdir}',0,linux_end)
+    keyStr(f'tar -zcvf  {filename}.tgz {filename}',0,linux_end)
+    keyStr('exit',0,'',False)
+    SetCloseSpawn(True)
+    return f'{absolutePath}.tgz'
+
+def uzip(absolutePath):
+    filename = os.path.basename(absolutePath)
+    tempdir = os.path.dirname(absolutePath)
+    keyStr(f"cd {tempdir}")
+    keyStr(f'tar -zxvf {filename}')
+
+def ScpFile(tmpath,user,ssh_ip):
+    tmprgz = zip(tmpath,user,ssh_ip)
+    tmdir = os.path.dirname(tmpath)
+    if not os.path.isdir(tmdir):
+        keyStr(f'mkdir -p {tmdir}')
+    keyStr(f"rm -rf {tmpath}")
+    keyStr(f"scp -r {user}@{ssh_ip}:{tmprgz} {tmdir}/")
+    uzip(tmprgz)
+    interact()
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='部署C385程序,部署release c385_deploy -c ic_service -d bin -p changan_c835_release -r')
@@ -123,21 +154,15 @@ if __name__ == "__main__":
         ssh_ip = jsConfig.get("ssh_ip","")
         pwd = jsConfig.get("pwd","")
         if '-a' in sys.argv:
-            tmdir = os.path.dirname(args.absolutePath)
-            if not os.path.isdir(tmdir):
-                os.system(f'mkdir -p {tmdir}')
-            os.system(f"scp -r {user}@{ssh_ip}:{args.absolutePath} {tmdir}/")
+            for tmpath in args.absolutePath:
+                ScpFile(tmpath,user,ssh_ip)
     
         if '-c' in sys.argv:
             proceesNames= args.customfile
             for proceesName in proceesNames:
                 execbin = getExecBin(proceesName,proceesName)
                 tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
-                tmdir = os.path.dirname(tmpath)
-                if not os.path.isdir(tmdir):
-                    keyStr(f'mkdir -p {tmdir}')
-                keyStr(f"scp -r {user}@{ssh_ip}:{tmpath} {tmdir}/")
-                interact()
+                ScpFile(tmpath,user,ssh_ip)
 
     keyStr('adb root')
     main(args,sys.argv)

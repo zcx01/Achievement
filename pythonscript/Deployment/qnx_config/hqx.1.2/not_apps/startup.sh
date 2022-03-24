@@ -1027,6 +1027,7 @@ start_dumper()
     fi
 }
 
+<<<<<<< HEAD
 config_slog2_verbosity()
 {
     waitfor /var/pps/verbose
@@ -1035,6 +1036,8 @@ config_slog2_verbosity()
     echo qcpe_qhee:n:1 >> /var/pps/verbose
 }
 
+=======
+>>>>>>> dca7082b72b0561c11edc3e5157ea520bfdafb00
 start_max20086()
 {
     #####start max20086 #####
