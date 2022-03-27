@@ -75,18 +75,6 @@ TestTest::TestTest(/* args */)
     // feedbackTopic = feedbackTopic.substr(0,feedbackTopic.find_last_of('/'));
     // COUT(feedbackTopic)
 
-    auto calTime = [](int64_t time_seconds, int &h, int &m)
-    {
-        time_t unix_time_seconds = time_seconds / 1000;
-        auto time_info = gmtime(&unix_time_seconds);
-        COUT(time_info->tm_hour<<"------"<<time_seconds)
-        h = time_info->tm_hour;
-        m = time_info->tm_min;
-    };
-    int m_h=0;
-    int m_m=0;
-    calTime((7*60+50)*60*1000,m_h,m_m);
-    COUT(m_h<<":"<<m_m);
 }
 
 CUSTOMEGISTER(Test, TestTest)

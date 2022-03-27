@@ -13,16 +13,17 @@ if __name__ == "__main__":
 
     core = args.core
     prebuilts = args.prebuilts
+    core_file = core+".core.gz"
     if '-n' not in sys.argv:
         keyStr(f'cd {pyFileDir}/qnx')
-        keyStr(f'python3 {pyFileDir}/cp_qnx.py -p /var/log/ -f {core}.core.gz')
-        keyStr(f'python3 {pyFileDir}/cp_qnx.py -p /usr/bin/ -f {core}')
+        keyStr(f'python3 {pyFileDir}/cp_qnx.py -p /var/log/ -f {core_file}')
+        # keyStr(f'python3 {pyFileDir}/cp_qnx.py -p /usr/bin/ -f {core}')
         keyStr(f'python3 {pyFileDir}/cp_qnx.py -p /lib64 -f lib_mega_ipc.so')
         keyStr('cd ..')
         keyStr(f'cp -f qnx/* {prebuilts}')
     keyStr(f'cd {prebuilts}')
     keyStr('ls')
-    keyStr('')
+    keyStr(f'gunzip {core_file}')
     keyStr(f'ntoaarch64-gdb {core} {core}.core')
     keyStr('bt')
     interact()
