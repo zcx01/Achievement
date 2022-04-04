@@ -8,9 +8,11 @@
 
 algorithmTest::algorithmTest(/* args */) 
 {
-    for(int i = 0; i < 18;i++)
-        COUT(calAverageValue(i))
-    COUT(calAverageValue(29))
+    for(int i = 0; i < 98;i++)
+        COUT(calAverageValue(0))
+    for(int i = 0; i < 98;i++)
+        COUT(calAverageValue(360))
+    // COUT(calAverageValue(29))
 }
 
 float algorithmTest::calAverageValue(float speed) 
@@ -24,6 +26,7 @@ float algorithmTest::calAverageValue(float speed)
     else if (speedCount > 18)
     {
         speedSamp.erase(speedSamp.begin());
+        speedCount--;
     }
 
     auto tempSpeed = speedSamp;

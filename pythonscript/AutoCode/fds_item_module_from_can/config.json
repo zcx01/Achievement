@@ -3,19 +3,19 @@
     ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/",
     "M":[
         {
-            "content":"#include \"{fileName}.hpp\"",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/init_signal_process.cpp",
+            "content":"#include \"{fileName}_module.hpp\"",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/init_signal_process.cpp",
             "pos":""
         },
         {
             "content":[
                 "",
-                "    auto {fileName} = std::make_shared<{ClassName}>(shared_from_this());",
+                "    auto {fileName} = std::make_shared<{ClassName}Module>();",
                 "    {fileName}->link_signal_item_module(signal_modules_map);",
                 "    {fileName}->start();",
                 ""
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/init_signal_process.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/init_signal_process.cpp",
             "pos":"init_signal_process"
         }
     ],

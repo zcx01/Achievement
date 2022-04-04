@@ -876,7 +876,7 @@ start_message_service()
 start_backlightsrv()
 {
     log_launch "backlightsrv"
-    backlight_resmgr &
+    on -T disp_bl_t -u disp_bl backlight_resmgr&
 }
 
 start_tempsrv()
@@ -913,7 +913,7 @@ start_iceoryx()
         chmod 0666 /var/lock
         rm /var/lock/*.lock
     fi
-    on -T iceoryx_t -u iceoryx -p 63 iox-roudi -m off -c /etc/iceoryx/roudi_config.toml &
+    on -T iceoryx_t -u iceoryx -p 40 iox-roudi -m off -c /etc/iceoryx/roudi_config.toml 2>/dev/console &
 }
 
 start_host_ota()
@@ -1000,7 +1000,7 @@ set_ic_apps_cpu_runmask()
 config_sysctl_network()
 {
     # Tuning for network throughput performance
-    sysctl -f /etc/sysctl.conf > /dev/null 2>&1
+#    sysctl -f /etc/sysctl.conf > /dev/null 2>&1
 }
 
 start_dumper()
@@ -1035,6 +1035,16 @@ config_slog2_verbosity()
     echo qcpe_qhee:n:1 >> /var/pps/verbose
 }
 
+start_config_vlan()
+{
+    log_launch "config vlan"
+
+    ifconfig vlan1 create
+    ifconfig vlan1 vlan 1 vlanif emac0
+    ifconfig vlan1 172.16.1.2 netmask 255.255.255.0 up
+    ifconfig vlan1 vlanprio 7
+}
+
 start_max20086()
 {
     #####start max20086 #####
@@ -1046,6 +1056,11 @@ start_mcu_hb()
 {
     log_launch "mcu_hb"
     on -T mcu_hb_t -u mcu_hb mcu_hb 500 &
+}
+start_mcu_did()
+{
+    log_launch "mcu_did"
+    on -T mcu_did_t -u mcu_did mcu_did &
 }
 start_mcu_systime()
 {
@@ -1119,6 +1134,11 @@ start_ais_dms_server()
     log_launch "ais_dms_server"
     # wait for the ais_dms_server device file
     on -T ais_dms_server_t -u ais_dms_server_u ais_dms_server &
+}
+start_display_manager()
+{
+    log_launch "display_manager"
+    on -T display_manager_t -u 865:865,819 /bin/display_manager &
 }
 
 
@@ -1318,6 +1338,9 @@ $ON $IOAUDIO_ON_ARGS io-audio -o sw_mixer_ms=16 -d qc skip_device_disable=0,bmet
 $ON $NPU_SERVICE_ON_ARGS $NPU_SERVICE_BINARY $NPU_SERVICE_ARGS
 waitfor /dev/msm_npu
 
+echo "start config vlan"
+start_config_vlan
+
 LOCAL_IPADDR=192.168.0.1
 GATEWAY_IPADDR=192.168.0.3
 
@@ -1460,6 +1483,10 @@ start_factoryservice
 echo "start input service"
 start_input_service
 
+#do not enable this command until production version
+echo "start ecu_config_utility"
+start_ecu_config_utility
+
 # echo "start record service"
 # start_record_service
 
@@ -1472,6 +1499,9 @@ timezone.sh
 
 echo "start backlightsrvr"
 start_backlightsrv
+
+echo "start display_manager"
+start_display_manager
 
 # echo "start MEGA PM daemon"
 # start_megapm
@@ -1511,6 +1541,9 @@ start_ais_vision_server
 
 echo "start ais_dms_server service"
 #start_ais_dms_server
+
+echo "start mcu DID service"
+start_mcu_did
 
 set_ic_apps_cpu_runmask
 
