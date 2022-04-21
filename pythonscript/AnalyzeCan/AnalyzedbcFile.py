@@ -116,6 +116,9 @@ class SigInfo(object):
     def getMessage_Id(self):
         return f'{self.Sender}_{self.messageId}'
 
+    def getMessage_SubNet(self):
+         return f'{self.subNet}_{self.messageId}'
+
     def getMessage_Sig(self):
         return self.getMessage_Id()+"__"+self.name
 
@@ -262,6 +265,9 @@ class MessageInfo(object):
         if len(self.message_Id) !=0:
             return self.message_Id
         return f'{self.sender}_{self.messageId}'
+
+    def getMessage_SubNet(self):
+        return f'{self.subNet}_{self.messageId}'
 
     def getAllSigInitValue(self):
         sig_value={}
@@ -599,7 +605,7 @@ class AnalyzeFile(object):
         linelist=readFileLines(self.dbcPath)
         linelistSize=len(linelist)
         if str(sig.getMId())+sig.name in self.dbcSigs:
-            print(f"{sig.name}信号已经存在")
+            # print(f"{sig.name}信号已经存在")
             return WriteDBCResult.AlreadyExists
         try:
             dm = self.dbcMessage.get(sig.messageId)
@@ -627,7 +633,7 @@ class AnalyzeFile(object):
                 for user in userIndex:
                     for sigUsrIndex in sigUsrIndexs:
                         if sigUsrIndex in userIndex[user]:
-                            printRed(f"{sig.name} 信号有覆盖:开始字节 {sig.startBit} ,结束的字节 {sig.endBit} ，占用的字节 {sigUsrIndexs} ,与 {user}     覆盖字节 {userIndex[user]}")
+                            printRed(f"{sig.name} 信号有覆盖:开始字节 {sig.startBit} ,结束的字节 {sig.endBit} ,占用的字节 {sigUsrIndexs} ,与 {user} 覆盖字节 {userIndex[user]}")
                             return WriteDBCResult.SignalCoverage
 
                 linelist.insert(insertRowIndex,sig.getSG())

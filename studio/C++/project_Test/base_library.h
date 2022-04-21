@@ -66,3 +66,23 @@ namespace fds
     }
 } // namespace fds
 
+class SendmultiTypeCanValue
+{
+public:
+    template <typename... T>
+    void DummyWrapper(T... t){};
+
+    template <typename... Ts>
+    void SendCanValue(Ts... args)
+    {
+        DummyWrapper(deal(args)...);
+    }
+    template <typename T>
+    T deal(T sig_val)
+    {
+        auto sig = std::get<0>(sig_val);
+        auto val = std::get<1>(sig_val);
+        TB_LOG_INFO("send mcu:sigName: %s value: %f", sig->sig_name, val);
+        return sig_val;
+    }
+};
