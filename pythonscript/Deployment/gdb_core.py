@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     core = args.core
     prebuilts = args.prebuilts
-    core_file = core+".core.gz"
+    core_file = core+".2.core.gz"
     if '-n' not in sys.argv:
         keyStr(f'cd {pyFileDir}/qnx')
         keyStr(f'python3 {pyFileDir}/cp_qnx.py -p /var/log/ -f {core_file}')
