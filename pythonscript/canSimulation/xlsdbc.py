@@ -54,7 +54,7 @@ def getSigInfo(sheel, row):
     sig.length = getValueInt(sheel, row, 7)
     sig.factor = getValueInt(sheel, row, 8)
     if sig.factor == float(0) and len(sig.name) != 0:
-        print(f'{sig.name}缩放不能为0，此处修改成1')
+        printYellow(f'{sig.name} 缩放不能为0，此处修改成1')
         sig.factor = 1
     sig.Offset = getValueInt(sheel, row, 9)
     sig.min = getValueInt(sheel, row, 10)
@@ -107,7 +107,7 @@ def getMessageInfo(sheel):
                 frame = VFrameFormat.get(frame, 0)
             msg.frame = frame
             if msg.messageId not in msgs:
-                msgs[msg.messageId] = msg
+                msgs[msg.getMessage_SubNet()] = msg
             else:
                 # print(f'{row} {msg.messageId} 已经存在')
                 pass
@@ -170,11 +170,11 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             # print(type(sig.min),type(sig.max),type(sig.Offset),type(sig.factor))
             realMin = (float(sig.min)-float(sig.Offset)) / float(sig.factor)
             realMax = (float(sig.max)-float(sig.Offset)) / float(sig.factor)
-            if realMin < 0:
+            if realMin < 0 and sig.dataType == "+":
                 printRed(f'{sig.name} 极小值小于0,最小值为{sig.min},raw值{realMin}')
                 continue
             if realMax > pow(2, sig.length)-1 and sig.max != pow(2, sig.length)-1:
-                printRed(f'{sig.name} 极大值大于长度,最小值为{sig.max},raw值{realMax}')
+                printRed(f'{sig.name} 极大值大于长度,最大值为{sig.max},raw值{realMax}')
                 continue
             if sig.min == sig.max:
                 printRed(f"{sig.name} 最大值和最小值相等最小值为{sig.min},最大值为{sig.max}")
@@ -182,7 +182,7 @@ def conversion(configPath, wirteSigName, canmatrix=""):
 
             isFind = True
             dbc = Analyze(dbcfile)
-            msg = msgs.get(sig.messageId, None)
+            msg = msgs.get(sig.getMessage_SubNet(), None)
             if msg == None:
                 print(f' {sig.name} 对应的 {sig.messageId} message不存在')
                 printYellow("可能的原因是:message没有加0x")
@@ -190,9 +190,10 @@ def conversion(configPath, wirteSigName, canmatrix=""):
 
             writedbcresult = dbc.writeSig(sig, msg)
             if writedbcresult == WriteDBCResult.AlreadyExists:
-                isRepalce = input('是否替換 y/n ')
-                if 'y' in isRepalce:
-                    dbc.repalceSig(sig)
+                dbc.repalceSig(sig)
+                # isRepalce = input('是否替換 y/n ')
+                # if 'y' in isRepalce:
+                #     dbc.repalceSig(sig)
 
             can_parse_whitelistPath = getKeyPath(
                 "can_parse_whitelist", jsConfig)
@@ -206,7 +207,7 @@ def conversionByOtherdbc(configPath, wirteSigNames, dbcfilPath=""):
     assert isinstance(wirteSigNames, list)
     jsConfig = getJScontent(configPath)
     dbcfile = getKeyPath("dbcfile", jsConfig)
-    ori_dbc = Analyze(dbcfilPath)
+    ori_dbc = AnalyzeFile(dbcfilPath)
     for messageSig in ori_dbc.dbcSigs:
         ori_sig = ori_dbc.getSig(messageSig)
         if ori_sig.name in wirteSigNames:
@@ -518,7 +519,7 @@ def modifyMessageInfo(configPath):
     dbc.repalceMessage(dbc.dbcMessage.values())
 
 # conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Achievement/pythonscript/canSimulation/temp.xls")
-# conversion(pyFileDir+"config.json",'ACC_TakeOverReq')
+conversion(pyFileDir+"config.json",'TboxLocalTiYear')
 # sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(

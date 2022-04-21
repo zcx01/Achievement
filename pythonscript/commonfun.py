@@ -134,7 +134,11 @@ def eConverf(value):
     if 'e' in valueStr:
         valueStrs = valueStr.split('e')
         if valueStrs[1].startswith('-'):
-            digit =len(valueStrs[0].split(".")[1]) + abs(int(valueStrs[1]))
+            flootStr = valueStrs[0].split(".")
+            digit = 0
+            if len(flootStr) > 1:
+                digit += len(flootStr[1])
+            digit += abs(int(valueStrs[1]))
             head='{:.%df}' % digit
             return head.format(value)
     return value

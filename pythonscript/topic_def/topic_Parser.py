@@ -94,7 +94,7 @@ def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_pars
                 print(f'{can_parse_whitelistPath} 文件存在，跳过')
                 return 0
         else:
-            print(f"写入 {can_parse_whitelistPath} 文件")
+            # print(f"写入 {can_parse_whitelistPath} 文件")
             can_parse_whitelist_read=open(can_parse_whitelistPath,"r")
             can_parse_whitelist_content_line=readFileLines(can_parse_whitelistPath)
 

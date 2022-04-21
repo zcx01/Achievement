@@ -1,6 +1,8 @@
 {
     "startup.sh":"/scripts/",
     "icwarning_config.json":"/opt/qt/config/",
+    "down_config.json":"/opt/qt/config/",
+    "up_config.json":"/opt/qt/config/",
     "libmega_ic_plugin.so":"/opt/qt/qml/MegaIC/",
     "ic_telltale":"/usr/bin/",
     "lib_mega_ipc.so":"/lib64/",
@@ -11,7 +13,8 @@
     "pwd":"123456",
     "PC":
     {
-        "ivi_compositor": "qt/bin"
+        "ivi_compositor": "qt/bin",
+        "ic_adas": "qt/bin"
     }
 }
  

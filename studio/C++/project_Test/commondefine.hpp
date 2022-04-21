@@ -38,6 +38,16 @@ void TB_LOG_ERROR(T0 t0, T... t)
         std::cout << std::endl;
 }
 
+template <typename T0, typename... T>
+void TB_LOG_WARNING(T0 t0, T... t)
+{
+    std::cout << t0 << " ";
+    if constexpr (sizeof...(t) > 0)
+        TB_LOG_INFO(t...);
+    else
+        std::cout << std::endl;
+}
+
 template <typename T>
 void COUTI(T c)
 {

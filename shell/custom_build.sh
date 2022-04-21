@@ -36,7 +36,12 @@ else
         cd $par
     fi
 fi
+
 make -j8
+if [ $# -eq 2 ]; then
+    ntoaarch64-strip ${par} -g -S -d --strip-debug
+fi
+
 make install
 cd $currentPath
 cd "build_script"
