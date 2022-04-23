@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from lib2to3.pytree import Node
 import os
 import sys
 import xlrd

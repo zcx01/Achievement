@@ -63,6 +63,7 @@ class SigInfo(object):
         self.enumRow=-1
         self.sendTypeRow = -1
         self.isdbcEnum = False #是否是dbc中的枚举，如果True枚举就是不转化
+        self.messgae_Id = ""
         #----------can矩阵独有------------
         self.chineseName=''
     
@@ -114,6 +115,8 @@ class SigInfo(object):
         return f'BA_ \"GenSigSendType\" SG_  {self.getMId()} {self.name} {self.sendType.value};'
 
     def getMessage_Id(self):
+        if len(self.messgae_Id) != 0:
+            return self.messgae_Id
         return f'{self.Sender}_{self.messageId}'
 
     def getMessage_SubNet(self):
@@ -349,6 +352,7 @@ class AnalyzeFile(object):
                 elif text.startswith("SG_"):
                     ds = AnalyzeFile.analySG(text)
                     ds.Sender = currentdbcMessage.sender
+                    ds.messgae_Id = currentdbcMessage.message_Id
                     ds.messageId = currentdbcMessage.messageId
                     ds.Row=rowIndex
                     self.dbcSigs[str(ds.getMId())+ds.name] = ds

@@ -60,7 +60,8 @@ if __name__ == "__main__":
 
     if "-l" in sys.argv:
         try:
-            keyStr(f' tail -f /var/log/syslog | grep \'{args.log}\' ')
+            # keyStr(f' tail -f /var/log/syslog | grep \'{args.log}\' ')
+             keyStr(f'slog2info -w | grep \'{args.log}\' ')
         except:
             pass
         

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from ast import Assign
 import os
 import sys
 import xlrd
@@ -190,10 +191,12 @@ def conversion(configPath, wirteSigName, canmatrix=""):
 
             writedbcresult = dbc.writeSig(sig, msg)
             if writedbcresult == WriteDBCResult.AlreadyExists:
-                dbc.repalceSig(sig)
-                # isRepalce = input('是否替換 y/n ')
-                # if 'y' in isRepalce:
-                #     dbc.repalceSig(sig)
+                if isAllAdd:
+                    dbc.repalceSig(sig)
+                else:
+                    isRepalce = input('是否替換 y/n ')
+                    if 'y' in isRepalce:
+                        dbc.repalceSig(sig)
 
             can_parse_whitelistPath = getKeyPath(
                 "can_parse_whitelist", jsConfig)
@@ -202,6 +205,15 @@ def conversion(configPath, wirteSigName, canmatrix=""):
                     f"topic_Parser -w {can_parse_whitelistPath} {sig.getMessage_Id()} {sig.getMessage_Sig()}")
     if not isFind:
         print(f"{wirteSigName} 在CAN矩阵中不存在")
+
+def WriteWhitelistPath(dbcPath,can_parse_whitelistPath):
+    dbc = Analyze(dbcPath)
+    for sig_dbc in dbc.AnalyzeDictlist:
+        assert isinstance(sig_dbc,AnalyzeFile)
+        for messageSig in sig_dbc.dbcSigs:
+            sig = sig_dbc.getSig(messageSig)
+            os.system(
+                f"topic_Parser -w {can_parse_whitelistPath} {sig.getMessage_Id()} {sig.getMessage_Sig()}")
 
 def conversionByOtherdbc(configPath, wirteSigNames, dbcfilPath=""):
     assert isinstance(wirteSigNames, list)
@@ -519,7 +531,7 @@ def modifyMessageInfo(configPath):
     dbc.repalceMessage(dbc.dbcMessage.values())
 
 # conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Achievement/pythonscript/canSimulation/temp.xls")
-conversion(pyFileDir+"config.json",'TboxLocalTiYear')
+# conversion(pyFileDir+"config.json",'TboxLocalTiYear')
 # sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
@@ -528,11 +540,12 @@ if __name__ == "__main__":
         d+s:从其他的dbc添加信号,
         d+r+t:信号名称的改变，并且修改配置的中源码的信号名称,
         d+r/d:从指定的dbc复制枚举到新的dbc中 r是输入比较后的结果
+        a+w:把dbc目录下dbc文件中,所有的信号都写入白名单
         ''')
 
     parse.add_argument('-c', '--config', help='配置文件路径',
                        default=pyFileDir+"config.json")
-    parse.add_argument('-a', '--append', help='新增整个can矩阵表格')
+    parse.add_argument('-a', '--append', help='新增整个can矩阵表格、+w是dbc目录')
     parse.add_argument('-s', '--sigNames', help='新增信号名，是一个列表',
                        default=[], nargs='+', type=str)
     parse.add_argument('-f', '--fristMatrix',
@@ -545,6 +558,7 @@ if __name__ == "__main__":
     parse.add_argument('-rm', '--rmsigs', help='删除信号,是一个集合',nargs='+')
     parse.add_argument('-u', '--isfilterNoUser',
                        help='是否过滤掉没有使用过的信号', nargs='*')
+    parse.add_argument('-w', '--WhitelistPath', help='白名单路径')                    
     arg = parse.parse_args()
 
     if '-d' in sys.argv and '-r' in sys.argv and '-t' in sys.argv:
@@ -556,6 +570,8 @@ if __name__ == "__main__":
     elif "-a" in sys.argv and '-s' in sys.argv:
         for sigName in arg.sigNames:
             conversion(arg.config,sigName,arg.append)
+    elif "-a" in sys.argv and '-w' in sys.argv:
+        WriteWhitelistPath(arg.append,arg.WhitelistPath)
     elif "-a" in sys.argv:
         conversion(arg.config, "", arg.append)
     elif '-s' in sys.argv:

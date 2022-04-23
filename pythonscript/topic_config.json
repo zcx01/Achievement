@@ -463,5 +463,16 @@
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_roadside_assc.cpp"
         ]
+    },
+    "BcmReDfrstrSts": {
+        "topic": [
+            "\"AC/RearDefrost\""
+        ],
+        "desc": [
+            "//后除霜模式"
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+        ]
     }
 }
