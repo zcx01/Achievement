@@ -89,3 +89,5 @@ CMakeCache*
 *signal_value_choices.csv
 pythonscript/Deployment/qnx/ic_service.core
 pythonscript/Deployment/qnx/ic_service
+pythonscript/Deployment/qnx_config/hqx.1.2/startup.sh
+pythonscript/Deployment/qnx_config/hqx.1.2/not_apps/startup.sh
