@@ -5,7 +5,6 @@ import re
 import sys
 from enum import Enum
 
-from sqlalchemy import true
 from commonfun import *
 from projectInI import *
 '''
