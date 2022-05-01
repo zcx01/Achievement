@@ -29,7 +29,8 @@ if __name__ == "__main__":
             break
         print(f"车机重启中...等待{j+1}秒")
         time.sleep(1)
-
+        
+    keyStr('adb root')
     keyStr("adb shell")
     keyStr("telnet cdc-qnx",0,"login:")
     keyStr("root",0,"#")

@@ -128,6 +128,17 @@ def isNumber(text):
             return True
     return False
 
+"""
+检查整个字符串是否包含中文
+:param string: 需要检查的字符串
+:return: bool
+"""
+def is_chinese(string):
+    for ch in string:
+        if u'\u4e00' <= ch <= u'\u9fff':
+            return True
+    return False
+    
 #科学技术法转化成数字
 def eConverf(value):
     valueStr =str(value)#会把E转化为e

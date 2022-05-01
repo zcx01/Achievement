@@ -4,6 +4,8 @@ from pickle import FALSE
 import re
 import sys
 from enum import Enum
+
+from sqlalchemy import true
 from commonfun import *
 from projectInI import *
 '''
@@ -509,10 +511,10 @@ class AnalyzeFile(object):
         linelist.append(key)
         return linelistSize+1
     
-    def repalceContent(self,linelist,row,content):
+    def repalceContent(self,linelist,row,content,isTip = True):
         if len(content) != 0 and row > 0:
             linelist[row] = content
-        else:
+        elif(isTip):
             print(f'{content}内容为空, {row} 行号小于等于0')
 
     def RowContent(self,rowIndexs,row):
@@ -699,7 +701,7 @@ class AnalyzeFile(object):
                 continue
             self.repalceContent(linelist,ori_sig.Row, sig.getSG())
             self.repalceContent(linelist,ori_sig.initRow, sig.getStartValue())
-            self.repalceContent(linelist,ori_sig.sendTypeRow, sig.getSigSendType())
+            self.repalceContent(linelist,ori_sig.sendTypeRow, sig.getSigSendType(),False)
             enumStr = sig.getEnum()
             if len(enumStr) !=0:
                 if ori_sig.enumRow <= 0:
