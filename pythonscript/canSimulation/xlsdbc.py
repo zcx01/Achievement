@@ -1,7 +1,7 @@
 #!/usr/bin/python
-from ast import Assign
 import os
 import sys
+
 import xlrd
 import argparse
 
@@ -10,6 +10,7 @@ from xlrd.sheet import Sheet
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *
 from AnalyzeCan.projectInI import *
+
 def getValue(src, row, col):
     return src.cell_value(row, col)
 
@@ -162,6 +163,9 @@ def conversion(configPath, wirteSigName, canmatrix=""):
     threeFrames = getThreeFrame(jsConfig)
     for row in range(sheel.nrows):
         sigName = str(getValue(sheel, row, 2))
+        # xf = book.xf_list[getValue(sheel, row, 2).xf_index]
+        # print(type(xf))
+
         if isAllAdd and row == 0:
             continue
         if sigName.strip() == wirteSigName or isAllAdd:

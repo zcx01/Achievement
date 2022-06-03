@@ -12,8 +12,6 @@ if __name__ == "__main__":
     keyStr('cd ~/Works/changan_shuaji')
     keyStr(f'rm -rf mcu')
 
-
-    
     keyStr(f'mkdir mcu')
     keyStr(f'cd mcu')
     keyStr(f'wget {downHttp} --http-user=chengxiong.zhu --http-password=@Huan2870244352')

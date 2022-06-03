@@ -61,7 +61,7 @@ void {ClassName}Module::link_topic_item_module(std::map<std::string, std::set<st
 
 void {ClassName}Module::onMessageArrival(const string &topic, const IpcMessage &msg)
 {
-    TB_LOG_INFO("onMessageArrival: %s, %s", topic.data(), msg.data);
+    IC_LOG_INFO("onMessageArrival: %s, %s", topic.data(), msg.data);
     std::string content((char *)msg.data, msg.length);
 
     if (topic_items_map.count(topic) == 0)
@@ -76,12 +76,12 @@ void {ClassName}Module::onMessageArrival(const string &topic, const IpcMessage &
 
 void {ClassName}Module::onMessageDelivered(const string &msgId)
 {
-    TB_LOG_INFO("onMessageDelivered: %s", msgId.data());
+    IC_LOG_INFO("onMessageDelivered: %s", msgId.data());
 }
 
 void {ClassName}Module::onConnectStateChanged(const string &nodeId, const ConnectState &state)
 {
-    TB_LOG_INFO("onConnectStateChanged: %s, %d", nodeId.data(), state);
+    IC_LOG_INFO("onConnectStateChanged: %s, %d", nodeId.data(), state);
 }
 
 void {ClassName}Module::link_signal_item()

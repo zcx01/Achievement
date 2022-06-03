@@ -9,11 +9,11 @@
 #define COUT(V) std::cout << __LINE__ << " ----  " << V << std::endl;
 
 template <typename T0, typename... T>
-void TB_LOG_INFO(T0 t0, T... t)
+void IC_LOG_INFO(T0 t0, T... t)
 {
     std::cout << t0 << " ";
     if constexpr (sizeof...(t) > 0)
-        TB_LOG_INFO(t...);
+        IC_LOG_INFO(t...);
     else
         std::cout << std::endl;
 }
@@ -23,7 +23,7 @@ void TB_LOG_DEBUG(T0 t0, T... t)
 {
     std::cout << t0 << " ";
     if constexpr (sizeof...(t) > 0)
-        TB_LOG_INFO(t...);
+        IC_LOG_INFO(t...);
     else
         std::cout << std::endl;
 }
@@ -33,7 +33,7 @@ void TB_LOG_ERROR(T0 t0, T... t)
 {
     std::cout << t0 << " ";
     if constexpr (sizeof...(t) > 0)
-        TB_LOG_INFO(t...);
+        IC_LOG_INFO(t...);
     else
         std::cout << std::endl;
 }
@@ -43,7 +43,7 @@ void TB_LOG_WARNING(T0 t0, T... t)
 {
     std::cout << t0 << " ";
     if constexpr (sizeof...(t) > 0)
-        TB_LOG_INFO(t...);
+        IC_LOG_INFO(t...);
     else
         std::cout << std::endl;
 }

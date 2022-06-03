@@ -34,7 +34,7 @@ using namespace megaipc;
 }
 void {ClassName}::state_process(const SignalMsg &sig_msg)
 {
-    TB_LOG_INFO("{classname}");
+    IC_LOG_INFO("{classname}");
 
     int power;
     int leakage;
@@ -76,7 +76,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
         }
     }
 
-    TB_LOG_INFO("{classname}: %d", result);
+    IC_LOG_INFO("{classname}: %d", result);
 
     nlohmann::json j;
 

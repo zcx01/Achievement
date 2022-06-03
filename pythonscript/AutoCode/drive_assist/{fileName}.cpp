@@ -7,7 +7,7 @@ namespace DriveAssist
 
 void {ClassName}::state_process(const std::string &topic, const std::string &content)
 {
-	TB_LOG_INFO("state_process: %s, %s", topic.data(), content.data());
+	IC_LOG_INFO("state_process: %s, %s", topic.data(), content.data());
 	PayloadInfo info = fds::ParseAndLogPayloadInfo(topic, content);
 	float value = info.value.get<float>();
 

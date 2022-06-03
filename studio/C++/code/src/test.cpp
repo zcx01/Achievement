@@ -3,7 +3,7 @@
 #include "commondefine.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
-
+#include "fds_cpp_timer.hpp"
 struct PayloadInfo
 {
     nlohmann::json value;     /*! 数值 */
@@ -32,7 +32,7 @@ void publish_uartpc(const std::vector<int>& values)
 {
     if (values.empty())
     {
-        TB_LOG_INFO("publish_uartpc: values is empty");
+        IC_LOG_INFO("publish_uartpc: values is empty");
         return;
     }
     const int &size = values.size();
@@ -56,25 +56,22 @@ void publish_uartpc(const std::vector<int>& values)
     delete[] data;
 }
 
-
 TestTest::TestTest(/* args */)
 {
-    // std::string content = "{\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":[1,2,3]}";
-    // nlohmann::json j = nlohmann::json::parse(content);
-    // PayloadInfo info = j.get<PayloadInfo>();
-    // std::vector<int> value =info.value.get<std::vector<int>>();
-    // COUTI(value);
 
-    // content = "{\"extension\":\"\",\"relative\":false,\"time\":14603935,\"type\":4194304,\"unit\":\"\",\"valid\":true,\"value\":1}";
-    // j = nlohmann::json::parse(content);
-    // info = j.get<PayloadInfo>();
-    // int in = info.value.get<int>();
-    // COUT(in)
+    fds::getTimer()->add(1000, [&](int){ this->thread_Test(12); });
 
-    // std::string feedbackTopic = "AC/VentilationTimer/Set";
-    // feedbackTopic = feedbackTopic.substr(0,feedbackTopic.find_last_of('/'));
-    // COUT(feedbackTopic)
+    while (1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+    
+}
 
+void TestTest::thread_Test(float value) 
+{
+    count++;
+    COUT(count);
 }
 
 CUSTOMEGISTER(Test, TestTest)

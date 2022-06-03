@@ -32,7 +32,7 @@ using namespace megaipc;
 }
 void {ClassName}::state_process(const SignalMsg &sig_msg)
 {
-    TB_LOG_INFO("{classname}");
+    IC_LOG_INFO("{classname}");
 
     int power=0;
     int leakage=0;
@@ -66,7 +66,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     result=normal_logic(power,leakage);
     fds::TimeOutHandle(&result,&CANSIG_{1}_g,(int)LAMP_OFF);
 
-    TB_LOG_INFO("{classname}: %d", result);
+    IC_LOG_INFO("{classname}: %d", result);
 
     nlohmann::json j;
 

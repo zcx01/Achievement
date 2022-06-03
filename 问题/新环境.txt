@@ -31,3 +31,4 @@ sudo apt-get install libgl1-mesa-dev
 出现 cog not fount
 pip3 install cogapp numpy pillow
 
+door_open_status
