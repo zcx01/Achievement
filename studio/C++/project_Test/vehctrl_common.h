@@ -75,14 +75,14 @@ int codec_sigle_down_signal_data(struct veh_signal *sig, T value, uint8_t *out_d
 {
     if (sig == NULL || out_data == NULL)
     {
-        TB_LOG_ERROR("Error: %s", "sig or out_data is null");
+        IC_LOG_ERROR("Error: %s", "sig or out_data is null");
         return -1;
     }
 
     struct veh_message *p_msg = (struct veh_message *)sig->p_veh_message;
     if (p_msg == NULL)
     {
-        TB_LOG_ERROR("Error:, %s", "p_msg is null");
+        IC_LOG_ERROR("Error:, %s", "p_msg is null");
         return -1;
     }
 
@@ -117,7 +117,7 @@ int codec_sigle_down_signal_data(struct veh_signal *sig, T value, uint8_t *out_d
     }
     else
     {
-        TB_LOG_ERROR("Error: signal val type error!");
+        IC_LOG_ERROR("Error: signal val type error!");
         return -1;
     }
     memcpy(out_data + 5, val.buffer, length);

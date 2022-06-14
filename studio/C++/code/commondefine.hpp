@@ -71,4 +71,4 @@ static void printHex(const uint8_t *data, uint8_t len)
 }
 // vector<string> v = split(s, ",*"); //可按多个字符来分隔;
 
-#endif  //COMMONDEFINE
+#endif  //COMMONDEFINE     

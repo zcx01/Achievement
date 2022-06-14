@@ -534,6 +534,53 @@ def modifyMessageInfo(configPath):
 
     dbc.repalceMessage(dbc.dbcMessage.values())
 
+def findsignalInfile(signal,filePath):
+    try:
+        f=open(filePath,'r')
+        content=f.readlines()
+        for text in content:
+            texts = text.split(" ")
+            if signal in texts[0]:
+                return True
+        return False
+    except:
+        return False
+
+def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return):
+    if os.path.isfile(can_parse_whitelistPath):  
+        if  findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
+            if can_parse_whitelist_return:
+                print(f'{can_parse_whitelistPath} 文件存在，跳过')
+                return 0
+        else:
+            # print(f"写入 {can_parse_whitelistPath} 文件")
+            can_parse_whitelist_read=open(can_parse_whitelistPath,"r")
+            can_parse_whitelist_content_line=readFileLines(can_parse_whitelistPath)
+
+            #写在现有的message后面
+            behindStr(can_parse_whitelist_content_line,'message',f'{message:<18}[message]		[all]')
+
+            if not can_parse_whitelist_read.read().endswith('\n'):
+                can_parse_whitelist_content_line.append('\n')
+            can_parse_whitelist_read.close()
+            
+            can_parse_whitelist_content_line.append(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
+            wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_line,False)
+            return 2
+    return 1
+
+def addCan_parse_whitelist(sigs):
+    jsConfig=getJScontent(pyFileDir+"config.json")
+    analy=Analyze(getKeyPath("dbcfile",jsConfig))
+    for sig in sigs:
+        message=analy.getMessage_Id_BySig(sig)
+        if len(message)==0:
+            print(f'{sig} 对应的message不存在')
+            break
+        messagesig=analy.getMessage_Id_Sig(sig)
+        can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
+        WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,False)
+
 # conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Achievement/pythonscript/canSimulation/temp.xls")
 # conversion(pyFileDir+"config.json",'TboxLocalTiYear')
 # sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
