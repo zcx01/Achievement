@@ -72,7 +72,7 @@ def getCommand(cmd,arrys):
 class AndroidQnx(object):
     def __init__(self):
         super().__init__()
-        self.androidDir = "/data"
+        self.androidDir = "/sdcard"
         self.android_qnxDir = "/ota"
         self.qnxDir = "/ota/android"
     

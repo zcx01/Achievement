@@ -171,13 +171,13 @@ if __name__ == "__main__":
         interact()
         exit()
 
-    devDir = getDevDir()
-    print('所在分支-------',devDir)
-    updateStartUp(f'{qnxConfigDir}{devDir}/')
-    if "-r" not in argv :
-        copyStartfile(f'{qnxConfigDir}{devDir}/not_apps/startup.sh',True)
+    # devDir = getDevDir()
+    # print('所在分支-------',devDir)
+    # updateStartUp(f'{qnxConfigDir}{devDir}/')
+    # if "-r" not in argv :
+    #     copyStartfile(f'{qnxConfigDir}{devDir}/not_apps/startup.sh',True)
         
-    keyStr('adb root')
+    # keyStr('adb root')
     if "-c" in argv :
         proceesNames= args.customfile
         if len(proceesNames) == 0:
@@ -192,8 +192,8 @@ if __name__ == "__main__":
             exe_proceesNames.append(f'{execbin}/{proceesName}')
         androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
-        copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
-        keyStr('reset')
+        # copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
+        # keyStr('reset')
         time.sleep(1)
         exit()
 
