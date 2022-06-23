@@ -1,7 +1,7 @@
 PC_PWD="123456"
 PROJECT_ID='c385ev'
 CHANNEL =0
-ignore_init_send =False
+ignore_init_send =True
 PowerSig = {'BcmPwrStsFb':'2','IbBrkPedlStsGb':'101'}
 main_can = "CAN1"
 local_machine_Sender=['CDC']

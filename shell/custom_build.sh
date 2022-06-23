@@ -1,10 +1,5 @@
 #!/bin/bash
 currentPath=$(cd `dirname ./`;pwd)
-# repoPath="/home/chengxiongzhu/Works/Repos/changan_c835/"
-
-# if [ $# -lt 2 ]; then
-#     repoPath="./"
-# fi
 
 cd "build"
 index=0
