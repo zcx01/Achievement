@@ -20,7 +20,7 @@ void {ClassName}::addSignalAndTop(struct veh_signal * s, const std::string &t)
 
 void {ClassName}::state_process(const SignalMsg &sig_msg)
 {
-    TB_LOG_INFO("{ClassName}");
+    IC_LOG_INFO("{ClassName}");
 
     float value = 0;
     veh_signal_value  raw_value;
@@ -30,7 +30,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
 
     // if (1 != fds::GetBcmPwrStsFbValue(bcmPwrStsFbValue))
     // {
-    //     TB_LOG_INFO("{ClassName} powerSts: %d", bcmPwrStsFbValue);
+    //     IC_LOG_INFO("{ClassName} powerSts: %d", bcmPwrStsFbValue);
     //     return;
     // }
     if(signal == nullptr)
@@ -68,7 +68,7 @@ void {ClassName}::publish_status(const std::string &topic, float value,bool isVa
     nlohmann::json j = PayloadInfo{ value, isVaild, "", false};
 
     std::string msg = j.dump();
-    TB_LOG_INFO("{ClassName} msg: %s %s %f", msg.data(), topic.data(), value);
+    IC_LOG_INFO("{ClassName} msg: %s %s %f", msg.data(), topic.data(), value);
 
     //publish message
     IpcMessage message = {(uint32_t)msg.length(), (uint8_t *)msg.data(), true};

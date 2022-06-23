@@ -21,12 +21,12 @@ TcpClientTest::TcpClientTest(/* args */)
     while (1)
     {
         char sendline[MAXLINE];
-        TB_LOG_INFO("send msg to server:");
+        IC_LOG_INFO("send msg to server:");
         fgets(sendline, 4096, stdin);
-        TB_LOG_INFO("send:%u",sendline);
+        IC_LOG_INFO("send:%u",sendline);
         if (send(sockfd, sendline, strlen(sendline), 0) < 0)
         {
-            TB_LOG_INFO("send msg error: %s(errno: %d)", strerror(errno), errno);
+            IC_LOG_INFO("send msg error: %s(errno: %d)", strerror(errno), errno);
         }
     }
 }
@@ -38,16 +38,16 @@ TcpClientTest::~TcpClientTest()
 
 int TcpClientTest::connectPort(std::string ip, int port) 
 {
-    TB_LOG_INFO("%s:%u",ip.c_str(),port);
+    IC_LOG_INFO("%s:%u",ip.c_str(),port);
     struct sockaddr_in  servaddr;
 
     if( ip.empty()){
-        TB_LOG_INFO("usage: ./client <ipaddress>");
+        IC_LOG_INFO("usage: ./client <ipaddress>");
         return -1;
     }
 
     if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
-        TB_LOG_INFO("create socket error: %s(errno: %d)", strerror(errno),errno);
+        IC_LOG_INFO("create socket error: %s(errno: %d)", strerror(errno),errno);
         return -1;
     }
 
@@ -55,12 +55,12 @@ int TcpClientTest::connectPort(std::string ip, int port)
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(port);
     if( inet_pton(AF_INET, ip.c_str(), &servaddr.sin_addr) <= 0){
-        TB_LOG_INFO("inet_pton error for %s",ip.c_str());
+        IC_LOG_INFO("inet_pton error for %s",ip.c_str());
         return -1;
     }
 
     if(connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0){
-        TB_LOG_INFO("connect error: %s(errno: %d)",strerror(errno),errno);
+        IC_LOG_INFO("connect error: %s(errno: %d)",strerror(errno),errno);
         return -1;
     }
 

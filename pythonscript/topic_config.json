@@ -474,5 +474,38 @@
         "filePath": [
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
+    },
+    "CdcPassSeatHeatSet": {
+        "topic": [
+            "\"AC/SeatHeating/FrontRight/Set\""
+        ],
+        "desc": [
+            "//副驾座椅加热状态 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_seat_heating.cpp"
+        ]
+    },
+    "CdcDrvrSeatWindReq": {
+        "topic": [
+            "\"AC/SeatVentilation/FrontRight/Set\""
+        ],
+        "desc": [
+            "//副驾座椅通风状态 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_seat_wind.cpp"
+        ]
+    },
+    "CdcPassSeatWindReq": {
+        "topic": [
+            "\"AC/SeatVentilation/FrontRight/Set\""
+        ],
+        "desc": [
+            "//副驾座椅通风状态 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_seat_wind.cpp"
+        ]
     }
 }

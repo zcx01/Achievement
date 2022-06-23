@@ -39,10 +39,10 @@ int TcpServiceTest::listenPort(int port)
      * */
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
-        TB_LOG_INFO("create socket error: %s(errno: %d)", strerror(errno), errno);
+        IC_LOG_INFO("create socket error: %s(errno: %d)", strerror(errno), errno);
         return -1;
     }
-    TB_LOG_INFO("----init socket----");
+    IC_LOG_INFO("----init socket----");
 
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
@@ -53,24 +53,24 @@ int TcpServiceTest::listenPort(int port)
     // setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &contain, sizeof(int));
     if (bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == -1)
     {
-        TB_LOG_INFO("bind socket error: %s(errno: %d)", strerror(errno), errno);
+        IC_LOG_INFO("bind socket error: %s(errno: %d)", strerror(errno), errno);
         return -1;
     }
-    TB_LOG_INFO("----bind sucess----");
+    IC_LOG_INFO("----bind sucess----");
 
     //sockfd:绑定了地址的socket文件描述符。
     //backlog:服务器负载，提示系统进程所要入队的未完成请求数量
     if (listen(listenfd, 10) == -1)
     {
-        TB_LOG_INFO("listen socket error: %s(errno: %d)", strerror(errno), errno);
+        IC_LOG_INFO("listen socket error: %s(errno: %d)", strerror(errno), errno);
         return -1;
     }
 
-    TB_LOG_INFO("======waiting for client's request======");
+    IC_LOG_INFO("======waiting for client's request======");
 
     if ((connfd = accept(listenfd, (struct sockaddr *)NULL, NULL)) == -1)
     {
-        TB_LOG_INFO("accept socket error: %s(errno: %d)", strerror(errno), errno);
+        IC_LOG_INFO("accept socket error: %s(errno: %d)", strerror(errno), errno);
     }
     while(1)
     {
@@ -84,7 +84,7 @@ int TcpServiceTest::listenPort(int port)
             connfd = 0;
             if ((connfd = accept(listenfd, (struct sockaddr *)NULL, NULL)) == -1)
             {
-                TB_LOG_INFO("accept socket error: %s(errno: %d)", strerror(errno), errno);
+                IC_LOG_INFO("accept socket error: %s(errno: %d)", strerror(errno), errno);
             }
         }
         if(m_call != nullptr)
@@ -92,9 +92,9 @@ int TcpServiceTest::listenPort(int port)
             m_call(buff,n);
         }
         buff[n] = '\0';
-        TB_LOG_INFO("recv msg from client: %s", buff);
+        IC_LOG_INFO("recv msg from client: %s", buff);
     }
-    TB_LOG_INFO("close:%u",listenfd);
+    IC_LOG_INFO("close:%u",listenfd);
     close(listenfd);
     return 0;
 }

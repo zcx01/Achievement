@@ -35,6 +35,7 @@ def CheckSigName(configPath,down_config=None,up_config=None):
         sigs = re.findall(m_s,sig)
         if len(sigs) >= 3 :
             sig16= str(int(sigs[1],16))+"_".join(sigs[2:])
+            print(sig16)
         if not dbc.sigExist(sig16):
             printRed(f'{sig:<50} 信号不存在')
     printGreen("分析完成")

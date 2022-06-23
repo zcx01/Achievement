@@ -34,12 +34,12 @@ void {ClassName}::signalChange(float value,std::string topic)
 
 void {ClassName}::publishValue(float value,std::string topic)
 {
-    TB_LOG_INFO("{ClassName}  %s[%f]",topic.c_str(), value);
+    IC_LOG_INFO("{ClassName}  %s[%f]",topic.c_str(), value);
     SendDriveInfo(topic, PayloadInfo{value, true});
 }
 
 void {ClassName}::publishInvalid(std::string topic)
 {
-    TB_LOG_INFO("{ClassName} %s Invalid",topic.c_str());
+    IC_LOG_INFO("{ClassName} %s Invalid",topic.c_str());
     SendDriveInfo(topic, PayloadInfo{0, false});
 }

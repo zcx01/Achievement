@@ -25,9 +25,9 @@ TextTipAdapterTest::TextTipAdapterTest()
 {
     d.m_rule.SetCallWarnInfoFun(std::bind(&TextTipAdapterTest::sendWarnInfo, this, std::placeholders::_1));
     // d.addWarnInfo("C385/HudFaultSts",1); //请重新入P挡再切换挡位
-    d.addWarnInfo("icwarning/VcuVehStartInfo",2); 
+    d.addWarnInfo("icwarning/DoorOpenSts",32); 
     // std::this_thread::sleep_for(std::chrono::milliseconds(2*1000));
-    d.addWarnInfo("icwarning/VcuVehStartInfo",3); 
+    d.addWarnInfo("icwarning/BcmVehLckAlrm",3); 
     // d.addWarnInfo("Info/Discharge",1); 
     // d.addWarnInfo("Info/Discharge",1);
     // d.addWarnInfo("Info/Discharge",0);
@@ -102,7 +102,7 @@ void TextTipAdapterTest::COUT_Topic()
                 int value = std::atoi(value_str.c_str());
                 if (value == 0)
                     continue;
-                TB_LOG_INFO(topic, value, (*iter_value).second);
+                IC_LOG_INFO(topic, value, (*iter_value).second);
             }
             catch (const std::exception &e)
             {
@@ -123,8 +123,8 @@ void TextTipAdapterTest::addWarn(std::string topic, int value)
 
 void TextTipAdapterTest::sendWarnInfo(const WarnInfo &info)
 {
-    //TB_LOG_INFO(d.getVariableText(info.topic,info.value).dump(),"VariableText");
-    TB_LOG_INFO("TextTipAdapterTest ", info.topic.c_str(),info.value,info.text.c_str(),info.alreadyTime);
+    //IC_LOG_INFO(d.getVariableText(info.topic,info.value).dump(),"VariableText");
+    IC_LOG_INFO("TextTipAdapterTest ", info.topic.c_str(),info.value,info.text.c_str(),info.alreadyTime);
     if (info.text.empty() || info.isCancel) 
     {
         is_one_finish = true;

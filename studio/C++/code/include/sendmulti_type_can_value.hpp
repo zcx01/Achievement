@@ -36,7 +36,7 @@ public:
         auto sig = std::get<0>(sig_val);
         auto val = std::get<1>(sig_val);
         // codec_sigle_down_signal_data(sig, val, vehctrl_data + i * DEFAULT_CTRL_FRAME_SIZE, i == 0, 0 , sig_vals.size());
-        TB_LOG_INFO(sig,val);
+        IC_LOG_INFO(sig,val);
         return sig_val;
     }
 

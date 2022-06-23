@@ -1,7 +1,7 @@
 #!/usr/bin/python
-from ast import Assign
 import os
 import sys
+
 import xlrd
 import argparse
 
@@ -10,6 +10,7 @@ from xlrd.sheet import Sheet
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *
 from AnalyzeCan.projectInI import *
+
 def getValue(src, row, col):
     return src.cell_value(row, col)
 
@@ -162,6 +163,9 @@ def conversion(configPath, wirteSigName, canmatrix=""):
     threeFrames = getThreeFrame(jsConfig)
     for row in range(sheel.nrows):
         sigName = str(getValue(sheel, row, 2))
+        # xf = book.xf_list[getValue(sheel, row, 2).xf_index]
+        # print(type(xf))
+
         if isAllAdd and row == 0:
             continue
         if sigName.strip() == wirteSigName or isAllAdd:
@@ -529,6 +533,53 @@ def modifyMessageInfo(configPath):
             print(f'{dbc.dbcMessage[messageId].messageId} 在CAN矩阵没有找到')
 
     dbc.repalceMessage(dbc.dbcMessage.values())
+
+def findsignalInfile(signal,filePath):
+    try:
+        f=open(filePath,'r')
+        content=f.readlines()
+        for text in content:
+            texts = text.split(" ")
+            if signal in texts[0]:
+                return True
+        return False
+    except:
+        return False
+
+def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return):
+    if os.path.isfile(can_parse_whitelistPath):  
+        if  findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
+            if can_parse_whitelist_return:
+                print(f'{can_parse_whitelistPath} 文件存在，跳过')
+                return 0
+        else:
+            # print(f"写入 {can_parse_whitelistPath} 文件")
+            can_parse_whitelist_read=open(can_parse_whitelistPath,"r")
+            can_parse_whitelist_content_line=readFileLines(can_parse_whitelistPath)
+
+            #写在现有的message后面
+            behindStr(can_parse_whitelist_content_line,'message',f'{message:<18}[message]		[all]')
+
+            if not can_parse_whitelist_read.read().endswith('\n'):
+                can_parse_whitelist_content_line.append('\n')
+            can_parse_whitelist_read.close()
+            
+            can_parse_whitelist_content_line.append(f'{messagesig:<30}       [signal]		[get, change_handle]\n')
+            wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_line,False)
+            return 2
+    return 1
+
+def addCan_parse_whitelist(sigs):
+    jsConfig=getJScontent(pyFileDir+"config.json")
+    analy=Analyze(getKeyPath("dbcfile",jsConfig))
+    for sig in sigs:
+        message=analy.getMessage_Id_BySig(sig)
+        if len(message)==0:
+            print(f'{sig} 对应的message不存在')
+            break
+        messagesig=analy.getMessage_Id_Sig(sig)
+        can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
+        WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,False)
 
 # conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Achievement/pythonscript/canSimulation/temp.xls")
 # conversion(pyFileDir+"config.json",'TboxLocalTiYear')

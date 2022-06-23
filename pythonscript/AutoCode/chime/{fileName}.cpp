@@ -10,7 +10,7 @@ using namespace megaipc;
 
 void {ClassName}::state_process(const SignalMsg &sig_msg)
 {
-    TB_LOG_INFO("{classname}");
+    IC_LOG_INFO("{classname}");
 
     int power=0;
     int result=0;
@@ -39,7 +39,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
         result = raw_value.val_{4};
     }
 
-    TB_LOG_INFO("{classname}: %d", result);
+    IC_LOG_INFO("{classname}: %d", result);
 
     if(CANSIG_GW_288__BcmPwrStsFb_g.is_timeout)
     {
@@ -64,7 +64,7 @@ void {ClassName}::send(const std::string &topic,const int &value)
 {
     nlohmann::json j = PayloadInfo{value,true};
     string msg = j.dump();
-    TB_LOG_INFO("msg: %s", msg.data());
+    IC_LOG_INFO("msg: %s", msg.data());
 
     //publish message
     IpcMessage message = {(uint32_t)msg.length(), (uint8_t *)msg.data(), true};

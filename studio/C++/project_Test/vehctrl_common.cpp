@@ -17,7 +17,7 @@ int codec_vehctrl_data(struct veh_signal *sig, float value, enum signal_value_ty
 {
     if (sig == NULL || out_data == NULL)
     {
-        TB_LOG_ERROR("Error: %s", "sig or out_data is null");
+        IC_LOG_ERROR("Error: %s", "sig or out_data is null");
         return -1;
     }
 
@@ -27,7 +27,7 @@ int codec_vehctrl_data(struct veh_signal *sig, float value, enum signal_value_ty
     struct veh_message *p_msg = (struct veh_message *)sig->p_veh_message;
     if (p_msg == NULL)
     {
-        TB_LOG_ERROR("Error:, %s", "p_msg is null");
+        IC_LOG_ERROR("Error:, %s", "p_msg is null");
         return -1;
     }
 
@@ -64,7 +64,6 @@ int codec_vehctrl_data(struct veh_signal *sig, float value, enum signal_value_ty
         val.val_uint64_t = value;
         break;
     default:
-        TB_LOG_WARNING("value type is unknown");
         break;
     }
     memcpy(out_data + 9, val.buffer, length);

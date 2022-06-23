@@ -62,7 +62,7 @@ namespace fds
     template <typename T>
     void SendSingleCanValue(struct veh_signal *sig, T value, uint8_t msg_type = 0, uint8_t sig_count = 1)
     {
-        TB_LOG_INFO("send mcu:sigName: %s value: %f, %u", sig->sig_name, value,msg_type);
+        IC_LOG_INFO("send mcu:sigName: %s value: %f, %u", sig->sig_name, value,msg_type);
     }
 } // namespace fds
 
@@ -82,7 +82,7 @@ public:
     {
         auto sig = std::get<0>(sig_val);
         auto val = std::get<1>(sig_val);
-        TB_LOG_INFO("send mcu:sigName: %s value: %f", sig->sig_name, val);
+        IC_LOG_INFO("send mcu:sigName: %s value: %f", sig->sig_name, val);
         return sig_val;
     }
 };
