@@ -64,7 +64,7 @@ class SigInfo(object):
         self.enumRow=-1
         self.sendTypeRow = -1
         self.isdbcEnum = False #是否是dbc中的枚举，如果True枚举就是不转化
-        self.messgae_Id = ""
+        self.messgae_Name = ""
         #----------can矩阵独有------------
         self.chineseName=''
     
@@ -115,16 +115,16 @@ class SigInfo(object):
     def getSigSendType(self):
         return f'BA_ \"GenSigSendType\" SG_  {self.getMId()} {self.name} {self.sendType.value};'
 
-    def getMessage_Id(self):
-        if len(self.messgae_Id) != 0:
-            return self.messgae_Id
+    def getMessage_Name(self):
+        if len(self.messgae_Name) != 0:
+            return self.messgae_Name
         return f'{self.Sender}_{self.messageId}'
 
     def getMessage_SubNet(self):
          return f'{self.subNet}_{self.messageId}'
 
     def getMessage_Sig(self):
-        return self.getMessage_Id()+"__"+self.name
+        return self.getMessage_Name()+"__"+self.name
 
     #endBit+(length - length%8)+(8-length)+1=startBit
     def getStartBit(self):
@@ -256,7 +256,7 @@ class MessageInfo(object):
         self.lenght=0
         self.sendType=0
         #---------dbc专有
-        self.message_Id=''
+        self.message_Name=''
         self.sigs=[]
         self.Row=-1
         self.cycleRow=-1
@@ -266,8 +266,8 @@ class MessageInfo(object):
         self.threeCycleRow=-1
 
     def getMessage_Id(self):
-        if len(self.message_Id) !=0:
-            return self.message_Id
+        if len(self.message_Name) !=0:
+            return self.message_Name
         return f'{self.sender}_{self.messageId}'
 
     def getMessage_SubNet(self):
@@ -353,7 +353,7 @@ class AnalyzeFile(object):
                 elif text.startswith("SG_"):
                     ds = AnalyzeFile.analySG(text)
                     ds.Sender = currentdbcMessage.sender
-                    ds.messgae_Id = currentdbcMessage.message_Id
+                    ds.messgae_Name = currentdbcMessage.message_Name
                     ds.messageId = currentdbcMessage.messageId
                     ds.Row=rowIndex
                     self.dbcSigs[str(ds.getMId())+ds.name] = ds
@@ -458,7 +458,7 @@ class AnalyzeFile(object):
             return None
         ms = MessageInfo()
         ms.messageId =  getNoOx16(messages[1])
-        ms.message_Id = messages[2]
+        ms.message_Name = messages[2]
         ms.lenght = int(messages[3])
         ms.sender = messages[4]
         return ms
@@ -574,7 +574,7 @@ class AnalyzeFile(object):
         try:
             sig = self.getSig(sigName)
             assert isinstance(sig,SigInfo)
-            return sig.getMessage_Id()
+            return sig.getMessage_Name()
         except:
             # print(f'{sig}没有找到message')
             return ""

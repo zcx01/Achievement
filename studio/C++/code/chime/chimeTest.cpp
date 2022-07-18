@@ -2,7 +2,7 @@
 #include "../ObjectFactory.h"
 #include "../commondefine.hpp"
 #include <iostream>
-#include "detect_shield.hpp"
+
 
 ChimeTestTest::ChimeTestTest(/* args */) 
 {
@@ -16,8 +16,6 @@ ChimeTestTest::ChimeTestTest(/* args */)
     //     // play.play_contorl(info);
     // }
 
-    DetectShield ds;
-    ds.valueChanged(106,true);
 
     while (true)
     {
