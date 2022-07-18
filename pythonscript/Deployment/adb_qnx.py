@@ -19,6 +19,7 @@ if __name__ == "__main__":
     parser.add_argument('-l','--log', help='taif log',type=str)
     parser.add_argument('-i','--interact', help='interact',default=1,type=int)
     parser.add_argument('-us','--useSyslog', help='use Syslog',default=1,type=int)
+    parser.add_argument('-ro','--remvelog', help='清除log',default=1,type=int)
     args = parser.parse_args()
 
     for j in range(120):
@@ -63,6 +64,14 @@ if __name__ == "__main__":
         try:
             # keyStr(f' tail -f /var/log/syslog | grep \'{args.log}\' ')
              keyStr(f'slog2info -w | grep \'{args.log}\' ')
+        except:
+            pass
+    
+    if "-ro" in sys.argv:
+        try:
+            keyStr(f'rm /var/log/dltlogs/*.dlt*')
+            keyStr(f'reset')
+            isExit=True
         except:
             pass
         
