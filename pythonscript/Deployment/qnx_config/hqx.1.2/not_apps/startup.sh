@@ -39,7 +39,7 @@ ARGS_TYPED_MEM="memory=/memory/ram/dma"
 }
 
 usb() {
-    log_launch $IO_USB_BINARY
+    log_launch "io-usb"
 
     if [ ! -z ${USB2_ENABLE} ]
     then
@@ -59,22 +59,12 @@ to_bmetrics()
 
 log_launch()
 {
-        to_bmetrics component_launch ${1}
-}
-
-log_start()
-{
-        to_bmetrics component_start ${1}
+        to_bmetrics bootmarker ${1}: launching
 }
 
 log_ready()
 {
-        to_bmetrics component_ready ${1}
-}
-
-log_event()
-{
-        to_bmetrics event_snapshot ${1}
+        to_bmetrics bootmarker ${1} ready
 }
 
 fde_on(){
@@ -362,6 +352,7 @@ format_ota_partition() {
 }
 
 mount_ota() {
+    mkdir -p /ota
     mount -t qnx6 /dev/disk/ota /ota
     if [ $? -ne 0 ] ; then
         echo "failed ot mount ota";
@@ -381,6 +372,7 @@ mount_ota() {
             fi
         fi
     fi
+    chmod 0755 /ota
     mkdir -p /ota/android
     mkdir -p /ota/qnx
     mkdir -p /ota/qnx/host
@@ -401,6 +393,7 @@ format_log_partition() {
 }
 
 mount_log() {
+    mkdir -p /log
     mount -t qnx6 /dev/disk/qnx_log /log
     if [ $? -ne 0 ] ; then
         echo "failed ot mount log";
@@ -421,6 +414,7 @@ mount_log() {
         fi
     fi
 
+    chmod 0755 /log
     mkdir -p /log/qlog
     chmod 0777 /log/qlog
     touch /log/qlog/.qlog.nfs
@@ -438,6 +432,7 @@ format_factory_partition() {
 }
 
 mount_factory() {
+    mkdir -p /factory
     mount -t qnx6 /dev/disk/factory /factory
     if [ $? -ne 0 ] ; then
         echo "failed ot mount factory";
@@ -458,6 +453,7 @@ mount_factory() {
         fi
     fi
 
+   chmod 0755 /factory
 }
 
 format_calibration_partition() {
@@ -469,6 +465,7 @@ format_calibration_partition() {
 }
 
 mount_calibration() {
+    mkdir -p /cal
     mount -t qnx6 /dev/disk/calibration /cal
     if [ $? -ne 0 ] ; then
         echo "failed ot mount calibration";
@@ -489,6 +486,7 @@ mount_calibration() {
         fi
     fi
 
+   chmod 0755 /cal
 }
 
 
@@ -525,21 +523,21 @@ common_late () {
     fi
 
     ##  start Analyzer; user responsible for creating/deleting flag
-    if [ -e /var/enable_analyzer ]
+    if [ -e /etc/enable_analyzer ]
     then
-        #echo "Info startup.sh: Analyzer enabled by default (/var/enable_analyzer)"
+        #echo "Info startup.sh: Analyzer enabled by default (/etc/enable_analyzer)"
         # Start Analyzer
         /scripts/analyzer.sh start
     else 
-        echo "Analyzer not enabled. touch /var/enable_analyzer and reset device to enable Analyzer debugging"
+        echo "Analyzer not enabled. touch /etc/enable_analyzer and reset device to enable Analyzer debugging"
         ##  start Analyzer External; user responsible for creating/deleting flag
-        if [ -e /var/enable_analyzer_external ]
+        if [ -e /etc/enable_analyzer_external ]
         then
-            echo "Info startup.sh: Analyzer External enabled by default (/var/enable_analyzer_external)"
+            echo "Info startup.sh: Analyzer External enabled by default (/etc/enable_analyzer_external)"
             # Start Analyzer
             /scripts/analyzer.sh start tpm
         else 
-            echo "Analyzer External not enabled. touch /var/enable_analyzer_external and reset device to enable Analyzer External debugging"
+            echo "Analyzer External not enabled. touch /etc/enable_analyzer_external and reset device to enable Analyzer External debugging"
         fi
     fi
 }
@@ -692,7 +690,7 @@ apply_ddr_freq_limits()
 }
 qseecom () {
 
-        log_launch $QSEECOM_SERVICE_BINARY 
+        log_launch "qseecom_service"
         on $QSEECOM_SERVICE_ON_ARGS $ASLR_FLAG $QSEECOM_SERVICE_BINARY $QSEECOM_SERVICE_ARGS &
         #modify rpmb device permissions
         if [[ "$uname_m" == *UFS* ]]; then   
@@ -703,7 +701,7 @@ qseecom () {
         #modify ssd device permissions
         SSD_DEVICE=`ls -l /dev/disk | grep "ssd" | cut -d'>' -f2`
         chmod 666 $SSD_DEVICE
-        log_launch $QSEECOM_DAEMON_BINARY
+        log_launch "qseecom_daemon"
         on $QSEECOM_DAEMON_ON_ARGS $ASLR_FLAG $QSEECOM_DAEMON_BINARY $QSEECOM_DAEMON_ARGS
         if [ $SECPOL_ENABLE -eq 1 ]; then
            setfacl -m user:98:w /persist
@@ -714,7 +712,7 @@ qseecom () {
 io-audio-deva () {
     DEVA_ARGS="skip_device_disable=0,bmetrics_level=medium,log_level=high,platform_id=demo,mib_cgms=0"
     waitfor /dev/audio_service
-    log_launch $IOAUDIO_BINARY
+    log_launch "io-audio"
     on $IOAUDIO_ON_ARGS $IOAUDIO_BINARY -d qc ${DEVA_ARGS}
 }
 
@@ -724,7 +722,7 @@ thermal () {
 #    echo 'dlexec "" "enable_dplmp" "0" GLOBALSYMS ' > /dev/qcore
     waitfor /dev/dplmp
 
-    log_launch $IOSERVICE_BINARY
+    log_launch "io-service"
     on $IOSERVICE_ON_ARGS $IOSERVICE_BINARY $IOSERVICE_ARGS
 
 }
@@ -768,7 +766,7 @@ usb-devcfg() {
 }
 
 camera_server () {
-    log_launch "ais_server "
+    log_launch "camera_server"
     if [ $SECPOL_ENABLE -eq 1 ];then
 	on -T ais_server_t -u 62:62,29,21,AVIN_SERVER_GID -d ais_server &
     else
@@ -778,12 +776,12 @@ camera_server () {
 
 km_be_loader () {
 	waitfor /dev/qseecom
-	log_launch $KM_BE_DAEMON_BINARY
+	log_launch "km_be"
 	on $KM_BE_DAEMON_ON_ARGS $ASLR_FLAG $KM_BE_DAEMON_BINARY $KM_BE_DAEMON_ARGS        
 }
 
 spu_services() {
-    log_launch $SPCOM_SERVICE_BINARY
+    log_launch "spcom_service"
     on $SPCOM_SERVICE_ON_ARGS $ASLR_FLAG $SPCOM_SERVICE_BINARY $SPCOM_SERVICE_ARGS &
     waitfor /dev/sp_kernel
     if [ $SECPOL_ENABLE -eq 1 ]; then
@@ -792,9 +790,9 @@ spu_services() {
        setfacl -m user:143:rw /persist/secnvm
        setfacl -m group:143:rw /persist/secnvm
     fi
-    log_launch $SEC_NVM_BINARY
+    log_launch "sec_nvm"
     on $SEC_NVM_ON_ARGS $ASLR_FLAG $SEC_NVM_BINARY $SEC_NVM_ARGS &
-    log_launch $SPDAEMON_BINARY
+    log_launch "spdaemon"
     on $SPDAEMON_ON_ARGS $ASLR_FLAG $SPDAEMON_BINARY $SPDAEMON_ARGS &    
 }
 
@@ -852,6 +850,7 @@ start_pm_event_preprocess()
 start_input_service()
 {
     log_launch "input_service"
+    waitfor /dev/uartrpc5
     on -T input_service_t -u 815:815,68,819 /bin/input_service -p ivi_compositor
 }
 
@@ -889,7 +888,7 @@ start_backlightsrv()
 start_tempsrv()
 {
     log_launch "tempsrv"
-    on -T disp_temp_t -u disp_bl temp_resmgr &
+    temp_resmgr &
 }
 
 setup_diag_service_pps()
@@ -902,14 +901,12 @@ create_syslog () {
     if [ -f /var/log/syslog ]; then
         rm -rf /var/log/syslog
     fi
-    touch /var/log/syslog
-    chmod 0666 /var/log/syslog
+    touch -m 0666 /var/log/syslog
 }
 
 create_icapps_version () {
     if [ ! -f /etc/icapps_version ]; then
-        touch /etc/icapps_version
-        chmod 0666 /etc/icapps_version
+        touch -m 0666 /etc/icapps_version
     fi
 }
 
@@ -931,21 +928,28 @@ start_host_ota()
     # /bin/slm -V /slm/host_update.xml
 }
 
+start_chk_luns_consistent()
+{
+    log_launch "check system slot luns consistent"
+    on -T chkslot_t -u chkslot chkslot &
+}
+
 start_factoryservice()
 {
     log_launch "factoryservice"
     on -T factory_service_t -u factory /bin/factoryservice &
-}
-start_looptester()
-{
-    log_launch "looptester"
-    on -T factory_service_t -u factory /bin/looptester &
 }
 
 start_ecu_ota()
 {
     log_launch "ecu_otaService"
     # /bin/slm -V /slm/ecu_update.xml
+}
+
+export_slot_info()
+{
+    log_launch "export current system start slot info to /tmp/slotinfo.txt"
+    slotinfo.sh
 }
 
 start_health_monitor()
@@ -958,12 +962,6 @@ start_chime_service()
 {
     log_launch "chime_service"
     on -T chime_service_t -u chime /bin/chime_service
-}
-
-start_topic_statistic()
-{
-    log_launch "topic_statistic"
-    on -T topic_statistic_t -u 853:853,819 /bin/topic_statistic
 }
 
 start_ecu_config_utility()
@@ -979,7 +977,7 @@ start_mcurpc()
 
     # wait for the SPI device file created by spi_service
     waitfor /dev/spi9
-    on -T spirpc_t -p 40 -R 0x20 -u spirpc /usr/bin/spirpc -s 143 -m 148 -p 9 &
+    on -T spirpc_t -p 40 -R 0x04 -u spirpc /usr/bin/spirpc -s 143 -m 148 -p 9 &
 
     # wait for the UART RPC device file created by uartrpc
     waitfor /dev/uartrpc0
@@ -1010,25 +1008,25 @@ config_sysctl_network()
 
 start_dumper()
 {
-    export COREFILES_DIR=/var/log/coredump
-    DUMPER_ARGS="-v -d ${COREFILES_DIR} -N 10 -S -z 9"
+    export COREFILES_DIR=/var/log
+    DUMPER_ARGS="-v -d /var/log -N 10 -S -z 9"
 
-    waitfor /var/log
-    mkdir -p ${COREFILES_DIR}
+    if [ -e $COREFILES_DIR ];then
 
-    for acore in /tmp/*.core*; do
-        if [ -f $acore ]; then
-            echo "Copying ${acore} to ${COREFILES_DIR}/early_boot_${acore##*/}"
-            # If file is already present then skip overwriting it.
-            cp -VX ${acore} ${COREFILES_DIR}/early_boot_${acore##*/}
-        fi;
-    done
+        for acore in /tmp/*.core*; do
+            if [ -f $acore ]; then
+                echo "Copying ${acore} to ${COREFILES_DIR}/early_boot_${acore##*/}"
+                # If file is already present then skip overwriting it.
+                cp -VX ${acore} ${COREFILES_DIR}/early_boot_${acore##*/}
+            fi;
+        done
 
-    slay -f -v dumper
-    if [ $SECPOL_ENABLE -eq 1 ];then
-        on -T dumper_t dumper -U dumper ${DUMPER_ARGS}
-    else
-        dumper ${DUMPER_ARGS}
+        slay -f -v dumper
+        if [ $SECPOL_ENABLE -eq 1 ];then
+            on -T dumper_t dumper -U dumper ${DUMPER_ARGS}
+        else
+            dumper ${DUMPER_ARGS}
+        fi
     fi
 }
 
@@ -1038,21 +1036,6 @@ config_slog2_verbosity()
     echo qseecom_service:n:4 >> /var/pps/verbose
     echo qcpe_service:n:4 >> /var/pps/verbose
     echo qcpe_qhee:n:1 >> /var/pps/verbose
-}
-
-start_dltlog_app()
-{
-    log_launch "dltlog"
-
-    if [ ! -d /var/log/dltlogs ]; then
-        mkdir -m 0777 -p /var/log/dltlogs;
-    fi
-
-    ln -f -s /etc/dlt_logstorage.conf /var/log/dltlogs/dlt_logstorage.conf
-    chown 832:832 /var/log/dltlogs
-
-    on -T dltlog_t -p 40 -u dltlog /usr/bin/dlt-daemon -d -c /etc/dlt.conf
-    on -T dltlog_t -p 40 /usr/bin/dlt-qnx-system -d -c /etc/dlt-qnx-system.conf
 }
 
 rename_slog_files()
@@ -1112,49 +1095,6 @@ copy_log_to_qlog()
     cp /persist/slog/*.log /var/log/slog/
 }
 
-setup_qt_env() {
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/qt/lib
-    export QT_PLUGIN_PATH=/opt/qt/plugins
-    export QML2_IMPORT_PATH=/opt/qt/qml
-    export FONTCONFIG_FILE=/opt/qt/lib/fontconfig/local.conf
-    export QQNX_PHYSICAL_SCREEN_SIZE=1920,720
-
-    export QT_DEBUG_PLUGINS=1
-    export QT_LOGGIN_TO_CONSOLE=1
-
-    if [ ! -d /var/fontconfig ]; then
-        mkdir -m 0666 -p /var/fontconfig;
-    fi    
-    chown 834:834 /var/fontconfig    
-
-    waitfor /dev/random
-}
-
-unpack_qt_resources() {
-    OPT_QT_VERSION=""
-    DATA_QT_VERSION=""
-    
-    if [ ! -d /data/qt ]; then
-        mkdir -m 0666 -p /data/qt
-    fi
-    
-    if [ -f /opt/qt/ic_qt_version ]; then
-        OPT_QT_VERSION=$(cat /opt/qt/ic_qt_version);
-    fi
-
-    if [ -f /data/qt/ic_qt_version ]; then
-        DATA_QT_VERSION=$(cat /data/qt/ic_qt_version);
-    fi
-    
-    if [ "$OPT_QT_VERSION" != "$DATA_QT_VERSION" ]; then
-        rm -rf /data/qt/*
-        tar -zxvf /opt/qt/resources.tar.gz -C /data/qt >/dev/null 2>&1;
-        
-        cp /opt/qt/ic_qt_version /data/qt/
-    fi
-}
-    
-        
 start_config_vlan()
 {
     log_launch "config vlan"
@@ -1195,7 +1135,7 @@ start_mcu_systime()
 start_thermal_ctrl()
 {
     log_launch "thermal_ctrl"
-    on -T thermal_ctrl_t -u thermal_ctrl thermal_ctrl -c /etc/thermal_ctrl.json &
+    on -T thermal_ctrl_t -u thermal_ctrl thermal_ctrl &
 }
 
 start_mosquitto()
@@ -1205,18 +1145,53 @@ start_mosquitto()
     on -T mosquitto_t -p 10 -u mosquitto /usr/bin/mosquitto -c /etc/mosquitto/mosquitto.conf -d &
 }
 
+start_dltlog_app()
+{
+    log_launch "dltlog"
 
+    if [ ! -d /var/log/dltlogs ]; then
+        mkdir -m 0777 -p /var/log/dltlogs;
+    fi
+
+    ln -f -s /etc/dlt_logstorage.conf /var/log/dltlogs/dlt_logstorage.conf
+    chown 832:832 /var/log/dltlogs
+
+    # /bin/slm -V /slm/dlt_daemon.xml
+    # /bin/slm -V /slm/dlt_qnx_system.xml
+}
+
+
+setup_qt_env() {
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/qt/lib
+    export QT_PLUGIN_PATH=/opt/qt/plugins
+    export QML2_IMPORT_PATH=/opt/qt/qml
+    export FONTCONFIG_FILE=/opt/qt/lib/fontconfig/local.conf
+    export QQNX_PHYSICAL_SCREEN_SIZE=1920,720
+
+    export QT_DEBUG_PLUGINS=1
+    export QT_LOGGIN_TO_CONSOLE=1
+
+    if [ ! -d /var/fontconfig ]; then
+        mkdir -m 0666 -p /var/fontconfig;
+    fi    
+    chown 834:834 /var/fontconfig    
+
+    waitfor /dev/random
+}
+
+unpack_resources() {
+    if [ ! -d /opt/qt/resources ]; then
+        tar -zxvf /opt/qt/resources.tar.gz -C /opt/qt;
+        rm /opt/qt/resources.tar.gz;
+    fi   
+}
 start_kbox()
 {
     log_launch "gptee"
     on -T kbox_t -p 10 -u 869:869 /bin/gptee &
 }
 
-start_rtc_detect()
-{
-    log_launch "rtc_detect"
-    on -T rtc_detect_t -u rtc_detect /bin/rtc_detect
-}
+
 start_ais_vision_server()
 {
     #####start ais_vision_server #####
@@ -1237,12 +1212,6 @@ start_display_manager()
     log_launch "display_manager"
     on -T display_manager_t -u 865:865,819 /bin/display_manager &
 }
-start_mtouch() 
-{
-    log_launch "mtouch - huayang"
-    mtouch -c /etc/system/config/mtouch-huayang.conf &
-}
-
 
 
 
@@ -1278,10 +1247,46 @@ waitfor_if()
     log_ready netconfig:if_up-$1
 }
 
+[ -f /etc/system/config/display_mapping.json ] || ln -s /etc/system/config/display_mapping_$(uname -m | awk -F '_' '{print $4}').json /etc/system/config/display_mapping.json
+
+echo 'Setting dump mode to mini_rawdump as /etc/enable_mini_rawdump is enabled'
+echo mini_rawdump > /dev/pdbg/memorydump/dload/dload_mode
+
 uname_m=`uname -m`
 . /scripts/platform_variables.sh
 
 common_early;
+
+waitfor /dev/screen
+
+echo "Starting iceoryx iox-roudi ..."
+start_iceoryx
+
+echo "start message service"
+start_message_service
+
+echo "start backlightsrvr"
+start_backlightsrv
+
+echo "start display_manager"
+waitfor /dev/backlight/mode
+start_display_manager
+
+echo "start pm_event_postprocess"
+start_pm_event_postprocess
+
+echo "start pm_event_preprocess"
+start_pm_event_preprocess
+
+# start up ic_qt
+echo "setup_qt_env"
+setup_qt_env
+
+echo "unpack resources"
+unpack_resources
+
+echo "start up ic_qt"
+# /bin/slm -V /slm/ic_qt.xml
 
 mount -T io-pkt -o peer=/dev/qvm/la/la_to_host,bind=/dev/vdevpeer/vp0,mac=aaaaaaaaaaaa,mode=0660 /lib/dll/devnp-vdevpeer-net.so
 
@@ -1301,8 +1306,7 @@ km_be_loader;
 
 chmod 660 /dev/disk/uda0;
 waitfor /dev/km_be_avb_server
-log_launch $QVB_SERVICE_BINARY
-$ON -R 0x0f $QVB_SERVICE_ON_ARGS $QVB_SERVICE_BINARY $QVB_SERVICE_ARGS
+$ON -R 0xf0 $QVB_SERVICE_ON_ARGS $QVB_SERVICE_BINARY $QVB_SERVICE_ARGS
 if [ $SECPOL_ENABLE -eq 1 ]; then
     setfacl -m user:146:w /persist
     setfacl -m group:146:w /persist
@@ -1313,43 +1317,12 @@ save_log_to_persist
 # mounting io-pck after VMM Service lauch is casuing vdev issues
 #mount -T io-pkt /lib64/libdevnp-emac-eth.so
 
-#mount_userdata may use QSEECom service functionality
-if [ $ENABLE_INPLACE_FDE -eq 1 ]; then
-    mount_inplace
-else
-    mount_userdata
-fi
-
-echo "start topic_statistic"
-start_topic_statistic
-
-echo "start rtc_detect"
-start_rtc_detect
-
-echo "Starting iceoryx iox-roudi ..."
-start_iceoryx
-
-waitfor /var/data
-waitfor /dev/screen
-
-echo "start mtouch"
-start_mtouch
-
-# start up ic_qt
-echo "setup_qt_env"
-setup_qt_env
-
-#echo "unpack qt resources"
-unpack_qt_resources
-
-#echo "start up ic_qt"
-# /bin/slm -V /slm/ic_qt.xml
 
 # configuring the socket send / recv buffer size
 config_sysctl_network
 
 # init usb hub chip power
-usb_hub_power &
+usb_hub_power
 
 # mount log partition
 mount_log
@@ -1357,19 +1330,44 @@ mount_log
 # create file /var/log/syslog
 create_syslog
 
+## Enable dump; user responsible for creating/deleting flag
+if [ -e /var/enable_fulldump ]; then
+    echo 'Setting dump mode to full ramdump as /etc/enable_fulldump is enabled'
+    echo full > /dev/pdbg/memorydump/dload/dload_mode
+elif [ -e /var/enable_mini_rawdump ]; then
+    echo 'Setting dump mode to mini_rawdump as /etc/enable_mini_rawdump is enabled'
+    echo mini_rawdump > /dev/pdbg/memorydump/dload/dload_mode
+elif [ -e /var/enable_mini_dload ]; then
+    echo 'Setting dump mode to mini_dload as /etc/enable_mini_dload is enabled'
+    echo mini_dload > /dev/pdbg/memorydump/dload/dload_mode
+elif [ -e /var/enable_nodump ]; then
+    echo 'Setting dump mode to no ramdump as /etc/enable_nodump is enabled'
+    echo nodump > /dev/pdbg/memorydump/dload/dload_mode
+else
+    echo
+fi
+
+echo "start check system slot luns consistent"
+start_chk_luns_consistent
+
 # create file /etc/icapps_version
 create_icapps_version
 
-echo "start message service"
-start_message_service
+log_launch "pps"
+$ON $PPS_ON_ARGS pps -m /var/pps -p /var/pps_persist -t 100
+waitfor /var/pps
+if [ $SECPOL_ENABLE -eq 1 ];then
+    chown 40:40 /var/pps
+fi
 
 #depend on /var/log
 waitfor /log/qlog
 mkdir -p /var/log/kernel
 
-log_launch $VMM_SERVICE_BINARY 
+
+waitfor /dev/screen
+log_launch "GVM(s)"
 	$ON $VMM_SERVICE_ON_ARGS $VMM_SERVICE_BINARY $VMM_SERVICE_ARGS
-log_launch $VMM_LIFECYCLE_BINARY 
 	$ON $VMM_LIFECYCLE_ON_ARGS $VMM_LIFECYCLE_BINARY $VMM_LIFECYCLE_ARGS &
 
 #$ON $DEFAULT_ROOT_T qnetconfig -b 2 -c /etc/early-net.cfg &
@@ -1387,6 +1385,16 @@ start_chime_service
 echo "start MAX20086 daemon"
 start_max20086
 
+#mount_userdata may use QSEECom service functionality
+if [ $ENABLE_INPLACE_FDE -eq 1 ]; then
+    mount_inplace
+else
+    mount_userdata
+fi
+
+export_slot_info
+
+
 # mount factory partition
 mount_factory
 
@@ -1399,12 +1407,8 @@ start_dltlog_app
 # copy the saved slog2 log file to qlog directory
 copy_log_to_qlog
 
-log_launch "pps"
-$ON $PPS_ON_ARGS pps -m /var/pps -p /var/pps_persist -t 100
-waitfor /var/pps
-if [ $SECPOL_ENABLE -eq 1 ];then
-    chown 40:40 /var/pps
-fi
+chmod a+w /etc/system/config
+
 usb;
 common_onetime;
 
@@ -1419,19 +1423,21 @@ else
     brconfig bridge0 add vp0 up
 fi
 
-log_launch "ssr_service"
+
 $ON $SSR_SERVICE_ON_ARGS  ssr_service -p /var/pps/ssr -s lpass -s modem -s cdsp -s spss -r 1 -t 300 &
 
 waitfor /dev/ssr
 waitfor /dev/pil_service
 
-log_launch "cdsp_service" 
 $ON $CDSP_SERVICE_ON_ARGS  cdsp_service -f /etc/cdsp_cfg &
 
 
 ##$ON $LCM_DEMO_ON_ARGS  life_cycle_man_demo &
 
 $ON $MEGA_LIFE_CYCLE_ON_ARGS  mega_life_cycle &
+
+waitfor /dev/screen
+
 
 echo test:persistent /pmic/client/wlan 2 > /dev/npa
 echo test:persistent /pmic/client/pcie 2 > /dev/npa
@@ -1440,18 +1446,16 @@ echo test:persistent /pmic/client/sensor 2 > /dev/npa
 $ON $PRNG_SERVICE_ON_ARGS  $PRNG_SERVICE_BINARY $PRNG_SERVICE_ARGS &
 $ON $FDE_BE_ON_ARGS  $FDE_BE_BINARY $FDE_BE_ARGS
 
-
 if [ $SECPOL_ENABLE -eq 1 ];then
     $ON -T ais_be_server_t -d ais_be_server -U 63:63  &
 else
      $ON $DEFAULT_ROOT_T  ais_be_server &
 fi
 
-#waitfor /dev/audio_service
-#$ON $IOAUDIO_ON_ARGS io-audio -o sw_mixer_ms=16 -d qc skip_device_disable=0,bmetrics_level=medium,log_level=high,platform_id=demo,mib_cgms=0
+waitfor /dev/audio_service
+$ON $IOAUDIO_ON_ARGS io-audio -o sw_mixer_ms=16 -d qc skip_device_disable=0,bmetrics_level=medium,log_level=high,platform_id=demo,mib_cgms=0
 
         
-log_launch $NPU_SERVICE_BINARY
 $ON $NPU_SERVICE_ON_ARGS $NPU_SERVICE_BINARY $NPU_SERVICE_ARGS
 waitfor /dev/msm_npu
 
@@ -1464,7 +1468,6 @@ GATEWAY_IPADDR=192.168.0.3
 
 common_netdbgservices;
 
-log_launch "io_service"
 $ON $IOSERVICE_ON_ARGS  io_service --log_level=7 &
 if [ $SECPOL_ENABLE -eq 1 ];then
     on -T ifconfig_t -u 50:50 ifconfig emac0 up
@@ -1504,11 +1507,7 @@ else
 fi
 
 $ON $VM_SSR_BE_ON_ARGS  vm_ssr_be &
-log_launch "dcvs_service"
 $ON $DCVS_ON_ARGS dcvs_service -d 30 &
-
-## WA: Disable Dynamic CPU Off-lining
-echo 0 > /dev/pdbg/qcore/power/dynamic_offline_en
 
 sysctl -qw net.inet6.ip6.ifq.maxlen=1024
 sysctl -qw net.inet.ip.ifq.maxlen=1024
@@ -1521,21 +1520,21 @@ start_dumper
 veth_ipa_be &
 
 ##  start Analyzer; user responsible for creating/deleting flag
-if [ -e /var/enable_analyzer ]
+if [ -e /etc/enable_analyzer ]
 then
-    #echo "Info startup.sh: Analyzer enabled by default (/var/enable_analyzer)"
+    #echo "Info startup.sh: Analyzer enabled by default (/etc/enable_analyzer)"
     #Start Analyzer
     /scripts/analyzer.sh start
 else 
-    echo "Analyzer not enabled. touch /var/enable_analyzer and reset device to enable Analyzer debugging"
+    echo "Analyzer not enabled. touch /etc/enable_analyzer and reset device to enable Analyzer debugging"
     ##  start Analyzer External; user responsible for creating/deleting flag
-    if [ -e /var/enable_analyzer_external ]
+    if [ -e /etc/enable_analyzer_external ]
     then
-        #echo "Info startup.sh: Analyzer External enabled by default (/var/enable_analyzer_external)"
+        #echo "Info startup.sh: Analyzer External enabled by default (/etc/enable_analyzer_external)"
         #Start Analyzer
         /scripts/analyzer.sh start tpm
     else 
-        echo "Analyzer External not enabled. touch /var/enable_analyzer_external and reset device to enable Analyzer External debugging"
+        echo "Analyzer External not enabled. touch /etc/enable_analyzer_external and reset device to enable Analyzer External debugging"
     fi
 fi
 
@@ -1555,7 +1554,7 @@ echo "qcdiaglsm ip " ${LSM_IPADDR}
 
 slay -R 0xFF qcpe_qhee
 
-
+log_collector &
 apply_ddr_freq_limits
 
 if [ -e /var/qgptp_enable ];then
@@ -1568,23 +1567,6 @@ if [ -e /var/qgptp_enable ];then
 		$ON $DEFAULT_ROOT_T qgptp emac0 -V -INITSYNC -5 -OPERSYNC -1 -INITPDELAY 0 -OPERPDELAY 2  &
 		$ON $DEFAULT_ROOT_T crf_stream -f /etc/qavb_config/crf_talker.ini &
 	fi
-fi
-
-## Enable dump; user responsible for creating/deleting flag
-if [ -e /var/enable_fulldump ]; then
-    echo 'Setting dump mode to full ramdump as /var/enable_fulldump is enabled'
-    echo full > /dev/pdbg/memorydump/dload/dload_mode
-elif [ -e /var/enable_mini_rawdump ]; then
-    echo 'Setting dump mode to mini_rawdump as /var/enable_mini_rawdump is enabled'
-    echo mini_rawdump > /dev/pdbg/memorydump/dload/dload_mode   
-elif [ -e /var/enable_mini_dload ]; then
-    echo 'Setting dump mode to mini_dload as /var/enable_mini_dload is enabled'
-    echo mini_dload > /dev/pdbg/memorydump/dload/dload_mode 
-elif [ -e /var/enable_nodump ]; then
-    echo 'Setting dump mode to no ramdump as /var/enable_nodump is enabled'
-    echo nodump > /dev/pdbg/memorydump/dload/dload_mode
-else
-    echo
 fi
 
 
@@ -1603,9 +1585,6 @@ fi
 echo "start factoryservice"
 start_factoryservice
 
-echo "start looptester"
-start_looptester
-
 echo "start input service"
 start_input_service
 
@@ -1623,22 +1602,6 @@ start_nfsd
 echo "update timezone info"
 timezone.sh
 
-
-echo "start backlightsrvr"
-start_backlightsrv
-
-echo "start display_manager"
-start_display_manager
-
-# echo "start MEGA PM daemon"
-# start_megapm
-
-echo "start pm_event_postprocess"
-start_pm_event_postprocess
-
-echo "start pm_event_preprocess"
-start_pm_event_preprocess
-
 echo "start host ota service"
 start_host_ota
 
@@ -1647,7 +1610,6 @@ start_ecu_ota
 
 echo "setup diag_service_pps"
 setup_diag_service_pps
-echo "run_audio_diag::true" > /var/pps/diag_service_pps
 
 echo "start MCU heartbeat service"
 start_mcu_hb
@@ -1657,8 +1619,6 @@ start_mcu_systime
 
 echo "start health monitor service"
 start_health_monitor
-
-log_collector &
 
 echo "start thermal_ctrl service"
 start_thermal_ctrl
@@ -1670,13 +1630,15 @@ echo "start ais_vision_server service"
 start_ais_vision_server
 
 echo "start ais_dms_server service"
-start_ais_dms_server
+#start_ais_dms_server
 
 echo "start mcu DID service"
 start_mcu_did
 
 ### adjust the slog2 verbosiry for some modules ###
 config_slog2_verbosity
+
+echo 0 > /dev/pdbg/qcore/power/dynamic_offline_en
 
 echo "start vmm_monitor"
 start_vmm_monitor

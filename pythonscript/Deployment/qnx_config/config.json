@@ -11,6 +11,7 @@
     "ic_telltale":"/usr/bin/",
     "lib_mega_ipc.so":"/lib64/",
     "release-bigsur_hqx.1.1_20211108":"hqx.1.1",
+    "libresources_plugin.so":"/opt/qt/qml/Resources/",
     "Other":"hqx.1.2",
     "ssh_ip":"10.25.11.197",
     "user":"chengxiongzhu",

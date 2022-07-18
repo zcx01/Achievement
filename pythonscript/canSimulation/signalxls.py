@@ -193,7 +193,7 @@ def ReMatchStr(text,case=None):
     for signal in signals:
         #去除不在dbc中的信号
         if dbc.sigExist(signal) or isNumber(signal):
-            if dbc.sender(signal) in local_machine_Sender or preStr == '-l':
+            if  preStr == '-l':
                 case.appendMonitorSignal(signal)
             else:
                 tempSignals.append(signal)

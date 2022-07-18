@@ -10,6 +10,7 @@ process = None
 cmd_Outs={'telnet':'login','ssh':'password','adb push':'in','curl':'100'}
 new_spawn=['ssh','adb shell']
 shellCmds=[]
+linux_end ='$'
 is_close_spawn=False
 
 def SetCloseSpawn(s):
@@ -72,7 +73,7 @@ def getCommand(cmd,arrys):
 class AndroidQnx(object):
     def __init__(self):
         super().__init__()
-        self.androidDir = "/data"
+        self.androidDir = "/sdcard"
         self.android_qnxDir = "/ota"
         self.qnxDir = "/ota/android"
     
@@ -89,7 +90,9 @@ class AndroidQnx(object):
     def qnx_cp(self,fileDict,chmod):
         for file in fileDict:
             if len(fileDict[file]) != 0:
+                keyStr(f'md5 {fileDict[file]}{file}')
                 keyStr(f"rm {fileDict[file]}{file}")
                 keyStr(f"cp {self.qnxDir}/{file} {fileDict[file]}")
+                keyStr(f'md5 {fileDict[file]}{file}')
             if chmod:
                 keyStr(f"chmod +x {fileDict[file]}/{file}",0)

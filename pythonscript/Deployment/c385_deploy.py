@@ -103,10 +103,10 @@ def zip(absolutePath,user,ssh_ip):
     assert isinstance(absolutePath,str)
     filename = os.path.basename(absolutePath)
     tempdir = os.path.dirname(absolutePath)
-    linux_end ='$'
     printYellow("如果是长时间等待不退出，就修改结尾符")
     keyStr(f'ssh {user}@{ssh_ip}')
     keyStr(f'cd {tempdir}',0,linux_end)
+    # keyStr(f'md5sum {filename}')
     keyStr(f'tar -zcvf  {filename}.tgz {filename}',0,linux_end)
     keyStr('exit',0,'',False)
     SetCloseSpawn(True)
@@ -127,6 +127,11 @@ def ScpFile(tmpath,user,ssh_ip):
     keyStr(f"scp -r {user}@{ssh_ip}:{tmprgz} {tmdir}/")
     uzip(tmprgz)
     interact()
+    keyStr(f'ssh {user}@{ssh_ip}')
+    keyStr(f'rm {tmprgz}',0,linux_end)
+    keyStr('exit',0,'',False)
+    SetCloseSpawn(True)
+    interact()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -137,7 +142,7 @@ if __name__ == "__main__":
     parser.add_argument('-a','--absolutePath',help='adb push absolute file list',default=[], nargs='+',type=str)
     parser.add_argument('-q','--qnx',help='cp for qnx',nargs='*')
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
-    parser.add_argument('-r','--not',help='excess commad',nargs='*')
+    parser.add_argument('-r','--not',help='是否重启',nargs='*')
     parser.add_argument('-d','--dir',help='exe dir',default='',type=str)
     parser.add_argument('-f','-PcFileName',help="打印自带PC上文件的名称",nargs='*')
     parser.add_argument('-s','-sship',help="从远程复制",nargs='*',default=jsConfig.get("ssh_ip",""))
@@ -171,13 +176,13 @@ if __name__ == "__main__":
         interact()
         exit()
 
-    devDir = getDevDir()
-    print('所在分支-------',devDir)
-    updateStartUp(f'{qnxConfigDir}{devDir}/')
-    if "-r" not in argv :
-        copyStartfile(f'{qnxConfigDir}{devDir}/not_apps/startup.sh',True)
+    # devDir = getDevDir()
+    # print('所在分支-------',devDir)
+    # updateStartUp(f'{qnxConfigDir}{devDir}/')
+    # if "-r" not in argv :
+    #     copyStartfile(f'{qnxConfigDir}{devDir}/not_apps/startup.sh',True)
         
-    keyStr('adb root')
+    # keyStr('adb root')
     if "-c" in argv :
         proceesNames= args.customfile
         if len(proceesNames) == 0:
@@ -192,8 +197,8 @@ if __name__ == "__main__":
             exe_proceesNames.append(f'{execbin}/{proceesName}')
         androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
-        copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
-        keyStr('reset')
+        # copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
+        if "-r" in argv : keyStr('reset')
         time.sleep(1)
         exit()
 
@@ -237,7 +242,7 @@ if __name__ == "__main__":
     fileDict['icwarning_config.json']='/opt/qt/config'
     androidQnx.qnx_cp(fileDict,False)
 
-    copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
+    # copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)
     keyStr('reset')
     time.sleep(1)
    
