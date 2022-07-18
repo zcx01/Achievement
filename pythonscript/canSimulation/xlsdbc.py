@@ -217,7 +217,7 @@ def WriteWhitelistPath(dbcPath,can_parse_whitelistPath):
         for messageSig in sig_dbc.dbcSigs:
             sig = sig_dbc.getSig(messageSig)
             os.system(
-                f"topic_Parser -w {can_parse_whitelistPath} {sig.getMessage_Id()} {sig.getMessage_Sig()}")
+                f"topic_Parser -w {can_parse_whitelistPath} {sig.getMessage_Name()} {sig.getMessage_Sig()}")
 
 def conversionByOtherdbc(configPath, wirteSigNames, dbcfilPath=""):
     assert isinstance(wirteSigNames, list)

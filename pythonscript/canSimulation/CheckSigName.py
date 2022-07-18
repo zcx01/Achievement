@@ -13,39 +13,67 @@ def CheckSigName(configPath,down_config=None,up_config=None):
         up_config = getKeyPath('up',jsConfig)
     jsDown = getJScontent(down_config)
     jsUp   = getJScontent(up_config)
-    sigNames = []
+    sigNames = {}
+    dbcfile = getKeyPath("dbcfile", jsConfig)
+    dbc = Analyze(dbcfile)
+
     for top in jsDown:
         topValue = jsDown[top]
         if type(topValue) == str:
             if topValue != top:
-                sigNames.append(topValue)
+                sigNames[topValue] = 0
         else:
             for t in topValue:
                 if t != top:
-                    sigNames.append(t)
+                    sigNames[t] = 0
     for s in jsUp:
-       sigNames.append(s)
+       sigNames[s] = 1
 
-    dbcfile = getKeyPath("dbcfile", jsConfig)
-    dbc = Analyze(dbcfile)
     for sig in sigNames:
         if is_chinese(sig):
             continue
-        # printGreen(sig)
-        sigs = re.findall(m_s,sig)
-        if len(sigs) >= 3 :
-            sig16= str(int(sigs[1],16))+"_".join(sigs[2:])
-            print(sig16)
-        if not dbc.sigExist(sig16):
-            printRed(f'{sig:<50} 信号不存在')
+        dbcSigName,Sender,isChanged = configConverdbc(sig,dbc)
+        if Sender == None or not isChanged:
+            continue
+        if  sigNames[sig] == 1: 
+            addConfigDict(jsUp,dbcSigName,sig)       
+        if  sigNames[sig] == 0: 
+            addConfigDict(jsDown,sig,dbcSigName)
     printGreen("分析完成")
 
 def ToJaveCode(javaPath,configPath,down_config=None,up_config=None):
     pass
 
+def configConverdbc(sig,dbc):
+    assert isinstance(dbc,Analyze)
+    assert isinstance(sig,str)
+    sigs = re.findall(m_s,sig)
+    dbcSig = None
+    if len(sigs) >= 3 :
+        sig16= str(int(sigs[1],16))+"_".join(sigs[2:])
+        prefix= f"{sigs[0]}_{sigs[1]}"
+        dbcSig = dbc.getSig(sig16)
+        if dbcSig == None:
+            printRed(f'{sig:<50}  没有对应的信号')
+        elif dbcSig.getMessage_Name() != prefix:
+            printYellow(f'{sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
+            return sig.replace(prefix,dbcSig.getMessage_Name()),dbcSig.Sender,True
+    else:
+        dbcSig = dbc.getSig(sig)
+        if dbcSig == None:
+            printRed(f'{sig:<50}  信号格式错误')
+    return sig, None if dbcSig == None else dbcSig.Sender,False
+
+def addConfigDict(js,key,value):
+    if value in js: del js[value] 
+    js[key] = value
+
 def ToConfigJson(javaPath,configPath,down_config=None,up_config=None):
     jsConfig = getJScontent(configPath)
     contents = readFileLines(javaPath)
+    dbcfile = getKeyPath("dbcfile", jsConfig)
+    dbc = Analyze(dbcfile)
+
     if down_config == None:
         down_config = getKeyPath("down", jsConfig)
     if up_config == None:
@@ -59,12 +87,17 @@ def ToConfigJson(javaPath,configPath,down_config=None,up_config=None):
             tContent = re.findall(r'".*"',tContents[0])[0]
             assert isinstance(tContent,str)
             tContent=tContent.replace('\"',"")
-            if "/Set" in tContent:
-                if tContent not in jsDown:
-                    jsDown[tContent] = ""
-            else:
-                if tContent not in jsUp:
-                    jsUp[tContent] = ""
+            dbcSigName,Sender,isChanged = configConverdbc(tContent,dbc)
+            down_topic = tContent+"/Set"
+            if Sender == None:
+                continue
+            if Sender not in local_machine_Sender: 
+                addConfigDict(jsUp,dbcSigName,tContent)       
+                # if down_topic in jsDown :del jsDown[down_topic]   
+            if Sender in local_machine_Sender: 
+                addConfigDict(jsDown,down_topic,dbcSigName)
+                # if dbcSigName in jsUp: del jsUp[dbcSigName]
+
     writeJs(down_config,jsDown)
     writeJs(up_config,jsUp)
 

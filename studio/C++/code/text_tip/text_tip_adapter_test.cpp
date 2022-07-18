@@ -25,9 +25,15 @@ TextTipAdapterTest::TextTipAdapterTest()
 {
     d.m_rule.SetCallWarnInfoFun(std::bind(&TextTipAdapterTest::sendWarnInfo, this, std::placeholders::_1));
     // d.addWarnInfo("C385/HudFaultSts",1); //请重新入P挡再切换挡位
-    d.addWarnInfo("icwarning/DoorOpenSts",32); 
+    // d.addWarnInfo("icwarning/DoorOpenSts",32); 
     // std::this_thread::sleep_for(std::chrono::milliseconds(2*1000));
-    d.addWarnInfo("icwarning/BcmVehLckAlrm",3); 
+    // d.addWarnInfo("icwarning/BcmVehLckAlrm",3); 
+    // d.addWarnInfo("C385/WithCarTimeDistance",1);
+    //  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    d.addWarnInfo("C385/WithCarTimeDistance",2);
+    d.addWarnInfo("icwarning/DoorOpenSts",1); 
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    d.addWarnInfo("icwarning/DoorOpenSts",0); 
     // d.addWarnInfo("Info/Discharge",1); 
     // d.addWarnInfo("Info/Discharge",1);
     // d.addWarnInfo("Info/Discharge",0);
