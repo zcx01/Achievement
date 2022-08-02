@@ -10,6 +10,7 @@ import mega.car.config.Extra;
         domainId = Signal.MGR_ID,
         name = Extra.SERVICE_NAME,
         permission = Extra.PERMISSION)
+@SuppressWarnings("LineLength")
 public final class Signal {
     /**
      * @hide
@@ -1783,4 +1784,842 @@ public final class Signal {
      */
     @PropertyDefine(topic = "ADC_307/ACC_RLaneDistanceFus", type = Float.class)
     public static final int ADC_307_ACC_RLANEDISTANCEFUS = MGR_ID << MGR_ID_BIT_OFFSET | 0x72;
+
+    /**
+     * DDSAS功能开关请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Inactive
+     *     0x1:Off
+     *     0x2:On
+     *     0x3:Reserved
+     */
+    @PropertyDefine(topic = "CDC_507/HU_DDSAS_Enable", type = Integer.class)
+    public static final int CDC_507_HU_DDSAS_ENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x73;
+
+    /**
+     * DDSAS功能开关状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Disable（默认）
+     *     0x1:Enable
+     */
+    @PropertyDefine(topic = "ADC_307/ADS_DDSAS_Enable", type = Integer.class)
+    public static final int ADC_307_ADS_DDSAS_ENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x74;
+
+    /**
+     * 陪伴助手设置开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:inactive
+     *     0x1:off
+     *     0x2:on
+     *     0x3:reserve
+     */
+    @PropertyDefine(topic = "CDC_507/HU_CompanionAssitModeEnable", type = Integer.class)
+    public static final int CDC_507_HU_COMPANIONASSITMODEENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x75;
+
+    /**
+     * 陪伴助手设置开关状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:off
+     *     0x1:on（默认）
+     */
+    @PropertyDefine(topic = "ADC_31A/ADC_CompanionAssitModeEnable", type = Integer.class)
+    public static final int ADC_31A_ADC_COMPANIONASSITMODEENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x76;
+
+    /**
+     * 智能泊车辅助开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Inactive
+     *     0x1:Off
+     *     0x2:On
+     *     0x3:Reserved
+     */
+    @PropertyDefine(topic = "CDC_507/HU_Parking_Asistant_Syste_Enable", type = Integer.class)
+    public static final int CDC_507_HU_PARKING_ASISTANT_SYSTE_ENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x77;
+
+    /**
+     * 智能泊车辅助开关状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Disable（默认）
+     *     0x1:Enable
+     */
+    @PropertyDefine(topic = "ADC_307/ADS_Parking_Asistant_Syste_Enable", type = Integer.class)
+    public static final int ADC_307_ADS_PARKING_ASISTANT_SYSTE_ENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x78;
+
+    /**
+     * 代客泊车辅助开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Inactive
+     *     0x1:Off
+     *     0x2:On
+     *     0x3:Reserved
+     */
+    @PropertyDefine(topic = "CDC_507/HU_Automated_Valet_Parking_Enable", type = Integer.class)
+    public static final int CDC_507_HU_AUTOMATED_VALET_PARKING_ENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x79;
+
+    /**
+     * 代客泊车辅助开关状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Disable（默认）
+     *     0x1:Enable
+     */
+    @PropertyDefine(topic = "ADC_307/ADS_Automated_Valet_Parking_Enable", type = Integer.class)
+    public static final int ADC_307_ADS_AUTOMATED_VALET_PARKING_ENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x7a;
+
+    /**
+     * 新手模式辅助开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Inactive
+     *     0x1:Off
+     *     0x2:On
+     *     0x3:Reserved
+     */
+    @PropertyDefine(topic = "CDC_507/HU_Novice_Enable", type = Integer.class)
+    public static final int CDC_507_HU_NOVICE_ENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x7b;
+
+    /**
+     * 新手模式辅助开关状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Disable（默认）
+     *     0x1:Enable
+     */
+    @PropertyDefine(topic = "ADC_307/ADS_Novice_Enable", type = Integer.class)
+    public static final int ADC_307_ADS_NOVICE_ENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x7c;
+
+    /**
+     * 开门预警开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:inactive
+     *     0x1:Off
+     *     0x2:On
+     *     0x3:Reserved
+     */
+    @PropertyDefine(topic = "CDC_507/HU_SEAEnable", type = Integer.class)
+    public static final int CDC_507_HU_SEAENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x7d;
+
+    /**
+     * 开门预警使能状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Off
+     *     0x1:On
+     */
+    @PropertyDefine(topic = "GW_2AD/LCDAL_SEAEnableStatus", type = Integer.class)
+    public static final int GW_2AD_LCDAL_SEAENABLESTATUS = MGR_ID << MGR_ID_BIT_OFFSET | 0x7e;
+
+    /**
+     * 换道驾驶风格
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Inactive
+     *     0x1:ComfortableStyle
+     *     0x2:SportStyle
+     *     0x3~0x7:reserve
+     */
+    @PropertyDefine(topic = "CDC_507/HU_LaneChangeStyle", type = Integer.class)
+    public static final int CDC_507_HU_LANECHANGESTYLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x7f;
+
+    /**
+     * 换道驾驶风格状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:ComfortableStyle（默认值）
+     *     0x1:SportStyle
+     *     0x2:reserve
+     *     0x3:reserve
+     */
+    @PropertyDefine(topic = "ADC_312/ADS_LaneChangeStyle", type = Integer.class)
+    public static final int ADC_312_ADS_LANECHANGESTYLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x80;
+
+    /**
+     * NDA语音提示开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0 =Inactive
+     *     0x1 =Off
+     *     0x2=On
+     *       0x3= Reserved
+     */
+    @PropertyDefine(topic = "CDC_507/HU_NDAAudioWarEnable", type = Integer.class)
+    public static final int CDC_507_HU_NDAAUDIOWARENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x81;
+
+    /**
+     * 智慧换道提示开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=Inactive
+     *     0x1=Off
+     *     0x2=On
+     *       0x3= Reserved
+     */
+    @PropertyDefine(topic = "CDC_394/HU_ADSLaneChangeVoiceEnable", type = Integer.class)
+    public static final int CDC_394_HU_ADSLANECHANGEVOICEENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x82;
+
+    /**
+     * 安全报警提示开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0 =Inactive
+     *     0x1 =Off
+     *     0x2=On
+     *       0x3= Reserved
+     */
+    @PropertyDefine(topic = "CDC_394/HU_ADSSafeVoiceEnable", type = Integer.class)
+    public static final int CDC_394_HU_ADSSAFEVOICEENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x83;
+
+    /**
+     * 路况播报提示开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0 =Inactive
+     *     0x1=Off
+     *     0x2=On
+     *       0x3= Reserved
+     */
+    @PropertyDefine(topic = "CDC_394/HU_ADSRoadVoiceEnable", type = Integer.class)
+    public static final int CDC_394_HU_ADSROADVOICEENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x84;
+
+    /**
+     * NDA语音提示开关状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=OFF
+     *     0x1=ON
+     */
+    @PropertyDefine(topic = "GW_312/ADS_NDAAudioWarEnableStatus", type = Integer.class)
+    public static final int GW_312_ADS_NDAAUDIOWARENABLESTATUS = MGR_ID << MGR_ID_BIT_OFFSET | 0x85;
+
+    /**
+     * 安全报警提示开关状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=OFF
+     *     0x1=ON
+     */
+    @PropertyDefine(topic = "GW_312/ADS_ADSSafeVoiceEnableSts", type = Integer.class)
+    public static final int GW_312_ADS_ADSSAFEVOICEENABLESTS = MGR_ID << MGR_ID_BIT_OFFSET | 0x86;
+
+    /**
+     * 智慧换道提示开关状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=OFF
+     *     0x1=ON
+     */
+    @PropertyDefine(topic = "GW_312/ADS_ADSLaneChangeVoiceEnableSts", type = Integer.class)
+    public static final int GW_312_ADS_ADSLANECHANGEVOICEENABLESTS = MGR_ID << MGR_ID_BIT_OFFSET | 0x87;
+
+    /**
+     * 路况播报提示开关状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=OFF
+     *     0x1=ON
+     */
+    @PropertyDefine(topic = "GW_312/ADS_ADSRoadVoiceEnableSts", type = Integer.class)
+    public static final int GW_312_ADS_ADSROADVOICEENABLESTS = MGR_ID << MGR_ID_BIT_OFFSET | 0x88;
+
+    /**
+     * 抽烟空调开启请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:No Request
+     *     0x1:Request
+     */
+    @PropertyDefine(topic = "CDC_356/CdcSmokeACStartReq", type = Integer.class)
+    public static final int CDC_356_CDCSMOKEACSTARTREQ = MGR_ID << MGR_ID_BIT_OFFSET | 0x89;
+
+    /**
+     * 抽烟外循环开启请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:No request
+     *     0x1:Request
+     */
+    @PropertyDefine(topic = "CDC_356/CdcSmokeOuterCircReq", type = Integer.class)
+    public static final int CDC_356_CDCSMOKEOUTERCIRCREQ = MGR_ID << MGR_ID_BIT_OFFSET | 0x8a;
+
+    /**
+     * 预约加热请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Not request
+     *     0x1:校时请求
+     *     0x2:预热请求
+     *     0x3:reserved
+     */
+    @PropertyDefine(topic = "TBOX_2F7/TboxHeatReq", type = Integer.class)
+    public static final int TBOX_2F7_TBOXHEATREQ = MGR_ID << MGR_ID_BIT_OFFSET | 0x8b;
+
+    /**
+     * 新手模式语音
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:IDLE
+     *     0x1:Educating Inroduction
+     *     0x2:Cancel Feedback
+     *     0x3:Recommended for beginners
+     *     0x4:activate any time
+     *     0x5:perfect completion
+     *     0x6:first Educating
+     *     0x7:intelligent parking
+     *     0x8:control speed
+     *     0x9:slow down
+     *     0xA:find slot
+     *     0xB:Parking Modeselection
+     *     0xC:slot too small
+     *     0xD:APP parking
+     *     0xE:Relese brake&steer
+     *     0xF:relax
+     *     0x10:close door
+     *     0x11:chose auto mode
+     *     0x12:Relese ACCpedal
+     *     0x13:keep shift
+     *     0x14:relese EPB
+     *     0x15:object cut in
+     *     0x16:parking Success
+     *     0x17:system cancel
+     *     0x18：time cancel
+     *     0x19：steer cancel
+     *     0x1A:gear cancel
+     *     0x1B:pedal cancel
+     *     0x1C:direction chose
+     *     0x1D：direction&left light
+     *     0x1E:direction&right light
+     *     0x1F:welcome
+     *     0x20:guide you
+     *     0x21:open set
+     *     0x22:AVM
+     *     0x23:chose slot
+     *     0x24:chose mode
+     *     0x25:close guide
+     *     0x26:click select direction
+     *     0x27-7F:Reserved
+     */
+    @PropertyDefine(topic = "ADC_31E/APA_Voice_Notice", type = Integer.class)
+    public static final int ADC_31E_APA_VOICE_NOTICE = MGR_ID << MGR_ID_BIT_OFFSET | 0x8c;
+
+    /**
+     * ACC目标巡航车速
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     */
+    @PropertyDefine(topic = "GW_307/ACC_SetSpeed", type = Integer.class)
+    public static final int GW_307_ACC_SETSPEED = MGR_ID << MGR_ID_BIT_OFFSET | 0x8d;
+
+    /**
+     * 匝道距离
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_DisToRamp", type = Integer.class)
+    public static final int GW_36F_ADS_DISTORAMP = MGR_ID << MGR_ID_BIT_OFFSET | 0x8e;
+
+    /**
+     * 轨迹显示C1
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_PathShow_C1", type = Float.class)
+    public static final int GW_36F_ADS_PATHSHOW_C1 = MGR_ID << MGR_ID_BIT_OFFSET | 0x8f;
+
+    /**
+     * 轨迹显示C2
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_PathShow_C2", type = Float.class)
+    public static final int GW_36F_ADS_PATHSHOW_C2 = MGR_ID << MGR_ID_BIT_OFFSET | 0x90;
+
+    /**
+     * 轨迹显示C3
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_PathShow_C3", type = Float.class)
+    public static final int GW_36F_ADS_PATHSHOW_C3 = MGR_ID << MGR_ID_BIT_OFFSET | 0x91;
+
+    /**
+     * 轨迹显示纵向距离
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_PathShowLngRange", type = Integer.class)
+    public static final int GW_36F_ADS_PATHSHOWLNGRANGE = MGR_ID << MGR_ID_BIT_OFFSET | 0x92;
+
+    /**
+     * 匝道信息
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:notThroughRamp
+     *     0x1:throughRamp
+     *     0x2:invalid
+     *     0x3:reserved
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_PathThroughRamp", type = Integer.class)
+    public static final int GW_36F_ADS_PATHTHROUGHRAMP = MGR_ID << MGR_ID_BIT_OFFSET | 0x93;
+
+    /**
+     * 匝道方向
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:invalid
+     *     0x1:onRightSide
+     *     0x2:onLeftSide
+     *     0x3:reserved
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_RampSide", type = Integer.class)
+    public static final int GW_36F_ADS_RAMPSIDE = MGR_ID << MGR_ID_BIT_OFFSET | 0x94;
+
+    /**
+     * 匝道状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:no display
+     *     0x1:nearRamp
+     *     0x2:rampIn
+     *     0x3:inRamp
+     *     0x4:RampOut
+     *     0x5-0x7:reserved
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_RampStatus", type = Integer.class)
+    public static final int GW_36F_ADS_RAMPSTATUS = MGR_ID << MGR_ID_BIT_OFFSET | 0x95;
+
+    /**
+     * 距目标位置实时横向距离
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     */
+    @PropertyDefine(topic = "GW_312/ADS_ToTargetLatDistance", type = Float.class)
+    public static final int GW_312_ADS_TOTARGETLATDISTANCE = MGR_ID << MGR_ID_BIT_OFFSET | 0x96;
+
+    /**
+     * NDA设定车速模式状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=invalid
+     *     0x1=Manual/Normal
+     *     0x2=Auto/Sport
+     *     0x3=Auto/Eco
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_NDASetSpdModeStatus", type = Integer.class)
+    public static final int GW_36F_ADS_NDASETSPDMODESTATUS = MGR_ID << MGR_ID_BIT_OFFSET | 0x97;
+
+    /**
+     * NDA导航开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0 =Inactive
+     *     0x1 =Off
+     *     0x2=On
+     *       0x3= Reserved
+     */
+    @PropertyDefine(topic = "CDC_507/HU_NDANavEnable", type = Integer.class)
+    public static final int CDC_507_HU_NDANAVENABLE = MGR_ID << MGR_ID_BIT_OFFSET | 0x98;
+
+    /**
+     * NDA设定车速模式
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=Inactive
+     *     0x1=Manual/Normal
+     *     0x2=Auto/Sport
+     *     0x3=Auto/Eco
+     */
+    @PropertyDefine(topic = "CDC_507/HU_NDASetSpdMode", type = Integer.class)
+    public static final int CDC_507_HU_NDASETSPDMODE = MGR_ID << MGR_ID_BIT_OFFSET | 0x99;
+
+    /**
+     * NDA状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=OFF
+     *     0x1=Passive
+     *     0x2=StandBy
+     *     0x3=ALC Active
+     *     0x4=FIDA Active
+     *     0x5=Takeover
+     *     0x6=Prohibition
+     *     0x7~0xF=Reserved
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_NDAStatus", type = Integer.class)
+    public static final int GW_36F_ADS_NDASTATUS = MGR_ID << MGR_ID_BIT_OFFSET | 0x9a;
+
+    /**
+     * NDA提示信息
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=no display
+     *     0x1=Out of Road ODD
+     *     0x2=NDA Limit
+     *     0x3=Weather Limit
+     *     0x4=Turn Limit
+     *     0x5=System Limit
+     *     0x6=Toll Exit
+     *     0x7=TrafficAccident Exit
+     *     0x8=Construction Exit
+     *     0x9=Imminent
+     *     xit
+     *     0xA=Handsoff And Eyesoff
+     *     0xB=Eyesoff level2
+     *     0xC=Eyesoff level1
+     *     0xD=About Exitt
+     *     0xE=Sharp Turn
+     *     0xF=Leave current road
+     *     0x10=Join to main road
+     *     0x11=Speed too high
+     *     0x12~0x1F=reserved
+     */
+    @PropertyDefine(topic = "GW_36F/ADS_NDATextInfo", type = Integer.class)
+    public static final int GW_36F_ADS_NDATEXTINFO = MGR_ID << MGR_ID_BIT_OFFSET | 0x9b;
+
+    /**
+     * 智能驾驶信息
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x1=ACC:ACC is OFF
+     *     0x2=ACC:ACC system error
+     *     0x3=ACC:ACC Error by EMS/VCU/TCU
+     *     0x4=ACC:ACC Error by EPBI
+     *     0x5=ACC:SAS Error
+     *     0x6=ACC:Button Error
+     *     0x7=ACC:IP Fail
+     *     0x8=ACC:ACC temporary unavailable by others
+     *     0x9=ACC:ACC error by Front Camera
+     *     0xA=ACC:ACC error by Front Radar
+     *     0xB=ACC:Engine No Running
+     *     0xC=ACC:door is open
+     *     0xD=ACC:bonnet is Open
+     *     0xE=ACC:Trunk is Open
+     *     0xF=ACC:Tire Status is abnormal
+     *     0x10=ACC:Bad weather
+     *     0x11=ACC:Seatbelt unbuckled
+     *     0x12=ACC:ESP off
+     *     0x13=ACC:No forward gear
+     *     0x14=ACC:APA  is on
+     *     0x15=ACC:EPB activate
+     *     0x16=ACC:ACC cannot active by snow mode
+     *     0x17=ACC:SteeringAngle is over
+     *     0x18=ACC:brake pedal is applied
+     *     0x19=ACC:Speed over 150kph
+     *     0x1A=ACC:caution about driving safty
+     *     0x1B=ACC:Road wet and slippery
+     *     0x1C=ACC:Road bumpy
+     *     0x1D=ACC:Have Pedestrain or Riders
+     *     0x1E=ACC:Out of slope or curvature range
+     *     0x1F=ACC:ACC active control is cancelled
+     *     0x20=ACC:ACC cannot active by Race mode
+     *     0x21=ACC:ACC unintended exit warning
+     *     0x22=ACC:emergency brake suddenly
+     *     0x23=ACC:speed reduce by condition
+     *     0x24=ACC:speed reduce by ramp
+     *     0x25=ACC:speed reduce by SpdLimited
+     *     0x26=ACC:speed reduce by Tollstation
+     *     0x27=ACC:speed reduce by tunnel
+     *     0x28=ACC:unable to activate ACC
+     *     0x29=ACC:车辆起步提醒（前车驶离）
+     *     0x2A=ACC:激活成功提醒
+     *     0x2B=ACC:前方红绿灯-智能限速
+     *     0x2C=ACC:前方人行横道-请注意减速慢行
+     *     0x2D=ACC:前方人行横道-智能限速
+     *     0x2E=ACC:前方收费站-请注意减速慢行
+     *     0x2F=ACC:前方收费站-智能限速
+     *     0x30=ACC:前方弯道-智能限速
+     *     0x31=ACC:前雷达不可用-ACC退出
+     *     0x32=ACC:前摄像头不可用-ACC退出
+     *     0x33=ACC:推荐调节巡航车速-避让并行车辆
+     *     0x34=ACC:巡航驻车提醒
+     *     0x35=ACC:雨天道路湿滑-自动增加跟车时距
+     *     0x36=ACC:智能加速避让并行车辆
+     *     0x37=ACC:智能减速避让并行车辆
+     *     0x38=ACC:主动提速提醒
+     *     0x39=ACC:主动退出提醒（稍强）
+     *     0x3A=ACC:自适应巡航已恢复
+     *     0x3B=ACC:操作反馈-设定车速达到上限
+     *     0x3C=ACC:操作反馈-设定车速达到下限
+     *     0x3D=ACC:操作反馈-设定车速达到限速值
+     *     0x3E=ACC:操作反馈-超速接近纵向控制极限，即将退出
+     *     0x3F-0x64预留
+     *     0x65=IACC:IACC not available by EPS
+     *     0x66=IACC:longitudinal control not available
+     *     0x67=IACC:ADR/DVR Status not Match
+     *     0x68=IACC:other system error
+     *     0x69=IACC:prohibition request for safestop
+     *     0x6A=IACC:Please turn on IACC in incall
+     *     0x6B=IACC:Driver Drowsy or Distracted
+     *     0x6C=IACC:SteeringAngle is over
+     *     0x6D=IACC:exceed speed limit
+     *     0x6E=IACC:turn light switch on
+     *     0x6F=IACC:turn light switch on
+     *     0x70=IACC:driver overrides steering
+     *     0x71=IACC:caution about driving safty
+     *     0x72=IACC:unable to active for not in lane/crossing lane
+     *     0x73=IACC:lane condition not available
+     *     0x74=IACC:unable to active in curve
+     *     0x75=IACC:unable to active in Bad weather
+     *     0x76=IACC:system error
+     *     0x77=IACC:LKA Takeover Req
+     *     0x78=IACC:ELK active
+     *     0x79=IACC:HeadingAngle is over
+     *     0x7A=IACC:LAT invalid
+     *     0x7B=IACC:LAT invalid（in safety stargy)
+     *     0x7C=IACC:Hands on plz
+     *     0x7D=IACC:IACC active
+     *     0x7E=IACC:IACC Cancel
+     *     0x7F=IACC:IACC deactivate
+     *     0x80=IACC:iacc override
+     *     0x81=IACC:IACC unintended exit
+     *     0x82=IACC:Lights on please
+     *     0x83=IACC:Longitude Exit
+     *     0x84=IACC:Prohibition request for rdf
+     *     0x85=IACC:takeover request with safety stop completed
+     *     0x86=IACC:takeover request with safety stoping
+     *     0x87=IACC:unable to activate IACC
+     *     0x88=IACC:未认证用户使用智能驾驶功能提醒
+     *     0x89=IACC:超速接近横向控制的极限即将退出
+     *     0x8A=IACC:车辆临时靠左行驶，避让并行车辆
+     *     0x8B=IACC:车辆临时靠右行驶，避让并行车辆
+     *     0x8C=IACC:车辆临时靠左行驶，避让护栏
+     *     0x8D=IACC:车辆临时靠右行驶，避让护栏
+     *     0x8E-0xC8预留
+     *     0xC9=UDLC:UDLC exit，触发式换道已退出，（UDLC不再等待换道并且不再主导控制）
+     *     0xCA=UDLC:UDLC return，触发式换道回退原车道（驾驶员取消换道而回退）
+     *     0xCB=UDLC:UDLC finished，请拨回转向灯（换道完成或回退对中完成时）
+     *     0xCC=UDLC:前方道路汇流，推荐换道行驶
+     *     0xCD=UDLC:change lane  to both sides for the  traffic jam,两边车道均可支持变道
+     *     0xCE=UDLC:Lane change request by ramp
+     *     0xCF=UDLC:change lane  to left side for the  traffic jam,左边车道可支持变道
+     *     0xD0=UDLC:change lane  to right side for the  traffic jam,右边车道可支持变道
+     *     0xD1=UDLC:out of ODD暂时不满足换道条件，不尝试换道
+     *     0xD2=UDLC:Please turn on the UDLC in HU请在主机中打开主动换道设置开关
+     *     0xD3=UDLC:speed out of range车速超出范围，自动换道条件不满足
+     *     0xD4=UDLC:UDLC System Error自动换道系统故障
+     *     0xD5=UDLC:雨量过大，自动换道条件不满足
+     *     0xD6=UDLC:wait over time,换道尝试超时中止
+     *     0xD7=UDLC:推荐向左换道-道路更畅通
+     *     0xD8=UDLC:推荐向左换道-超越前车
+     *     0xD9=UDLC:推荐向左换道-避让前方障碍物
+     *     0xDA=UDLC:推荐向左换道-避让前方异常车辆
+     *     0xDB=UDLC:推荐向左换道-道路前方有道路施工
+     *     0xDC=UDLC:推荐向左换道-提前避让右侧汇入车辆
+     *     0xDD=UDLC:推荐向左换道-避让右侧汇入车辆
+     *     0xDE=UDLC:推荐向左换道-前方道路即将向左合并
+     *     0xDF=UDLC:推荐向左换道-避让右侧大型车辆
+     *     0xE0=UDLC:推荐向左换道-避让后方大型车辆
+     *     0xE1=UDLC:推荐向右换道-道路更畅通
+     *     0xE2=UDLC:推荐向右换道-超越前车
+     *     0xE3=UDLC:推荐向右换道-道路前方有障碍物
+     *     0xE4=UDLC:推荐向右换道-道路前方有异常车辆
+     *     0xE5=UDLC:推荐向右换道-道路前方有道路施工
+     *     0xE6=UDLC:推荐向右换道-提前避让左侧汇入车辆
+     *     0xE7=UDLC:推荐向右换道-避让左侧汇入车辆
+     *     0xE8=UDLC:推荐向右换道-前方道路即将向右合并
+     *     0xE9=UDLC:推荐向右换道-避让左侧大型车辆
+     *     0xEA=UDLC:推荐向右换道-避让后方大型车辆
+     *     0xEB=UDLC:避让侧后方来车，返回原车道
+     *     0xEC=UDLC:避让危险车辆，返回原车道
+     *     0xED=UDLC:避让行人，返回原车道
+     *     0xEE=UDLC:避让障碍物，返回原车道
+     *     0xEF=UDLC:非驾驶员操作通用原因，返回原车道
+     *     0xF0-0x12C预留
+     *     0x12D=ALC:LaneChangeToLeftForPathThroughRamp前方接近匝道，即将向左换道
+     *     0x12E=ALC:LaneChangeToRightForPathThroughRamp前方接近匝道，即将向右换道
+     *     0x12F=ALC:LaneChangeForQuickRoad,即将汇入主路
+     *     0x130=ALC:LaneChangeToLeft即将向左换道
+     *     0x131=ALC:LaneChangeToRight即将向右换道
+     *     0x132=ALC:LaneChangeToLeftForSurpassTheCar,即将向左超车
+     *     0x133=ALC:LaneChangeToRightForSurpassTheCar,即将向右超车
+     *     0x134=ALC:向左自动换道-道路更畅通
+     *     0x135=ALC:向左自动换道-超越前车
+     *     0x136=ALC:向左自动换道-避让前方障碍物
+     *     0x137=ALC:向左自动换道-避让前方异常车辆
+     *     0x138=ALC:向左自动换道-道路前方有道路施工
+     *     0x139=ALC:向左自动换道-提前避让右侧汇入车辆
+     *     0x13A=ALC:向左自动换道-避让右侧汇入车辆
+     *     0x13B=ALC:向左自动换道-前方道路即将向左合并
+     *     0x13C=ALC:向左自动换道-避让右侧大型车辆
+     *     0x13D=ALC:向左自动换道-避让后方大型车辆
+     *     0x13E=ALC:向右自动换道-道路更畅通
+     *     0x13F=ALC:向右自动换道-超越前车
+     *     0x140=ALC:向右自动换道-道路前方有障碍物
+     *     0x141=ALC:向右自动换道-道路前方有异常车辆
+     *     0x142=ALC:向右自动换道-道路前方有道路施工
+     *     0x143=ALC:向右自动换道-提前避让左侧汇入车辆
+     *     0x144=ALC:向右自动换道-避让左侧汇入车辆
+     *     0x145=ALC:向右自动换道-前方道路即将向右合并
+     *     0x146=ALC:向右自动换道-避让左侧大型车辆
+     *     0x147=ALC:向右自动换道-避让后方大型车辆
+     *     0x148=ALC:自动换道已取消（主动）
+     *     0x149=ALC:避让侧后方来车，取消自动换道
+     *     0x14A=ALC:避让危险车辆，取消自动换道
+     *     0x14B=ALC:避让行人，取消自动换道
+     *     0x14C=ALC:避让障碍物，取消自动换道
+     *     0x14D=ALC:非驾驶员操作通用原因，取消自动换道
+     *     0x14E-0x1FF预留
+     *     "
+     */
+    @PropertyDefine(topic = "GW_244/ACC_ADCNotice", type = Integer.class)
+    public static final int GW_244_ACC_ADCNOTICE = MGR_ID << MGR_ID_BIT_OFFSET | 0x9c;
+
+    /**
+     * 发动机运行状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Stop
+     *     0x1:Crank
+     *     0x2:Running
+     *     0x3:Reserved
+     */
+    @PropertyDefine(topic = "GW_1E5/EmsEngSts", type = Integer.class)
+    public static final int GW_1E5_EMSENGSTS = MGR_ID << MGR_ID_BIT_OFFSET | 0x9d;
+
+    /**
+     * 车外温度信号
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     */
+    @PropertyDefine(topic = "GW_1E5/TmsAcEnvtlT", type = Float.class)
+    public static final int GW_1E5_TMSACENVTLT = MGR_ID << MGR_ID_BIT_OFFSET | 0x9e;
 }

@@ -56,6 +56,8 @@ def position(configPath):
     otherTelltale(jsTelltale, modifytopic, imageWith, space)
     writeJs(configjsonPath,jsTelltale)
             
+def getPosition():
+    pass
 
 if __name__ == "__main__":
     if len(sys.argv) >=2:

@@ -1,6 +1,4 @@
 #!/usr/bin/python
-import os
-import string
 import argparse
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *

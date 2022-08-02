@@ -32,7 +32,7 @@ class CompareResult(Enum):
 
 class SigSendType(Enum):
     Normal = 0      #正常
-    Event  = 1      #时间
+    Event  = 1      #事件
     Three  = 2      #三帧反转
 
 class SigInfo(object):
@@ -635,11 +635,32 @@ class AnalyzeFile(object):
               
                 #判断信号是否合理
                 sigUsrIndexs=sig.useBit
+                cover_count = 0
+                user_sigName = []
                 for user in userIndex:
+                    is_user = False
                     for sigUsrIndex in sigUsrIndexs:
                         if sigUsrIndex in userIndex[user]:
-                            printRed(f"{sig.name} 信号有覆盖:开始字节 {sig.startBit} ,结束的字节 {sig.endBit} ,占用的字节 {sigUsrIndexs} ,与 {user} 覆盖字节 {userIndex[user]}")
-                            return WriteDBCResult.SignalCoverage
+                            cover_count+=1
+                            is_user = True
+                    if cover_count == 0:
+                        continue
+                    if cover_count == len(userIndex[user]) and cover_count == len(sigUsrIndexs):
+                        printYellow(f"{sig.name} 与 {user} 字节相同")
+                        return WriteDBCResult.SignalCoverage
+                    elif is_user:
+                        user_sigName.append(user)
+                        
+                if cover_count == len(sigUsrIndexs):
+                    printYellow(f"{sig.name} 与 {user_sigName} 字节相同")
+                    return WriteDBCResult.SignalCoverage
+                elif cover_count != 0:
+                    if len(user_sigName) ==1:
+                        user = user_sigName[0]
+                        printRed(f"{sig.name} 信号有覆盖:开始字节 {sig.startBit} ,结束的字节 {sig.endBit} ,占用的字节 {sigUsrIndexs} ,与 {user} 覆盖字节 {userIndex[user]}")
+                    else:
+                        printYellow(f"{sig.name} 与 {user_sigName} 字节冲突")
+                    return WriteDBCResult.SignalCoverage
 
                 linelist.insert(insertRowIndex,sig.getSG())
                 insertRow = AnalyzeFile.appendKey(linelist,sig.getStartValue())

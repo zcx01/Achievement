@@ -7,28 +7,27 @@
 # exit 0
 # EOF
 
-# parser=~/Works/Repos/changan_c835_release
-parser=~/Works/Repos/changan_c835
-toolDir=~/Works/Repos/canmatrix_tool/tool_parser
+parser=$(cd `dirname ./`;pwd)
+toolDir=$parser/canmatrix_tool/tool_parser
 
 cd  $toolDir 
-echo '123456' | sudo -S make
+make
 
-echo "删除原来的文件"
-for f in `ls $parser/src/ic_service/parser/generated/`;
-do
-    if [ $f != "parser_net" ] ;then
-        rm -rf $f
-        echo $f
-    fi
-done
+# echo "删除原来的文件"
+# for f in `ls $parser/src/ic_service/parser/generated/`;
+# do
+#     if [ $f != "parser_net" ] ;then
+#         rm -rf $f
+#         echo $f
+#     fi
+# done
 
-rm -rf common_codes
+# rm -rf common_codes
 
-echo "开始拷贝"
-cp -r $toolDir/output/* $parser/src/ic_service/parser/generated
+# echo "开始拷贝"
+# cp -r $toolDir/output/* $parser/src/ic_service/parser/generated/
 
 cd $parser/src/ic_service/parser
 git status
 
-echo "拷贝完成"
+# echo "拷贝完成"
