@@ -244,6 +244,12 @@ def RemoveSigs(configPath, sigNames):
     dbc = Analyze(dbcfile)
     dbc.removeSig(sigNames)
 
+def RemoveMsgs(configPath, msgs):
+    jsConfig = getJScontent(configPath)
+    dbcfile = getKeyPath("dbcfile", jsConfig)
+    dbc = Analyze(dbcfile)
+    dbc.removeMessage(msgs)
+
 def addHeadEnd(text, name):
     text.insert(0, f'{name}')
     text.append("")
@@ -597,7 +603,7 @@ if __name__ == "__main__":
 
     parse.add_argument('-c', '--config', help='配置文件路径',
                        default=pyFileDir+"config.json")
-    parse.add_argument('-a', '--append', nargs='?', help='新增整个can矩阵表格、+w是dbc目录')
+    parse.add_argument('-a', '--append', nargs='?', help='新增整个can矩阵表格（如果没有指定路径，使用就是配置文件中）、和+w一起使用则是dbc目录')
     parse.add_argument('-s', '--sigNames', help='新增信号名，是一个列表',
                        default=[], nargs='+', type=str)
     parse.add_argument('-f', '--fristMatrix',
@@ -605,11 +611,12 @@ if __name__ == "__main__":
     parse.add_argument('-t', '--twoMatrix', help='比较dbc矩阵,被比较的文件,也是旧的一方的文件')
     parse.add_argument('-r', '--resultPath', help='比较dbc矩阵结果路径', default='')
     parse.add_argument('-m', '--modifyMessageInfo',
-                       help='替换message信息,有m就会替换', default=1, type=int, nargs='*')
+                       help='替换message信息,有m就会替换，使用CAN矩阵的message替换', default=1, type=int, nargs='*')
     parse.add_argument('-d', '--dbcPath', help='比较新旧两个dbc,输入的是被比较的')
-    parse.add_argument('-rm', '--rmsigs', help='删除信号,是一个集合',nargs='+')
+    parse.add_argument('-rs', '--rmsigs', help='删除信号,是一个集合,可以用10进制+信号名称,也可以是信号名',nargs='+')
+    parse.add_argument('-rm', '--rmmsgs', help='删除message,是一个集合,是一个16进制',nargs='+')
     parse.add_argument('-u', '--isfilterNoUser',
-                       help='是否过滤掉没有使用过的信号', nargs='*')
+                       help='是否过滤掉没有使用过的信号,用于比较can矩阵', nargs='*')
     parse.add_argument('-w', '--WhitelistPath', help='白名单路径')                    
     arg = parse.parse_args()
 
@@ -622,8 +629,10 @@ if __name__ == "__main__":
         sigNameChanged(arg.config, arg.dbcPath, arg.resultPath, arg.twoMatrix)
     elif '-d' in sys.argv and '-s' in sys.argv:
         conversionByOtherdbc(arg.config, arg.sigNames, arg.dbcPath)
-    elif '-rm' in sys.argv:
+    elif '-rs' in sys.argv:
         RemoveSigs(arg.config, arg.rmsigs)
+    elif '-rm' in sys.argv:
+        RemoveMsgs(arg.config, arg.rmmsgs)
     elif "-a" in sys.argv and '-s' in sys.argv:
         for sigName in arg.sigNames:
             conversion(arg.config,sigName,canmatrix)

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from email import message
 import os
 from re import S
 import sys
@@ -29,6 +30,14 @@ class Analyze(object):
         for dbc in self.AnalyzeDictlist:
             assert isinstance(dbc,AnalyzeFile)
             if dbc.sigExist(sigName):
+                return dbc
+        dbc = self.AnalyzeDictlist[0]
+        return dbc
+
+    def getAnalyzeSingleByMessageId(self,mesId):
+        for dbc in self.AnalyzeDictlist:
+            assert isinstance(dbc,AnalyzeFile)
+            if dbc.getMessage(mesId) != None:
                 return dbc
         dbc = self.AnalyzeDictlist[0]
         return dbc
@@ -79,12 +88,31 @@ class Analyze(object):
 
     def GetChannelMsg(self,*msgs):
         channelSig={}
+        allMags=[]
         for msg in msgs:
-            assert isinstance(msg,MessageInfo)
-            dbc = self.getAnalyzeSingleByMsgInfo(msg)
+            if type(msg) == tuple:
+                for childMsg in msg:
+                    if type(childMsg) == list:
+                        allMags.extend(list(childMsg))
+                    else:
+                        allMags.append(childMsg)
+            else:
+                allMags.append(msg)
+
+        for msg in allMags:
+            if type(msg) == MessageInfo:
+                assert isinstance(msg,MessageInfo)
+                dbc = self.getAnalyzeSingleByMsgInfo(msg)
+                msgInfo = msg
+            else:
+                dbc = self.getAnalyzeSingleByMessageId(msg)
+                msgInfo = dbc.getMessage(msg)
+                if msgInfo == None:
+                    continue
+                assert isinstance(msgInfo,MessageInfo)
             if dbc not in channelSig:
                 channelSig[dbc] = []
-            channelSig[dbc].append(msg)
+            channelSig[dbc].append(msgInfo)
         return channelSig
 
     def getSig(self,sigName):
@@ -155,6 +183,13 @@ class Analyze(object):
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
                 dbc.removeSig(channelSig[dbc])
+
+    def removeMessage(self,*mags):
+        channelMsg= self.GetChannelMsg(mags)
+        for dbc in channelMsg.keys():
+            if dbc != None:
+                assert isinstance(dbc,AnalyzeFile)
+                dbc.removeMessage(channelMsg[dbc])
 
     def repalceMessage(self,*msgs):
         channelSig= self.GetChannelMsg(msgs)

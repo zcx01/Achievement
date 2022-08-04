@@ -246,7 +246,7 @@ class SigInfo(object):
 class MessageInfo(object):
     def __init__(self) -> None:
         super().__init__()
-        self.messageId = 0
+        self.messageId = 0 #16进制
         self.sender=''
         self.cycle = 0
         self.threeCycle = 0 #三帧反转的周期
@@ -389,17 +389,6 @@ class AnalyzeFile(object):
                     except:
                         # print(f'初始值 {text} 信号不在定义中')
                         pass
-                elif "GenMsgCycleTime" in text:
-                    try:
-                        texts = re.findall(e_i,text,re.A)
-                        messageId = getNoOx16(texts[3])
-                        me = self.dbcMessage[messageId]
-                        assert isinstance(me,MessageInfo)
-                        me.cycle = int(texts[4])
-                        me.cycleRow = rowIndex
-                    except:
-                        # print(f'周期 {text} 不在定义中')
-                        pass
                 elif "GenMsgCycleTimeFast" in text:
                     try:
                         texts = re.findall(e_i,text,re.A)
@@ -408,6 +397,17 @@ class AnalyzeFile(object):
                         assert isinstance(me,MessageInfo)
                         me.threeCycle = int(texts[4])
                         me.threeCycleRow = rowIndex
+                    except:
+                        # print(f'周期 {text} 不在定义中')
+                        pass
+                elif "GenMsgCycleTime" in text:
+                    try:
+                        texts = re.findall(e_i,text,re.A)
+                        messageId = getNoOx16(texts[3])
+                        me = self.dbcMessage[messageId]
+                        assert isinstance(me,MessageInfo)
+                        me.cycle = int(texts[4])
+                        me.cycleRow = rowIndex
                     except:
                         # print(f'周期 {text} 不在定义中')
                         pass
@@ -558,6 +558,21 @@ class AnalyzeFile(object):
             if sig.name.upper() == sigName.upper() or sig.getMessage_Sig().upper() == sigName.upper():
                 return sig
         return None
+
+    def getMessage(self,msgId): #msgId 16进制
+        try:
+            return self.dbcMessage[msgId]
+        except:
+            return None
+
+    def getSigsByMessageId(self,msgId):
+        sigs=[]
+        for messageSig in self.dbcSigs:
+            sig = self.dbcSigs[messageSig]
+            assert isinstance(sig,SigInfo)
+            if sig.messageId == msgId:
+                sigs.append(sig)
+        return sigs
 
     def sigExist(self,sigName):
         return self.getSig(sigName) != None
@@ -730,7 +745,7 @@ class AnalyzeFile(object):
                     linelist[ori_sig.enumRow] = enumStr
         wirteFileDicts(self.dbcPath, linelist, False) 
 
-    def removeSig(self,sigs):
+    def removeSig(self,sigs,isWirte=True):
         removeIndex = []
         for sig in sigs:
             assert isinstance(sig,SigInfo)
@@ -740,8 +755,31 @@ class AnalyzeFile(object):
             self.RowContent(removeIndex,sig.enumRow)
         linelist = readFileLines(self.dbcPath)
         linelist=removeListIndexs(linelist,removeIndex)
+        if isWirte:
+            wirteFileDicts(self.dbcPath, linelist, False)
+        printGreen(f"移除{sig.name}信号完成")
+        return removeIndex
+
+    def removeMessage(self,masgs):
+        removeIndex = []
+        for msg in masgs:
+            assert isinstance(msg,MessageInfo)
+            ori_msg = self.dbcMessage.get(msg.messageId,None)
+            assert isinstance(ori_msg,MessageInfo)
+            if ori_msg == None:
+                print(f'{msg.messageId} 不存在')
+                continue
+            sigs = self.getSigsByMessageId(ori_msg.messageId)
+            removeIndex.extend(self.removeSig(sigs,False))
+            self.RowContent(removeIndex,ori_msg.Row)
+            self.RowContent(removeIndex,ori_msg.frameRow)
+            self.RowContent(removeIndex,ori_msg.sendTypeRow)
+            self.RowContent(removeIndex,ori_msg.cycleRow)
+            self.RowContent(removeIndex,ori_msg.threeCycleRow)
+        linelist = readFileLines(self.dbcPath)
+        linelist=removeListIndexs(linelist,removeIndex)
         wirteFileDicts(self.dbcPath, linelist, False)
-        printGreen("移除信号完成")
+        printGreen("移除message完成")
 
     def repalceMessage(self,msgs):
         linelist = readFileLines(self.dbcPath)
