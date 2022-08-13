@@ -1,4 +1,5 @@
 #!/bin/python
+from readline import parse_and_bind
 import sys
 import time
 from execCmd import *
@@ -12,12 +13,13 @@ if __name__ == "__main__":
         description='qnx ')
 
     parser.add_argument('-r','--reset',help='reset',nargs='*')
-    parser.add_argument('-m','--subtopic',help='sub topic',type=str,default=[])
-    parser.add_argument('-p','--pulishtopic',help='send topic',type=str,default=[])
+    parser.add_argument('-m','--subtopic',help='订阅 topic',type=str,default=[])
+    parser.add_argument('-p','--pulishtopic',help='发送 topic',type=str,default=[])
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     parser.add_argument('-k','--slay', help='slay process',type=str,nargs='*')
-    parser.add_argument('-l','--log', help='taif log',type=str)
+    parser.add_argument('-l','--log', help='查看log',type=str)
     parser.add_argument('-i','--interact', help='interact',default=1,type=int)
+    parser.add_argument('-m','--logGrade', help='修改log等级,指的是进程名称',default=1,type=int)
     parser.add_argument('-ro','--remvelog', help='清除log', nargs='?',default=1,type=int)
     args = parser.parse_args()
 
@@ -66,7 +68,11 @@ if __name__ == "__main__":
         except:
             pass
         
-
+    if "m" in sys.argv:
+        try:
+            keyStr(f"echo {args.logGrade}:n:7 >> /var/pps/verbose")
+        except:
+            pass
     if '-r' in sys.argv:
         # keyStr("mcu_tool -g 2")
         # keyStr("reset -f",0.3,'PON_SOFT_RB_SPARE')

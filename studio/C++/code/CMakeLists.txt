@@ -7,9 +7,10 @@ AUX_SOURCE_DIRECTORY(./src DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./storage DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./text_tip DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./chime DIR_SRCS)
+AUX_SOURCE_DIRECTORY(./ic_base/src DIR_SRCS)
 
 #---------------include--------------
-set(DIR_INCLUDE ./include ./)
+set(DIR_INCLUDE ./include ./ ./ic_base/include)
 
 set(CMAKE_BUILD_TYPE "Debug")
 include_directories(${DIR_INCLUDE})

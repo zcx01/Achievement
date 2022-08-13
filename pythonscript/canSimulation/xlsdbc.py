@@ -205,19 +205,20 @@ def conversion(configPath, wirteSigName, canmatrix=""):
             can_parse_whitelistPath = getKeyPath(
                 "can_parse_whitelist", jsConfig)
             if os.path.isfile(can_parse_whitelistPath):
-                os.system(
-                    f"topic_Parser -w {can_parse_whitelistPath} {sig.getMessage_Name()} {sig.getMessage_Sig()}")
+                WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
     if not isFind:
         print(f"{wirteSigName} 在CAN矩阵中不存在")
 
-def WriteWhitelistPath(dbcPath,can_parse_whitelistPath):
+def WriteWhitelistPath():
+    jsConfig=getJScontent(pyFileDir+"config.json")
+    dbcPath = getKeyPath("dbcfile",jsConfig)
+    can_parse_whitelistPath = getKeyPath("can_parse_whitelist",jsConfig)
     dbc = Analyze(dbcPath)
     for sig_dbc in dbc.AnalyzeDictlist:
         assert isinstance(sig_dbc,AnalyzeFile)
         for messageSig in sig_dbc.dbcSigs:
             sig = sig_dbc.getSig(messageSig)
-            os.system(
-                f"topic_Parser -w {can_parse_whitelistPath} {sig.getMessage_Name()} {sig.getMessage_Sig()}")
+            WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
 
 def conversionByOtherdbc(configPath, wirteSigNames, dbcfilPath=""):
     assert isinstance(wirteSigNames, list)
@@ -546,8 +547,11 @@ def findsignalInfile(signal,filePath):
         content=f.readlines()
         for text in content:
             texts = text.split(" ")
-            if signal in texts[0]:
-                return True
+            try:
+                if signal == texts[0]:
+                    return True
+            except:
+                pass
         return False
     except:
         return False
@@ -617,7 +621,7 @@ if __name__ == "__main__":
     parse.add_argument('-rm', '--rmmsgs', help='删除message,是一个集合,是一个16进制',nargs='+')
     parse.add_argument('-u', '--isfilterNoUser',
                        help='是否过滤掉没有使用过的信号,用于比较can矩阵', nargs='*')
-    parse.add_argument('-w', '--WhitelistPath', help='白名单路径')                    
+    parse.add_argument('-w', '--WhitelistPath', help='和-a组合是白名单路径，单独是信号名称',nargs='?')                    
     arg = parse.parse_args()
 
     canmatrix = arg.append
@@ -637,12 +641,14 @@ if __name__ == "__main__":
         for sigName in arg.sigNames:
             conversion(arg.config,sigName,canmatrix)
     elif "-a" in sys.argv and '-w' in sys.argv:
-        WriteWhitelistPath(canmatrix,arg.WhitelistPath)
+        WriteWhitelistPath()
     elif "-a" in sys.argv:
         conversion(arg.config, "", canmatrix)
     elif '-s' in sys.argv:
         for sigName in arg.sigNames:
             conversion(arg.config, sigName)
+    elif '-w' in sys.argv:
+        addCan_parse_whitelist(arg.WhitelistPath)
     elif '-m' in sys.argv:
         modifyMessageInfo(arg.config)
     elif '-t' in sys.argv:

@@ -1,7 +1,23 @@
 #!/usr/bin/python
 import argparse
+from nis import cat
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *
+
+
+def findsignalInfile(signal,content):
+    print(signal)
+    try:
+        for text in content:
+            texts = re.findall(e_i,text,re.A)
+            try:
+                if signal == texts[0]:
+                    return True
+            except:
+                pass
+        return False
+    except:
+        return False
 
 def CheckSigName(configPath,down_config=None,up_config=None):
     jsConfig = getJScontent(configPath)
@@ -31,6 +47,15 @@ def CheckSigName(configPath,down_config=None,up_config=None):
         if is_chinese(sig):
             continue
         dbcSigName,Sender,isChanged = configConverdbc(sig,dbc)
+
+        can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
+        f=open(can_parse_whitelistPath,'r')
+        whitelistPath_content=f.readlines()
+        f.close()
+        messagesig = dbcSigName.replace("/","__")
+        if  not findsignalInfile(f'{messagesig}',whitelistPath_content):
+            printRed(f'{dbcSigName} 不在白名单中')
+        
         if Sender == None or not isChanged:
             continue
         if  sigNames[sig] == 1: 
@@ -54,7 +79,7 @@ def configConverdbc(sig,dbc):
         if dbcSig == None:
             printRed(f'{sig:<50}  没有对应的信号')
         elif dbcSig.getMessage_Name() != prefix:
-            printYellow(f'{sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
+            # printYellow(f'{sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
             return sig.replace(prefix,dbcSig.getMessage_Name()),dbcSig.Sender,True
     else:
         dbcSig = dbc.getSig(sig)
@@ -65,6 +90,22 @@ def configConverdbc(sig,dbc):
 def addConfigDict(js,key,value):
     if value in js: del js[value] 
     js[key] = value
+
+def reConfigDict(js,key,value): # 添加进容器，如果有重复就打印，不添加
+    if key in js :
+        try:
+            if js[key] == value:
+                printYellow(f'{key} 是存在的')
+                return
+            else:
+                # y = input("是否替换y/n")
+                # if y == 'y':
+                js[key] = value
+        except:
+            js[key] = value
+    else:
+        js[key] = value
+    printGreen(f'{key} 添加完成')
 
 def ToConfigJson(javaPath,configPath,down_config=None,up_config=None):
     jsConfig = getJScontent(configPath)
@@ -99,6 +140,35 @@ def ToConfigJson(javaPath,configPath,down_config=None,up_config=None):
     writeJs(down_config,jsDown)
     writeJs(up_config,jsUp)
 
+def addConfigSig(sigs,configPath=None,down_config=None,up_config=None):
+    if configPath == None: configPath = pyFileDir+"config.json"
+    jsConfig = getJScontent(configPath)
+    dbcfile = getKeyPath("dbcfile", jsConfig)
+    dbc = Analyze(dbcfile)
+
+    if down_config == None:
+        down_config = getKeyPath("down", jsConfig)
+    if up_config == None:
+        up_config = getKeyPath('up', jsConfig)
+
+    jsDown = getJScontent(down_config)
+    jsUp = getJScontent(up_config)
+    for sigName in sigs:
+        dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
+        down_topic = sigName+"/Set"
+        if Sender == None:
+            continue
+        if Sender not in local_machine_Sender: 
+            reConfigDict(jsUp,dbcSigName,sigName)       
+            # if down_topic in jsDown :del jsDown[down_topic]   
+        if Sender in local_machine_Sender: 
+            reConfigDict(jsDown,down_topic,dbcSigName)
+            # if dbcSigName in jsUp: del jsUp[dbcSigName]
+
+
+    writeJs(down_config,jsDown)
+    writeJs(up_config,jsUp)
+    
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
         description='''
@@ -108,12 +178,15 @@ if __name__ == "__main__":
         ''')
     parse.add_argument('-j', '--ToJave', help='生成json代码', nargs='?', type=str)
     parse.add_argument('-c', '--ToConfig', help='从java代码生成配置文件',type=str)
+    parse.add_argument('-a', '--addSig', help='把信号添加带配置文件中',nargs='+',type=str)
     arg = parse.parse_args()
-
+    configPath = pyFileDir+"config.json"
     if '-j' in sys.argv:
-        ToJaveCode(arg.ToJave,pyFileDir+"config.json")
+        ToJaveCode(arg.ToJave,configPath)
     elif '-c' in sys.argv:
-        ToConfigJson(arg.ToConfig,pyFileDir+"config.json")
+        ToConfigJson(arg.ToConfig,configPath)
+    elif '-a' in sys.argv:
+        addConfigSig(arg.addSig,configPath)
     else:
-        CheckSigName(pyFileDir+"config.json")
+        CheckSigName(configPath)
     

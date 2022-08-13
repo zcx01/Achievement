@@ -59,9 +59,12 @@ def findsignalInfile(signal,filePath):
         f=open(filePath,'r')
         content=f.readlines()
         for text in content:
-            texts = text.split(" ")
-            if signal in texts[0]:
-                return True
+            texts = re.findall(e_i,text,re.A)
+            try:
+                if signal == texts[0]:
+                    return True
+            except:
+                pass
         return False
     except:
         return False
@@ -126,8 +129,8 @@ def addCan_parse_whitelist(sigs):
         if WriteCan == 2 and not is_Parser:
             is_Parser = True
 
-    if is_Parser:
-        os.system("Parser")
+    # if is_Parser:
+    #     os.system("Parser")
 
 def dealnewSig(can_parse_whitelist_return=False):
     jsConfig=getJScontent(pyFileDir+"config.json")
@@ -239,7 +242,7 @@ if __name__ == "__main__":
     parse.add_argument('-r','--CanParseWhitelistReturn', help='在can的白名单中存在就不生成代码',type=int,default=0)
     parse.add_argument('-p','--power',help='是否加入电源信号',default=0,type=int)
     parse.add_argument('-w','--whitelist',nargs='+',help='向白名单中加入信号并且要输入路径')
-    parse.add_argument('-a','--Autowhite',nargs='+',help='向自动白名单中加入信号')
+    parse.add_argument('-a','--Autowhite',nargs='+',help='向白名单中加入信号')
     arg = parse.parse_args()
 
     if judgeCommad('-w'):

@@ -1,5 +1,6 @@
 import os
 import sys
+
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 from commonfun import*
 
@@ -56,11 +57,62 @@ def position(configPath):
     otherTelltale(jsTelltale, modifytopic, imageWith, space)
     writeJs(configjsonPath,jsTelltale)
             
-def getPosition():
+def getPosition(configPath):
+    jsConfig=getJScontent(configPath)
+    common=jsConfig["common"]
+    space=common["space"]
+    configjsonPath=common["configjsonPath"]
+    imageWith=common["imageWith"]
+    groupTopic={}
+    jsTelltale=getJScontent(configjsonPath)
+    for topic in jsTelltale:
+        y = jsTelltale[topic]["top"]
+        if y not in groupTopic:
+            groupTopic[y] = []
+        groupTopic[y].append(jsTelltale[topic])
+    
+    for y in groupTopic:
+        tmp = groupTopic[y]
+        assert isinstance(tmp, list)
+        groupTopic[y] = sorted(tmp,key=lambda x : x["left"])
+
+    groupTopics=[]
+    for y in groupTopic:
+        currentGroup=[]
+        pre_value = 0
+        for tmp in groupTopic[y]:
+            x = tmp['left']
+            pic = tmp['pic']
+            startPos = {}
+            if len(currentGroup) == 0 :
+                startPos['x'] = x
+                startPos['y'] = y
+                currentGroup.append(startPos)
+                currentGroup.append(pic)
+            elif x - pre_value < space-2 :
+                last_index = len(currentGroup) -1
+                last_pic = currentGroup[last_index]
+                if type(last_pic) == str:
+                    last_pic = last_pic + "," + pic
+                    currentGroup[last_index] = last_pic
+            elif x - pre_value > space + imageWith + 10:
+                groupTopics.append(currentGroup.copy())
+                currentGroup.clear()
+                startPos['x'] = x
+                startPos['y'] = y
+                currentGroup.append(startPos)
+                currentGroup.append(pic)
+            else:
+                currentGroup.append(pic)
+            pre_value = x
+        groupTopics.append(currentGroup.copy())
+    print(groupTopics)
+    jsConfig["position"] = groupTopics
+    writeJs(configPath,jsConfig)
     pass
 
 if __name__ == "__main__":
     if len(sys.argv) >=2:
         position(sys.argv[1])
     else:
-        position(pyFileDir+"config.json")
+        getPosition(pyFileDir+"config.json")

@@ -2,77 +2,75 @@
     "common": {
         "space": 8,
         "configjsonPath": "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/ictelltale_config.json",
-        "commit": ["如果信号在同一个位置用,分割","position的名称是图片的名字，要配置位置比在configjsonPath文件存在这个配置项"],
-        "imageWith":48
+        "commit": [
+            "如果信号在同一个位置用,分割",
+            "position的名称是图片的名字，要配置位置比在configjsonPath文件存在这个配置项"
+        ],
+        "imageWith": 48
     },
     "position": [
         [
             {
-                "x": 72,    
+                "x": 106,
                 "y": 24
             },
-            "Ready",
-            "MotorFault",
-            "PowerBatteryFault,PowerBatteryLowYellow",
-            "LVBatteryFault",
-            "BrakeSystemFault",
-            "PowerSystemFault",
-            "ChargeState",
-            "ChargeConnect",
-            "RearFogLamp",
-            "PositionLamp",
-            "TurnLeft"
+            "MotorFault.png",
+            "PowerBatteryFault.png",
+            "LVBatteryFault.png",
+            "BrakeSystemFault.png",
+            "PowerSystemFault.png",
+            "ChargeState.png",
+            "ChargeConnect.png",
+            "RearFogLamp.png",
+            "PositionLamp.png",
+            "TurnLeft.png"
         ],
         [
             {
-                "x": 1232,
+                "x": 1262,
                 "y": 24
             },
-            "TurnRight",
-            "LowBeam",
-            "HighBeam",
-            "AutoHighBeam",
-            "FatigueDrivingLamp,FatigueDetectionOff",
-            "TPMS",
-            "LimitPower",
-            "ParkingBrakeFault,ParkingBrakeActive",
-            "AirBagFault",
-            "EPS",
-            "ABS"
+            "TurnRight.png",
+            "LowBeam.png",
+            "HighBeam.png",
+            "AutoHighBeam.png",
+            "FatigueDetectionOff.png,FatigueDrivingLamp.png",
+            "TPMS.png",
+            "LimitPower.png",
+            "ParkingBrakeActive.png",
+            "AirBagFault.png",
+            "EPS.png",
+            "ABS.png"
         ],
         [
             {
-                "x": 72,
+                "x": 218,
                 "y": 80
             },
-            "FuelCellSystemFailure_yellow",
-            "HydrogenSurplusLow",
-            "HydrogenLeakage_yellow",
-            "ldw_green",
-            "EngineOil",
-            "EngineFault",
-            "SteeringWheelHead_yellow",
-            "DischargeActive",
-            "PowerBatteryHeating",
-            "RearSeatBelt",
-            "DriverSeatBelt"
+            "sensor_lamp.png",
+            "ldw_green.png",
+            "EngineOilWarn.png,HighStackTemperature.png",
+            "EngineFault.png,FuelCellSystemFailure_yellow.png,SteeringWheelHead_red.png",
+            "DischargeActive.png",
+            "PowerBatteryHeating.png",
+            "RearSeatBelt_grey.png",
+            "RearSeatBelt_grey.png",
+            "RearSeatBelt_grey.png",
+            "DriverSeatBelt.png"
         ],
         [
             {
-                "x": 1232,
+                "x": 1318,
                 "y": 80
             },
-            "Cruise",
-            "ESCOFF,ESCActive",
-            "AutoHold",
-            "WaterTempWarn",
-            "WinterMode",
-            "EnergyActive",
-            "aeb_off",
-            "bsd",
-            "HighStackTemperature",
-            "FuelTankLow_yellow",
-            "FCWorkState,FCWorkStateLow"
+            "ESCActive.png",
+            "AutoHold.png",
+            "WaterTempWarn.png,HydrogenLeakage_yellow.png",
+            "WinterMode_yellow.png",
+            "EnergyActive.png",
+            "ESCOFF.png",
+            "ParkingBrakeFault.png",
+            "FCWorkState.png,FCWorkStateLow.png,aeb_off.png"
         ]
     ]
 }
