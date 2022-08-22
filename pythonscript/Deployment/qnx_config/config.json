@@ -18,8 +18,16 @@
     "pwd":"123456",
     "PC":
     {
-        "ivi_compositor": "qt/bin",
-        "ic_adas": "qt/bin"
+        "ivi_compositor": "../../output/binary/opt/apps/latest/qt/bin",
+        "ic_adas": "../../output/binary/opt/apps/latest/qt/bin",
+        "up_config.json": "../../qt/ic_qt/resources/config",
+        "down_config.json": "../../qt/ic_qt/resources/config",
+        "icwarning_config.json": "../../qt/ic_qt/resources/config",
+        "ictelltale_config.json": "../../qt/ic_qt/resources/config",
+        "libresources_plugin.so": "../../output/binary/opt/apps/latest/qt/qml/Resources",
+        "libmega_ic_plugin.so": "../../output/binary/opt/apps/latest/qt/qml/MegaIC",
+        "resources.rcc": "../../output/binary/opt/apps/latest/qt",
+        "ic_qt_zh_CN.qm": "../../qt/ic_qt/resources/translate"
     }
 }
  
