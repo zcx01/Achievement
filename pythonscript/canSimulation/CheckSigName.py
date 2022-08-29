@@ -3,10 +3,11 @@ import argparse
 from nis import cat
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *
-
+from xlrd.book import Book
+from xlrd.sheet import Sheet
+import xlrd
 
 def findsignalInfile(signal,content):
-    print(signal)
     try:
         for text in content:
             texts = re.findall(e_i,text,re.A)
@@ -54,7 +55,7 @@ def CheckSigName(configPath,down_config=None,up_config=None):
         f.close()
         messagesig = dbcSigName.replace("/","__")
         if  not findsignalInfile(f'{messagesig}',whitelistPath_content):
-            printRed(f'{dbcSigName} 不在白名单中')
+            printRed(f'{messagesig} 不在白名单中')
         
         if Sender == None or not isChanged:
             continue
@@ -77,7 +78,7 @@ def configConverdbc(sig,dbc):
         prefix= f"{sigs[0]}_{sigs[1]}"
         dbcSig = dbc.getSig(sig16)
         if dbcSig == None:
-            printRed(f'{sig:<50}  没有对应的信号')
+            printRed(f'{sig:<50} {sig16}  没有对应的信号')
         elif dbcSig.getMessage_Name() != prefix:
             # printYellow(f'{sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
             return sig.replace(prefix,dbcSig.getMessage_Name()),dbcSig.Sender,True
@@ -85,7 +86,7 @@ def configConverdbc(sig,dbc):
         dbcSig = dbc.getSig(sig)
         if dbcSig == None:
             printRed(f'{sig:<50}  信号格式错误')
-    return sig, None if dbcSig == None else dbcSig.Sender,False
+    return sig if dbcSig == None else dbcSig.getMessage_Name()+'/'+dbcSig.name, None if dbcSig == None else dbcSig.Sender,False
 
 def addConfigDict(js,key,value):
     if value in js: del js[value] 
@@ -127,7 +128,7 @@ def ToConfigJson(javaPath,configPath,down_config=None,up_config=None):
             assert isinstance(tContent,str)
             tContent=tContent.replace('\"',"")
             dbcSigName,Sender,isChanged = configConverdbc(tContent,dbc)
-            down_topic = tContent+"/Set"
+            if not tContent.endswith('/Set'): down_topic = tContent+"/Set"
             if Sender == None:
                 continue
             if Sender not in local_machine_Sender: 
@@ -154,9 +155,15 @@ def addConfigSig(sigs,configPath=None,down_config=None,up_config=None):
     jsDown = getJScontent(down_config)
     jsUp = getJScontent(up_config)
     for sigName in sigs:
-        dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
-        down_topic = sigName+"/Set"
+        assert isinstance(sigName,str)
+        try:
+            dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
+        except:
+            printRed(f"{sigName} 信号格式错误")
+            continue
+        if not sigName.endswith('/Set'): down_topic = sigName+"/Set"
         if Sender == None:
+            printRed(f"{sigName} 没有发送者")
             continue
         if Sender not in local_machine_Sender: 
             reConfigDict(jsUp,dbcSigName,sigName)       
@@ -168,6 +175,27 @@ def addConfigSig(sigs,configPath=None,down_config=None,up_config=None):
 
     writeJs(down_config,jsDown)
     writeJs(up_config,jsUp)
+
+def getCellValue(src, row, col):
+    return src.cell_value(row, col)
+
+def addConfigByXls(xlsFileName):
+    book = xlrd.open_workbook(xlsFileName)
+    assert isinstance(book, Book)
+    sheel = book.sheet_by_name(Sig_Matrix)
+    sigs = []
+    for i in range(sheel.nrows):
+        try:
+            sigName = getCellValue(sheel,i,XlsCharToInt('C'))
+            msgid =  str( getCellValue(sheel,i,XlsCharToInt('E'))).split(".")[0].replace('0x', '')
+            Sender= getCellValue(sheel,i,XlsCharToInt('B'))
+            msgId_sigName = Sender+"_"+msgid+'/'+sigName
+            sigs.append(msgId_sigName)
+        except:
+            printRed(f'获取 {sigName} 信息失败')
+            pass
+    addConfigSig(sigs)
+
     
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
@@ -179,6 +207,7 @@ if __name__ == "__main__":
     parse.add_argument('-j', '--ToJave', help='生成json代码', nargs='?', type=str)
     parse.add_argument('-c', '--ToConfig', help='从java代码生成配置文件',type=str)
     parse.add_argument('-a', '--addSig', help='把信号添加带配置文件中',nargs='+',type=str)
+    parse.add_argument('-s', '--xls', help='把表格中所有的信号都添加配置文件中,-s为表格的路径',type=str)
     arg = parse.parse_args()
     configPath = pyFileDir+"config.json"
     if '-j' in sys.argv:
@@ -187,6 +216,8 @@ if __name__ == "__main__":
         ToConfigJson(arg.ToConfig,configPath)
     elif '-a' in sys.argv:
         addConfigSig(arg.addSig,configPath)
+    elif '-s' in sys.argv:
+        addConfigByXls(arg.xls)
     else:
         CheckSigName(configPath)
     

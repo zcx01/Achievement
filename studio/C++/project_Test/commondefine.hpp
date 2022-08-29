@@ -8,6 +8,10 @@
 
 #define COUT(V) std::cout << __LINE__ << " ----  " << V << std::endl;
 
+static int64_t IC_TIMESTAMP()
+{
+    return 1;
+}
 template <typename T0, typename... T>
 void IC_LOG_INFO(T0 t0, T... t)
 {

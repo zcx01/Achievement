@@ -753,11 +753,11 @@ class AnalyzeFile(object):
             self.RowContent(removeIndex,sig.initRow)
             self.RowContent(removeIndex,sig.sendTypeRow)
             self.RowContent(removeIndex,sig.enumRow)
+            printGreen(f"移除{sig.name}信号完成")
         linelist = readFileLines(self.dbcPath)
         linelist=removeListIndexs(linelist,removeIndex)
         if isWirte:
             wirteFileDicts(self.dbcPath, linelist, False)
-        printGreen(f"移除{sig.name}信号完成")
         return removeIndex
 
     def removeMessage(self,masgs):

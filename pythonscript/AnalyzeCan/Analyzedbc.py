@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from email import message
 import os
 from re import S
 import sys
@@ -86,7 +85,7 @@ class Analyze(object):
         assert isinstance(dbc,AnalyzeFile)
         return dbc
 
-    def GetChannelMsg(self,*msgs):
+    def GetChannelMsg(self,channel="",*msgs):
         channelSig={}
         allMags=[]
         for msg in msgs:
@@ -105,7 +104,11 @@ class Analyze(object):
                 dbc = self.getAnalyzeSingleByMsgInfo(msg)
                 msgInfo = msg
             else:
-                dbc = self.getAnalyzeSingleByMessageId(msg)
+                dbc=None
+                if len(channel) != 0:
+                    dbc = self.AnalyzeDict.get(channel,None)
+                if dbc == None:
+                    dbc = self.getAnalyzeSingleByMessageId(msg)
                 msgInfo = dbc.getMessage(msg)
                 if msgInfo == None:
                     continue
@@ -184,8 +187,8 @@ class Analyze(object):
                 assert isinstance(dbc,AnalyzeFile)
                 dbc.removeSig(channelSig[dbc])
 
-    def removeMessage(self,*mags):
-        channelMsg= self.GetChannelMsg(mags)
+    def removeMessage(self,channal,*mags):
+        channelMsg= self.GetChannelMsg(channal,mags)
         for dbc in channelMsg.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)

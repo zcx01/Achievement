@@ -103,10 +103,14 @@ def getMessageInfo(sheel):
             msg.lenght = getValueInt(sheel, row, 5)
             msg.Recevier = str(sheel.cell_value(row, 6))
             frame = str(sheel.cell_value(row, 9))
-            if len(frame) == 0 or len(splitSpace(frame)) == 0 or not isNumber(frame):
+            try:
+                if len(frame) == 0 or len(splitSpace(frame)) == 0:
+                    frame = SubNet_Frame.get(msg.subNet, 0)
+                else:
+                    frame = VFrameFormat.get(frame, int(float(frame)) if isNumber(frame) else SubNet_Frame.get(msg.subNet, 0))
+            except:
                 frame = SubNet_Frame.get(msg.subNet, 0)
-            else:
-                frame = VFrameFormat.get(frame, 0)
+
             msg.frame = frame
             if msg.messageId not in msgs:
                 msgs[msg.getMessage_SubNet()] = msg
@@ -245,11 +249,11 @@ def RemoveSigs(configPath, sigNames):
     dbc = Analyze(dbcfile)
     dbc.removeSig(sigNames)
 
-def RemoveMsgs(configPath, msgs):
+def RemoveMsgs(configPath, msgs,channal):
     jsConfig = getJScontent(configPath)
     dbcfile = getKeyPath("dbcfile", jsConfig)
     dbc = Analyze(dbcfile)
-    dbc.removeMessage(msgs)
+    dbc.removeMessage(channal,msgs)
 
 def addHeadEnd(text, name):
     text.insert(0, f'{name}')
@@ -621,7 +625,8 @@ if __name__ == "__main__":
     parse.add_argument('-rm', '--rmmsgs', help='删除message,是一个集合,是一个16进制',nargs='+')
     parse.add_argument('-u', '--isfilterNoUser',
                        help='是否过滤掉没有使用过的信号,用于比较can矩阵', nargs='*')
-    parse.add_argument('-w', '--WhitelistPath', help='和-a组合是白名单路径，单独是信号名称',nargs='?')                    
+    parse.add_argument('-w', '--WhitelistPath', help='和-a组合是白名单路径，单独是信号名称',nargs='?') 
+    parse.add_argument('-ch', '--channal', help='删除message指定通道',nargs='?')                    
     arg = parse.parse_args()
 
     canmatrix = arg.append
@@ -636,7 +641,7 @@ if __name__ == "__main__":
     elif '-rs' in sys.argv:
         RemoveSigs(arg.config, arg.rmsigs)
     elif '-rm' in sys.argv:
-        RemoveMsgs(arg.config, arg.rmmsgs)
+        RemoveMsgs(arg.config, arg.rmmsgs,arg.channal)
     elif "-a" in sys.argv and '-s' in sys.argv:
         for sigName in arg.sigNames:
             conversion(arg.config,sigName,canmatrix)
