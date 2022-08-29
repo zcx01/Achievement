@@ -18,7 +18,10 @@ def adbPush(proceesNames,excess,argv):
     fileDict={}
     if '-a' not in argv:
         for proceesName in proceesNames:
-            fileDict[proceesName] = "/usr/bin/"
+            if proceesName not in jsConfig:
+                fileDict[proceesName] = "/usr/bin/"
+            else:
+                fileDict[proceesName] = getKeyPath(proceesName,jsConfig)
         androidQnx.qnx_cp(fileDict,True)
     else:
         for proceesName in proceesNames:

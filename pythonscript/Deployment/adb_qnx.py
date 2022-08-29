@@ -19,8 +19,9 @@ if __name__ == "__main__":
     parser.add_argument('-k','--slay', help='slay process',type=str,nargs='*')
     parser.add_argument('-l','--log', help='查看log',type=str)
     parser.add_argument('-i','--interact', help='interact',default=1,type=int)
-    parser.add_argument('-m','--logGrade', help='修改log等级,指的是进程名称',default=1,type=int)
+    parser.add_argument('-n','--logGrade', help='修改log等级,指的是进程名称',default=1,type=int)
     parser.add_argument('-ro','--remvelog', help='清除log', nargs='?',default=1,type=int)
+    parser.add_argument('-np','--nextPage', help='下一页', nargs='?')
     args = parser.parse_args()
 
     for j in range(120):
@@ -67,8 +68,15 @@ if __name__ == "__main__":
             isExit=True
         except:
             pass
+
+    if "-np" in sys.argv:
+        try:
+            keyStr(r'on -T ic_apps_t -u ic_apps mega_ipc_pub -t "keyinput/event" -m "{\"value\":{\"status\":false, \"longClick\":false,\"keyCode\":14}}"')
+            # isExit=True
+        except:
+            pass
         
-    if "m" in sys.argv:
+    if "-n" in sys.argv:
         try:
             keyStr(f"echo {args.logGrade}:n:7 >> /var/pps/verbose")
         except:
