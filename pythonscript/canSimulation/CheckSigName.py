@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import argparse
-from nis import cat
+from ast import Assign
+from hashlib import new
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *
 from xlrd.book import Book
@@ -20,17 +21,27 @@ def findsignalInfile(signal,content):
     except:
         return False
 
-def CheckSigName(configPath,down_config=None,up_config=None):
+def getJsConfig(configPath="",down_config="",up_config="",isPrint = False):
+    if configPath == "": configPath = pyFileDir+"config.json"
     jsConfig = getJScontent(configPath)
-    if down_config == None:
-        down_config= getKeyPath("down",jsConfig)
-    if up_config == None:
-        up_config = getKeyPath('up',jsConfig)
-    jsDown = getJScontent(down_config)
-    jsUp   = getJScontent(up_config)
-    sigNames = {}
     dbcfile = getKeyPath("dbcfile", jsConfig)
+
+    if down_config == "":
+        down_config = getKeyPath("down", jsConfig)
+    if up_config == "":
+        up_config = getKeyPath('up', jsConfig)
+    
+    if isPrint:
+        print("down_config:",down_config)
+        print("up_config:",up_config)
     dbc = Analyze(dbcfile)
+    jsDown = getJScontent(down_config)
+    jsUp = getJScontent(up_config)
+    return jsDown,jsUp,dbc,jsConfig
+
+def CheckSigName(configPath,down_config="",up_config=""):
+    jsDown, jsUp, dbc, jsConfig = getJsConfig(configPath,down_config,up_config,True)
+    sigNames = {}
 
     for top in jsDown:
         topValue = jsDown[top]
@@ -42,7 +53,14 @@ def CheckSigName(configPath,down_config=None,up_config=None):
                 if t != top:
                     sigNames[t] = 0
     for s in jsUp:
-       sigNames[s] = 1
+        isTopc = False
+        if type(jsUp[s]) == dict:
+            for k in jsUp[s]:
+                if k == "bindSigNames":
+                    isTopc = True
+                    for bindSigName in jsUp[s][k]:
+                        sigNames[bindSigName] = 1
+        if not isTopc: sigNames[s] = 1
 
     for sig in sigNames:
         if is_chinese(sig):
@@ -96,31 +114,20 @@ def reConfigDict(js,key,value): # 添加进容器，如果有重复就打印，�
     if key in js :
         try:
             if js[key] == value:
-                printYellow(f'{key} 是存在的')
+                printYellow(f'{value} 是存在的')
                 return
             else:
-                # y = input("是否替换y/n")
-                # if y == 'y':
                 js[key] = value
         except:
             js[key] = value
     else:
         js[key] = value
-    printGreen(f'{key} 添加完成')
+    printGreen(f'{value} 添加完成')
 
-def ToConfigJson(javaPath,configPath,down_config=None,up_config=None):
-    jsConfig = getJScontent(configPath)
+
+def ToConfigJson(javaPath,configPath,down_config="",up_config=""):
     contents = readFileLines(javaPath)
-    dbcfile = getKeyPath("dbcfile", jsConfig)
-    dbc = Analyze(dbcfile)
-
-    if down_config == None:
-        down_config = getKeyPath("down", jsConfig)
-    if up_config == None:
-        up_config = getKeyPath('up', jsConfig)
-
-    jsDown = getJScontent(down_config)
-    jsUp = getJScontent(up_config)
+    jsDown, jsUp, dbc, jsConfig = getJsConfig(configPath,down_config,up_config)
     for content in contents:
         tContents = re.findall(r'topic = ".*"',content)
         if len(tContents) != 0:
@@ -141,19 +148,8 @@ def ToConfigJson(javaPath,configPath,down_config=None,up_config=None):
     writeJs(down_config,jsDown)
     writeJs(up_config,jsUp)
 
-def addConfigSig(sigs,configPath=None,down_config=None,up_config=None):
-    if configPath == None: configPath = pyFileDir+"config.json"
-    jsConfig = getJScontent(configPath)
-    dbcfile = getKeyPath("dbcfile", jsConfig)
-    dbc = Analyze(dbcfile)
-
-    if down_config == None:
-        down_config = getKeyPath("down", jsConfig)
-    if up_config == None:
-        up_config = getKeyPath('up', jsConfig)
-
-    jsDown = getJScontent(down_config)
-    jsUp = getJScontent(up_config)
+def addConfigSig(sigs,isOriginal,configPath="",down_config="",up_config=""):
+    jsDown, jsUp, dbc, jsConfig = getJsConfig(configPath,down_config,up_config)
     for sigName in sigs:
         assert isinstance(sigName,str)
         try:
@@ -161,12 +157,13 @@ def addConfigSig(sigs,configPath=None,down_config=None,up_config=None):
         except:
             printRed(f"{sigName} 信号格式错误")
             continue
-        if not sigName.endswith('/Set'): down_topic = sigName+"/Set"
+        down_topic = sigName if isOriginal else dbcSigName
+        if not sigName.endswith('/Set'):  down_topic+="/Set"
         if Sender == None:
             printRed(f"{sigName} 没有发送者")
             continue
         if Sender not in local_machine_Sender: 
-            reConfigDict(jsUp,dbcSigName,sigName)       
+            reConfigDict(jsUp,dbcSigName,sigName if isOriginal else dbcSigName)       
             # if down_topic in jsDown :del jsDown[down_topic]   
         if Sender in local_machine_Sender: 
             reConfigDict(jsDown,down_topic,dbcSigName)
@@ -179,24 +176,69 @@ def addConfigSig(sigs,configPath=None,down_config=None,up_config=None):
 def getCellValue(src, row, col):
     return src.cell_value(row, col)
 
-def addConfigByXls(xlsFileName):
+class SigXls():
+    def __init__(self) -> None:
+        self.sigName =""
+        self.msgid = ""
+        self.Sender = ""
+
+    def msgId_sigName(self):
+        return self.Sender+"_"+self.msgid+'/'+self.sigName
+
+def getSigXls(xlsFileName):
+    sigs = []
     book = xlrd.open_workbook(xlsFileName)
     assert isinstance(book, Book)
     sheel = book.sheet_by_name(Sig_Matrix)
-    sigs = []
     for i in range(sheel.nrows):
         try:
             sigName = getCellValue(sheel,i,XlsCharToInt('C'))
             msgid =  str( getCellValue(sheel,i,XlsCharToInt('E'))).split(".")[0].replace('0x', '')
             Sender= getCellValue(sheel,i,XlsCharToInt('B'))
-            msgId_sigName = Sender+"_"+msgid+'/'+sigName
-            sigs.append(msgId_sigName)
+            sigXls = SigXls()
+            sigXls.Sender = Sender
+            sigXls.msgid = msgid
+            sigXls.sigName = sigName
+            sigs.append(sigXls)
         except:
             printRed(f'获取 {sigName} 信息失败')
             pass
-    addConfigSig(sigs)
+    return sigs
 
+def addConfigByXls(xlsFileName):
+    sigs = []
+    sigXls = getSigXls(xlsFileName)
+    for sig in sigXls:
+        assert isinstance(sig,SigXls)
+        sigs.append(sig.msgId_sigName())
+    addConfigSig(sigs,True)
+
+def addMultipleSig(xlsFileName,msgId,topic):
+    sigs = []
+    jsDown, jsUp, dbc, jsConfig = getJsConfig()
+    if xlsFileName =='':
+        xlsFileName = getKeyPath("canmatrix", jsConfig)
+    sigXls = getSigXls(xlsFileName)
+    for sig in sigXls:
+        assert isinstance(sig,SigXls)
+        if sig.msgid == msgId:
+            sigs.append(sig.msgId_sigName())
+
+    up_config = getKeyPath('up', jsConfig)
+    bindSigNames=[]
+    for sigName in sigs:
+        assert isinstance(sigName,str)
+        try:
+            dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
+        except:
+            printRed(f"{sigName} 信号格式错误")
+            continue   
+        bindSigNames.append(dbcSigName)
     
+    jsUp[topic]={}
+    jsUp[topic]['bindSigNames'] = bindSigNames
+    writeJs(up_config,jsUp)        
+
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
         description='''
@@ -207,17 +249,24 @@ if __name__ == "__main__":
     parse.add_argument('-j', '--ToJave', help='生成json代码', nargs='?', type=str)
     parse.add_argument('-c', '--ToConfig', help='从java代码生成配置文件',type=str)
     parse.add_argument('-a', '--addSig', help='把信号添加带配置文件中',nargs='+',type=str)
-    parse.add_argument('-s', '--xls', help='把表格中所有的信号都添加配置文件中,-s为表格的路径',type=str)
+    parse.add_argument('-s', '--xls', help='把表格中所有的信号都添加配置文件中,-s为表格的路径',type=str,default='')
+    parse.add_argument('-d', '--downjson', help='下行文件路径，没有从配置中读取',type=str,default='', nargs='?')
+    parse.add_argument('-u', '--upjson', help='上行文件路径，没有从配置中读取',type=str,default='', nargs='?')
+    parse.add_argument('-t', '--topic', help='topic',type=str)
+    parse.add_argument('-m', '--msgId', help='messageId',type=str)
     arg = parse.parse_args()
     configPath = pyFileDir+"config.json"
+
+    if '-t' in sys.argv and '-m' in sys.argv:
+        addMultipleSig(arg.xls,arg.msgId,arg.topic)
     if '-j' in sys.argv:
         ToJaveCode(arg.ToJave,configPath)
     elif '-c' in sys.argv:
         ToConfigJson(arg.ToConfig,configPath)
     elif '-a' in sys.argv:
-        addConfigSig(arg.addSig,configPath)
+        addConfigSig(arg.addSig,False,configPath)
     elif '-s' in sys.argv:
         addConfigByXls(arg.xls)
     else:
-        CheckSigName(configPath)
+        CheckSigName(configPath,arg.downjson,arg.upjson)
     

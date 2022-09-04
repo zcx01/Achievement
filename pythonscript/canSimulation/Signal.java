@@ -2622,4 +2622,331 @@ public final class Signal {
      */
     @PropertyDefine(topic = "GW_1E5/TmsAcEnvtlT", type = Float.class)
     public static final int GW_1E5_TMSACENVTLT = MGR_ID << MGR_ID_BIT_OFFSET | 0x9e;
+
+    /**
+     * DVR模式反馈
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Inactive
+     *     0x1:RealTimeMode
+     *     0x2:ReplayMode
+     *     0x3:SettingMode
+     */
+    @PropertyDefine(topic = "ADC_612/AVM_DVRModeFeedback", type = Integer.class)
+    public static final int ADC_612_AVM_DVRMODEFEEDBACK = MGR_ID << MGR_ID_BIT_OFFSET | 0x9f;
+
+    /**
+     * 驾驶员疲劳检测设置请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:无请求
+     *     0x1:开启
+     *     0x2:关闭
+     *     0x3:预留
+     */
+    @PropertyDefine(topic = "CDC_2D2/CdcDrvrFatigueDetdReq", type = Integer.class)
+    public static final int CDC_2D2_CDCDRVRFATIGUEDETDREQ = MGR_ID << MGR_ID_BIT_OFFSET | 0xa0;
+
+    /**
+     * 分神功能状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:关闭
+     *     0x1:开启
+     *     0x2:预留
+     */
+    @PropertyDefine(topic = "DMS_356/DmsAttentionFunSts", type = Integer.class)
+    public static final int DMS_356_DMSATTENTIONFUNSTS = MGR_ID << MGR_ID_BIT_OFFSET | 0xa1;
+
+    /**
+     * 人脸注册状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:未注册
+     *     0x1:已注册
+     *     0x2:正在注册中
+     *     0x3:注册失败
+     */
+    @PropertyDefine(topic = "DMS_356/DmsFaceRegistSts", type = Integer.class)
+    public static final int DMS_356_DMSFACEREGISTSTS = MGR_ID << MGR_ID_BIT_OFFSET | 0xa2;
+
+    /**
+     * 人脸注册继续按键状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:无请求
+     *     0x1:请求
+     */
+    @PropertyDefine(topic = "CDC_2D2/CdcFaceRegistContinSts", type = Integer.class)
+    public static final int CDC_2D2_CDCFACEREGISTCONTINSTS = MGR_ID << MGR_ID_BIT_OFFSET | 0xa3;
+
+    /**
+     * 屏幕操作状态信号
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:released
+     *     0x1:pressed
+     *     0x3~0x7:Reserved
+     */
+    @PropertyDefine(topic = "CDC_3BD/HU_ScreenOperateStatus", type = Integer.class)
+    public static final int CDC_3BD_HU_SCREENOPERATESTATUS = MGR_ID << MGR_ID_BIT_OFFSET | 0xa4;
+
+    /**
+     * DVR截图确认
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:inactive
+     *     0x1:successful
+     *     0x2:failure
+     *     0x3:invalid
+     */
+    @PropertyDefine(topic = "ADC_612/DVR_PrintScreenFeedback", type = Integer.class)
+    public static final int ADC_612_DVR_PRINTSCREENFEEDBACK = MGR_ID << MGR_ID_BIT_OFFSET | 0xa5;
+
+    /**
+     * 格式化状态反馈
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:invalid
+     *     0x1:normal
+     *     0x2:Ready  Format
+     *     0x3:Formatting
+     *     0x4:Format  Complete
+     *     0x5:Format failure
+     *     0x6:Can't Format
+     *     0x7:Reserved
+     */
+    @PropertyDefine(topic = "ADC_612/DVR_FormatStatus", type = Integer.class)
+    public static final int ADC_612_DVR_FORMATSTATUS = MGR_ID << MGR_ID_BIT_OFFSET | 0xa6;
+
+    /**
+     * 报警方式识别
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:不报警
+     *     0x1:长鸣区报警
+     *     0x2:间歇音1报警（报警75ms，不报警175ms）
+     *     0x3:间歇音2报警（报警75ms，不报警425ms）
+     *     0x4:间歇音3报警（预留）
+     *     0x5:长鸣区前后同时报警（前角报警0.5s，后角报警0.5s）
+     *     0x6:错误3S报警（长鸣3s）
+     *     0x7:系统无错误提示（鸣叫0.5s）
+     *     0x8-0xF:Not Used
+     */
+    @PropertyDefine(topic = "GW_31E/RRS_WarningType", type = Integer.class)
+    public static final int GW_31E_RRS_WARNINGTYPE = MGR_ID << MGR_ID_BIT_OFFSET | 0xa7;
+
+    /**
+     * 扬声器位置
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     bit0:左前门扬声器
+     *     bit1:右前门扬声器
+     *     bit2:左后门扬声器
+     *     bit3:右后门扬声器
+     *     (每个bit：0表示不响，1表示响  )
+     */
+    @PropertyDefine(topic = "RRS_2E1/RRS_LoudspeakersPosition", type = Integer.class)
+    public static final int RRS_2E1_RRS_LOUDSPEAKERSPOSITION = MGR_ID << MGR_ID_BIT_OFFSET | 0xa8;
+
+    /**
+     * 小憩模式熄屏、关灯请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:关闭
+     *     0x1:开启
+     */
+    @PropertyDefine(topic = "CDC_2D2/CdcRespiteModOffReq", type = Integer.class)
+    public static final int CDC_2D2_CDCRESPITEMODOFFREQ = MGR_ID << MGR_ID_BIT_OFFSET | 0xa9;
+
+    /**
+     * 驾驶员疲劳检测设置状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:关闭
+     *     0x1:开启
+     *     0x2:预留
+     *     0x3:Invalid
+     */
+    @PropertyDefine(topic = "DMS_356/DmsDrvrFatigueDetdSts", type = Integer.class)
+    public static final int DMS_356_DMSDRVRFATIGUEDETDSTS = MGR_ID << MGR_ID_BIT_OFFSET | 0xaa;
+
+    /**
+     * 驾驶疲劳报警请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:无请求
+     *     0x1:有请求
+     *     0x2:预留
+     *     0x3:预留
+     */
+    @PropertyDefine(topic = "DMS_356/DmsDrvrFatigueWarnReq", type = Integer.class)
+    public static final int DMS_356_DMSDRVRFATIGUEWARNREQ = MGR_ID << MGR_ID_BIT_OFFSET | 0xab;
+
+    /**
+     * 分神检测设置开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:无请求
+     *     0x1:关闭
+     *     0x2:开启
+     */
+    @PropertyDefine(topic = "CDC_2D2/CdcAttentionDetdSet", type = Integer.class)
+    public static final int CDC_2D2_CDCATTENTIONDETDSET = MGR_ID << MGR_ID_BIT_OFFSET | 0xac;
+
+    /**
+     * 抽烟模式设置状态
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:无请求
+     *     0x1:on
+     *     0x2:off
+     */
+    @PropertyDefine(topic = "CDC_2D2/CdcSmokeModSetSts", type = Integer.class)
+    public static final int CDC_2D2_CDCSMOKEMODSETSTS = MGR_ID << MGR_ID_BIT_OFFSET | 0xad;
+
+    /**
+     * 抽烟模式设置状态反馈
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Invalid
+     *     0x1:on
+     *     0x2:off
+     */
+    @PropertyDefine(topic = "CDC_356/DmsSmokeModSetFb", type = Integer.class)
+    public static final int CDC_356_DMSSMOKEMODSETFB = MGR_ID << MGR_ID_BIT_OFFSET | 0xae;
+
+    /**
+     * 一键紧急录制开关
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:Inactive
+     *     0x1:Record
+     *     0x2:Reserved
+     *     0x3:Invalid
+     */
+    @PropertyDefine(topic = "CDC_507/HU_DVREmergencyRecord", type = Integer.class)
+    public static final int CDC_507_HU_DVREMERGENCYRECORD = MGR_ID << MGR_ID_BIT_OFFSET | 0xaf;
+
+    /**
+     * 纵向接管请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:no request
+     *     0x1:level 1 request
+     *     0x2:level 2 request
+     *     0x3:reserved
+     */
+    @PropertyDefine(topic = "ADC_307/ACC_LngTakeOverReq", type = Integer.class)
+    public static final int ADC_307_ACC_LNGTAKEOVERREQ = MGR_ID << MGR_ID_BIT_OFFSET | 0xb0;
+
+    /**
+     * 横向接管请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:no request
+     *     0x1:level 1 request
+     *     0x2:level 2 request
+     *     0x3:reserved
+     */
+    @PropertyDefine(topic = "ADC_31A/ACC_LatTakeoverReq", type = Integer.class)
+    public static final int ADC_31A_ACC_LATTAKEOVERREQ = MGR_ID << MGR_ID_BIT_OFFSET | 0xb1;
+
+    /**
+     * DVR系统故障
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0=normal
+     *     0x1=error
+     */
+    @PropertyDefine(topic = "GW_612/DVR_Error", type = Integer.class)
+    public static final int GW_612_DVR_ERROR = MGR_ID << MGR_ID_BIT_OFFSET | 0xb2;
+
+    /**
+     * 空调能耗模式设置请求
+     * <br/>
+     * Attribute: <br/>
+     * {access, WRITE} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:无请求
+     *     0x1:标准
+     *     0x2:节能
+     *     0x3:reserved
+     */
+    @PropertyDefine(topic = "CDC_2F2/CdcACEnergyModSetReq", type = Integer.class)
+    public static final int CDC_2F2_CDCACENERGYMODSETREQ = MGR_ID << MGR_ID_BIT_OFFSET | 0xb3;
+
+    /**
+     * 空调能耗模式设置反馈
+     * <br/>
+     * Attribute: <br/>
+     * {access, READ} <br/>
+     * {group, VENDOR} <br/>
+     * params:
+     *     0x0:标准
+     *     0x1:节能
+     */
+    @PropertyDefine(topic = "GW_1E5/ItmsACEnergyModSetFb", type = Integer.class)
+    public static final int GW_1E5_ITMSACENERGYMODSETFB = MGR_ID << MGR_ID_BIT_OFFSET | 0xb4;
 }

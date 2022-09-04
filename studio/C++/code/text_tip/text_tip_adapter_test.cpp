@@ -30,9 +30,9 @@ TextTipAdapterTest::TextTipAdapterTest()
     // d.addWarnInfo("icwarning/BcmVehLckAlrm",3); 
     d.addWarnInfo("icwarning/DoorOpenSts",1); 
     std::this_thread::sleep_for(std::chrono::milliseconds(2*1000));
-    d.addWarnInfo("icwarning/DoorOpenSts",0); 
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-    d.addWarnInfo("icwarning/DoorOpenSts",1);
+    d.addWarnInfo("C385/IACCTextTakeOver",1); 
+    // std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    // d.addWarnInfo("icwarning/DoorOpenSts",1);
     // d.addWarnInfo("icwarning/DoorOpenSts",0); 
     // d.addWarnInfo("Info/Discharge",1); 
     // d.addWarnInfo("Info/Discharge",1);

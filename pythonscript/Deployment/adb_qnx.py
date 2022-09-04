@@ -19,7 +19,7 @@ if __name__ == "__main__":
     parser.add_argument('-k','--slay', help='slay process',type=str,nargs='*')
     parser.add_argument('-l','--log', help='查看log',type=str)
     parser.add_argument('-i','--interact', help='interact',default=1,type=int)
-    parser.add_argument('-n','--logGrade', help='修改log等级,指的是进程名称',default=1,type=int)
+    parser.add_argument('-n','--logGrade', help='修改log等级,指的是进程名称',type=str)
     parser.add_argument('-ro','--remvelog', help='清除log', nargs='?',default=1,type=int)
     parser.add_argument('-np','--nextPage', help='下一页', nargs='?')
     args = parser.parse_args()

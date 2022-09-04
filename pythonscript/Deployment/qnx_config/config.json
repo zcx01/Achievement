@@ -7,6 +7,7 @@
     "resources.rcc":"/opt/qt/",
     "ivi_compositor":"/usr/bin/",
     "ic_adas":"/usr/bin/",
+    "ic_qt_zh_CN.qm": "/opt/qt/translate/",
     "libmega_ic_plugin.so":"/opt/qt/qml/MegaIC/",
     "ic_telltale":"/usr/bin/",
     "lib_mega_ipc.so":"/lib64/",
