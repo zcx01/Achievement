@@ -69,6 +69,29 @@ static void printHex(const uint8_t *data, uint8_t len)
     }
     printf("%s\n", buff);
 }
+
+static std::string hexToString(uint8_t start, uint8_t len, uint8_t *data,bool isReverse=false)
+{
+    std::string out;
+    for (int i = start; i < len; i++)
+    {
+        char buff[1024] = {0};
+        sprintf(buff, "%02x", data[i]);//2值的是保留2位
+        std::string temp(buff, 2);
+        if (isReverse)
+        {
+            std::reverse(temp.begin(), temp.end());
+        }
+        out += temp;
+    }
+    if (isReverse)
+    {
+        std::reverse(out.begin(), out.end());
+    }
+    IC_LOG_INFO("%s", out.c_str());
+    return out;
+}
+
 // vector<string> v = split(s, ",*"); //可按多个字符来分隔;
 
 #endif  //COMMONDEFINE     

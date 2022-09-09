@@ -56,7 +56,7 @@ def getSigInfo(sheel, row):
     sig.length = getValueInt(sheel, row, 7)
     sig.factor = getValueInt(sheel, row, 8)
     if sig.factor == float(0) and len(sig.name) != 0:
-        printYellow(f'{sig.name} 缩放不能为0，此处修改成1')
+        printYellow(f'{sig.name} 缩放不能为0，此处修改成1,行号为{row}')
         sig.factor = 1
     sig.Offset = getValueInt(sheel, row, 9)
     sig.min = getValueInt(sheel, row, 10)
@@ -140,7 +140,14 @@ def getThreeFrame(jsConfig):
                 pass
     return threeFrames
 
-def conversion(configPath, wirteSigName, canmatrix=""):
+def appoint(sig,wirteSigName, isMsg): #是否是指定添加的信号
+    assert isinstance(sig,SigInfo)
+    if not isMsg:
+        return sig.name.upper() == wirteSigName.upper()
+    else:
+        return sig.messageId == wirteSigName.upper()
+
+def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
     jsConfig = getJScontent(configPath)
     isAllAdd = (len(wirteSigName) == 0)
     if len(canmatrix) == 0:
@@ -166,14 +173,13 @@ def conversion(configPath, wirteSigName, canmatrix=""):
 
     threeFrames = getThreeFrame(jsConfig)
     for row in range(sheel.nrows):
-        sigName = str(getValue(sheel, row, 2))
         # xf = book.xf_list[getValue(sheel, row, 2).xf_index]
         # print(type(xf))
 
-        if isAllAdd and row == 0:
+        if row == 0:
             continue
-        if sigName.strip() == wirteSigName or isAllAdd:
-            sig = getSigInfo(sheel, row)
+        sig = getSigInfo(sheel, row)
+        if appoint(sig,wirteSigName,isMsg) or isAllAdd:
             if sig.name in threeFrames:
                 sig.sendType = SigSendType.Three
             # print(type(sig.min),type(sig.max),type(sig.Offset),type(sig.factor))
@@ -202,7 +208,7 @@ def conversion(configPath, wirteSigName, canmatrix=""):
                 if isAllAdd:
                     dbc.repalceSig(sig)
                 else:
-                    isRepalce = input('是否替換 y/n ')
+                    isRepalce = input(f'{sig.getMessage_Sig()} 是否替換 y/n ')
                     if 'y' in isRepalce:
                         dbc.repalceSig(sig)
 
@@ -614,11 +620,13 @@ if __name__ == "__main__":
     parse.add_argument('-a', '--append', nargs='?', help='新增整个can矩阵表格（如果没有指定路径，使用就是配置文件中）、和+w一起使用则是dbc目录')
     parse.add_argument('-s', '--sigNames', help='新增信号名，是一个列表',
                        default=[], nargs='+', type=str)
+    parse.add_argument('-m', '--messages', help='新增messages，是一个列表',
+                       default=[], nargs='+', type=str)
     parse.add_argument('-f', '--fristMatrix',
                        help='比较dbc矩阵,比较的文件,没有指定就使用配置文件中的路径', default="")
     parse.add_argument('-t', '--twoMatrix', help='比较dbc矩阵,被比较的文件,也是旧的一方的文件')
     parse.add_argument('-r', '--resultPath', help='比较dbc矩阵结果路径', default='')
-    parse.add_argument('-m', '--modifyMessageInfo',
+    parse.add_argument('-md', '--modifyMessageInfo',
                        help='替换message信息,有m就会替换，使用CAN矩阵的message替换', default=1, type=int, nargs='*')
     parse.add_argument('-d', '--dbcPath', help='比较新旧两个dbc,输入的是被比较的')
     parse.add_argument('-rs', '--rmsigs', help='删除信号,是一个集合,可以用10进制+信号名称,也可以是信号名',nargs='+')
@@ -626,7 +634,7 @@ if __name__ == "__main__":
     parse.add_argument('-u', '--isfilterNoUser',
                        help='是否过滤掉没有使用过的信号,用于比较can矩阵', nargs='*')
     parse.add_argument('-w', '--WhitelistPath', help='和-a组合是白名单路径，单独是信号名称',nargs='?') 
-    parse.add_argument('-ch', '--channal', help='删除message指定通道',nargs='?')                    
+    parse.add_argument('-ch', '--channal', help='删除message指定通道',nargs='?',default="")                    
     arg = parse.parse_args()
 
     canmatrix = arg.append
@@ -652,9 +660,12 @@ if __name__ == "__main__":
     elif '-s' in sys.argv:
         for sigName in arg.sigNames:
             conversion(arg.config, sigName)
+    elif '-m' in sys.argv:
+        for msg in arg.messages:
+            conversion(arg.config, msg,"",True)
     elif '-w' in sys.argv:
         addCan_parse_whitelist(arg.WhitelistPath)
-    elif '-m' in sys.argv:
+    elif '-md' in sys.argv:
         modifyMessageInfo(arg.config)
     elif '-t' in sys.argv:
         diffCanMatrix(arg.fristMatrix, arg.twoMatrix, arg.config,arg.resultPath, '-u' in sys.argv)

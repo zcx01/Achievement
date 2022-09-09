@@ -28,7 +28,7 @@ if __name__ == "__main__":
         adb_out = subprocess.getoutput("adb devices").split('\n')
         if len(adb_out) >= 3:
             if j >=3:
-                time.sleep(20)
+                time.sleep(10)
             break
         print(f"车机重启中...等待{j+1}秒")
         time.sleep(1)

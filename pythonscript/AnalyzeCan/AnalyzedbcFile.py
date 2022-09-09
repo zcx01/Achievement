@@ -657,11 +657,12 @@ class AnalyzeFile(object):
                     for sigUsrIndex in sigUsrIndexs:
                         if sigUsrIndex in userIndex[user]:
                             cover_count+=1
+                            print(sigUsrIndex,str(userIndex[user]),user,"----------")
                             is_user = True
                     if cover_count == 0:
                         continue
-                    if cover_count == len(userIndex[user]) and cover_count == len(sigUsrIndexs):
-                        printYellow(f"{sig.name} 与 {user} 字节相同")
+                    if cover_count == len(userIndex[user]) and cover_count == len(sigUsrIndexs) and len(user_sigName) == 0:
+                        printYellow(f"{sig.name}: {str(sigUsrIndexs)} 与 {user}: {userIndex[user]} 字节相同+++++  ")
                         return WriteDBCResult.SignalCoverage
                     elif is_user:
                         user_sigName.append(user)

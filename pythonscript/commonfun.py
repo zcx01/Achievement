@@ -55,6 +55,34 @@ class EesyStr():
             print("删除失败，字符串为空")
         return "".join(temp)
 
+class ProgressBar():
+    def __init__(self):
+        self.current = 0
+        self.total = 100
+        self.contents = []
+
+    def setList(self,texts):
+        self.contents = texts
+        self.total = len(texts)
+    
+    def printCurrntContent(self):
+        if self.total > 0 and self.current < self.total:
+            print("\r", end="")
+            print(f"{self.current+1 / self.total * 100} : {self.contents[self.current]} ",end="")
+            sys.stdout.flush()
+            self.current+=1
+
+    def cal(self):
+        return round(((self.current) / self.total * 100),2)
+
+    def printCurrnt(self):
+        if self.total > 0 and self.current < self.total:
+            print("\r", end="") #清除原来的
+            print(f"{self.cal()} %",end="",flush=True)
+            self.current+=1
+        else:
+            print("\r", end="") #清除原来的
+            print("100.00 %",flush=True)
 
 def getJScontent(configJson):
     with open(configJson, "r") as cr:
