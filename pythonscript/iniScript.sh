@@ -1,4 +1,5 @@
 #!/bin/bash
+#此脚本用来初始化本工程的脚本
 
 shellPath="$(dirname "${BASH_SOURCE[0]}")"
 

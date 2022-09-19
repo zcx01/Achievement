@@ -1,6 +1,6 @@
 import sys
 from commonfun import *
-
+#此脚本用来截取文件的从开始行到结束行之间的文本
 def deal(dataPath,outPath,startIndex,endIndex):
     contentes=readFileLines(dataPath)
     index = startIndex

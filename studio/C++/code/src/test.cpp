@@ -56,15 +56,17 @@ void publish_uartpc(const std::vector<int>& values)
     delete[] data;
 }
 
+void modifyByte3()
+{
+    uint8_t data[8];
+    data[5] |=0x4;
+    data[5] |= 0x8;
+    printHex(data,8);
+}
 TestTest::TestTest(/* args */)
 {
 
-    fds::getTimer()->add(1000, [&](int){ this->thread_Test(12); });
-
-    while (1)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
+    modifyByte3();
     
 }
 

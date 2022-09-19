@@ -156,7 +156,7 @@ if __name__ == "__main__":
         printPCFile()
         sys.exit()
     PrjectDir = args.PrjectDir
-
+    printYellow(PrjectDir)
     if "-s" in sys.argv:
         user=jsConfig.get("user",)
         ssh_ip = jsConfig.get("ssh_ip","")
