@@ -1,10 +1,18 @@
 #!/usr/bin/python
 import argparse
+from cgitb import text
+from pydoc_data.topics import topics
+import string
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 import xlrd
+
+'''
+    可以检测的前提条件
+    message名称必须是id结尾
+'''
 
 def findsignalInfile(signal,content):
     try:
@@ -58,7 +66,7 @@ def CheckSigName(configPath,down_config="",up_config=""):
                 if k == "bindSigNames":
                     isTopc = True
                     for bindSigName in jsUp[s][k]:
-                        sigNames[bindSigName] = 1
+                        sigNames[bindSigName] = s
         if not isTopc: sigNames[s] = 1
 
     bar= ProgressBar()
@@ -81,36 +89,57 @@ def CheckSigName(configPath,down_config="",up_config=""):
         
         if  sigNames[sig] == 1: 
             addConfigDict(jsUp,dbcSigName,sig)       
-        if  sigNames[sig] == 0: 
+        elif  sigNames[sig] == 0: 
             addConfigDict(jsDown,sig,dbcSigName)
+        elif type(sigNames[sig]) == str:
+            replaceIndex = jsUp[sigNames[sig]]["bindSigNames"].index(sig)
+            jsUp[sigNames[sig]]["bindSigNames"][replaceIndex] = dbcSigName
+
+    writeJs(down_config,jsDown)
+    writeJs(up_config,jsUp)
     bar.printCurrnt()
     printGreen("分析完成")
 
 def ToJaveCode(javaPath,configPath,down_config=None,up_config=None):
     pass
 
+
+def splitSig(sig):
+    assert isinstance(sig,str)
+    sigs = []
+    sigs.append(sig)
+    if "__" in sig:
+        tempSigs =  sig.split("__")
+    elif "/" in sig:
+        tempSigs =  sig.split("/")
+    else:
+        return sigs
+
+    if len(tempSigs) < 2:
+        return sigs
+    sigs.clear()
+    tempMesages = re.findall(m_s,tempSigs[0])
+    sigs+=tempMesages
+    sigs.append(tempSigs[1])
+    return sigs
+        
+
 def configConverdbc(sig,dbc):
     assert isinstance(dbc,Analyze)
     assert isinstance(sig,str)
-    sigs = re.findall(m_s,sig)
+    sigs = splitSig(sig)
     dbcSig = None
     if len(sigs) >= 3 :
         try:
             sig16= str(int(sigs[1],16))+"_".join(sigs[2:])
             prefix= f"{sigs[0]}_{sigs[1]}"
-            dbcSig = dbc.getSig(sig16)
-            if dbcSig == None:
-                printRed(f'{sig:<50} {sig16}  没有对应的信号')
-            elif dbcSig.getMessage_Name() != prefix:
-                # printYellow(f'{sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
+            dbcSig = dbc.getSig(sig16,sigs[0])
+            if dbcSig != None and dbcSig.getMessage_Name() != prefix:
+                printYellow(f' {sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
                 return sig.replace(prefix,dbcSig.getMessage_Name()),dbcSig.Sender,True
         except:
-            sig16= str(int(sigs[1],16))+"_".join()
-            prefix= f"{sigs[0]}_{sigs[1]}"
-            dbcSig = dbc.getSig(sigs[2:])
-            if dbcSig == None:
-                printRed(f'{sig:<50} {sig16}  没有对应的信号')
-    else:
+            pass
+    if dbcSig==None:
         dbcSig = dbc.getSig(sig)
         if dbcSig == None:
             printRed(f'{sig:<50}  信号格式错误')
@@ -134,6 +163,9 @@ def reConfigDict(js,key,value): # 添加进容器，如果有重复就打印，�
         js[key] = value
     printGreen(f'{value} 添加完成')
 
+def addSet(topic):
+    if not topic.endswith('/Set'): topic = topic+"/Set"
+    return topic
 
 def ToConfigJson(javaPath,configPath,down_config="",up_config=""):
     contents = readFileLines(javaPath)
@@ -145,7 +177,7 @@ def ToConfigJson(javaPath,configPath,down_config="",up_config=""):
             assert isinstance(tContent,str)
             tContent=tContent.replace('\"',"")
             dbcSigName,Sender,isChanged = configConverdbc(tContent,dbc)
-            if not tContent.endswith('/Set'): down_topic = tContent+"/Set"
+            down_topic=addSet(tContent)
             if Sender == None:
                 continue
             if Sender not in local_machine_Sender: 
@@ -162,13 +194,9 @@ def addConfigSig(sigs,isOriginal,configPath="",down_config="",up_config=""):
     jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath,down_config,up_config)
     for sigName in sigs:
         assert isinstance(sigName,str)
-        try:
-            dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
-        except:
-            printRed(f"{sigName} 信号格式错误")
-            continue
+        dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
         down_topic = sigName if isOriginal else dbcSigName
-        if not sigName.endswith('/Set'):  down_topic+="/Set"
+        down_topic = addSet(sigName)
         if Sender == None:
             printRed(f"{sigName} 没有发送者")
             continue
@@ -223,31 +251,44 @@ def addConfigByXls(xlsFileName):
         sigs.append(sig.msgId_sigName())
     addConfigSig(sigs,True)
 
-def addMultipleSig(xlsFileName,msgId,topic):
-    sigs = []
+def addMultipleSig(canmatrix,msgIds,topics):
     jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig()
-    if xlsFileName =='':
-        xlsFileName = getKeyPath("canmatrix", jsConfig)
-    sigXls = getSigXls(xlsFileName)
-    for sig in sigXls:
-        assert isinstance(sig,SigXls)
-        if sig.msgid == msgId:
-            sigs.append(sig.msgId_sigName())
+    if canmatrix =='':
+        canmatrix = getKeyPath("canmatrix", jsConfig)
+    sigXls = getSigXls(canmatrix)
+    sigs = []
+    for msgIdIndex in range(len(msgIds)):
+        msgId = msgIds[msgIdIndex]
+        for sig in sigXls:
+            assert isinstance(sig,SigXls)
+            if sig.msgid == msgId:
+                sigs.append(sig.msgId_sigName())
 
-    up_config = getKeyPath('up', jsConfig)
-    bindSigNames=[]
-    for sigName in sigs:
-        assert isinstance(sigName,str)
-        try:
-            dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
-        except:
-            printRed(f"{sigName} 信号格式错误")
-            continue   
-        bindSigNames.append(dbcSigName)
-    
-    jsUp[topic]={}
-    jsUp[topic]['bindSigNames'] = bindSigNames
-    writeJs(up_config,jsUp)        
+        if len(topics)!=0:
+            bindSigNames=[]
+            for sigName in sigs:
+                assert isinstance(sigName,str)
+                try:
+                    dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
+                except:
+                    printRed(f"{sigName} 信号格式错误")
+                    continue   
+                bindSigNames.append(dbcSigName)
+
+            if Sender not in local_machine_Sender: 
+                jsUp[topics[msgIdIndex]]={}
+                jsUp[topics[msgIdIndex]]['bindSigNames'] = bindSigNames
+            else:
+                jsDown[addSet(topics[msgIdIndex])] = {}
+                for bindSigName in bindSigNames:
+                    jsDown[addSet(topics[msgIdIndex])][bindSigName]={}
+            sigs.clear()
+
+    if len(topics)!=0:    
+        writeJs(down_config,jsDown)
+        writeJs(up_config,jsUp)     
+    else:
+        addConfigSig(sigs,True,"",down_config,up_config)
 
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
@@ -262,14 +303,14 @@ if __name__ == "__main__":
     parse.add_argument('-a', '--xls', help='把表格中所有的信号都添加配置文件中,-s为表格的路径',type=str,default='')
     parse.add_argument('-d', '--downjson', help='下行文件路径，没有从配置中读取',type=str,default='', nargs='?')
     parse.add_argument('-u', '--upjson', help='上行文件路径，没有从配置中读取',type=str,default='', nargs='?')
-    parse.add_argument('-t', '--topic', help='topic',type=str)
-    parse.add_argument('-m', '--msgId', help='messageId',type=str)
+    parse.add_argument('-t', '--topic', help='topic是列表和-m参数索引要对应',default=[], nargs='+', type=str)
+    parse.add_argument('-m', '--messages', help='新增messages是一个列表',default=[], nargs='+', type=str)
     arg = parse.parse_args()
     configPath = pyFileDir+"config.json"
 
-    if '-t' in sys.argv and '-m' in sys.argv:
-        addMultipleSig(arg.xls,arg.msgId,arg.topic)
-    if '-j' in sys.argv:
+    if '-m' in sys.argv:
+        addMultipleSig(arg.xls,arg.messages,arg.topic)
+    elif '-j' in sys.argv:
         ToJaveCode(arg.ToJave,configPath)
     elif '-c' in sys.argv:
         ToConfigJson(arg.ToConfig,configPath)

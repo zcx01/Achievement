@@ -650,6 +650,9 @@ if __name__ == "__main__":
         RemoveSigs(arg.config, arg.rmsigs)
     elif '-rm' in sys.argv:
         RemoveMsgs(arg.config, arg.rmmsgs,arg.channal)
+    elif '-m' in sys.argv:
+        for msg in arg.messages:
+            conversion(arg.config, msg,canmatrix,True)
     elif "-a" in sys.argv and '-s' in sys.argv:
         for sigName in arg.sigNames:
             conversion(arg.config,sigName,canmatrix)
@@ -660,9 +663,6 @@ if __name__ == "__main__":
     elif '-s' in sys.argv:
         for sigName in arg.sigNames:
             conversion(arg.config, sigName)
-    elif '-m' in sys.argv:
-        for msg in arg.messages:
-            conversion(arg.config, msg,"",True)
     elif '-w' in sys.argv:
         addCan_parse_whitelist(arg.WhitelistPath)
     elif '-md' in sys.argv:

@@ -4,8 +4,7 @@ shellPath="/home/chengxiongzhu/Achievement/pythonscript/getgitpath.py"
 # repoPath=~/Works/Repos/changan_c835/
 # cd $repoPath
 branch="dev_hqx.1.2.1"
-
-
+prefix="mega"
 if [ $# -lt 1 ]; then
     echo "选择路径:"
     project=`repo status -q`
@@ -13,6 +12,7 @@ if [ $# -lt 1 ]; then
     do
         if [ $f != "prebuilts/" ] && [ $f != "project" ] && [ $f != "common-prebuilts/" ];then
             repo status $f
+            repo forall $f -c "git branch -vv" 
         fi
     done
     exit 0
@@ -25,23 +25,32 @@ else
     fi
 fi
 
-if [ $# -eq 1 ]; then
-    git add -A
-    git commit -s
-    git fetch mega
-    git rebase mega/$branch
-    git push mega HEAD:refs/for/$branch
-elif [ $2 == "-c" ];then
+if [ $# -ge 3 ]; then
+    if [ $2 == "-o" ];then
+        branchs=$3
+        prefixIndex=`expr index $branchs "/"`
+        prefix=${branchs:0:$prefixIndex-1}
+        branch=${branchs:$prefixIndex}
+    fi
+fi
+
+if [ ${!#} == "-c" ];then
     git status
     git add -A
     git rebase --continue
-    git push mega HEAD:refs/for/$branch
-elif [ $2 == "-n" ];then
+    git push $prefix HEAD:refs/for/$branch
+elif [ ${!#} == "-n" ];then
     git add -A
     git commit --amend --no-edit
-    git push mega HEAD:refs/for/$branch 
-elif [ $2 == "-a" ];then
+    git push $prefix HEAD:refs/for/$branch 
+elif [ ${!#} == "-a" ];then
     git add -A
     git commit --amend 
-    git push mega HEAD:refs/for/$branch
+    git push $prefix HEAD:refs/for/$branch
+else
+    git add -A
+    git commit -s
+    git fetch $prefix
+    git rebase $prefix/$branch
+    git push $prefix HEAD:refs/for/$branch
 fi

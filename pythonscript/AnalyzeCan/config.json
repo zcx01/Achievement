@@ -3,7 +3,7 @@
     "newSig": "/home/chengxiongzhu/Works/newsig/newsig.txt",
     "xlsNewSigPath":"/home/chengxiongzhu/Works/newsig/newsig.xlsx",
     "can_parse_whitelist": "src/ic_service/parser/VendorFiles/can_parse_whitelist.txt",
-    "canmatrix": "/home/chengxiongzhu/Works/文档/D/C385EV项目整车通讯协议v-2.2.3高低配20220720.xlsx",
+    "canmatrix": "/home/chengxiongzhu/Works/文档/ota/C385EV项目整车通讯协议v-2.2.4高低配20220906.xlsx",
     "canmatrixEVE": "/home/chengxiongzhu/Works/文档/D/C385-EVE项目整车通讯协议_V2.2.2_ 20220606.xlsx(CDC).xlsx",
     "canmatrixF":"/home/chengxiongzhu/Works/文档/B样/C385EVF项目整车CAN协议_V2.2.3_20211118CDC.xlsx", 
     "dbcfile": "src/ic_service/parser/VendorFiles/dbc_files",

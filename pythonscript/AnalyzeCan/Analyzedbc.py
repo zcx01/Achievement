@@ -25,11 +25,16 @@ class Analyze(object):
                     else:
                         self.AnalyzeDictlist.append(dbc)
 
-    def getAnalyzeSingleByName(self,sigName):
+    def getAnalyzeSingleByName(self,sigName,sender=""):
+        existdbc=None
         for dbc in self.AnalyzeDictlist:
             assert isinstance(dbc,AnalyzeFile)
             if dbc.sigExist(sigName):
-                return dbc
+                existdbc = dbc
+                if sender=="" or dbc.sender(sigName) == sender:
+                    return dbc
+        if existdbc != None:
+            return existdbc
         dbc = self.AnalyzeDictlist[0]
         return dbc
 
@@ -118,8 +123,8 @@ class Analyze(object):
             channelSig[dbc].append(msgInfo)
         return channelSig
 
-    def getSig(self,sigName):
-        dbc = self.getAnalyzeSingleByName(sigName)
+    def getSig(self,sigName,sender=""):
+        dbc = self.getAnalyzeSingleByName(sigName,sender)
         if  dbc != None:
             return dbc.getSig(sigName)
         return None
