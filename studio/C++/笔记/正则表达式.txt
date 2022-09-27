@@ -1,0 +1,32 @@
+
+file:///./../code/src/regex_test.cpp
+
+std::regex
+包含头文件为:#include <regex>
+方法:
+regex	        表示有一个正则表达式的类
+regex_match	    将一个字符序列与一个正则表达式匹配
+regex_search	寻找第一个与正则表达式匹配的子序列
+regex_replace	使用给定格式替换一个正则表达式
+sregex_iterator	迭代器适配器，调用regex_search来遍历一个string中所有匹配的子串
+smatch	        容器类，保存在string中搜索的结果
+ssub_match	    string中匹配的子表达式的结果
+
+如下:
+std::string test = "foo.txt";
+// 在 C++ 中 \ 会被作为字符串内的转义符，为使 \. 作为正则表达式传递进去生效，需要对 \ 进行二次转义，从而有 \\.
+std::regex txt_regex("[a-z]+\\.txt");
+
+//第一种匹配方式
+//传入 std::string 以及一个 std::regex 进行匹配
+//当匹配成功时，会返回 true，否则返回 false
+std::cout << std::regex_match(test, txt_regex) << std::endl;
+
+//获取匹配的结果
+for (std::sregex_iterator it(test.begin(), test.end(), txt_regex), end_it; it != end_it; ++it)
+{
+    COUT(it->str());
+}
+
+参考
+http://www.45fan.com/article.php?aid=1D05faLP0L6dTj2O#_lab2_3_0

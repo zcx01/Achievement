@@ -36,10 +36,9 @@ void FdsTimeOutProcess::timer_thread_fun()
 		IC_LOG_DEBUG("timer_thread_fun %p", timer_thread);
 	}
 	IC_LOG_INFO("timer_thread_fun %p", timer_thread);
-	std::unique_lock<std::mutex> lock(m_mutex);
 	t_thread_s[timer_thread] = timer_id;
-	lock.unlock();
 	thread_local uint64_t _timer_id = timer_id;
+	std::unique_lock<std::mutex> lock(m_mutex,std::defer_lock);
 	do
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(timeSpace));
@@ -47,7 +46,7 @@ void FdsTimeOutProcess::timer_thread_fun()
 		auto thread_Ptr = std::find_if(t_thread_s.begin(), t_thread_s.end(),
 									[this](const std::unordered_map<std::thread *, uint64_t>::value_type item)
 									{
-										// IC_LOG_DEBUG("item.second: %lu %lu", item.second, _timer_id);
+										IC_LOG_DEBUG("item.second: %lu %lu", item.second, _timer_id);
 										return item.second == _timer_id;
 									});
 		if(thread_Ptr == t_thread_s.end())

@@ -72,6 +72,7 @@ def getSigInfo(sheel, row):
         pass
     sig.invalidValue = getValue(sheel, row, 17)
     sig.Recevier = getValue(sheel, row, 20)
+    sig.RecevierRemoveSend()
     if sig.endBit != -1:
         sig.getStartBit()
     else:

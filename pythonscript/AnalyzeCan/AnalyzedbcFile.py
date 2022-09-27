@@ -242,6 +242,14 @@ class SigInfo(object):
         #     result.append(f"name:{self.name},message:{self.messageId} {other.messageId}")
         
         return isSame,result
+    
+    def RecevierRemoveSend(self):
+        if len(self.Recevier)==0 or self.Recevier == None:
+            self.Recevier = "Vector__XXX"
+        receviers = re.findall(e_i,self.Recevier)
+        if self.Sender in receviers:
+            receviers.remove(self.Sender)
+        self.Recevier = ",".join(receviers)
 
 class MessageInfo(object):
     def __init__(self) -> None:

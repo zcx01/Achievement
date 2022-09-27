@@ -59,6 +59,7 @@
         "thread": "cpp",
         "valarray": "cpp",
         "iomanip": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "regex": "cpp"
     }
 }
