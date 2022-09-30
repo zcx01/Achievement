@@ -1,0 +1,25 @@
+-----------------------std::thread-----------------------
+用于创建一个执行的线程实例
+#include <thread>
+
+//来获取所创建线程的线程 ID
+get_id();
+
+//来加入一个线程等，等线程的执行完成才继续执行
+join();
+
+//使线程剥离
+detach();
+注*:删除线程时需要调用join()或者detach();
+-----------------------std::mutex-----------------------
+#include <mutex>
+可以创建互斥量，而通过其成员函数 lock() 可以进行上锁，unlock() 可以进行解锁
+一般和std::unique_lock使用
+注*:std::lock_guard 不能显式的调用 lock 和 unlock， 而 std::unique_lock 可以在声明后的任意位置调用， 可以缩小锁的作用范围，提供更高的并发度
+
+使用方式如下:
+static std::mutex mtx;
+std::unique_lock<std::mutex> lock(mtx);
+
+-----------------------期物-----------------------
+#include <future>
