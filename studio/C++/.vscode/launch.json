@@ -8,7 +8,7 @@
             "name": "(gdb) 启动",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/code/main",
+            "program": "${workspaceFolder}/algorithm/main",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

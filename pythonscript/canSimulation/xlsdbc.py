@@ -190,7 +190,7 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                 printRed(f'{sig.name} 极小值小于0,最小值为{sig.min},raw值{realMin}')
                 continue
             if realMax > pow(2, sig.length)-1 and sig.max != pow(2, sig.length)-1:
-                printRed(f'{sig.name} 极大值大于长度,最大值为{sig.max},raw值{realMax}')
+                printRed(f'{sig.name} 极大值大于长度,最大值为{sig.max},raw值{realMax}，极限值为{pow(2, sig.length)}')
                 continue
             if sig.min == sig.max:
                 printRed(f"{sig.name} 最大值和最小值相等最小值为{sig.min},最大值为{sig.max}")

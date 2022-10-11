@@ -60,6 +60,11 @@
         "valarray": "cpp",
         "iomanip": "cpp",
         "variant": "cpp",
-        "regex": "cpp"
-    }
+        "regex": "cpp",
+        "future": "cpp",
+        "bitset": "cpp",
+        "set": "cpp",
+        "shared_mutex": "cpp"
+    },
+    "cmake.sourceDirectory": "${workspaceFolder}/algorithm"
 }

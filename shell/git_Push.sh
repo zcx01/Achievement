@@ -49,7 +49,7 @@ elif [ ${!#} == "-a" ];then
     git push $prefix HEAD:refs/for/$branch
 else
     git add -A
-    git commit -s
+    git commit -s2
     git fetch $prefix
     git rebase $prefix/$branch
     git push $prefix HEAD:refs/for/$branch

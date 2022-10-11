@@ -220,6 +220,8 @@ def createfile(fileName,type,replaceList):
     else:
         className=fileName
         fileName=getFileName(className)
+
+    className=EesyStr.removeStartDigit(className)
     print(f'class {className}')
     for (dirpath,dirnames,filenames) in os.walk(configDir):
         jsConfig = getJScontent(dirpath)

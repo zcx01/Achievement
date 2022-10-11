@@ -42,8 +42,6 @@ void publish_uartpc(const std::vector<int>& values)
         data[i] = values[i];
     }
 
-    // IpcMessage msg = {(uint32_t)sizeof(data), data};
-    // megaipc::MegaIpcApi::instance().publish(UARTRPC_SVC_IPC_TOPIC_DOWNLINK, msg);
     for (int i = 0; i < size; i++)
     {
         if (data[i] == 0x26)

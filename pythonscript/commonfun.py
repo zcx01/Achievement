@@ -55,6 +55,15 @@ class EesyStr():
             print("删除失败，字符串为空")
         return "".join(temp)
 
+    #移除开头的数值
+    @staticmethod
+    def removeStartDigit(str):
+        for index in range(len(str)):
+            if not str[index].isdigit():
+                str= str[index:]
+                break
+        return str
+
 class ProgressBar():
     def __init__(self):
         self.current = 0

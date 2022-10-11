@@ -2,7 +2,6 @@
  * @file singleton.h
  * @brief Singleton template definition
  * @date 2021-05-07
- * @copyright Copyright (c) 2021 Megatronix
  */
 #ifndef SINGLETON_H
 #define SINGLETON_H
