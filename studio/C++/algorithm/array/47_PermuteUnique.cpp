@@ -4,52 +4,51 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
+#include <set>
 using namespace std;
 
-vector<vector<int>> permuteUniqueChild(vector<vector<int>> &result,int n,vector<int> &nums)
+void permuteUniqueChild(vector<vector<int>> &result,vector<int> &nums,set<int> &existence,int f,int n)
 {
-    
+    if(f == n)
+    {
+        result.emplace_back(nums);
+        return;
+    }
+    for (int i = f; i < n; i++)
+    {   
+        if(existence.count(nums[f]) == 0)
+        {
+            swap(nums[i], nums[f]);
+        }
+        else
+        {
+            continue;
+        }
+        permuteUniqueChild(result, nums,existence, f + 1, n);
+        if (f == 0)
+        {
+            existence.insert(nums[f]);
+        }
+        swap(nums[i],nums[f]);
+    }
 }
 
 vector<vector<int>> permuteUnique(vector<int> &nums)
 {
     vector<vector<int>> result;
-    int n = nums.size();
-    if(n = 0) return result;
-    vector<vector<int>> tmps;
-    for (int i = 0; i < n; i++)
-    {
-        auto current = nums[i];
-        vector<int> tmp;
-        for(int j =0; j < tmps.size();j++)
-        {
-            for (int k = 0; k < tmps[j].size(); k++)
-            {
-                tmp.push_back(current);
-                tmp.insert(tmp.end(), tmps[j].begin(), tmps[j].end());
-                current = 
-            }
-
-        }
-        
-    }
+    set<int> existence;
+    permuteUniqueChild(result,nums,existence,0,nums.size());
+    return result;
 }
-//1
-
-//1 2
-//2 1
-
-// 1 2 3
-// 1 3 2
-// 2 1 3
-// 2 3 1
-// 3 1 2
-// 3 2 1
 
 PermuteUnique::PermuteUnique(/* args */) 
 {
-
+    vector<int> nums = {1, 1, 2};
+    auto res = permuteUnique(nums);
+    for(auto r : res)
+    {
+        COUTI(r);
+    }
 }
 
 CUSTOMEGISTER(PermuteUnique,PermuteUnique)
