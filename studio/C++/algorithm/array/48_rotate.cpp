@@ -13,12 +13,11 @@ void rotate(vector<vector<int>> &matrix)
 {
     int n = matrix.size();
     if(n == 0) return;
-    int colhalf = n / 2 + 1;
     int rowhalf = n / 2;
     n--;
     for (int startRow = 0; startRow < rowhalf; startRow++)
     {
-        for(int startCol = startRow; startCol < colhalf - startRow; startCol++)
+        for(int startCol = startRow; startCol < n - startRow; startCol++)
         {
             int i = startRow;
             int j = startCol;
@@ -38,6 +37,10 @@ void rotate(vector<vector<int>> &matrix)
 Rotate::Rotate(/* args */) 
 {
     vector<vector<int>> matrix={{5,1,9,11},{2,4,8,10},{13,3,6,7},{15,14,12,16}};
+    for (auto ma : matrix)
+        COUTI(ma);
+
+    COUT("---------输出-------------")
     rotate(matrix);
     for(auto ma : matrix)
         COUTI(ma);

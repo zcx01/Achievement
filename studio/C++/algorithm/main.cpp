@@ -37,12 +37,12 @@ int main(int arg, char *argv[])
     std::list<std::string> names;
     ObjectFactory::getObjectName(names);
 
-#ifndef NDEBUG
-    std::string cl;
-    std::cin >> cl;
-    exec(names, cl);
-    return 0;
-#endif
+// #ifndef NDEBUG
+//     std::string cl;
+//     std::cin >> cl;
+//     exec(names, cl);
+//     return 0;
+// #endif
 
     if (arg < 2)
     {

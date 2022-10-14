@@ -2,9 +2,10 @@ project (main)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./array DIR_SRCS)
+AUX_SOURCE_DIRECTORY(./str DIR_SRCS)
 
 #---------------include--------------
-set(DIR_INCLUDE ./ ./array ./include)
+set(DIR_INCLUDE ./ ./include)
 
 set(CMAKE_BUILD_TYPE "Debug")
 include_directories(${DIR_INCLUDE})
