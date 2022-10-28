@@ -64,7 +64,7 @@ def getSigInfo(sheel, row):
     if getValue(sheel, row, 12) == "Signed":
         sig.dataType = "-"
     sig.SetUnit(str(getValue(sheel, row, 13)))
-    sig.enum = str(getValue(sheel, row, 14))
+    if ISUSEDBCENUM: sig.enum = str(getValue(sheel, row, 14))
     try:
         if str(getValue(sheel, row, 15)) != 'nan':
             sig.initValue = int(getValue(sheel, row, 15), 16)  # 十进制
