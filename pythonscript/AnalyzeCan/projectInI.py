@@ -13,3 +13,4 @@ MSB=False
 ISUSEDBCENUM=False
 SubNet_Channel={'ICAN':"CAN1",'RCAN':'CAN0','ISCAN':'CAN0','HCAN':'CAN2',"Other":'CAN1'}
 Jira_Project = "BGS"
+SETSTR='/Set'

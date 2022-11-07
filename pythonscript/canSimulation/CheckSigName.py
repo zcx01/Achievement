@@ -119,7 +119,10 @@ def splitSig(sig):
         return sigs
     sigs.clear()
     tempMesages = re.findall(m_s,tempSigs[0])
-    sigs+=tempMesages
+    id = tempMesages.pop()
+    sender = "_".join(tempMesages)
+    sigs.append(sender)
+    sigs.append(id)
     sigs.append(tempSigs[1])
     return sigs
         
@@ -164,7 +167,7 @@ def reConfigDict(js,key,value): # 添加进容器，如果有重复就打印，�
     printGreen(f'{value} 添加完成')
 
 def addSet(topic):
-    if not topic.endswith('/Set'): topic = topic+"/Set"
+    if not topic.endswith(SETSTR): topic = topic+SETSTR
     return topic
 
 def ToConfigJson(javaPath,configPath,down_config="",up_config=""):
@@ -275,7 +278,7 @@ def addMultipleSig(canmatrix,msgIds,topics):
                     continue   
                 bindSigNames.append(dbcSigName)
 
-            if Sender not in local_machine_Sender: 
+            if Sender not in local_machine_Sender and not topics[msgIdIndex].endswith(SETSTR): 
                 jsUp[topics[msgIdIndex]]={}
                 jsUp[topics[msgIdIndex]]['bindSigNames'] = bindSigNames
             else:

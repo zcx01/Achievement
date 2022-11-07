@@ -1,0 +1,25 @@
+file:///./../code/include/terminate.hpp
+
+1.传统的错误处理
+assert（）的意图是：用于开发阶段的调试，通过宏定义语句#define NDEBUG使其在最终发行的软件产品中失效。
+
+2.抛出异常 throw
+
+3.捕获异常
+try{}catch{}
+
+4.捕获所有异常 ...
+
+5.不捕获异常
+1)terminate
+如果没有处理异常，会自动调用terminate(),在默认情况下terminate函数会调用abort()使程序执行异常终止而退出
+析构函数不允许抛出异常
+
+2)set_terminate()函数
+设置读者自己的terminate()函数
+返回被替换的指向terminate()函数的指针
+
+3)清理
+当构造函数没有正常结束(抛出异常)时不会调用相关联的析构函数
+会造成内存泄漏
+
