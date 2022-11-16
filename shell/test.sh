@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# spawn ssh chengxiongzhu@10.25.11.197 \
+# spawn ssh chengxiongzhu@10.25.11.10 \
 # "ls\n"\
 # "cd Works\n"\
 # "ls\n"\
@@ -14,7 +14,7 @@
 # }
 # interact
 
-# ssh chengxiongzhu@10.25.11.197 
+# ssh chengxiongzhu@10.25.11.10 
 # <<EOF 
 # adb shell 
 # EOF

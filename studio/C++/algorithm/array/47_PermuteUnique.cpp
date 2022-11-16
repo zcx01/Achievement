@@ -29,6 +29,7 @@ void permuteUniqueChild(vector<vector<int>> &result,vector<int> &nums,set<int> &
         {
             existence.insert(nums[f]);
         }
+        COUTI(existence);
         swap(nums[i],nums[f]);
     }
 }
@@ -45,10 +46,10 @@ PermuteUnique::PermuteUnique(/* args */)
 {
     vector<int> nums = {1, 1, 2};
     auto res = permuteUnique(nums);
-    for(auto r : res)
-    {
-        COUTI(r);
-    }
+    // for(auto r : res)
+    // {
+    //     COUTI(r);
+    // }
 }
 
 CUSTOMEGISTER(PermuteUnique,PermuteUnique)

@@ -144,7 +144,7 @@ def getThreeFrame(jsConfig):
 def appoint(sig,wirteSigName, isMsg): #是否是指定添加的信号
     assert isinstance(sig,SigInfo)
     if not isMsg:
-        return sig.name.upper() == wirteSigName.upper()
+        return sig.name.upper() == wirteSigName.upper() or sig.messageId+sig.name.upper() == wirteSigName.upper()
     else:
         return sig.messageId == wirteSigName.upper()
 

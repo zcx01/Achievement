@@ -28,5 +28,5 @@ for i in range(3):
 
 is_ssh = "-s" in sys.argv
 if is_ssh:
-    keyStr("ssh chengxiongzhu@10.25.11.197")
+    keyStr("ssh chengxiongzhu@10.25.11.10")
     keyStr("123456")
