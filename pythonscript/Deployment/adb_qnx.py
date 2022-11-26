@@ -22,6 +22,7 @@ if __name__ == "__main__":
     parser.add_argument('-n','--logGrade', help='修改log等级,指的是进程名称',type=str)
     parser.add_argument('-rl','--remvelog', help='清除log', nargs='?',default=1,type=int)
     parser.add_argument('-np','--nextPage', help='下一页', nargs='?')
+    parser.add_argument('-v','--value', help='值', nargs='?',default=1,type=int)
     args = parser.parse_args()
 
     for j in range(120):
@@ -39,6 +40,7 @@ if __name__ == "__main__":
     keyStr("root",0,"#")
 
     isExit = (args.interact == 0)
+    value = args.value
 
     if "-m" in sys.argv:
         try:
@@ -50,7 +52,8 @@ if __name__ == "__main__":
     if "-p" in sys.argv:
         try:
             # keyStr(f"on -T ic_apps_t -u ic_apps mega_ipc_sub -t  \"{args.subtopic}\" ")
-            keyStr(sendMqtt(args.pulishtopic,1))
+            keyStr(sendMqtt(args.pulishtopic,value))
+            isExit=True
         except:
             pass
 

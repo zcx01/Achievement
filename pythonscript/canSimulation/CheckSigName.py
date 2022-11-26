@@ -1,8 +1,5 @@
 #!/usr/bin/python
 import argparse
-from cgitb import text
-from pydoc_data.topics import topics
-import string
 from commonfun import*
 from AnalyzeCan.Analyzedbc import *
 from xlrd.book import Book
@@ -49,9 +46,13 @@ def CheckSigName(configPath,down_config="",up_config=""):
     jsDown, jsUp, dbc, jsConfig ,down_config,up_config= getJsConfig(configPath,down_config,up_config,True)
     sigNames = {}
 
+    igSigs = []
+    checkSigIgnore = getKeyPath("checkSigIgnore",jsConfig)
+    if os.path.exists(checkSigIgnore):
+        igSigs = getJScontent(checkSigIgnore)
     for top in jsDown:
         topValue = jsDown[top]
-        topNoSet = EesyStr.removeAll(top, "/Set")
+        topNoSet = EesyStr.removeAll(top, SETSTR)
         if type(topValue) == str:
             if topValue != top:
                 sigNames[topValue] = 0
@@ -69,15 +70,26 @@ def CheckSigName(configPath,down_config="",up_config=""):
                         sigNames[bindSigName] = s
         if not isTopc: sigNames[s] = 1
 
+    for igSig in igSigs:
+        if igSig in sigNames:
+            del sigNames[igSig]
+
     bar= ProgressBar()
     bar.total = len(sigNames)
+    igCmd =""
     for sig in sigNames:
         bar.printCurrnt()
         if is_chinese(sig):
             continue
         dbcSigName,Sender,isChanged = configConverdbc(sig,dbc)
 
-        if Sender == None or not isChanged:
+        if Sender == None:
+            if 'd' not in igCmd:
+                igCmd = input("下次检测是否忽略y(是)/n(否)/dy(全是)/dn(全否)")
+            if 'y' in igCmd:
+                igSigs.append(sig)
+            continue
+        if  not isChanged:
             continue
         can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
         f=open(can_parse_whitelistPath,'r')
@@ -97,6 +109,7 @@ def CheckSigName(configPath,down_config="",up_config=""):
 
     writeJs(down_config,jsDown)
     writeJs(up_config,jsUp)
+    writeJs(checkSigIgnore,igSigs)
     bar.printCurrnt()
     printGreen("分析完成")
 
