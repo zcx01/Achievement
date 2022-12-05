@@ -1,8 +1,5 @@
 #!/usr/bin/python
-import os
-from pickle import FALSE
 import re
-import sys
 from enum import Enum
 
 from commonfun import *

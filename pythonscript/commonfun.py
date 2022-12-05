@@ -278,6 +278,33 @@ def XlsCharToInt(col):
         return ord(col) - ord('A')
     return col
 
+#获取变量的名称
+def getVariableName(variable):
+    loc = globals()
+    for k,v in loc.items():
+        if loc[k] ==variable:
+            return k
+
+#获取文本中变量的值
+def getVariableText(variable,text):
+    variableName = getVariableName(variable)
+    if variableName in text:
+        texts = re.findall(e_i,text,re.A)
+        if len(texts) > 1:
+            return texts[1],True
+    return 0,False
+
+def strToBool(text):
+    assert isinstance(text,str)
+    if text.upper() == "TRUE":
+        return True
+    elif text.upper() == "FALSE":
+        return False
+    return bool(text)
+
+def boolToStr(b):
+    return str(b).lower()
+    
 # print(removeListIndexs([12,23,56],[0,2]))
 # def Temp(linelist):
 #     linelist.append('ddd')

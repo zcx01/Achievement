@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.txt": "plaintext",
+        "*.cpp": "cpp",
         "iostream": "cpp",
         "array": "cpp",
         "atomic": "cpp",
@@ -60,6 +61,9 @@
         "cinttypes": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "shared_mutex": "cpp"
     }
 }
