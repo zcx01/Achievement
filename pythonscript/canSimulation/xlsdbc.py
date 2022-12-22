@@ -203,20 +203,26 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                 print(f' {sig.name} 对应的 {sig.messageId} message不存在')
                 printYellow("可能的原因是:message没有加0x")
                 continue
-
+            
+            isWriteWhite = False
             writedbcresult = dbc.writeSig(sig, msg)
             if writedbcresult == WriteDBCResult.AlreadyExists:
                 if isAllAdd:
+                    # printYellow(f'{sig.getMessage_Sig()} 被替换')
                     dbc.repalceSig(sig)
+                    isWriteWhite = True
                 else:
                     isRepalce = input(f'{sig.getMessage_Sig()} 是否替換 y/n ')
                     if 'y' in isRepalce:
                         dbc.repalceSig(sig)
-
-            can_parse_whitelistPath = getKeyPath(
-                "can_parse_whitelist", jsConfig)
-            if os.path.isfile(can_parse_whitelistPath):
-                WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
+                        isWriteWhite = True
+            if writedbcresult == WriteDBCResult.WriteComplete:
+                isWriteWhite = True
+            if isWriteWhite:
+                can_parse_whitelistPath = getKeyPath(
+                    "can_parse_whitelist", jsConfig)
+                if os.path.isfile(can_parse_whitelistPath):
+                    WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
     if not isFind:
         print(f"{wirteSigName} 在CAN矩阵中不存在")
 

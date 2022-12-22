@@ -2,6 +2,7 @@
 import json
 import re
 import sys
+import os
 
 w_d=r'[a-zA-Z_]'                #匹配单词
 i_i=r"-?[0x0-9]"                #匹配数字
@@ -304,7 +305,12 @@ def strToBool(text):
 
 def boolToStr(b):
     return str(b).lower()
-    
+
+def getSuffix(fileName):
+    suffixs = os.path.splitext(fileName)
+    if len(suffixs) > 1 :
+        return suffixs[1]    
+    return ''
 # print(removeListIndexs([12,23,56],[0,2]))
 # def Temp(linelist):
 #     linelist.append('ddd')

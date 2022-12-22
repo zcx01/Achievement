@@ -662,7 +662,7 @@ class AnalyzeFile(object):
                     for sigUsrIndex in sigUsrIndexs:
                         if sigUsrIndex in userIndex[user]:
                             cover_count+=1
-                            print(sigUsrIndex,str(userIndex[user]),user,"----------")
+                            # print(sigUsrIndex,str(userIndex[user]),user,"----------")
                             is_user = True
                     if cover_count == 0:
                         continue

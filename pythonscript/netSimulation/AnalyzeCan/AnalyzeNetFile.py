@@ -118,8 +118,9 @@ class AnalyzeNetParserFile(object):
         self.maxSigRow=0
         for (dirpath,dirnames,filenames) in os.walk(self.netParserFile):
             sigInfo = None
-            for oriName in filenames:
-                with open(oriName,"r") as f:
+            for filename in filenames:
+                if getSuffix(filename) != SOURCE: continue
+                with open(filename,"r") as f:
                     linelist=f.readlines()
                     rowIndex=-1
                     for text in linelist:
@@ -161,6 +162,10 @@ class AnalyzeNetParserFile(object):
     def writeFile(self):
         sigInfos = list(self.netSigs.values())
         sigInfos.sort(key=lambda siginfo: siginfo.start_by_byte)
+        for (dirpath,dirnames,filenames) in os.walk(self.netParserFile):
+            for filename in filenames:
+                suffix = getSuffix(filename)
+                if suffix == HEAD:
 
         pass
     def repalceContent(self,linelist,row,content,isTip = True):

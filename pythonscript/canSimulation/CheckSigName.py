@@ -247,6 +247,9 @@ def getSigXls(xlsFileName):
     for i in range(sheel.nrows):
         try:
             sigName = getCellValue(sheel,i,XlsCharToInt('C'))
+            if len(sigName) == 0:
+                printRed(f'{i}行是空的')
+                continue
             msgid =  str( getCellValue(sheel,i,XlsCharToInt('E'))).split(".")[0].replace('0x', '')
             Sender= getCellValue(sheel,i,XlsCharToInt('B'))
             sigXls = SigXls()
