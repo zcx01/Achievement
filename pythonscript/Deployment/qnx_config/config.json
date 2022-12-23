@@ -29,7 +29,7 @@
         "ictelltale_config.json": "../../qt/ic_qt/resources/config",
         "libresources_plugin.so": "../../output/binary/opt/apps/latest/qt/qml/Resources",
         "libmega_ic_plugin.so": "../../output/binary/opt/apps/latest/qt/qml/MegaIC",
-        "lib_mega_ipc.so": "../../common_prebuilts/mega_ipc/lib",
+        "lib_mega_ipc.so": "../common/mega_ipc/lib",
         "resources.rcc": "../../output/binary/opt/apps/latest/qt",
         "ic_qt_zh_CN.qm": "../../qt/ic_qt/resources/translate"
     }

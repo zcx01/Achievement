@@ -16,7 +16,7 @@ import pexpect
 from PIL import Image
 
 
-def qnx_screen_video(serial, video_path, branch='bigsur'):
+def qnx_screen_video(serial, video_path, branch=''):
     """
 
     :param serial:
@@ -46,14 +46,14 @@ def qnx_screen_video(serial, video_path, branch='bigsur'):
                 # p.sendline("screenshot -display=2 -file=/ota/android/screen_2.bmp")
                 # p.expect(["#", pexpect.EOF, pexpect.TIMEOUT])
                 p.sendline("exit")
-                logout_index = p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT])
+                logout_index = p.expect([":", pexpect.EOF, pexpect.TIMEOUT])
                 if logout_index == 0:
                     logging.info("log out qnx sucessful!")
                     # 拉取图片到android
                     # p.sendline('curl -u root:root -o /sdcard/screen_1.bmp "ftp://cdc-qnx/var/screen_1.bmp"')
-                    # p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
+                    # p.expect([":", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
                     # p.sendline('curl -u root:root -o /sdcard/screen_2.bmp "ftp://cdc-qnx/var/screen_2.bmp"')
-                    # p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
+                    # p.expect([":", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
                     p.close(force=True)
                     # 拉取图片到PC
                     # img_tag = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
@@ -87,10 +87,10 @@ def qnx_screen_video(serial, video_path, branch='bigsur'):
 
 
 
-def qnx_screenshot_1_2_1(serial, image_path, branch='bigsur'):
+def qnx_screenshot_1_2_1(serial, image_path,Sindex=1, branch=''):
     """
     :param image_path: image_path
-    :param branch: defalut is bigsur
+    :param branch: defalut is 
     :param ratio: below two images
     :return: True if screenshot success,
     """
@@ -113,19 +113,19 @@ def qnx_screenshot_1_2_1(serial, image_path, branch='bigsur'):
             if qnx_index == 0:
                 logging.info("login qnx sucessful!")
                 # 开始截屏
-                p.sendline("screenshot -display=1 -file=/ota/android/screen.bmp")
+                p.sendline(f"screenshot -display={Sindex} -file=/ota/android/screen.bmp")
                 p.expect(["#", pexpect.EOF, pexpect.TIMEOUT])
                 # p.sendline("screenshot -display=1 -file=/ota/android/screen_2.bmp")
                 # p.expect(["#", pexpect.EOF, pexpect.TIMEOUT])
                 p.sendline("exit")
-                logout_index = p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT])
+                logout_index = p.expect([":", pexpect.EOF, pexpect.TIMEOUT])
                 if logout_index == 0:
                     logging.info("log out qnx sucessful!")
                     # 拉取图片到android
                     # p.sendline('curl -u root:root -o /sdcard/screen_1.bmp "ftp://cdc-qnx/var/screen_1.bmp"')
-                    # p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
+                    # p.expect([":", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
                     # p.sendline('curl -u root:root -o /sdcard/screen_2.bmp "ftp://cdc-qnx/var/screen_2.bmp"')
-                    # p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
+                    # p.expect([":", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
                     p.close(force=True)
                     # 拉取图片到PC
                     # img_tag = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
@@ -158,7 +158,7 @@ def qnx_screenshot_1_2_1(serial, image_path, branch='bigsur'):
 def qnx_screenshot_1_1_0(serial, image_path):
     #登录android
     p = pexpect.spawn("adb shell", encoding='utf-8', logfile=sys.stdout, timeout=30)
-    index = p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT])
+    index = p.expect([":", pexpect.EOF, pexpect.TIMEOUT])
     if index != 0:
         logging.error("%s is not connected!" % serial)
         p.close(force=True)
@@ -178,14 +178,14 @@ def qnx_screenshot_1_1_0(serial, image_path):
                 p.sendline("screenshot -display=2 -file=/var/screen_2.bmp")
                 p.expect(["#", pexpect.EOF, pexpect.TIMEOUT])
                 p.sendline("exit")
-                logout_index = p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT])
+                logout_index = p.expect([":", pexpect.EOF, pexpect.TIMEOUT])
                 if logout_index == 0:
                     logging.info("log out qnx successful!")
                     #拉取图片到android
                     p.sendline('curl -u root:root -o /sdcard/screen_1.bmp "ftp://192.168.1.1/var/screen_1.bmp"')
-                    p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
+                    p.expect([":", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
                     p.sendline('curl -u root:root -o /sdcard/screen_2.bmp "ftp://192.168.1.1/var/screen_2.bmp"')
-                    p.expect(["bigsur:", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
+                    p.expect([":", pexpect.EOF, pexpect.TIMEOUT], timeout=60)
                     p.close(force=True)
                     #拉取图片到PC
                     img1 = os.path.join(image_path, "screen_1.bmp")
@@ -222,6 +222,9 @@ def blend_two_images(img1, img2, output_img, ratio=0.4):
 
 
 if __name__ == "__main__":
-    qnx_screenshot_1_2_1(serial="614467a7", image_path="./")
+    if len(sys.argv) < 2:   
+        qnx_screenshot_1_2_1(serial="614467a7", image_path="./")
+    else:
+        qnx_screenshot_1_2_1(serial="614467a7", image_path="./",Sindex=int(sys.argv[1]))
     # qnx_screen_video(0, video_path="/home/shengm/Pictures/test")
 
