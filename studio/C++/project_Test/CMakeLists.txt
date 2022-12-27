@@ -7,7 +7,7 @@ AUX_SOURCE_DIRECTORY(./parser_can DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./parser_lin DIR_SRCS)
 
 #---------------include--------------
-set(DIR_INCLUDE ./common_codes ./)
+set(DIR_INCLUDE ./common_codes ./ ./base)
 
 set(CMAKE_BUILD_TYPE "Debug")
 include_directories(${DIR_INCLUDE})

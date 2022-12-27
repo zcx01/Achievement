@@ -211,13 +211,21 @@ def addConfigSig(sigs,isOriginal,configPath="",down_config="",up_config=""):
     for sigName in sigs:
         assert isinstance(sigName,str)
         dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
-        down_topic = sigName if isOriginal else dbcSigName
-        down_topic = addSet(sigName)
+        if isOriginal and SETSTR in sigName:
+            down_topic = addSet(sigName)
+        else:
+            down_topic = addSet(dbcSigName)
+        
+        if isOriginal and SETSTR in sigName:
+            up_topic = sigName
+        else:
+            up_topic = dbcSigName
+            
         if Sender == None:
             printRed(f"{sigName} 没有发送者")
             continue
         if Sender not in local_machine_Sender: 
-            reConfigDict(jsUp,dbcSigName,sigName if isOriginal else dbcSigName)       
+            reConfigDict(jsUp,dbcSigName,up_topic)       
             # if down_topic in jsDown :del jsDown[down_topic]   
         if Sender in local_machine_Sender: 
             reConfigDict(jsDown,down_topic,dbcSigName)

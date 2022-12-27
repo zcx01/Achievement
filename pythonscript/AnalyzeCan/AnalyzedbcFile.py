@@ -684,6 +684,8 @@ class AnalyzeFile(object):
                     return WriteDBCResult.SignalCoverage
 
                 linelist.insert(insertRowIndex,sig.getSG())
+                msg.message_Name = dm.message_Name
+                sig.messgae_Name = dm.message_Name
                 insertRow = AnalyzeFile.appendKey(linelist,sig.getStartValue())
                 if sig.sendType != SigSendType.Normal:
                     AnalyzeFile.appendKey(linelist,sig.getSigSendType(),insertRow)
