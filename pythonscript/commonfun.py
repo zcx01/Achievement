@@ -192,28 +192,57 @@ def eConverf(value):
             return head.format(value)
     return value
 
-#在lines关键字behind后面添加content
-def behindStr(lines,behind,content):
+#在lines关键字behind后面添加content, number:第几个
+def behindStr(lines,behind,content,number=0):
     index = 0
     behinds=[]
     row=0
+    numberIndex=0
     while index < len(lines):
         if behind in lines[index]:
             behinds.append(lines[index])
             row = index+1
+            if numberIndex == number:
+                continue
+            numberIndex+=1
         index+=1
-    if content not in behinds:
-        lines.insert(row,content)
+    if type(content) == str:
+        if content not in behinds:
+            lines.insert(row,content)
+    elif type(content) == list:
+        behindIndex(lines,row,content)
 
 #在指定行后面添加contents
 def behindIndex(lines,pos,contents):
-    temp=[]
-    temp.extend(lines[0:pos])
-    temp.extend(contents)
-    temp.extend(lines[pos:len(lines)])
-    return temp
+    assert isinstance(lines,list)
+    temp=lines.copy()
+    lines.clear()
+    lines.extend(temp[0:pos])
+    lines.extend(contents)
+    lines.extend(temp[pos:len(lines)])
+    return lines
+'''
+移除文本块
+lineTexts:文本
+beginStr:开始标志
+endStr:结束标志
+'''
+def RemoveBlock(lineTexts,beginStr,endStr):
+    assert isinstance(lineTexts,list)
+    tmp=[]
+    isRemove = False
+    for lineText in lineTexts:
+        if beginStr in lineText:
+            tmp.append(lineText)
+            isRemove = True
+        elif endStr in lineText:
+            tmp.append(lineText)
+            isRemove = True
+        if not isRemove:
+            tmp.append(lineText)
+    return tmp
 
-#
+#得到没有0x的16进制的文本
 def getNoOx16(text):
     content = str(text)
     if content.startswith('0x'):
@@ -311,6 +340,7 @@ def getSuffix(fileName):
     if len(suffixs) > 1 :
         return suffixs[1]    
     return ''
+
 # print(removeListIndexs([12,23,56],[0,2]))
 # def Temp(linelist):
 #     linelist.append('ddd')

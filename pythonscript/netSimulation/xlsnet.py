@@ -8,11 +8,11 @@ import argparse
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 from commonfun import*
-from AnalyzeNet import *
-from AnalyzeCan.projectInI import *
+from AnalyzenNet.AnalyzeNetFile import *
+from AnalyzenNet.projectInI import *
 
 def getValue(src, row, col):
-    return src.cell_value(row, col)
+    return src.cell_value(row, XlsCharToInt(col))
 
 def getValueInt(src, row, col, lenght=-1):
     try:
@@ -36,113 +36,40 @@ def getValueInt(src, row, col, lenght=-1):
         return pow(2, lenght)-1
 
 def getSigInfo(sheel, row):
-    sig = SigInfo()
-    sig.subNet = str(getValue(sheel, row, 0)).upper()
-    sig.Sender = str(getValue(sheel, row, 1)).upper()
-    temp = str(getValue(sheel, row, 2))
+    sig = NetSigInfo()
+    sig.subNet = str(getValue(sheel, row, 'A')).upper()
+    sig.Sender = str(getValue(sheel, row, 'B')).upper()
+    temp = str(getValue(sheel, row, 'F'))
     temps = re.findall(e_i, temp, re.A)
     sig.name = "_".join(temps)
-    sig.chineseName = str(getValue(sheel, row, 3))
-    sig.messageId = str(getValue(sheel, row, 4)).split(".")[0].replace('0x', '')
-    sig.cycle = getValueInt(sheel, row, 5)
-    if sig.cycle == 0:  # 没有周期，就解析为0
-        sig.sendType = SigSendType.Event
-
-    posBit = getValueInt(sheel, row, 6)
-    if MSB == True:
-        sig.startBit = posBit
-    else:
-        sig.endBit = posBit
-    sig.length = getValueInt(sheel, row, 7)
-    sig.factor = getValueInt(sheel, row, 8)
+    sig.chineseName = str(getValue(sheel, row, 'G'))
+    sig.messageId = str(getValue(sheel, row, 'H')).split(".")[0].replace('0x', '')
+    sig.cycle = getValueInt(sheel, row, 'I')
+    sig.start_by_byte = getValueInt(sheel, row, 'J')
+    sig.length_byte = getValueInt(sheel, row, 'K')
+    sig.length_bits = getValueInt(sheel, row, 'L')
+    sig.factor = getValueInt(sheel, row, 'M')
     if sig.factor == float(0) and len(sig.name) != 0:
         printYellow(f'{sig.name} 缩放不能为0，此处修改成1,行号为{row}')
         sig.factor = 1
-    sig.Offset = getValueInt(sheel, row, 9)
-    sig.min = getValueInt(sheel, row, 10)
-    sig.max = getValueInt(sheel, row, 11, sig.length)
-    if getValue(sheel, row, 12) == "Signed":
+    sig.Offset = getValueInt(sheel, row, 'N')
+    sig.phy_min = getValueInt(sheel, row, 'O')
+    sig.phy_max = getValueInt(sheel, row, 'P', sig.length_bits)
+    if getValue(sheel, row, 'Q') == "Signed":
         sig.dataType = "-"
-    sig.SetUnit(str(getValue(sheel, row, 13)))
+    sig.SetUnit(str(getValue(sheel, row, 'R')))
     if ISUSEDBCENUM: sig.enum = str(getValue(sheel, row, 14))
     try:
-        if str(getValue(sheel, row, 15)) != 'nan':
+        if str(getValue(sheel, row, 'T')) != 'nan':
             sig.initValue = int(getValue(sheel, row, 15), 16)  # 十进制
     except:
         pass
-    sig.invalidValue = getValue(sheel, row, 17)
-    sig.Recevier = getValue(sheel, row, 20)
-    sig.RecevierRemoveSend()
-    if sig.endBit != -1:
-        sig.getStartBit()
-    else:
-        sig.getEndBit()
+    sig.invalidValue = getValue(sheel, row, 'U')
+    sig.Recevier = getValue(sheel, row, 'X')
     return sig
 
-def getMessageInfo(sheel):
-    msgs = {}
-    assert isinstance(sheel, Sheet)
-    for row in range(sheel.nrows):
-        try:
-            msg = MessageInfo()
-            msg.subNet = sheel.cell_value(row, 0)
-            msg.sender = sheel.cell_value(row, 1)
-            sendingMode = str(sheel.cell(row, 2))
-            msg.messageId = getNoOx16(str(sheel.cell_value(row, 4)))
-            if 'event' in sendingMode.lower():
-                msg.sendType = 8
-            msg.cycle = getValueInt(sheel, row, 3)
-            if msg.cycle == 0:
-                cycleContent = str(getValue(sheel, row, 3))
-                cycleContents = re.findall(e_i, cycleContent, re.A)
-                if len(cycleContents) >= 2:
-                    try:
-                        msg.cycle = int(cycleContents[0])
-                        msg.threeCycle = int(cycleContents[1])
-                    except:
-                        pass
-            msg.lenght = getValueInt(sheel, row, 5)
-            msg.Recevier = str(sheel.cell_value(row, 6))
-            frame = str(sheel.cell_value(row, 9))
-            try:
-                if len(frame) == 0 or len(splitSpace(frame)) == 0:
-                    frame = SubNet_Frame.get(msg.subNet, 0)
-                else:
-                    frame = VFrameFormat.get(frame, int(float(frame)) if isNumber(frame) else SubNet_Frame.get(msg.subNet, 0))
-            except:
-                frame = SubNet_Frame.get(msg.subNet, 0)
-
-            msg.frame = frame
-            if msg.messageId not in msgs:
-                msgs[msg.getMessage_SubNet()] = msg
-            else:
-                # print(f'{row} {msg.messageId} 已经存在')
-                pass
-        except:
-            if len(msgs) != 0:
-                print(f'{row} 是值不合法的')
-            pass
-    return msgs
-
-def getThreeFrame(jsConfig):
-    srcSendType = getKeyPath("srcSendType", jsConfig)
-    threeFrames = []
-    if not os.path.isfile(srcSendType):
-        print("不存在 srcSendType 文件 " + srcSendType)
-        return threeFrames
-    typeContents = readFileLines(srcSendType)
-    for typeContent in typeContents:
-        typeContent = typeContent.strip()
-        if typeContent.startswith('.start_bit'):
-            try:
-                contents = re.findall(e_i, typeContent, re.A)
-                threeFrames.append(contents[2])
-            except:
-                pass
-    return threeFrames
-
 def appoint(sig,wirteSigName, isMsg): #是否是指定添加的信号
-    assert isinstance(sig,SigInfo)
+    assert isinstance(sig,NetSigInfo)
     if not isMsg:
         return sig.name.upper() == wirteSigName.upper() or sig.messageId+sig.name.upper() == wirteSigName.upper()
     else:
@@ -156,8 +83,8 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
         isAllAdd = False
     print(canmatrix)
 
-    dbcfile = getKeyPath("dbcfile", jsConfig)
-    print(dbcfile)
+    netfile = getKeyPath("netParser", jsConfig)
+    print(netfile)
     book = xlrd.open_workbook(canmatrix)
     assert isinstance(book, Book)
 
@@ -166,24 +93,12 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
     assert isinstance(messageSheel, Sheet)
     isFind = False
 
-    msgs = getMessageInfo(messageSheel)
-    assert isinstance(msgs, dict)
-    if len(msgs) == 0:
-        printRed("messaage 不存在或者解析错误")
-        return
-
-    threeFrames = getThreeFrame(jsConfig)
+    net = AnalyzeNetParserFile(netfile)
     for row in range(sheel.nrows):
-        # xf = book.xf_list[getValue(sheel, row, 2).xf_index]
-        # print(type(xf))
-
         if row == 0:
             continue
         sig = getSigInfo(sheel, row)
         if appoint(sig,wirteSigName,isMsg) or isAllAdd:
-            if sig.name in threeFrames:
-                sig.sendType = SigSendType.Three
-            # print(type(sig.min),type(sig.max),type(sig.Offset),type(sig.factor))
             realMin = (float(sig.min)-float(sig.Offset)) / float(sig.factor)
             realMax = (float(sig.max)-float(sig.Offset)) / float(sig.factor)
             if realMin < 0 and sig.dataType == "+":
@@ -197,38 +112,30 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                 continue
 
             isFind = True
-            dbc = Analyze(dbcfile)
-            msg = msgs.get(sig.getMessage_SubNet(), None)
-            if msg == None:
-                print(f' {sig.name} 对应的 {sig.messageId} message不存在')
-                printYellow("可能的原因是:message没有加0x")
-                continue
-
-            writedbcresult = dbc.writeSig(sig, msg)
-            if writedbcresult == WriteDBCResult.AlreadyExists:
+            writedbcresult = net.addSig(sig)
+            if writedbcresult == WriteResult.AlreadyExists:
                 if isAllAdd:
-                    dbc.repalceSig(sig)
+                    net.repalceSig(sig)
                 else:
-                    isRepalce = input(f'{sig.getMessage_Sig()} 是否替換 y/n ')
+                    isRepalce = input(f'{sig.name()} 是否替換 y/n ')
                     if 'y' in isRepalce:
-                        dbc.repalceSig(sig)
+                        net.repalceSig(sig)
 
     if not isFind:
-        print(f"{wirteSigName} 在CAN矩阵中不存在")
-
-
-
+        print(f"{wirteSigName} 在矩阵中不存在")
+    else:
+        net.writeFile()
 
 def RemoveSigs(configPath, sigNames):
     jsConfig = getJScontent(configPath)
-    dbcfile = getKeyPath("dbcfile", jsConfig)
-    dbc = Analyze(dbcfile)
-    dbc.removeSig(sigNames)
+    netfile = getKeyPath("netParser", jsConfig)
+    net = AnalyzeNetParserFile(netfile)
+    net.removeSig(sigNames)
 
 def RemoveMsgs(configPath, msgs,channal):
     jsConfig = getJScontent(configPath)
-    dbcfile = getKeyPath("dbcfile", jsConfig)
-    dbc = Analyze(dbcfile)
+    netfile = getKeyPath("netParser", jsConfig)
+    dbc = AnalyzeNetParserFile(netfile)
     dbc.removeMessage(channal,msgs)
 
 def addHeadEnd(text, name):

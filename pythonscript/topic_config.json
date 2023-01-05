@@ -507,5 +507,35 @@
         "filePath": [
             "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_seat_wind.cpp"
         ]
+    },
+    "IPC_ADAS_LANE_CHANGE_ASSIST_MODE_SET": {
+        "topic": [
+            "\"ADAS/LaneChangeAssistMode/Set\""
+        ],
+        "desc": [
+            "//并线/换道辅助 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_assist_module.cpp"
+        ]
+    },
+    "风量": {
+        "topic": [],
+        "desc": [],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/air_conditioner.cpp"
+        ]
+    },
+    "IPC_AC_WIND_LEVEL_FRONT_SET": {
+        "topic": [
+            "\"AC/WindLevel/Front/Set\""
+        ],
+        "desc": [
+            "//前排空调当前风速 Set "
+        ],
+        "filePath": [
+            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
+        ]
     }
 }

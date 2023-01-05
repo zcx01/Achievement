@@ -11,7 +11,7 @@ class DataType(Enum):
     VINT=1
     VFLOAT=2
 
-class WriteDBCResult(Enum):
+class WriteResult(Enum):
     AlreadyExists=1     #信号已经存在
     SignalCoverage=2    #信号有覆盖
     WriteComplete=3     #写入完成
@@ -41,22 +41,28 @@ class NetSigInfo(object):
         #-------message--------
         self.Recevier=""
         self.Sender=""
-        self.cycle=0 
+        self.cycle=0
+        self.messageId =0 
         #----------代码中独有的------------
         self.structRow=-1
         self.externRow=-1
         self.netMsgRow=-1
         #----------can矩阵独有------------
         self.chineseName=''
+        self.subNet=''
+        self.dataType = ''
+        self.enum=''
+        self.initValue=''
+        self.invalidValue=''
     
     def getStrcutName(self):
         return 'struct NetSignal Net_{} ='.format(self.name)
 
     def getExtern(self):
-        return 'extern struct NetSignal Net_{};'.format(self.name)
+        return 'extern struct NetSignal Net_{};\n'.format(self.name)
 
     def getNetMsg(self):
-        return 'extern struct NetSignal Net_{};'.format(self.name)
+        return '	&Net_{},\n'.format(self.name)
 
     def getVariableNameAndValue(variable):
         return '.{} = {},'.format(getVariableName(variable)).format(variable)
@@ -76,45 +82,34 @@ class NetSigInfo(object):
             block_l0.add_code_line(self.getVariableNameAndValue(self.phy_min),termination='')
             block_l0.add_code_line(self.getVariableNameAndValue(self.phy_max),termination='')
             block_l0.add_code_line(self.getVariableNameAndBool(self.is_timeout),termination='')
+            block_l0.add_blank_line()
         return block_l0.data
 
-
-class NetMessageInfo(object):
-    def __init__(self) -> None:
-        super().__init__()
-        self.messageId = 0 #16进制
-        self.sender=''
-        self.cycle = 0
-        self.threeCycle = 0 #三帧反转的周期
-        self.frame=0
-        self.subNet=''
-        self.Recevier=''
-        self.lenght=0
-        self.sendType=0
-        #---------dbc专有
-        self.message_Name=''
-        self.sigs=[]
-        self.Row=-1
-        self.cycleRow=-1
-        self.frameRow=-1
-        self.sendTypeRow=-1
-        self.sigMaxRow=-1
-        self.threeCycleRow=-1
-
-
+    #得到使用的字节,如果返回的数组有数据标识有冲突
+    def getUseByte(self,useByte):
+        conflictByte=[]
+        conflict= False
+        assert isinstance(useByte,list)
+        for byte in range(self.length_byte):
+            currentByte=self.start_by_byte+byte
+            if currentByte in useByte:
+                conflict = True
+            if conflict:
+                conflictByte.append(currentByte)
+            else:
+                useByte.append(currentByte)
+        return conflictByte
 class AnalyzeNetParserFile(object):
     def __init__(self,net_parser_Path=None) :
         if len(net_parser_Path) ==0:
             return
         self.netSigs={} #以 name 为key
-        self.netMessage={} # 以 十六进制ID 为key
         self.netParserFile=net_parser_Path
         self.maxSigRow=0
         self.analy()
     
     def analy(self):
         self.netSigs={}
-        self.netMessage={}
         self.maxSigRow=0
         for (dirpath,dirnames,filenames) in os.walk(self.netParserFile):
             sigInfo = None
@@ -159,15 +154,22 @@ class AnalyzeNetParserFile(object):
                         variableValue,exist = getVariableText(sigInfo.is_timeout,text)
                         if exist: sigInfo.is_timeout = strToBool(variableValue)                                                
 
-    def writeFile(self):
-        sigInfos = list(self.netSigs.values())
-        sigInfos.sort(key=lambda siginfo: siginfo.start_by_byte)
-        for (dirpath,dirnames,filenames) in os.walk(self.netParserFile):
-            for filename in filenames:
-                suffix = getSuffix(filename)
-                if suffix == HEAD:
-
-        pass
+    @staticmethod
+    def RemoveOldbBock(lineTexts,beginStr,endStr):
+        assert isinstance(lineTexts,list)
+        tmp=[]
+        isRemove = False
+        for lineText in lineTexts:
+            if BUILDINGBLOCKSBEGIN in lineText:
+                tmp.append(lineText)
+                isRemove = True
+            elif BUILDINGBLOCKEND in lineText:
+                tmp.append(lineText)
+                isRemove = True
+            if not isRemove:
+                tmp.append(lineText)
+        return tmp
+                
     def repalceContent(self,linelist,row,content,isTip = True):
         if len(content) != 0 and row > 0:
             linelist[row] = content
@@ -176,8 +178,29 @@ class AnalyzeNetParserFile(object):
 
     def RowContent(self,rowIndexs,row):
         if row > 0:
-            rowIndexs.append(row)                       
-        
+            rowIndexs.append(row) 
+
+    def checkOneSigBit(self,sigInfo,useBtye):
+        assert isinstance(sigInfo,NetSigInfo)
+        if sigInfo.messageId not in useBtye:
+            useBtye[sigInfo.messageId]=[]
+        conflictByte=sigInfo.getUseByte(useBtye[sigInfo.messageId])
+        if len(conflictByte) != 0:
+            printRed(f'{sigInfo.name}字节有冲突，冲突的字节为{conflictByte}')
+            return False
+        return True
+
+    def checkSigBit(self,sig=None):
+        useBtye={}
+        if sig==None:
+            passCheck = True
+            sigInfos = list(self.netSigs.values())
+            for sigInfo in sigInfos:
+                if not self.checkOneSigBit(sigInfo,useBtye):
+                    passCheck = False
+            return passCheck
+        else:
+            return self.checkOneSigBit(sig,useBtye,useBtye)
 
     #----------------------------------对外接口-----------------------------------------
     #------------------------------------------------------------------------------------
@@ -189,62 +212,62 @@ class AnalyzeNetParserFile(object):
     def getSig(self,sigName):
         if sigName in self.netSigs:
             return self.netSigs[sigName]
-        for messageSig in self.netSigs:
-            sig = self.netSigs[messageSig]
-            assert isinstance(sig,NetSigInfo)
-            if sig.name.upper() == sigName.upper() or sig.getMessage_Sig().upper() == sigName.upper():
-                return sig
         return None
-
-    def getMessage(self,msgId): #msgId 16进制
-        try:
-            return self.netMessage[msgId]
-        except:
-            return None
 
     def sigExist(self,sigName):
         return self.getSig(sigName) != None
         # sys.exit()
 
-    def writeSig(self,sig,msg):
-        assert isinstance(sig,NetSigInfo)
-        assert isinstance(msg,NetMessageInfo)
+    def addSig(self,sigInfo):
+        assert isinstance(sigInfo,NetSigInfo)
+        if self.sigExist(sigInfo.name):
+            return WriteResult.AlreadyExists
+        elif not self.checkSigBit(sigInfo):
+            return WriteResult.SignalCoverage
+        self.netSigs[sigInfo.name] = sigInfo
+        return WriteResult.WriteComplete
 
-    def removeSig(self,sigs,isWirte=True):
-        removeIndex = []
-        for sig in sigs:
-            assert isinstance(sig,NetSigInfo)
-            self.RowContent(removeIndex,sig.Row)
-            self.RowContent(removeIndex,sig.initRow)
-            self.RowContent(removeIndex,sig.sendTypeRow)
-            self.RowContent(removeIndex,sig.enumRow)
-            printGreen(f"移除{sig.name}信号完成")
-        linelist = readFileLines(self.dbcPath)
-        linelist=removeListIndexs(linelist,removeIndex)
-        if isWirte:
-            wirteFileDicts(self.dbcPath, linelist, False)
-        return removeIndex
+    def repalceSig(self,sigInfo):
+        assert isinstance(sigInfo,NetSigInfo)
+        self.netSigs[sigInfo.name] = sigInfo
 
-    def removeMessage(self,masgs):
-        removeIndex = []
-        for msg in masgs:
-            assert isinstance(msg,NetMessageInfo)
-            ori_msg = self.netMessage.get(msg.messageId,None)
-            assert isinstance(ori_msg,NetMessageInfo)
-            if ori_msg == None:
-                print(f'{msg.messageId} 不存在')
-                continue
-            sigs = self.getSigsByMessageId(ori_msg.messageId)
-            removeIndex.extend(self.removeSig(sigs,False))
-            self.RowContent(removeIndex,ori_msg.Row)
-            self.RowContent(removeIndex,ori_msg.frameRow)
-            self.RowContent(removeIndex,ori_msg.sendTypeRow)
-            self.RowContent(removeIndex,ori_msg.cycleRow)
-            self.RowContent(removeIndex,ori_msg.threeCycleRow)
-        linelist = readFileLines(self.dbcPath)
-        linelist=removeListIndexs(linelist,removeIndex)
-        wirteFileDicts(self.dbcPath, linelist, False)
-        printGreen("移除message完成")
+    def removeSig(self,sigInfo):
+        assert isinstance(sigInfo,NetSigInfo)
+        if  sigInfo.name in self.netSigs:
+            del self.netSigs[sigInfo.name]
+            self.writeFile(False,False)
+            printGreen(f'{sigInfo.name}删除成功')
+        printGreen(f'{sigInfo.name}不存在')
+
+    def writeFile(self,isCheck=True,isTip=True):
+        if isCheck and not self.checkSigBit(): return WriteResult.SignalCoverage
+        sigInfos = list(self.netSigs.values())
+        sigInfos.sort(key=lambda siginfo: siginfo.start_by_byte)
+        for (dirpath,dirnames,filenames) in os.walk(self.netParserFile):
+            for filename in filenames:
+                suffix = getSuffix(filename)
+                lineTexts = readFileLines(filename)
+                lineTexts = RemoveBlock(lineTexts,BUILDINGBLOCKSBEGIN,BUILDINGBLOCKEND)
+                if suffix == HEAD:
+                    tmp = []
+                    for sigInfo in sigInfos:
+                        assert isinstance(sigInfo,NetSigInfo)
+                        tmp.append(sigInfo.getExtern())
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,tmp)
+                
+                elif suffix == SOURCE:
+                    strcutCode = []
+                    netMsg = []
+                    for sigInfo in sigInfos:
+                        assert isinstance(sigInfo,NetSigInfo)
+                        strcutCode.append(sigInfo.getStrcutCode())
+                        strcutCode.append("\n")
+                        netMsg.append(sigInfo.getStrcutCode())
+                        netMsg.append("\n")
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,strcutCode)
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,netMsg,1)
+        if isTip : printGreen("写入完成")
+        return WriteResult.WriteComplete
     #------------------------------------------------------------------------------------
     #------------------------------------------------------------------------------------
     #------------------------------------------------------------------------------------

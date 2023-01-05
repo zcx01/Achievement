@@ -12,10 +12,11 @@ from AnalyzeCan.Analyzedbc import *
 from AnalyzeCan.projectInI import *
 
 def getValue(src, row, col):
-    return src.cell_value(row, col)
+    return src.cell_value(row,XlsCharToInt(col))
 
 def getValueInt(src, row, col, lenght=-1):
     try:
+        col = XlsCharToInt(col)
         value = str(src.cell_value(row, col))
         values = value.split(".")
         isallZero = True

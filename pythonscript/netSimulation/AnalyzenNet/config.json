@@ -1,5 +1,5 @@
 {
     "projectPath": "/home/chengxiongzhu/Works/Repos/changan_c835/",
-    "netParser":"/home/chengxiongzhu/Works/newsig/newsig.xlsx",
+    "netParser":"src/ic_service/parser/generated/parser_net",
     "canmatrix": "/home/chengxiongzhu/Works/文档/ota/C385EV项目整车通讯协议v-2.2.4高低配20220906.xlsx"
 }
