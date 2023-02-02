@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>TDC-O1 系统测试报告</title>
+    <!-- 引入 echarts.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.1/echarts.min.js" integrity="sha512-OTbGFYPLe3jhy4bUwbB8nls0TFgz10kn0TLkmyA+l3FyivDs31zsXCjOis7YGDtE2Jsy0+fzW+3/OVoPVujPmQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<h1>TDC-O1 系统测试报告</h1>
+<body>
+    <h2>进程级内存占用</h2>
+    <div id="process_memory_charts_data" style="width: 1200px;height:800px;"></div>
+    <h2>线程级CPU占用</h2>
+    <div id="thread_cpu_charts_data" style="width: 1200px;height:800px;"></div>
+
+    <h2>Camera</h2>
+    <table border="1" width = "40%" cellspacing='0' cellpadding='0'>
+        <tr>
+            <th>通道</th>
+            <th>Camera平均帧率</th>
+            <th>Camera最大帧率</th>
+            <th>Camera最小帧率</th>
+            <th>Camera分辨率</th>
+            <th>测试结果</th>
+        </tr>
+        {% for key,item in camera_datas.items() %}
+        <tr align='center'>
+            <td>{{ item.chIndex }}</td>
+            <td>{{ item.fpsAvg }}</td>
+            <td>{{ item.fpsMax }}</td>
+            <td>{{ item.fpsMin }}</td>
+            <td>{{ item.resolution }}</td>
+            <td>{{ item.testResult }}</td>
+        </tr>
+        {% endfor%}
+    </table>
+    <div id="camera_fps_charts_data" style="width: 1200px;height:800px;"></div>
+    <h2>Algo时间戳(整百ms 上下浮动不超过5%)</h2>
+    <table border="1" width = "40%" cellspacing='0' cellpadding='0'>
+        <tr>
+            <th>通道</th>
+            <th>测试结果</th>
+        </tr>
+        {% for key,item in algo_timestamp_datas.items() %}
+        <tr align='center'>
+            <td>{{ item.chIndex }}</td>
+            <td>{{ item.testResult }}</td>
+        </tr>
+        {% endfor%}
+    </table>
+    <h2>Algo帧间隔(100ms上下浮动不超过5%)</h2>
+    <table border="1" width = "40%" cellspacing='0' cellpadding='0'>
+        <tr>
+            <th>通道</th>
+            <th>测试结果</th>
+        </tr>
+        {% for key,item in algo_timespan_datas.items() %}
+        <tr align='center'>
+            <td>{{ item.chIndex }}</td>
+            <td>{{ item.testResult }}</td>
+        </tr>
+        {% endfor%}
+    </table>
+
+    <div id="algo_timespan_charts" style="width: 1200px;height:800px;"></div>
+
+    <h2>Encoder时间戳(整百ms 上下浮动不超过5%)</h2>
+    <table border="1" width = "40%" cellspacing='0' cellpadding='0'>
+        <tr>
+            <th>通道</th>
+            <th>测试结果</th>
+        </tr>
+        {% for key,item in encoder_timestamp_datas.items() %}
+        <tr align='center'>
+            <td>{{ item.chIndex }}</td>
+            <td>{{ item.testResult }}</td>
+        </tr>
+        {% endfor%}
+    </table>
+
+    <h2>Encoder帧间隔(100ms 上下浮动不超过5%)</h2>
+    <table border="1" width = "40%" cellspacing='0' cellpadding='0'>
+        <tr>
+            <th>通道</th>
+            <th>测试结果</th>
+        </tr>
+        {% for key,item in encoder_timespan_datas.items() %}
+        <tr align='center'>
+            <td>{{ item.chIndex }}</td>
+            <td>{{ item.testResult }}</td>
+        </tr>
+        {% endfor%}
+    </table>
+
+    <div id="encoder_timespan_charts" style="width: 1200px;height:800px;"></div>
+    <h2>Lidar_Status 帧间隔(100ms 上下浮动不超过5%): {{ sensor_results_data.lidar_status.timespan }}</h2>
+    <h2>Lidar_Status 时间戳(整百ms 上下浮动不超过5%): {{ sensor_results_data.lidar_status.timestamp }}</h2>
+    <div id="lidar_status_timespan_charts" style="width: 1200px;height:800px;"></div>
+    <h2>Lidar_Packet 帧间隔(100ms 上下浮动不超过5%): {{ sensor_results_data.lidar_packet.timespan }}</h2>
+    <h2>Lidar_Packet 时间戳(整百ms 上下浮动不超过5%): {{ sensor_results_data.lidar_packet.timestamp }}</h2>
+    <div id="lidar_packet_timespan_charts" style="width: 1200px;height:800px;"></div>
+    <h2>Imu 帧间隔(100ms 上下浮动不超过5%): {{ sensor_results_data.imu.timespan }}</h2>
+    <h2>Imu 时间戳(整百ms 上下浮动不超过5%): {{ sensor_results_data.imu.timestamp }}</h2>
+    <div id="imu_timespan_charts" style="width: 1200px;height:800px;"></div>
+    <h2>Gnss 帧间隔(100ms 上下浮动不超过5%): {{ sensor_results_data.gnss.timespan }}</h2>
+    <h2>Gnss 时间戳(整百ms 上下浮动不超过5%): {{ sensor_results_data.gnss.timestamp }}</h2>
+    <div id="gnss_timespan_charts" style="width: 1200px;height:800px;"></div>
+
+    <script type="text/javascript">
+        window.onload = function(){
+
+        // 基于准备好的dom，初始化echarts实例
+        var charts_data_map = {{charts_data_map}};
+        var divs = document.body.getElementsByTagName('div');
+        var div_keys = []
+        for(var i=0;i<divs.length;i++){
+            let charts_key = divs[i].id;
+            div_keys.push(charts_key);
+        }
+
+        for(var i=0;i<div_keys.length;i++)
+        {
+            var charts_key = div_keys[i];
+            var myChart = echarts.init(document.getElementById(charts_key));
+            var charts_data = charts_data_map[charts_key];
+            
+            // 指定图表的配置项和数据
+            var option = {
+                toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+                },
+                title: {
+                    text: charts_data.title
+                },
+                tooltip: {},
+                legend: {
+                    data:charts_data.legend
+                },
+                xAxis: {},
+                yAxis: {},
+                series: charts_data.series,
+                dataZoom: [{
+                    show: true,
+                    type: 'slider',
+                    xAxisIndex: [0, 1],
+                    bottom: 10,
+                    start: 10,
+                    end: 100
+                },
+                { 
+                    start: 0,
+                    end: 40,
+                    type: "inside",  // 支持内部鼠标滚动平移
+                    zoomOnMouseWheel: false,  // 关闭滚轮缩放
+                    moveOnMouseWheel: true, // 开启滚轮平移
+                    moveOnMouseMove: true  // 鼠标移动能触发数据窗口平移 
+                }
+            ],
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+    }
+    </script>
+</body>
+</html>

@@ -10,12 +10,15 @@
     "ic_avm":"/usr/bin/",
     "ic_qt_zh_CN.qm": "/opt/qt/translate/",
     "libmega_ic_plugin.so":"/opt/qt/qml/MegaIC/",
+    "libscreenshot_plugin.so":"/opt/qt/lib/",
+    "screenshot_app":"/usr/bin/",
     "ic_telltale":"/usr/bin/",
     "lib_mega_ipc.so":"/lib64/",
+    "libic_camera.so":"/lib64/",
     "release-bigsur_hqx.1.1_20211108":"hqx.1.1",
     "libresources_plugin.so":"/opt/qt/qml/Resources/",
     "Other":"hqx.1.2",
-    "ssh_ip":"10.25.11.10",
+    "ssh_ip":"10.25.11.106",
     "user":"chengxiongzhu",
     "pwd":"123456",
     "PC":
@@ -31,7 +34,10 @@
         "libmega_ic_plugin.so": "../../output/binary/opt/apps/latest/qt/qml/MegaIC",
         "lib_mega_ipc.so": "../common/mega_ipc/lib",
         "resources.rcc": "../../output/binary/opt/apps/latest/qt",
-        "ic_qt_zh_CN.qm": "../../qt/ic_qt/resources/translate"
+        "ic_qt_zh_CN.qm": "../../qt/ic_qt/resources/translate",
+        "libscreenshot_plugin.so":"../../output/binary/opt/apps/latest/qt/bin",
+        "screenshot_app":"../../output/binary/opt/apps/latest/qt/bin",
+        "libic_camera.so":"lib/"
     }
 }
  

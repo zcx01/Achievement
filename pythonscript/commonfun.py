@@ -13,6 +13,8 @@ s_i_e = r"CANSIG.\w+"           #匹配CANSIG开头的单词
 m_s = r"[a-zA-Z0x0-9]+"         #匹配单词和数字
 '''
 [a-zA-Z_]+::                    #匹配以::结束的单词
+表达式参考:
+https://zhuanlan.zhihu.com/p/127807805
 '''
 
 def sendMqtt(topic,value):
@@ -192,8 +194,22 @@ def eConverf(value):
             return head.format(value)
     return value
 
-#在lines关键字behind后面添加content, number:第几个
-def behindStr(lines,behind,content,number=0):
+def getFloatE(value):
+    values = value.split(".")
+    isallZero = True
+    #防止丢失精度
+    if len(values) > 1:
+            for c in values[1]:
+                if c != '0':
+                    isallZero = False
+                    break
+
+    if not isallZero or 'e' in value.lower():
+            return eConverf(float(value))
+    return int(values[0])
+    
+#在lines关键字behind后面添加content, number:第几个,-1表示末尾
+def behindStr(lines,behind,content,number=-1):
     index = 0
     behinds=[]
     row=0
@@ -203,7 +219,7 @@ def behindStr(lines,behind,content,number=0):
             behinds.append(lines[index])
             row = index+1
             if numberIndex == number:
-                continue
+                break
             numberIndex+=1
         index+=1
     if type(content) == str:
@@ -219,7 +235,7 @@ def behindIndex(lines,pos,contents):
     lines.clear()
     lines.extend(temp[0:pos])
     lines.extend(contents)
-    lines.extend(temp[pos:len(lines)])
+    lines.extend(temp[pos:len(temp)])
     return lines
 '''
 移除文本块
@@ -236,8 +252,7 @@ def RemoveBlock(lineTexts,beginStr,endStr):
             tmp.append(lineText)
             isRemove = True
         elif endStr in lineText:
-            tmp.append(lineText)
-            isRemove = True
+            isRemove = False
         if not isRemove:
             tmp.append(lineText)
     return tmp
@@ -316,12 +331,11 @@ def getVariableName(variable):
             return k
 
 #获取文本中变量的值
-def getVariableText(variable,text):
-    variableName = getVariableName(variable)
-    if variableName in text:
+def getVariableText(variable,text,isEnd=False):
+    if variable in text:
         texts = re.findall(e_i,text,re.A)
         if len(texts) > 1:
-            return texts[1],True
+            return "".join(texts[1:]) if isEnd else texts[1],True
     return 0,False
 
 def strToBool(text):
@@ -347,3 +361,4 @@ def getSuffix(fileName):
 # linelist=['ww']
 # Temp(linelist)
 # print(linelist)
+# print(getVariableText('factor','	.factor = 1.52587890625e-05,'))

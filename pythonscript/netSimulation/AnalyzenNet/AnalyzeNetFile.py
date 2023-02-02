@@ -2,10 +2,10 @@
 import re
 import os
 from enum import Enum
-
 from commonfun import *
-from projectInI import *
-from ccode import *
+from AnalyzenNet.projectInI import *
+from AnalyzenNet.ccode import *
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 
 class DataType(Enum):
     VINT=1
@@ -39,10 +39,10 @@ class NetSigInfo(object):
         self.Unit=0
         self.is_timeout=False
         #-------message--------
-        self.Recevier=""
-        self.Sender=""
+        self.Recevier=''
+        self.Sender=''
         self.cycle=0
-        self.messageId =0 
+        self.messageId ='' 
         #----------代码中独有的------------
         self.structRow=-1
         self.externRow=-1
@@ -54,12 +54,18 @@ class NetSigInfo(object):
         self.enum=''
         self.initValue=''
         self.invalidValue=''
-    
+        self.Unit=''
+
+    def SetUnit(self,value):
+        if value == r"/" or len(value) == 0:
+            self.Unit = "\"\""
+        self.Unit = f'\"{value}\"'
+
     def getStrcutName(self):
         return 'struct NetSignal Net_{} ='.format(self.name)
 
     def getExtern(self):
-        return 'extern struct NetSignal Net_{};\n'.format(self.name)
+        return 'extern struct NetSignal Net_{};'.format(self.name)
 
     def getNetMsg(self):
         return '	&Net_{},\n'.format(self.name)
@@ -107,6 +113,7 @@ class AnalyzeNetParserFile(object):
         self.netParserFile=net_parser_Path
         self.maxSigRow=0
         self.analy()
+
     
     def analy(self):
         self.netSigs={}
@@ -114,6 +121,7 @@ class AnalyzeNetParserFile(object):
         for (dirpath,dirnames,filenames) in os.walk(self.netParserFile):
             sigInfo = None
             for filename in filenames:
+                filename=dirpath+filename
                 if getSuffix(filename) != SOURCE: continue
                 with open(filename,"r") as f:
                     linelist=f.readlines()
@@ -130,29 +138,53 @@ class AnalyzeNetParserFile(object):
                                 texts = re.findall(net,text,re.A)
                                 if len(texts) != 0:
                                     sigInfo.name = texts[0]
+                                if texts[0] == "Net_ACC_LaneEquationC2":
+                                    print("dd")
                                 self.netSigs[sigInfo.name] = sigInfo
                             except:
                                 pass
-                        variableValue,exist = getVariableText(sigInfo.start_by_byte,text)
-                        if exist: sigInfo.start_by_byte = int(variableValue)
-                        variableValue,exist = getVariableText(sigInfo.length_bits,text)
-                        if exist: sigInfo.length_bits = int(variableValue)
-                        variableValue,exist = getVariableText(sigInfo.length_byte,text)
-                        if exist: sigInfo.length_byte = int(variableValue)
-                        variableValue,exist = getVariableText(sigInfo.raw_value,text)
-                        if exist: sigInfo.raw_value = int(variableValue)
-                        variableValue,exist = getVariableText(sigInfo.phy_value,text)
-                        if exist: sigInfo.phy_value = float(variableValue)
-                        variableValue,exist = getVariableText(sigInfo.factor,text)
-                        if exist: sigInfo.factor = float(variableValue)
-                        variableValue,exist = getVariableText(sigInfo.offset,text)
-                        if exist: sigInfo.offset = float(variableValue)
-                        variableValue,exist = getVariableText(sigInfo.phy_min,text)
-                        if exist: sigInfo.phy_min = float(variableValue)
-                        variableValue,exist = getVariableText(sigInfo.phy_max,text)
-                        if exist: sigInfo.phy_max = float(variableValue)
-                        variableValue,exist = getVariableText(sigInfo.is_timeout,text)
-                        if exist: sigInfo.is_timeout = strToBool(variableValue)                                                
+                            continue
+                        if sigInfo == None:
+                            continue
+                        variableValue, exist = getVariableText('start_by_byte', text)
+                        if exist:
+                            sigInfo.start_by_byte = int(variableValue)
+                            continue
+                        variableValue, exist = getVariableText('length_bits', text)
+                        if exist:
+                            sigInfo.length_bits = int(variableValue)
+                            continue
+                        variableValue, exist = getVariableText('length_byte', text)
+                        if exist:
+                            sigInfo.length_byte = int(variableValue)
+                            continue
+                        variableValue, exist = getVariableText('raw_value', text)
+                        if exist:
+                            sigInfo.raw_value = int(variableValue)
+                            continue
+                        variableValue, exist = getVariableText('phy_value', text,True)
+                        if exist:
+                            sigInfo.phy_value = float(variableValue)
+                            continue
+                        variableValue, exist = getVariableText('factor', text,True)
+                        if exist:
+                            sigInfo.factor = float(variableValue)
+                            continue
+                        variableValue, exist = getVariableText('offset', text,True)
+                        if exist:
+                            sigInfo.offset = float(variableValue)
+                            continue
+                        variableValue, exist = getVariableText('phy_min', text,True)
+                        if exist:
+                            sigInfo.phy_min = float(variableValue)
+                            continue
+                        variableValue, exist = getVariableText('phy_max', text,True)
+                        if exist:
+                            sigInfo.phy_max = float(variableValue)
+                            continue
+                        variableValue, exist = getVariableText('is_timeout', text)
+                        if exist:
+                            sigInfo.is_timeout = strToBool(variableValue)
 
     @staticmethod
     def RemoveOldbBock(lineTexts,beginStr,endStr):
@@ -200,7 +232,7 @@ class AnalyzeNetParserFile(object):
                     passCheck = False
             return passCheck
         else:
-            return self.checkOneSigBit(sig,useBtye,useBtye)
+            return self.checkOneSigBit(sig,useBtye)
 
     #----------------------------------对外接口-----------------------------------------
     #------------------------------------------------------------------------------------
@@ -231,13 +263,31 @@ class AnalyzeNetParserFile(object):
         assert isinstance(sigInfo,NetSigInfo)
         self.netSigs[sigInfo.name] = sigInfo
 
-    def removeSig(self,sigInfo):
-        assert isinstance(sigInfo,NetSigInfo)
-        if  sigInfo.name in self.netSigs:
-            del self.netSigs[sigInfo.name]
-            self.writeFile(False,False)
-            printGreen(f'{sigInfo.name}删除成功')
-        printGreen(f'{sigInfo.name}不存在')
+    def removeSigs(self,sigInfos):
+        for sigInfo in sigInfos:
+            assert isinstance(sigInfo,NetSigInfo)
+            if  sigInfo.name in self.netSigs:
+                del self.netSigs[sigInfo.name]
+                printGreen(f'{sigInfo.name}删除成功')
+            printGreen(f'{sigInfo.name}不存在')
+        self.writeFile(False,False)
+
+    def removeSigByNames(self,sigNames):
+        sigInfos=[]
+        for sigName in sigNames:
+            if sigName in self.netSigs:
+                sigInfos.append(self.netSigs[sigName])
+        self.removeSigs(sigInfos)
+
+    def removeMessage(self,msgId):
+        allsigInfos = list(self.netSigs.values())
+        sigInfos=[]
+        for sigInfo in allsigInfos:
+            assert isinstance(sigInfo,NetSigInfo)
+            if str(sigInfo.messageId) == str(msgId):
+                sigInfos.append(sigInfo)
+        self.removeSigs(sigInfos)
+
 
     def writeFile(self,isCheck=True,isTip=True):
         if isCheck and not self.checkSigBit(): return WriteResult.SignalCoverage
@@ -245,15 +295,16 @@ class AnalyzeNetParserFile(object):
         sigInfos.sort(key=lambda siginfo: siginfo.start_by_byte)
         for (dirpath,dirnames,filenames) in os.walk(self.netParserFile):
             for filename in filenames:
+                filename=dirpath+filename
                 suffix = getSuffix(filename)
                 lineTexts = readFileLines(filename)
                 lineTexts = RemoveBlock(lineTexts,BUILDINGBLOCKSBEGIN,BUILDINGBLOCKEND)
-                if suffix == HEAD:
+                if suffix == HEADFILNE:
                     tmp = []
                     for sigInfo in sigInfos:
                         assert isinstance(sigInfo,NetSigInfo)
                         tmp.append(sigInfo.getExtern())
-                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,tmp)
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,tmp,0)
                 
                 elif suffix == SOURCE:
                     strcutCode = []
@@ -264,8 +315,9 @@ class AnalyzeNetParserFile(object):
                         strcutCode.append("\n")
                         netMsg.append(sigInfo.getStrcutCode())
                         netMsg.append("\n")
-                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,strcutCode)
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,strcutCode,0)
                     behindStr(lineTexts,BUILDINGBLOCKSBEGIN,netMsg,1)
+                wirteFileDicts(filename,lineTexts,False)
         if isTip : printGreen("写入完成")
         return WriteResult.WriteComplete
     #------------------------------------------------------------------------------------

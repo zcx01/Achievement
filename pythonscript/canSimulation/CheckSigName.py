@@ -211,12 +211,12 @@ def addConfigSig(sigs,isOriginal,configPath="",down_config="",up_config=""):
     for sigName in sigs:
         assert isinstance(sigName,str)
         dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
-        if isOriginal and SETSTR in sigName:
+        if isOriginal or SETSTR in sigName:
             down_topic = addSet(sigName)
         else:
             down_topic = addSet(dbcSigName)
         
-        if isOriginal and SETSTR in sigName:
+        if isOriginal or SETSTR in sigName:
             up_topic = sigName
         else:
             up_topic = dbcSigName

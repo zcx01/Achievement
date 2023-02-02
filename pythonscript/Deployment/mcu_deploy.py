@@ -28,5 +28,5 @@ if __name__ == "__main__":
                 break
     # mcu_bin = ' '.join(mcu_bins)
     # muc_dir = f'/ota/android/'
-    os.system(f'python3 {pyFileDir}/c385_deploy.py -a {mcu_bin} -e \'flash_mcu.sh -u {os.path.basename(mcu_bin)}\' \'flash_mcu.sh -a\' \'flash_mcu.sh -r\'')
+    os.system(f'python3 {pyFileDir}/c385_deploy.py -a {mcu_bin} -e \'flash_mcu.sh -u 1 {os.path.basename(mcu_bin)}\' \'flash_mcu.sh -a 1\' \'flash_mcu.sh -r 1\'')
     
