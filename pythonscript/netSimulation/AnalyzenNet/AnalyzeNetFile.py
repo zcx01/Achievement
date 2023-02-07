@@ -33,8 +33,7 @@ class NetSigInfo(object):
         self.phy_value=0
         self.factor=0
         self.offset=0
-        self.Offset=0
-        self.phy_min=0
+        self.phy_min=0.0
         self.phy_max=0
         self.Unit=0
         self.is_timeout=False
@@ -62,33 +61,34 @@ class NetSigInfo(object):
         self.Unit = f'\"{value}\"'
 
     def getStrcutName(self):
-        return 'struct NetSignal Net_{} ='.format(self.name)
+        return 'struct NetSignal Net_{} = '.format(self.name)+'{'
 
     def getExtern(self):
         return 'extern struct NetSignal Net_{};'.format(self.name)
 
     def getNetMsg(self):
-        return '	&Net_{},\n'.format(self.name)
+        return '	&Net_{},'.format(self.name)
 
-    def getVariableNameAndValue(variable):
-        return '.{} = {},'.format(getVariableName(variable)).format(variable)
+    def getVariableNameAndValue(self,variableName,variable,digit=0):
+        if type(variable) == int and digit != 0:
+            return '.{} = {}.0,'.format(variableName,variable)
+        return '.{} = {},'.format(variableName,variable)
 
-    def getVariableNameAndBool(variable):
-        return '.{}={}'.format(getVariableName(variable)).format(boolToStr(variable))
+    def getVariableNameAndBool(self,variableName,variable):
+        return '.{} = {}'.format(variableName,boolToStr(variable))
 
     def getStrcutCode(self):
-        with CBaseBlock(self.getStrcutName()) as block_l0:
-            block_l0.add_code_line(self.getVariableNameAndValue(self.start_by_byte),termination='')
-            block_l0.add_code_line(self.getVariableNameAndValue(self.length_bits),termination='')
-            block_l0.add_code_line(self.getVariableNameAndValue(self.length_byte),termination='')
-            block_l0.add_code_line(self.getVariableNameAndValue(self.raw_value),termination='')
-            block_l0.add_code_line(self.getVariableNameAndValue(self.phy_value),termination='')
-            block_l0.add_code_line(self.getVariableNameAndValue(self.factor),termination='')
-            block_l0.add_code_line(self.getVariableNameAndValue(self.offset),termination='')
-            block_l0.add_code_line(self.getVariableNameAndValue(self.phy_min),termination='')
-            block_l0.add_code_line(self.getVariableNameAndValue(self.phy_max),termination='')
-            block_l0.add_code_line(self.getVariableNameAndBool(self.is_timeout),termination='')
-            block_l0.add_blank_line()
+        with CBaseBlock(self.getStrcutName(),block_segmenter=('','};')) as block_l0:
+            block_l0.add_code_line(self.getVariableNameAndValue("start_by_byte",self.start_by_byte),termination='')
+            block_l0.add_code_line(self.getVariableNameAndValue("length_bits",self.length_bits),termination='')
+            block_l0.add_code_line(self.getVariableNameAndValue("length_byte",self.length_byte),termination='')
+            block_l0.add_code_line(self.getVariableNameAndValue("raw_value",self.raw_value),termination='')
+            block_l0.add_code_line(self.getVariableNameAndValue("phy_value",self.phy_value,1),termination='')
+            block_l0.add_code_line(self.getVariableNameAndValue("factor",self.factor,1),termination='')
+            block_l0.add_code_line(self.getVariableNameAndValue("offset",self.offset,1),termination='')
+            block_l0.add_code_line(self.getVariableNameAndValue("phy_min",self.phy_min,1),termination='')
+            block_l0.add_code_line(self.getVariableNameAndValue("phy_max",self.phy_max,1),termination='')
+            block_l0.add_code_line(self.getVariableNameAndBool("is_timeout",self.is_timeout),termination='')
         return block_l0.data
 
     #得到使用的字节,如果返回的数组有数据标识有冲突
@@ -137,16 +137,17 @@ class AnalyzeNetParserFile(object):
                                 net = r"Net_.\w+"
                                 texts = re.findall(net,text,re.A)
                                 if len(texts) != 0:
-                                    sigInfo.name = texts[0]
-                                if texts[0] == "Net_ACC_LaneEquationC2":
-                                    print("dd")
+                                    tmpName = EesyStr.removeAll( texts[0],'Net_')
+                                    sigInfo.name = tmpName
                                 self.netSigs[sigInfo.name] = sigInfo
                             except:
                                 pass
                             continue
+                        if text.startswith("};"):
+                            sigInfo = None
                         if sigInfo == None:
                             continue
-                        variableValue, exist = getVariableText('start_by_byte', text)
+                        variableValue, exist = getVariableText('start_by_byte', text,True)
                         if exist:
                             sigInfo.start_by_byte = int(variableValue)
                             continue
@@ -298,7 +299,8 @@ class AnalyzeNetParserFile(object):
                 filename=dirpath+filename
                 suffix = getSuffix(filename)
                 lineTexts = readFileLines(filename)
-                lineTexts = RemoveBlock(lineTexts,BUILDINGBLOCKSBEGIN,BUILDINGBLOCKEND)
+                lineTexts,isExistence = RemoveBlock(lineTexts,BUILDINGBLOCKSBEGIN,BUILDINGBLOCKEND)
+                if not isExistence: continue
                 if suffix == HEADFILNE:
                     tmp = []
                     for sigInfo in sigInfos:
@@ -311,13 +313,13 @@ class AnalyzeNetParserFile(object):
                     netMsg = []
                     for sigInfo in sigInfos:
                         assert isinstance(sigInfo,NetSigInfo)
-                        strcutCode.append(sigInfo.getStrcutCode())
-                        strcutCode.append("\n")
-                        netMsg.append(sigInfo.getStrcutCode())
-                        netMsg.append("\n")
+                        strcutCodes = sigInfo.getStrcutCode()
+                        for scode in strcutCodes:
+                            strcutCode.append(scode)
+                        netMsg.append(sigInfo.getNetMsg())
                     behindStr(lineTexts,BUILDINGBLOCKSBEGIN,strcutCode,0)
                     behindStr(lineTexts,BUILDINGBLOCKSBEGIN,netMsg,1)
-                wirteFileDicts(filename,lineTexts,False)
+                wirteFileDicts(filename,lineTexts)
         if isTip : printGreen("写入完成")
         return WriteResult.WriteComplete
     #------------------------------------------------------------------------------------

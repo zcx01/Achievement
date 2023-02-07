@@ -16,7 +16,7 @@ def getValue(src, row, col):
 
 def getValueInt(src, row, col, lenght=-1):
     try:
-        value = str(src.cell_value(row, col))
+        value = str(getValue(src,row, col))
         values = value.split(".")
         isallZero = True
 
@@ -52,7 +52,7 @@ def getSigInfo(sheel, row):
     if sig.factor == float(0) and len(sig.name) != 0:
         printYellow(f'{sig.name} 缩放不能为0，此处修改成1,行号为{row}')
         sig.factor = 1
-    sig.Offset = getValueInt(sheel, row, 'N')
+    sig.offset = getValueInt(sheel, row, 'N')
     sig.phy_min = getValueInt(sheel, row, 'O')
     sig.phy_max = getValueInt(sheel, row, 'P', sig.length_bits)
     if getValue(sheel, row, 'Q') == "Signed":
@@ -99,16 +99,16 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
             continue
         sig = getSigInfo(sheel, row)
         if appoint(sig,wirteSigName,isMsg) or isAllAdd:
-            realMin = (float(sig.min)-float(sig.Offset)) / float(sig.factor)
-            realMax = (float(sig.max)-float(sig.Offset)) / float(sig.factor)
+            realMin = (float(sig.phy_min)-float(sig.offset)) / float(sig.factor)
+            realMax = (float(sig.phy_max)-float(sig.offset)) / float(sig.factor)
             if realMin < 0 and sig.dataType == "+":
-                printRed(f'{sig.name} 极小值小于0,最小值为{sig.min},raw值{realMin}')
+                printRed(f'{sig.name} 极小值小于0,最小值为{sig.phy_min},raw值{realMin}')
                 continue
-            if realMax > pow(2, sig.length)-1 and sig.max != pow(2, sig.length)-1:
-                printRed(f'{sig.name} 极大值大于长度,最大值为{sig.max},raw值{realMax}，极限值为{pow(2, sig.length)}')
+            if realMax > pow(2, sig.length_bits)-1 and sig.phy_max != pow(2, sig.length_bits)-1:
+                printRed(f'{sig.name} 极大值大于长度,最大值为{sig.phy_max},raw值{realMax}，极限值为{pow(2, sig.length_bits)}')
                 continue
-            if sig.min == sig.max:
-                printRed(f"{sig.name} 最大值和最小值相等最小值为{sig.min},最大值为{sig.max}")
+            if sig.phy_min == sig.phy_max:
+                printRed(f"{sig.name} 最大值和最小值相等最小值为{sig.length_bits},最大值为{sig.phy_max}")
                 continue
 
             isFind = True
@@ -130,13 +130,13 @@ def RemoveSigs(configPath, sigNames):
     jsConfig = getJScontent(configPath)
     netfile = getKeyPath("netParser", jsConfig)
     net = AnalyzeNetParserFile(netfile)
-    net.removeSig(sigNames)
+    net.removeSigByNames(sigNames)
 
 def RemoveMsgs(configPath, msgs,channal):
     jsConfig = getJScontent(configPath)
     netfile = getKeyPath("netParser", jsConfig)
-    dbc = AnalyzeNetParserFile(netfile)
-    dbc.removeMessage(channal,msgs)
+    net = AnalyzeNetParserFile(netfile)
+    net.removeMessage(channal,msgs)
 
 def addHeadEnd(text, name):
     text.insert(0, f'{name}')
@@ -146,18 +146,12 @@ def addHeadEnd(text, name):
 
 
 
-# conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Achievement/pythonscript/canSimulation/temp.xls")
+# conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Achievement/pythonscript/netSimulation/NID3.0（HMI）与CDC的以太网通讯协议V1.2_202201021.xlsx")
 # conversion(pyFileDir+"config.json",'TboxLocalTiYear')
 # sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
         description='''
-        这个脚本是用来通过生成dbc,比较CAN矩阵,
-        d+s:从其他的dbc添加信号,
-        d+r+t:信号名称的改变，并且修改配置的中源码的信号名称,
-        d+r/d:从指定的dbc复制枚举到新的dbc中 r是输入比较后的结果
-        a+w:把dbc目录下dbc文件中,所有的信号都写入白名单,
-        a+s:把指定路径下的CAN矩阵中的指定的信号添加进入dbc
         ''')
 
     parse.add_argument('-c', '--config', help='配置文件路径',

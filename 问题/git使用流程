@@ -120,3 +120,7 @@ git fetch xxxxx
 git commit --amend --reset-author
 
 git push mega HEAD:refs/for/master 
+
+---------------------git error Missing tree 解决办法---------------------
+提交的时候，加入一个参数 --no-thin
+git push --no-thin origin HEAD:refs/for/master
