@@ -138,7 +138,7 @@ def ScpFile(tmpath,user,ssh_ip):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='部署C385程序,部署release c385_deploy -c ic_service -d bin -p changan_c835_release -r')
+        description='部署C385程序,部署release c385_deploy -c ic_service -d bin -p changan_c385_release -r')
     
     #这个是要解析 -f 后面的参数
     parser.add_argument('-c','--customfile',help='adb push custom file list',default=[], nargs='+',type=str)
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     parser.add_argument('-d','--dir',help='exe dir',default='',type=str)
     parser.add_argument('-f','-PcFileName',help="打印自带PC上文件的名称",nargs='*')
     parser.add_argument('-s','-sship',help="从远程复制",nargs='*',default=jsConfig.get("ssh_ip",""))
-    parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c835/prebuilts/ic',type=str)
+    parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c385/prebuilts/ic',type=str)
     args = parser.parse_args()
     argv = sys.argv
     if '-f' in argv:

@@ -1,10 +1,10 @@
 {
-    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/",
-    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/",
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/",
     "M":[
         {
             "content":"#include \"{fileName}_module.hpp\"",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/init_signal_process.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/init_signal_process.cpp",
             "pos":""
         },
         {
@@ -15,7 +15,7 @@
                 "    {fileName}->start();",
                 ""
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/init_signal_process.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/init_signal_process.cpp",
             "pos":"init_signal_process"
         }
     ],

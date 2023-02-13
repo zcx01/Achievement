@@ -29,7 +29,7 @@ def getFileName(className):
         index+=1
     return fileName
 
-fileName = "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210713.dbc"
+fileName = "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210713.dbc"
 
 if __name__ == "__main__":
     p = pexpect.spawn("adb shell", encoding='utf-8', logfile=sys.stdout, timeout=300)

@@ -1,15 +1,15 @@
 {
-    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_assist",
-    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/drive_assist",
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/drive_assist",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/drive_assist",
     "M":[
         {
             "content":"#include \"{fileName}.hpp\"",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/drive_assist/item_def.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/drive_assist/item_def.hpp",
             "pos":""
         },
         {
             "content":"    std::shared_ptr<DriveAssist::{ClassName}> {fileName} = nullptr;",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/drive_assist_module.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/drive_assist_module.hpp",
             "pos":"PubSubListenerInterface"
         },
         {
@@ -18,7 +18,7 @@
                 "    {fileName} = std::make_shared<DriveAssist::{ClassName}>(shared_from_this());",
                 "    {fileName}->subscribe({2});"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_assist_module.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/drive_assist_module.cpp",
             "pos":"link_signal_item"
         }
     ],

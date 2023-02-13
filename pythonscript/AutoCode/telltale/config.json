@@ -1,15 +1,15 @@
 {
-    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/telltale",
-    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/telltale",
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/telltale",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/telltale",
     "M":[
         {
             "content":"#include \"{fileName}.hpp\"",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/telltale/te_item_def.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/telltale/te_item_def.hpp",
             "pos":""
         },
         {
             "content":"    std::shared_ptr<{ClassName}> {fileName} = nullptr;",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/telltale_module.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/telltale_module.hpp",
             "pos":"TelltaleModule"
         },
         {
@@ -19,7 +19,7 @@
                 "    {fileName}->subscribe((struct veh_signal *)&CANSIG_GW_288__BcmPwrStsFb_g);",
                 "    {fileName}->subscribe((struct veh_signal *)&CANSIG_{1}_g);"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/telltale_module.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/telltale_module.cpp",
             "pos":"link_signal_item"
         },
         {
@@ -36,7 +36,7 @@
                 "   \"top\": 0,",
                 "}"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/ictelltale_config.json",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/ictelltale_config.json",
             "pos":"-1"
         }
     ],

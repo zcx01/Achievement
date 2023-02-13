@@ -202,7 +202,7 @@ if __name__ == "__main__":
         description='这个脚本是生成测试的case')
 
     parser.add_argument('-x','--casefile',help="指定生成的case路径",default="text")
-    parser.add_argument('-a','--aimfile',help='被自测的文件名',default="/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_info/machine_time.cpp")
+    parser.add_argument('-a','--aimfile',help='被自测的文件名',default="/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/drive_info/machine_time.cpp")
     parser.add_argument('-v','--variable',help='moudle中的变量名',default='')
     parser.add_argument('-p','--power',help='是否加入电源信号',default=0,type=int)
     parser.add_argument('-s', '--shellIndex', help='shell的索引', default=0, type=int)

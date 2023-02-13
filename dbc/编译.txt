@@ -16,7 +16,7 @@ cd ~/Works/Repos/tool_parser
 
 5.执行sudo make
 
-6.把output文件拷贝到~/Works/Repos/changan_c835/src/ic_service/parser/generated下
+6.把output文件拷贝到~/Works/Repos/changan_c385/src/ic_service/parser/generated下
 
-(注*) 要在~/Works/Repos/tool_parser目录下创建软件链接VendorFiles指到~/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles
+(注*) 要在~/Works/Repos/tool_parser目录下创建软件链接VendorFiles指到~/Works/Repos/changan_c385/src/ic_service/parser/VendorFiles
 

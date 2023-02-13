@@ -148,7 +148,7 @@ def addHeadEnd(text, name):
 
 # conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Achievement/pythonscript/netSimulation/NID3.0（HMI）与CDC的以太网通讯协议V1.2_202201021.xlsx")
 # conversion(pyFileDir+"config.json",'TboxLocalTiYear')
-# sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
+# sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
         description='''

@@ -8,7 +8,7 @@ if __name__ == "__main__":
         description='分析core文件')
     parser.add_argument('-c','--core', help='core文件',default="ic_service",type=str)
     parser.add_argument('-n','--noCopy', help='不从qnx上拷贝直接分析',nargs="*")
-    parser.add_argument('-p','--prebuilts', help='prebuilts目录',default='~/Works/Repos/changan_c835/prebuilts/',)
+    parser.add_argument('-p','--prebuilts', help='prebuilts目录',default='~/Works/Repos/changan_c385/prebuilts/',)
     args = parser.parse_args()
 
     core = args.core

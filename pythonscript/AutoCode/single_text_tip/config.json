@@ -7,7 +7,7 @@
                 "    //{3}",
                 "    single_text_tip->addSignalAndTop((struct veh_signal *)&CANSIG_{1}_g, {2});"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip_module.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/text_tip_module.cpp",
             "pos":"link_single_signal"
         },
         {
@@ -19,7 +19,7 @@
                 "           \"desc\": \"{3}\"",
                 "       }\n"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/icwarning_config.json",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json",
             "pos":"-1"
         }
     ],

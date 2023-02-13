@@ -12,14 +12,14 @@
                 "        publish_status({2}, info.value);",
                 "    }"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/air_conditioner.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/air_conditioner.cpp",
             "pos":"state_process"
         },
         {
             "content":[
                 "    air_conditioner->subscribe({2});"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
             "pos":"link_signal_item"
         }
     ],

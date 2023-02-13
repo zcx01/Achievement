@@ -5,8 +5,8 @@
 #include <iomanip>
 #include "../commondefine.hpp"
 
-//"file:///home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/ictelltale_config.json"
-#define DATAJSONFILE "/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/ictelltale_configs.json"
+//"file:///home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/ictelltale_config.json"
+#define DATAJSONFILE "/home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/ictelltale_configs.json"
 std::map<std::string, StoreInfo> AccessJson::getData() 
 {
     std::map<std::string, StoreInfo> data;

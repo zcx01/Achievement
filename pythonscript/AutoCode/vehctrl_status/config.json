@@ -1,10 +1,10 @@
 {
-    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status",
-    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/vehctrl_status",
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/vehctrl_status",
     "M":[
         {
             "content":"#include \"{fileName}.hpp\"",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/vehctrl_status/status_item_def.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/vehctrl_status/status_item_def.hpp",
             "pos":""
         },
         {
@@ -12,7 +12,7 @@
                 "",
                 "    std::shared_ptr<{ClassName}> {fileName}{-s}vc_{-e} = nullptr;"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/vehctrl_status_module.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/vehctrl_status_module.hpp",
             "pos":"VehctrlStatusModule"
         },
         {
@@ -22,7 +22,7 @@
                 "    {fileName}{-s}vc_{-e} = std::make_shared<{ClassName}>(shared_from_this());",
                 "    {fileName}{-s}vc_{-e}->addSignalAndTop((struct veh_signal *)&CANSIG_{1}_g,{2});"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp",
             "pos":"link_signal_item"
         }
     ],

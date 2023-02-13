@@ -325,7 +325,8 @@ if __name__ == "__main__":
     elif '-c' in sys.argv:
         dealTest(arg.casexlsx,0,1,arg.SendPowerSig)
     elif '-s' in sys.argv:
-        use.AddPowerSig()
+        if arg.SendPowerSig==1:
+            use.AddPowerSig()
         if arg.Send != None and len(arg.Send) != 0:
             ReMatchStr(str(arg.Send),use)
         use.SimulationCan()

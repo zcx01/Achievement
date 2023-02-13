@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     auto t = new QTimer(this);
-    auto f = new QFile("/home/chengxiongzhu/Works/Repos/changan_c835/ds.yuv",this);
+    auto f = new QFile("/home/chengxiongzhu/Works/Repos/changan_c385/ds.yuv",this);
     auto ba = new QByteArray(YUVWI*YUVHE*2,0);
 
     f->open(QIODevice::ReadOnly);

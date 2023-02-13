@@ -7,7 +7,7 @@
             "//前排扫风模式"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "TmsFrntWindLvl": {
@@ -18,7 +18,7 @@
             "//前排空调当前风速"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "TmsPassAutT": {
@@ -29,7 +29,7 @@
             "//前排右空调当前温度"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "BcuDcboxDcU": {
@@ -40,7 +40,7 @@
             "//放电电压"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "BcuDcboxDcI": {
@@ -51,7 +51,7 @@
             "//放电电流"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "DcChrgCnctrSts": {
@@ -62,7 +62,7 @@
             "//直流充电口插线状态"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "BcuDcOutDischrgSts": {
@@ -73,7 +73,7 @@
             "//放电状态"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "TmsWorkSpaceSyncSts": {
@@ -84,7 +84,7 @@
             "//温区同步模式"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "CdcDoorLiSwtSet": {
@@ -95,8 +95,8 @@
             "//顶灯(阅读灯) 跟随车门打开状态 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_toplamps_door.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_toplamps_door.cpp"
         ]
     },
     "ItmsBacktWindLvlSet": {
@@ -107,7 +107,7 @@
             "//后排空调当前风速"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "CdcPlasmaOpenSet": {
@@ -118,8 +118,8 @@
             "//离子发生器 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_lon_generator.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_lon_generator.cpp"
         ]
     },
     "TmsPlasmaSts": {
@@ -130,7 +130,7 @@
             "//离子发生器"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "DcacStsLamp": {
@@ -141,8 +141,8 @@
             "//220V放电状态工作指示灯状态"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/telltale/discharge_state_lamp.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/telltale_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/telltale/discharge_state_lamp.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/telltale_module.cpp"
         ]
     },
     "AcChrgCnctrSts": {
@@ -153,8 +153,8 @@
             "//交流充电口插线状态"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/common_codes/fds_common_codes.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/common_codes/fds_common_codes.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "BcmDoorLiSts": {
@@ -165,7 +165,7 @@
             "//顶灯(阅读灯) 跟随车门打开状态"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "BcmLckAutoClsWinSetSts": {
@@ -176,7 +176,7 @@
             "//离车自动闭锁关窗"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "VcuVehErrInfo": {
@@ -187,7 +187,7 @@
             "//车辆严重故障"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/text_tip_module.cpp"
         ]
     },
     "LCDAR_RCTAEnableStatus": {
@@ -198,7 +198,7 @@
             "//后侧横向制动报警开关"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "CdcDchaSocLimitSet": {
@@ -209,8 +209,8 @@
             "//放电阈值 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_discharge_soc.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_discharge_soc.cpp"
         ]
     },
     "CdcDchaSocLimitset": {
@@ -221,8 +221,8 @@
             "//放电阈值 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_discharge_soc.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_discharge_soc.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
         ]
     },
     "HudEngDistSwSts": {
@@ -233,7 +233,7 @@
             "//剩余能量百分比|距离显示选项"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "CdcWasherSt": {
@@ -244,8 +244,8 @@
             "//前雨刷状态 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_washer_set.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_washer_set.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
         ]
     },
     "CdcEasyEntrySet": {
@@ -256,8 +256,8 @@
             "//座椅礼让(前排左侧) Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_courtesy_seats.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_courtesy_seats.cpp"
         ]
     },
     "CdcWiprSrvSig": {
@@ -268,8 +268,8 @@
             "//雨刮器维修模式 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_wipr_srv.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_wipr_srv.cpp"
         ]
     },
     "CdcFrntWindLvlSet": {
@@ -280,7 +280,7 @@
             "//前排空调当前风速 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/air_conditioner.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/air_conditioner.cpp"
         ]
     },
     "CdcOffgasDetnSetSts": {
@@ -291,7 +291,7 @@
             "//尾气检测开关 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
         ]
     },
     "ItmsHotColdModFb": {
@@ -302,7 +302,7 @@
             "//制热制冷模式"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "BcuDcboxDischrgPwr": {
@@ -313,7 +313,7 @@
             "//放电电量"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "WLCMWirelsChrgnSts": {
@@ -324,8 +324,8 @@
             "//无线充电状态"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_info/wireless_charge_status.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/drive_info/wireless_charge_status.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/drive_module.cpp"
         ]
     },
     "BcmLiHightManuSetSts": {
@@ -336,7 +336,7 @@
             "//大灯高度"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "CdcLiHightManuSet": {
@@ -347,8 +347,8 @@
             "//大灯高度 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_headlamps_height.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_headlamps_height.cpp"
         ]
     },
     "CdcBokgChrgStopTiMin": {
@@ -359,7 +359,7 @@
             "//预约充电时间 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/charger.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/charger.cpp"
         ]
     },
     "BcuChrgMod": {
@@ -370,9 +370,9 @@
             "//充电类型"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/common_codes/fds_common_codes.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/common_codes/fds_common_codes.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/drive_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "BcmBuzWarnMod": {
@@ -383,16 +383,16 @@
             "//钥匙学习成功蜂鸣提示"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime/door_open_chime.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/chime/door_open_chime.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/chime_module.cpp"
         ]
     },
     "VcuBuzWarnMod": {
         "topic": [],
         "desc": [],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/chime/gear_shift_chime.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/chime_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/chime/gear_shift_chime.cpp"
         ]
     },
     "VcuDCACInfo": {
@@ -403,7 +403,7 @@
             "//放电相关提示"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/text_tip_module.cpp"
         ]
     },
     "TmsAirQlyOutCarLvl": {
@@ -414,7 +414,7 @@
             "//车外空气质量等级"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "TmsCycMod": {
@@ -425,7 +425,7 @@
             "//循环模式"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "CdcMirrAutFoldSet": {
@@ -436,8 +436,8 @@
             "//后视镜停车自动折叠 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_mirror_auto_fold.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_mirror_auto_fold.cpp"
         ]
     },
     "CdcLiShwDRLReq": {
@@ -448,8 +448,8 @@
             "//灯光秀日间行车灯控制信号 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/light_show_day_light.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/light_show_day_light.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
         ]
     },
     "CdcRoadsideAsscSts": {
@@ -460,8 +460,8 @@
             "//道路救援电话 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_roadside_assc.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_roadside_assc.cpp"
         ]
     },
     "BcmReDfrstrSts": {
@@ -472,7 +472,7 @@
             "//后除霜模式"
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp"
         ]
     },
     "CdcPassSeatHeatSet": {
@@ -483,7 +483,7 @@
             "//副驾座椅加热状态 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_seat_heating.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_seat_heating.cpp"
         ]
     },
     "CdcDrvrSeatWindReq": {
@@ -494,7 +494,7 @@
             "//副驾座椅通风状态 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_seat_wind.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_seat_wind.cpp"
         ]
     },
     "CdcPassSeatWindReq": {
@@ -505,7 +505,7 @@
             "//副驾座椅通风状态 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/vc_seat_wind.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/vc_seat_wind.cpp"
         ]
     },
     "IPC_ADAS_LANE_CHANGE_ASSIST_MODE_SET": {
@@ -516,15 +516,15 @@
             "//并线/换道辅助 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/drive_assist_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/drive_assist_module.cpp"
         ]
     },
     "风量": {
         "topic": [],
         "desc": [],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp",
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl/air_conditioner.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_status_module.cpp",
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl/air_conditioner.cpp"
         ]
     },
     "IPC_AC_WIND_LEVEL_FRONT_SET": {
@@ -535,7 +535,7 @@
             "//前排空调当前风速 Set "
         ],
         "filePath": [
-            "/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
+            "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp"
         ]
     }
 }

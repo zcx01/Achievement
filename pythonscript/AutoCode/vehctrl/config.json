@@ -1,15 +1,15 @@
 {
-    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl",
-    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/vehctrl",
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/vehctrl",
     "M":[
         {
             "content":"#include \"{fileName}.hpp\"",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/vehctrl/vc_item_def.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/vehctrl/vc_item_def.hpp",
             "pos":""
         },
         {
             "content":"    std::shared_ptr<vehctrl::{ClassName}> {fileName}{-s}vc_{-e} = nullptr;",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/vehctrl_module.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/vehctrl_module.hpp",
             "pos":"PubSubListenerInterface"
         },
         {
@@ -18,7 +18,7 @@
                 "    {fileName}{-s}vc_{-e} = std::make_shared<vehctrl::{ClassName}>(shared_from_this());",
                 "    {fileName}{-s}vc_{-e}->subscribe({2});"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp",
             "pos":"link_signal_item"
         }
     ],

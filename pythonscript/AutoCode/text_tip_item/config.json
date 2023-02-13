@@ -1,15 +1,15 @@
 {
-    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip",
-    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/text_tip",
+    ".cpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/text_tip",
+    ".hpp":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/text_tip",
     "M":[
         {
             "content":"#include \"{fileName}.hpp\"",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/text_tip/tx_item_def.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/text_tip/tx_item_def.hpp",
             "pos":""
         },
         {
             "content":"    std::shared_ptr<{ClassName}> {fileName} = nullptr;",
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/include/text_tip_module.hpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/include/text_tip_module.hpp",
             "pos":"TextTipModule"
         },
         {
@@ -20,7 +20,7 @@
                 "    {fileName}->subscribe((struct veh_signal *)&CANSIG_GW_288__BcmPwrStsFb_g);",
                 "    {fileName}->subscribe((struct veh_signal *)&CANSIG_{1}_g);"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip_module.cpp",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/text_tip_module.cpp",
             "pos":"link_signal_item"
         },
         {
@@ -32,7 +32,7 @@
                 "           \"desc\": \"{3}\"",
                 "       }\n"
             ],
-            "path":"/home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/icwarning_config.json",
+            "path":"/home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json",
             "pos":"-1"
         }
     ],

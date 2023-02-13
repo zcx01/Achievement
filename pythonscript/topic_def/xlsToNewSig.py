@@ -270,7 +270,7 @@ def getInSrcDefineBySig(sigName,srcPath):
             for fileName in filenames:
                 if os.path.splitext(fileName)[1] == '.cpp': 
                     filePath = dirpath+'/'+fileName
-                    # if filePath != '/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/vehctrl_module.cpp': continue
+                    # if filePath != '/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/vehctrl_module.cpp': continue
                     contents = readFileLines(filePath)
                     for contentIndex in range(len(contents)):
                         #if contentIndex != 300 : continue

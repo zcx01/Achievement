@@ -15,7 +15,7 @@ c385_deploy -c ic_service
 
 #单独更新绝对路径的文件
 #-a 是更加config.json文件复制到指定路径
-c385_deploy -a /home/chengxiongzhu/Works/Repos/changan_c835/qt/ic_qt/resources/config/icwarning_config.json
+c385_deploy -a /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json
 
 #获取更多信息
 c385_deploy -h
