@@ -84,6 +84,7 @@ class AndroidQnx(object):
             fileNames .append(os.path.basename(path))
 
         keyStr('adb shell')
+        keyStr('init.mount_ota.sh',0,"#")
         for fileName in fileNames:
             keyStr(f'cp {self.androidDir}/{fileName} {self.android_qnxDir}',0,"#")
 

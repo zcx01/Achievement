@@ -2,6 +2,7 @@
 #include <type_traits>
 #include "ObjectFactory.h"
 #include <iostream>
+#include "init_signal_process.hpp"
 
 void exec(std::list<std::string> names,std::string i)
 {
@@ -31,11 +32,13 @@ void exec(std::list<std::string> names,std::string i)
          ObjectFactory::createObject(i);
 }
 
+
 int main(int arg, char *argv[])
 {
     std::list<std::string> names;
     ObjectFactory::getObjectName(names);
 
+    init_signal_process_up();
 // #ifndef NDEBUG
 //     std::string cl;
 //     std::cin >> cl;
