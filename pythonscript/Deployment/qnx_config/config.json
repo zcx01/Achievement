@@ -14,7 +14,7 @@
     "screenshot_app":"/usr/bin/",
     "ic_telltale":"/usr/bin/",
     "lib_mega_ipc.so":"/lib64/",
-    "ic_screenshot.so":"/lib64/",
+    "libic_screenshot.so":"/lib64/",
     "release-bigsur_hqx.1.1_20211108":"hqx.1.1",
     "libresources_plugin.so":"/opt/qt/qml/Resources/",
     "Other":"hqx.1.2",
@@ -37,7 +37,7 @@
         "ic_qt_zh_CN.qm": "../../qt/ic_qt/resources/translate",
         "libscreenshot_plugin.so":"../../output/binary/opt/apps/latest/qt/bin",
         "screenshot_app":"../../output/binary/opt/apps/latest/qt/bin",
-        "ic_screenshot.so":"lib/"
+        "libic_screenshot.so":"lib/"
     }
 }
  

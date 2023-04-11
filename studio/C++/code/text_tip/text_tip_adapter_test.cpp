@@ -28,7 +28,7 @@ TextTipAdapterTest::TextTipAdapterTest()
     // d.addWarnInfo("icwarning/DoorOpenSts",32); 
     // std::this_thread::sleep_for(std::chrono::milliseconds(2*1000));
     // d.addWarnInfo("icwarning/BcmVehLckAlrm",3); 
-    d.addWarnInfo("C385/TJPText",1); 
+    d.addWarnInfo("C385/BrakeDiscHighTempWarning",1); 
     // std::this_thread::sleep_for(std::chrono::milliseconds(2*1000));
     // d.addWarnInfo("C385/IACCTextTakeOver",1); 
     // std::this_thread::sleep_for(std::chrono::milliseconds(5000));

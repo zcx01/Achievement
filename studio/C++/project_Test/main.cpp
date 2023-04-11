@@ -39,12 +39,12 @@ int main(int arg, char *argv[])
     ObjectFactory::getObjectName(names);
 
     init_signal_process_up();
-// #ifndef NDEBUG
-//     std::string cl;
-//     std::cin >> cl;
-//     exec(names, cl);
-//     return 0;
-// #endif
+#ifndef NDEBUG
+    std::string cl;
+    std::cin >> cl;
+    exec(names, cl);
+    return 0;
+#endif
 
     if (arg < 2)
     {

@@ -22,12 +22,14 @@ def otherTelltale(jsTelltale,modifytopic,imageWith,space):
 
 def modifyTelltale(pic,jsTelltale,lef,top):
     for topic in jsTelltale:
+        print(f"\"{topic}\",")
         for pro in jsTelltale[topic]:
             if len(pic) != 0 and pic in str(jsTelltale[topic][pro]):
                 print(pic,"---------",topic,lef)
                 jsTelltale[topic]["left"]=lef
                 jsTelltale[topic]["top"]=top
                 return topic
+    sys.exit()
     return ""
 
 def position(configPath):
@@ -55,7 +57,7 @@ def position(configPath):
                 modifytopic.append(modifyTelltale(imageName, jsTelltale, left, top))
             index += 1
     otherTelltale(jsTelltale, modifytopic, imageWith, space)
-    writeJs(configjsonPath,jsTelltale)
+    # writeJs(configjsonPath,jsTelltale)
             
 def getPosition(configPath):
     jsConfig=getJScontent(configPath)

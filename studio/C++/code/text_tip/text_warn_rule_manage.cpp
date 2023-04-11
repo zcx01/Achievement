@@ -1,1 +1,1 @@
-/home/chengxiongzhu/Works/Repos/changan_c835/src/ic_service/src/signal_process/src/text_tip/warn_rule/text_warn_rule_manage.cpp
+/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/src/signal_process/src/text_tip/warn_rule/text_warn_rule_manage.cpp

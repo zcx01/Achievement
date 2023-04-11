@@ -18,7 +18,6 @@ from AnalyzeCan.projectInI import *
 
 jsConfig = getJScontent(pyFileDir+"config.json",)
 dbc=Analyze(getKeyPath("dbcfile",jsConfig))
-
 class useCase(object):
     def __init__(self):
         self.index=0
@@ -65,7 +64,7 @@ class useCase(object):
 
     def startSig(self,sendSig):
         if self.sendSim == None:
-            self.sendSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
+            self.sendSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send,dbc=signalMonitorDbc)
         Thread(target=self.sendSim.begin_sending, args=(sendSig,)).start()
         # while True:
         #     if  self.sim.stopped:
@@ -172,7 +171,7 @@ class useCase(object):
 
     def MonitorSig(self,sigName):
         if self.monitorSim == None:
-            self.monitorSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send)
+            self.monitorSim = SignalMonitor(pwd=PC_PWD, project=PROJECT_ID, channel=CHANNEL, ignore_init_sending=ignore_init_send,dbc=signalMonitorDbc)
         Thread(target=self.monitorSim.begin_listening, args=(sigName,)).start()
     
     def find(self,name):
@@ -312,14 +311,16 @@ if __name__ == "__main__":
     parser.add_argument('-b','--bugxlsx',help="jira xlsx file")
     parser.add_argument('-c','--casexlsx',help="generate case xlsx file")
     parser.add_argument('-s', '--Send',help="Send CAN",type=str,default='',nargs='?')
+    parser.add_argument('-d', '--dbc',help="dbc",type=str,default=None,nargs='?')
     parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
     parser.add_argument('-p', '--SendPowerSig', help="Send Power Sig", nargs='*', type=int,default=1)
-    parser.add_argument('-d', '--dataType',help="get sig data type", default=[], nargs='+', type=str)
+    parser.add_argument('-t', '--dataType',help="get sig data type", default=[], nargs='+', type=str)
     parser.add_argument('-i', '--SequenceSendInitValue',help="按照指定的间隔发送信号初始值",type=int,default=2)
 
     arg=parser.parse_args()
 
     use = useCase()
+    signalMonitorDbc = arg.dbc
     if "-b" in sys.argv:
         dealTest(arg.bugxlsx,1,26,arg.SendPowerSig)
     elif '-c' in sys.argv:
@@ -334,7 +335,7 @@ if __name__ == "__main__":
         if arg.SendPowerSig==1:
             use.SendPowerSig()
         use.MonitorSig(arg.Monitor)
-    elif '-d' in sys.argv:
+    elif '-t' in sys.argv:
         printSigTypes(arg.dataType)  
     elif '-i' in sys.argv:
         use.SequenceSendInitValue(arg.SequenceSendInitValue)
