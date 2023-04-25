@@ -1,3 +1,4 @@
+# coding:utf-8
 #!/bin/python
 import os
 import sys
@@ -49,15 +50,15 @@ import re
 import datetime
 import shutil
 import time
-from commonfun import *
+import tkinter as tk
 from jira import JIRA
 # from AnalyzeCan.projectInI import *
   
 jira =JIRA("http://jira.i-tetris.com/",basic_auth=("chengxiong.zhu","@Huan2870244352"))
 useCases=[]
 
-LOGDIR="C:/Users/chengxiong.zhu/Downloads/log分析/"+datetime.datetime.now().strftime("%Y-%m-%d")+"/"
-
+ROOTLOGDIR="C:/Users/chengxiong.zhu/Downloads/log分析/"
+LOGDIR=""
 def appendUseCases(case):
     if case.isVaild():
         case.index = len(useCases)
@@ -98,16 +99,25 @@ def createLogDir(dirlog):
         shutil.rmtree(dirlog)
     os.makedirs(dirlog)
 
+def isExists(issue):
+    oriDir = LOGDIR+" "+issue.key+issue.fields.summary
+    logDir = LOGDIR+issue.key
+    return os.path.exists(logDir) or  os.path.exists(oriDir)
+
 def displayIssue(issue,arg):
     dirlog=LOGDIR+issue.key
-    print(issue.permalink())
     if arg & 1:
         title='标题'
-        print(f'{title:<10}{issue.fields.summary}')
+        # print(f'{title:<10}{issue.fields.summary}')
         try:
-            createLogDir(dirlog)
+            if not isExists(issue):
+                createLogDir(dirlog)
+            else:
+                return
         except:
             pass
+    printYellow(issue.permalink())
+    printGreen("下载目录为: "+dirlog)
     if arg & 2:
         title='详细'
         print(f'{title:<10}{issue.fields.description}')
@@ -134,6 +144,7 @@ def displayIssue(issue,arg):
     except:
         pass
 
+
 def help():
     print('-h 获取帮助')
     print('bugId 发送CAN报文')
@@ -143,18 +154,19 @@ def help():
     print('-e: 退出')
 
 
-def getBugInfo(text):
-    #fields = 'comment'不配置就没有备注,默认不存在
-    issues = jira.search_issues(text,fields = ['comment','summary','description','attachment'])
-    for issue in issues:
-        displayIssue(issue,15)    
-
-    # issue=jira.issue(text)
-    # displayIssue(issue,15)
+def getBugInfo(text,isSearch):
+    if isSearch:
+        #fields = 'comment'不配置就没有备注,默认不存在
+        issues = jira.search_issues(text,fields = ['comment','summary','description','attachment'])
+        for issue in issues:
+            displayIssue(issue,15)    
+    else:
+        issue=jira.issue(text,fields = ['comment','summary','description','attachment'])
+        displayIssue(issue,15)
 
 def getNoResolvedInfo():
     #fields = 'comment'不配置就没有备注,默认不存在
-    getBugInfo('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC')
+    getBugInfo('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC',True)
     # getBugInfo('BGS-52779')
 
 #测试 getBugInfo 函数
@@ -162,19 +174,22 @@ def getNoResolvedInfo():
 
 if __name__ == "__main__":
 
-    # parser = argparse.ArgumentParser(
-    # description='''
-    # 获取Jira上的信息，
-    # 用来发送信号
-    # ''')
-    
+    parser = argparse.ArgumentParser(
+    description='''
+    获取Jira上的log
+    ''')
+
     # #这个是要解析 -f 后面的参数
-    # parser.add_argument('-t', '--toal',help="今天解决的Jira",type=str,default='',nargs='?')
-    # arg=parser.parse_args()
-
-
-    while 1:
-        getNoResolvedInfo()
-        time.sleep(1000)
+    parser.add_argument('-i', '--jiraId',help="今天解决的Jira",type=str,default='',nargs='?')
+    arg=parser.parse_args()
+    
+    if '-i' in sys.argv:
+        LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime("%Y-%m-%d")+"/"
+        getBugInfo(arg.jiraId,False)
+    else:
+        while 1:
+            LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime("%Y-%m-%d")+"/"
+            getNoResolvedInfo()
+            time.sleep(10)
     # getBugInfo("BGS-3771")
     # sendBugCan("BGS-4547")
