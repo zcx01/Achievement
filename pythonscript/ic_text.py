@@ -10,20 +10,23 @@ from xlrd.book import Book
 from xlrd.sheet import Sheet
 
 SOUCRELANGUAGESUFFIX="zh_CN.ts"
-ORILANGUAGESUFFIX="en_US.ts"
-
+ORILANGUAGESUFFIX="th_TH.ts" 
+EXISTRANSLATES=["en_US.ts"]
 class translateConent(object):
     def __init__(self) -> None:
         self.path = ""
         self.sourceKey=""
         self.content=""
+        self.exisTranslates=[]
         self.translateContent=""
 
     def getList(self):
         xlsContent = []
         xlsContent.append(self.path)
         xlsContent.append(self.sourceKey)
-        xlsContent.append(self.translateContent)
+        xlsContent.append(self.content)
+        for exisTranslate in self.exisTranslates:
+            xlsContent.append(exisTranslate)
         return xlsContent
     
 def getTextCout(fileName):
@@ -38,6 +41,33 @@ def getTextCout(fileName):
 def joint(f,t):
     return f'{f}__{t}'
 
+def translatesByTs(dirpath,oriName,translateConents):
+    translatePath_file = f'{dirpath}/{oriName}'
+    domTree = parse(translatePath_file)
+    assert isinstance(domTree,Document)
+    rootNode = domTree.documentElement
+    assert isinstance(rootNode,Element)
+    contexts = rootNode.getElementsByTagName("context")
+    for context in contexts:
+        assert isinstance(context,Element)
+        contentFile = context.getElementsByTagName("name")[0].childNodes[0].data
+        messageNodes = context.getElementsByTagName("message")
+        for messageNode in messageNodes:
+            assert isinstance(messageNode,Element)
+            try:
+                source = messageNode.getElementsByTagName("source")[0].childNodes[0].data
+            except:
+                continue
+            try:
+                content= messageNode.getElementsByTagName("translation")[0].childNodes[0].data
+            except:
+                content = source
+            xlsContent = translateConent()
+            xlsContent.path = joint(oriName,contentFile)
+            xlsContent.sourceKey = source
+            xlsContent.content = content
+            translateConents[source] = xlsContent
+
 def coverXls(translatePath,jsonPath,outPath):
     # 创建一个Excel workbook 对象
     # if os.path.isfile(outPath):
@@ -50,51 +80,57 @@ def coverXls(translatePath,jsonPath,outPath):
     sh['A1'] = '文件名'
     sh['B1'] = '源key'
     sh['C1'] = '内容'
-    sh['D1'] = '翻译结果'
-    sh['E1'] = '备注'
+    count = 3
+    for EXISTRANSLATE in EXISTRANSLATES:
+        sh[f'{XlsIntToChar(count)}1'] = EXISTRANSLATE
+        count+=1
+    sh[f'{XlsIntToChar(count)}1'] = '翻译结果'
+    count+=1
+    sh[f'{XlsIntToChar(count)}1'] = '备注'
 
     for (dirpath,dirnames,filenames) in os.walk(translatePath):
         for oriName in filenames:
             if SOUCRELANGUAGESUFFIX in oriName:
-                translatePath_file = f'{dirpath}/{oriName}'
-                print(f"检测 {translatePath_file} 文件")
-                domTree = parse(translatePath_file)
-                assert isinstance(domTree,Document)
-                rootNode = domTree.documentElement
-                assert isinstance(rootNode,Element)
-                contexts = rootNode.getElementsByTagName("context")
-                for context in contexts:
-                    assert isinstance(context,Element)
-                    contentFile = context.getElementsByTagName("name")[0].childNodes[0].data
-                    messageNodes = context.getElementsByTagName("message")
-                    for messageNode in messageNodes:
-                        assert isinstance(messageNode,Element)
-                        try:
-                            source = messageNode.getElementsByTagName("source")[0].childNodes[0].data
-                        except:
-                            continue
-                        try:
-                            content= messageNode.getElementsByTagName("translation")[0].childNodes[0].data
-                        except:
-                            content = source
-                        xlsContent = translateConent()
-                        xlsContent.path = joint(oriName,contentFile)
-                        xlsContent.sourceKey = source
-                        xlsContent.content = content
-                        sh.append(xlsContent.getList())
+                soucreLanguages={}
+                translatesByTs(dirpath,oriName,soucreLanguages)
+                existranslatelanguages = {}
+
+                for EXISTRANSLATE in EXISTRANSLATES:
+                    existransName = oriName.replace(SOUCRELANGUAGESUFFIX,EXISTRANSLATE)
+                    existranslatelanguage = {}
+                    translatesByTs(dirpath,existransName,existranslatelanguage)
+                    existranslatelanguages[EXISTRANSLATE] = existranslatelanguage
+
+                count = 0
+                for soucreLanguage in soucreLanguages:
+                    xlsContent=soucreLanguages[soucreLanguage]
+                    assert isinstance(xlsContent,translateConent)
+                    try:
+                        for EXISTRANSLATE in EXISTRANSLATES:
+                            xlsContent.exisTranslates.append(existranslatelanguages[EXISTRANSLATE][xlsContent.sourceKey].content)
+                    except:
+                        pass
+                    sh.append(xlsContent.getList())
+                    count+=1
+                print(f"检测 {dirpath}/{oriName} 文件 一共有 {count}")
 
     try:
         jsContents = getJScontent(jsonPath)
-        print(f"检测 {jsonPath} 文件")
+        count=0
         for top in jsContents:
             for grade in jsContents[top]:
                 if isNumber(grade) :
                     xlsContent = translateConent()
                     xlsContent.path = os.path.basename(jsonPath)
                     xlsContent.sourceKey = joint(top,grade)          
-                    xlsContent.content = jsContents[top][grade]
+                    xlsContent.content = jsContents[top][grade][removeSuffix(SOUCRELANGUAGESUFFIX)]
+                    for EXISTRANSLATE in EXISTRANSLATES:
+                        xlsContent.exisTranslates.append(jsContents[top][grade][removeSuffix(EXISTRANSLATE)])
                     sh.append(xlsContent.getList())
+                    count+=1
+        print(f"检测 {jsonPath} 文件 一共有{count}")
     except:
+        printRed(f"{jsonPath} 异常")
         pass
     book.save(outPath)
     printGreen("检测完成")
@@ -222,12 +258,13 @@ def translationText(fileName):
     writeJs(fileName,jsContents)
     printGreen("转化完成")
 
+#./ic_text.py -t /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/translate -j /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json -o ic-out.xlsx
 if __name__ == "__main__":
     aparse = argparse.ArgumentParser(description='python的脚本模板')
     aparse.add_argument('-t','--translatePath',help='翻译文件所在目录',type=str)
     aparse.add_argument('-j','--json',help='报警文字配置文件',type=str,nargs="?",default="")
     aparse.add_argument('-o','--outPath',help='生成xls文件路径',type=str)
-    aparse.add_argument('-i','--input',help='生成xls文件路径',type=str)
+    aparse.add_argument('-i','--input',help='输入xls文件路径',type=str)
     arg = aparse.parse_args()
 
     if len(sys.argv) == 1:
