@@ -1,10 +1,6 @@
 # coding:utf-8
 #!/bin/python
-import os
-import sys
-import argparse
-from commonfun import *
-import requests
+
 
 # basic_auth=("chengxiong.zhu","@Huan2870244352")
 # if __name__ == "__main__":
@@ -50,15 +46,23 @@ import re
 import datetime
 import shutil
 import time
-import tkinter as tk
+import threading
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import QApplication, QMainWindow,QTextEdit, QWidget
 from jira import JIRA
-# from AnalyzeCan.projectInI import *
+from PyQt5.QtCore import Qt, QThread, pyqtSignal,QObject
+from PyQt5.QtGui import QCloseEvent,QKeyEvent
+from commonfun import *
+import platform
+
+os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = ""
   
 jira =JIRA("http://jira.i-tetris.com/",basic_auth=("chengxiong.zhu","@Huan2870244352"))
 useCases=[]
 
 ROOTLOGDIR="C:/Users/chengxiong.zhu/Downloads/log分析/"
 LOGDIR=""
+textEdit=None
 def appendUseCases(case):
     if case.isVaild():
         case.index = len(useCases)
@@ -103,8 +107,8 @@ def isExists(issue):
     oriDir = LOGDIR+" "+issue.key+issue.fields.summary
     logDir = LOGDIR+issue.key
     return os.path.exists(logDir) or  os.path.exists(oriDir)
-
-def displayIssue(issue,arg):
+        
+def displayIssue(issue,arg,signal):
     dirlog=LOGDIR+issue.key
     if arg & 1:
         title='标题'
@@ -117,7 +121,14 @@ def displayIssue(issue,arg):
         except:
             pass
     printYellow(issue.permalink())
-    printGreen("下载目录为: "+dirlog)
+    writeFile(issue.key)
+    dirlogTemp = dirlog
+    if not signal == None:
+        signal.emit(issue.permalink())
+        if platform.system == "Windows":
+            dirlogTemp = dirlogTemp.replace('/','\\')
+        signal.emit(dirlogTemp)
+    printGreen("下载目录为: "+dirlogTemp)
     if arg & 2:
         title='详细'
         print(f'{title:<10}{issue.fields.description}')
@@ -143,7 +154,9 @@ def displayIssue(issue,arg):
         os.rename(dirlog,oriDir)
     except:
         pass
-
+    if not signal == None:
+        signal.emit("下载完成")
+        printGreen("下载完成")
 
 def help():
     print('-h 获取帮助')
@@ -154,23 +167,67 @@ def help():
     print('-e: 退出')
 
 
-def getBugInfo(text,isSearch):
+def getBugInfo(text,isSearch,signal):
     if isSearch:
         #fields = 'comment'不配置就没有备注,默认不存在
         issues = jira.search_issues(text,fields = ['comment','summary','description','attachment'])
         for issue in issues:
-            displayIssue(issue,15)    
+            textEdit.append("\n")
+            displayIssue(issue,15,signal)    
     else:
         issue=jira.issue(text,fields = ['comment','summary','description','attachment'])
-        displayIssue(issue,15)
+        displayIssue(issue,15,signal)
 
-def getNoResolvedInfo():
+def getNoResolvedInfo(signal):
     #fields = 'comment'不配置就没有备注,默认不存在
-    getBugInfo('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC',True)
+    while 1:
+        global LOGDIR
+        LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime("%Y-%m-%d")+"/"
+        if not os.path.isdir(LOGDIR):
+            writeFile(datetime.datetime.now().strftime("%Y-%m-%d")+'\n')
+        getBugInfo('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC',True,signal)
+        time.sleep(10)
     # getBugInfo('BGS-52779')
 
-#测试 getBugInfo 函数
+def writeFile(text):
+    file_path = ROOTLOGDIR+"统计.txt"
+    with open(file_path, 'a') as f:
+        f.write(text)
 
+#测试 getBugInfo 函数
+class UpdateThread(QObject):
+    update_data = pyqtSignal(str)
+    def start(self) -> None:
+        my_thread = threading.Thread(target=getNoResolvedInfo,args=(self.update_data,))
+        my_thread.setDaemon(True)
+        my_thread.start()
+
+
+class MainWindow(QTextEdit):
+    def initUI(self):
+        self.subTheard = UpdateThread()
+        self.subTheard.update_data.connect(self.updataText)
+        self.subTheard.start()
+
+    def updataText(self,text):
+        if self.isHidden():
+            self.show()
+        self.append(text)
+
+    def closeEvent(self, a0: QCloseEvent) -> None:
+        a0.ignore()
+        self.hide()
+    
+    def keyPressEvent(self, e: QKeyEvent) -> None:
+        modifier = e.modifiers()
+        if modifier & Qt.AltModifier:
+            if e.key() == Qt.Key_Return:
+                selected_text = str(self.textCursor().selectedText())
+                os.system(f"explorer {selected_text}")
+        if modifier & Qt.ControlModifier:
+            if e.key == Qt.Key_C:
+                sys.exit()
+        return super().keyPressEvent(e)
 
 if __name__ == "__main__":
 
@@ -182,14 +239,18 @@ if __name__ == "__main__":
     # #这个是要解析 -f 后面的参数
     parser.add_argument('-i', '--jiraId',help="今天解决的Jira",type=str,default='',nargs='?')
     arg=parser.parse_args()
-    
+
     if '-i' in sys.argv:
         LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime("%Y-%m-%d")+"/"
-        getBugInfo(arg.jiraId,False)
+        getBugInfo(arg.jiraId,False,None)
     else:
-        while 1:
-            LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime("%Y-%m-%d")+"/"
-            getNoResolvedInfo()
-            time.sleep(10)
-    # getBugInfo("BGS-3771")
-    # sendBugCan("BGS-4547")
+        try:
+            app = QApplication(sys.argv)
+            textEdit = MainWindow()
+            textEdit.show()
+            textEdit.initUI()
+            sys.exit(app.exec())
+        except KeyboardInterrupt:
+            sys.exit()
+        # getBugInfo("BGS-3771")
+        # sendBugCan("BGS-4547")
