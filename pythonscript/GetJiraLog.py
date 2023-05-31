@@ -1,20 +1,5 @@
 # coding:utf-8
 #!/bin/python
-
-
-# basic_auth=("chengxiong.zhu","@Huan2870244352")
-# if __name__ == "__main__":
-#     # parse = argparse.ArgumentParser(description='python的脚本模板')
-#     # parse.add_argument('-s','--startRow',help='开始的行号',type=int,default=0)
-#     # arg = parse.parse_args()
-#     url="http://jira.i-tetris.com/secure/attachment/312417/%E6%97%A5%E5%BF%97.rar"
-
-#     response = requests.get(url,auth=basic_auth)
-    
-#     with open('C:\\Users\\chengxiong.zhu\\Downloads\\log分析\\test.rar', 'wb') as f:
-#         f.write(response.content)
-    
-
 '''# 查询issue信息，传入参数issueId
 issue = jiraClinet.issue('xxx-679')
 
@@ -47,26 +32,26 @@ import datetime
 import shutil
 import time
 import threading
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow,QTextEdit, QWidget
+import socket
 from jira import JIRA
-from PyQt5.QtCore import Qt, QThread, pyqtSignal,QObject
-from PyQt5.QtGui import QCloseEvent,QKeyEvent
 from commonfun import *
 import platform
 
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = ""
-  
-jira =JIRA("http://jira.i-tetris.com/",basic_auth=("chengxiong.zhu","@Huan2870244352"))
-useCases=[]
 
+basic_auth=("chengxiong.zhu","@Huan2870244352")
 ROOTLOGDIR="C:/Users/chengxiong.zhu/Downloads/log分析/"
+jira =JIRA("http://jira.i-tetris.com/",basic_auth=basic_auth)
 LOGDIR=""
-textEdit=None
-def appendUseCases(case):
-    if case.isVaild():
-        case.index = len(useCases)
-        useCases.append(case)
+TIMEFORMAT="%Y-%m-%d"
+TIMEFORMATDATA="%Y-%m"
+PORTMSG = 12345
+HOSTMSG = 'LOCALHOST'
+CODEMSG = 'utf-8'
+
+def send_msg(msg):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        s.sendto(msg.encode(CODEMSG), (HOSTMSG, PORTMSG))
 
 def getLogPath(bugId):
     texts=[]
@@ -88,7 +73,7 @@ def smbToWindow(text,dirlog):
     #     smb=smb.replace("smb:","")
     #     smb=smb.replace('/','\\')
     #     return smb
-    ips = re.findall(r'\\\\10.+\S+\b',text,re.A)
+    ips = re.findall(r'\\\\10.\S+',text,re.A)
     for yip in ips:
         print("下载 "+yip)
         os.system(f'cp -rf {yip} {dirlog}')
@@ -104,10 +89,20 @@ def createLogDir(dirlog):
     os.makedirs(dirlog)
 
 def isExists(issue):
-    oriDir = LOGDIR+" "+issue.key+issue.fields.summary
+    oriDir = getOriDir(issue)
     logDir = LOGDIR+issue.key
     return os.path.exists(logDir) or  os.path.exists(oriDir)
-        
+
+def getOriDir(issue):
+    summary = re.sub(r'[^\w\-./]', '', issue.fields.summary)
+    oriDir = LOGDIR+" "+issue.key+" "+ summary
+    return oriDir
+
+def printDir(dirPath):
+    if platform.system == "Windows":
+        dirPath = dirPath.replace('/','\\')
+    return dirPath
+    
 def displayIssue(issue,arg,signal):
     dirlog=LOGDIR+issue.key
     if arg & 1:
@@ -121,13 +116,10 @@ def displayIssue(issue,arg,signal):
         except:
             pass
     printYellow(issue.permalink())
-    writeFile(issue.key)
     dirlogTemp = dirlog
     if not signal == None:
-        signal.emit(issue.permalink())
-        if platform.system == "Windows":
-            dirlogTemp = dirlogTemp.replace('/','\\')
-        signal.emit(dirlogTemp)
+        signal(issue.permalink())
+        dirlogTemp = printDir(dirlogTemp)
     printGreen("下载目录为: "+dirlogTemp)
     if arg & 2:
         title='详细'
@@ -148,31 +140,24 @@ def displayIssue(issue,arg,signal):
                 f.write(attachment.get())
 
     try:
-        oriDir =  LOGDIR+" "+issue.key+issue.fields.summary
+        oriDir =getOriDir(issue)
         if os.path.exists(oriDir):
             shutil.rmtree(oriDir)
         os.rename(dirlog,oriDir)
+        if not signal == None:
+            signal(printDir(oriDir))
     except:
         pass
     if not signal == None:
-        signal.emit("下载完成")
+        signal("下载完成")
         printGreen("下载完成")
-
-def help():
-    print('-h 获取帮助')
-    print('bugId 发送CAN报文')
-    print("-d bugId 查看问题详细描述")
-    print("-c bugId 查看问题备注")
-    print("-a bugId 查看问题所有信息")
-    print('-e: 退出')
-
+        signal("\n")
 
 def getBugInfo(text,isSearch,signal):
     if isSearch:
         #fields = 'comment'不配置就没有备注,默认不存在
         issues = jira.search_issues(text,fields = ['comment','summary','description','attachment'])
         for issue in issues:
-            textEdit.append("\n")
             displayIssue(issue,15,signal)    
     else:
         issue=jira.issue(text,fields = ['comment','summary','description','attachment'])
@@ -182,53 +167,80 @@ def getNoResolvedInfo(signal):
     #fields = 'comment'不配置就没有备注,默认不存在
     while 1:
         global LOGDIR
-        LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime("%Y-%m-%d")+"/"
-        if not os.path.isdir(LOGDIR):
-            writeFile(datetime.datetime.now().strftime("%Y-%m-%d")+'\n')
+        LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime(TIMEFORMAT)+"/"
         getBugInfo('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC',True,signal)
         time.sleep(10)
     # getBugInfo('BGS-52779')
 
-def writeFile(text):
-    file_path = ROOTLOGDIR+"统计.txt"
-    with open(file_path, 'a') as f:
-        f.write(text)
+def get_last_week_thursday_dates():
+    today = datetime.datetime.now()
+    days_to_thursday = (3 - today.weekday()) % 7
+    start_of_last_week = today - datetime.timedelta(days=6-days_to_thursday)
+    dates = []
+    for i in range(7):
+        date = start_of_last_week + datetime.timedelta(days=i)
+        dates.append(date.strftime('%Y-%m-%d'))
+    return dates
 
-#测试 getBugInfo 函数
-class UpdateThread(QObject):
-    update_data = pyqtSignal(str)
-    def start(self) -> None:
-        my_thread = threading.Thread(target=getNoResolvedInfo,args=(self.update_data,))
-        my_thread.setDaemon(True)
-        my_thread.start()
+def getCurrentWeekdDir():
+    dates = get_last_week_thursday_dates()
+    dateDirs = []
+    for date in dates:
+        dateDir = ROOTLOGDIR+date
+        if os.path.isdir(dateDir):
+            dateDirs.append(dateDir)
+    return dateDirs,dates[0],dates[len(dates)-1],dates[3]
 
+def getJiraSolveBugContent(jiraKeys,JiraContent):
+    issues=[]
+    noSolveBug=[]
+    noSolveBugIssues = jira.search_issues("assignee = currentUser() AND resolution = Unresolved order by updated DESC",fields = ['assignee','summary','status'])
+    for noSolveBugIssue in noSolveBugIssues:
+        noSolveBug.append(noSolveBugIssue.key)
+    for jiraKey in jiraKeys:
+        issue = jira.issue(jiraKey,fields = ['assignee','summary','status'])
+        if  issue.key not in noSolveBug:
+            issues.append(issue)
+    getIssuesContet(issues,JiraContent)
 
-class MainWindow(QTextEdit):
-    def initUI(self):
-        self.subTheard = UpdateThread()
-        self.subTheard.update_data.connect(self.updataText)
-        self.subTheard.start()
-
-    def updataText(self,text):
-        if self.isHidden():
-            self.show()
-        self.append(text)
-
-    def closeEvent(self, a0: QCloseEvent) -> None:
-        a0.ignore()
-        self.hide()
+def getIssuesContet(issues,JiraContent):
+    index = 1
+    for issue in issues:
+        JiraContent.append(f"{index}、{issue.key} {issue.fields.summary}")
+        index+=1
+   
+def Reporting():
+    dateDirs,startDate,endDate,currentDate = getCurrentWeekdDir()
+    file_path = ROOTLOGDIR+"Report/"
+    if not os.path.isdir(file_path):
+        os.makedirs(file_path)
+    file_path += currentDate+".txt"
+    reportContent=[]
+    jiraBugKeys=[]
+    for dateDir in dateDirs:
+        for (dirpath,dirnames,filenames) in os.walk(dateDir):
+            if dirpath == dateDir:
+                for dirname in dirnames:
+                    keys = re.findall(e_i,dirname,re.A)
+                    if len(keys) > 1:
+                        jiraBugKey = keys[0]+keys[1]
+                        if jiraBugKey not in jiraBugKeys:
+                            jiraBugKeys.append(jiraBugKey)
     
-    def keyPressEvent(self, e: QKeyEvent) -> None:
-        modifier = e.modifiers()
-        if modifier & Qt.AltModifier:
-            if e.key() == Qt.Key_Return:
-                selected_text = str(self.textCursor().selectedText())
-                os.system(f"explorer {selected_text}")
-        if modifier & Qt.ControlModifier:
-            if e.key == Qt.Key_C:
-                sys.exit()
-        return super().keyPressEvent(e)
+    reportContent.append("处理的Bug")
+    getJiraSolveBugContent(jiraBugKeys,reportContent)
+    reportContent.append("")
 
+    reportContent.append("处理的Task")
+    taskSearch = f'issuetype in (Task, Story) AND resolution in (Done, \"Won\'t Do\") AND resolved >= -1w AND assignee in (currentUser()) order by updated DESC' 
+    #taskSearch = f'issuetype in (Task, Story) AND resolution in (Done, \"Won\'t Do\") AND resolved >= {startDate} AND resolved <= {endDate} AND assignee in (currentUser()) order by updated DESC'  
+    print(taskSearch)
+    issues = jira.search_issues(taskSearch,fields = ['assignee','summary','status'])
+    getIssuesContet(issues,reportContent)
+
+    wirteFileDicts(file_path,reportContent)
+    print("生成完成")
+    
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
@@ -237,20 +249,20 @@ if __name__ == "__main__":
     ''')
 
     # #这个是要解析 -f 后面的参数
-    parser.add_argument('-i', '--jiraId',help="今天解决的Jira",type=str,default='',nargs='?')
+    parser.add_argument('-i', '--jiraIds',help="JiraId",type=str,default=[],nargs='+')
+    parser.add_argument('-r', '--Reporting',help="生成报文",type=str,default='',nargs='?')
     arg=parser.parse_args()
 
+    if not os.path.isdir(ROOTLOGDIR):
+        os.makedirs(ROOTLOGDIR)
     if '-i' in sys.argv:
-        LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime("%Y-%m-%d")+"/"
-        getBugInfo(arg.jiraId,False,None)
+        LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime(TIMEFORMAT)+"/"
+        for jiraId in arg.jiraIds:
+            getBugInfo(jiraId,False,send_msg)
+    elif '-r' in sys.argv:
+        Reporting()
     else:
-        try:
-            app = QApplication(sys.argv)
-            textEdit = MainWindow()
-            textEdit.show()
-            textEdit.initUI()
-            sys.exit(app.exec())
-        except KeyboardInterrupt:
-            sys.exit()
-        # getBugInfo("BGS-3771")
-        # sendBugCan("BGS-4547")
+        # my_thread = threading.Thread(target=getNoResolvedInfo,args=(send_msg,))
+        # my_thread.setDaemon(True)
+        # my_thread.start()
+        getNoResolvedInfo(send_msg)

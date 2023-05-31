@@ -1,6 +1,5 @@
 import os
 import sys
-
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 from commonfun import*
 
@@ -114,6 +113,9 @@ def getPosition(configPath):
     pass
 
 if __name__ == "__main__":
+
+
+
     if len(sys.argv) >=2:
         position(sys.argv[1])
     else:
