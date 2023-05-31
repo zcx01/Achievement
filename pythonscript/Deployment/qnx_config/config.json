@@ -9,6 +9,7 @@
     "ic_adas":"/usr/bin/",
     "ic_avm":"/usr/bin/",
     "ic_qt_zh_CN.qm": "/opt/qt/translate/",
+    "ic_qt_th_TH.qm": "/opt/qt/translate/",
     "libmega_ic_plugin.so":"/opt/qt/qml/MegaIC/",
     "libscreenshot_plugin.so":"/opt/qt/lib/",
     "screenshot_app":"/usr/bin/",
@@ -37,6 +38,7 @@
         "lib_mega_ipc.so": "../common/mega_ipc/lib",
         "resources.rcc": "../../output/binary/opt/apps/latest/qt",
         "ic_qt_zh_CN.qm": "../../qt/ic_qt/resources/translate",
+        "ic_qt_th_TH.qm": "../../qt/ic_qt/resources/translate",
         "libscreenshot_plugin.so":"../../output/binary/opt/apps/latest/qt/bin",
         "screenshot_app":"../../output/binary/opt/apps/latest/qt/bin",
         "libic_screenshot.so":"lib/"

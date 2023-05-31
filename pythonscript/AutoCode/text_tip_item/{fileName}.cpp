@@ -20,7 +20,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     status = CANSIG_GW_288__BcmPwrStsFb_g.GetValue.fpGetter(nullptr, &raw_value);
     if (status != eSigStatus_Ok)
     {
-        TB_LOG_ERROR("signal get error.");
+        IC_LOG_ERROR("signal get error.");
         return;
     }
     else
@@ -31,7 +31,7 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     status = CANSIG_{1}_g.GetValue.fpGetter( &raw_value,nullptr);
     if (status != eSigStatus_Ok)
     {
-        TB_LOG_ERROR("signal get error.");
+        IC_LOG_ERROR("signal get error.");
         return;
     }
     else

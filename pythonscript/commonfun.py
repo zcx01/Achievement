@@ -184,6 +184,10 @@ def XlsCharToInt(col):
         return ord(col) - ord('A')
     return col
 
+def XlsIntToChar(col):
+    if type(col) == int:
+        return chr(col+ord('A')) 
+    return col
 #-------------------------------容器相关操作-------------------------------
 def getValueByIndex(names,index,defaultValue=""):
     try:

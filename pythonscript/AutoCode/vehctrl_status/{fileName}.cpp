@@ -41,21 +41,21 @@ void {ClassName}::state_process(const SignalMsg &sig_msg)
     if(signal->is_timeout)
     {
         publish_status(topic,value,false);
-        TB_LOG_ERROR("%s time out.",signal->sig_name);
+        IC_LOG_ERROR("%s time out.",signal->sig_name);
         return;
     }
 
     if(NULL != signal->GetIsValueOutOfRange && signal->GetIsValueOutOfRange())
     {
         publish_status(topic,value,false);
-        TB_LOG_ERROR("status signal value out of range.");
+        IC_LOG_ERROR("status signal value out of range.");
         return;
     }
     
     status = signal->GetValue.fpGetter(&raw_value,nullptr);
     if (status != eSigStatus_Ok)
     {
-        TB_LOG_ERROR("%s signal get error.",signal->sig_name);
+        IC_LOG_ERROR("%s signal get error.",signal->sig_name);
         return;
     }    
     value = raw_value.val_{4};
