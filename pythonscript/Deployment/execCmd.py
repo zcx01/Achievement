@@ -96,4 +96,5 @@ class AndroidQnx(object):
                 keyStr(f"cp {self.qnxDir}/{file} {fileDict[file]}")
                 keyStr(f'md5 {fileDict[file]}{file}')
             if chmod:
+                keyStr(f'slay {file}')
                 keyStr(f"chmod +x {fileDict[file]}/{file}",0)

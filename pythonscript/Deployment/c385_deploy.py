@@ -9,7 +9,8 @@ from commonfun import *
 
 pyFileDir = os.path.dirname(os.path.abspath(__file__))
 qnxConfigDir = pyFileDir+"/qnx_config/"
-jsConfig=getJScontent(qnxConfigDir+"config.json")
+qnxConfigPath = qnxConfigDir+"config.json"
+jsConfig=getJScontent(qnxConfigPath)
 androidQnx=AndroidQnx()
 
 def adbPush(proceesNames,excess,argv):
@@ -136,6 +137,25 @@ def ScpFile(tmpath,user,ssh_ip):
     SetCloseSpawn(True)
     interact()
 
+def updateConfig(prjectDir,addFileName):
+    updateDir = jsConfig['update']
+    updateConfig = jsConfig
+    for sDir,oDir in updateDir.items():
+        sPrjectDir = prjectDir+"/"+sDir
+        print(f'添加 {sPrjectDir}')
+        for (dirpath,dirnames,filenames) in os.walk(os.path.expanduser(sPrjectDir)):
+            for fileName in filenames:
+                if addFileName == None or len(addFileName) == 0:
+                    printGreen(f'文件 {fileName}')
+                elif fileName == addFileName:
+                    if fileName not in updateConfig:
+                        printGreen(f'添加{fileName}')
+                        updateConfig[fileName] = oDir
+                        updateConfig["PC"][fileName] = sDir
+                    else:
+                        printGreen(f"{fileName} 已经在配置文件中")
+    writeJs(qnxConfigPath,updateConfig)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='部署C385程序,部署release c385_deploy -c ic_service -d bin -p changan_c385_release -r')
@@ -149,14 +169,21 @@ if __name__ == "__main__":
     parser.add_argument('-d','--dir',help='exe dir',default='',type=str)
     parser.add_argument('-f','-PcFileName',help="打印自带PC上文件的名称",nargs='*')
     parser.add_argument('-s','-sship',help="从远程复制",nargs='*',default=jsConfig.get("ssh_ip",""))
+    parser.add_argument('-u','--updateConfig',help='添加文件到配置中',default='',type=str,nargs='?')
     parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c385/prebuilts/ic',type=str)
     args = parser.parse_args()
     argv = sys.argv
     if '-f' in argv:
         printPCFile()
         sys.exit()
+    
     PrjectDir = args.PrjectDir
     printYellow(PrjectDir)
+    
+    if '-u' in argv:
+        updateConfig(PrjectDir,args.updateConfig)
+        sys.exit()
+
     if "-s" in sys.argv:
         user=jsConfig.get("user",)
         ssh_ip = jsConfig.get("ssh_ip","")
