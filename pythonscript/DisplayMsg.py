@@ -14,8 +14,8 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow,QTextEdit, QWidget
 from PyQt5.QtCore import Qt, QThread, pyqtSignal,QObject
 from PyQt5.QtGui import QCloseEvent,QKeyEvent
-import platform
 import socket
+from commonfun import *
 
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = ""
 
@@ -63,9 +63,10 @@ class MainWindow(QTextEdit):
         if modifier & Qt.AltModifier:
             if e.key() == Qt.Key_Return:
                 selected_text = str(self.textCursor().selectedText())
-                os.system(f"explorer {selected_text}")
+                cmd = f"explorer {selected_text}"
+                os.system(cmd)
         if modifier & Qt.ControlModifier:
-            if e.key == Qt.Key_C:
+            if e.key() == Qt.Key_C:
                 sys.exit()
         return super().keyPressEvent(e)
 
