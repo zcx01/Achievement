@@ -33,15 +33,6 @@ std::string baseRegisterSigChangeFun(const std::string &topic, mapFun &mapfun, F
 
     return topic;
 }
-static std::string _registerSigChangeFun(const std::string &topic, downSigChange fun)
-{
-    return baseRegisterSigChangeFun(topic, downSigChanges, fun);
-}
-
-static std::string _registerSigChangeFun(const std::string &topic, downSigChange_s fun)
-{
-    return baseRegisterSigChangeFun(topic, downSigChanges_s, fun);
-}
 
 template <typename FUN, typename... Ts>
 void registerSigChangeFun(FUN fun, Ts... args)
@@ -64,12 +55,11 @@ void baseCallTopicChanged(const std::string &topic, mapFun &mapfun, const T &val
     }
 }
 
-static void callTopicChanged(const std::string &topic, const float &value)
-{
-    baseCallTopicChanged(topic, downSigChanges, (float)value);
-}
+//在.hpp实现会有多个定义,需要在.cpp中实现
+std::string _registerSigChangeFun(const std::string &topic, downSigChange fun);
 
-static void callTopicChanged(const std::string &topic, const std::string &value)
-{
-    baseCallTopicChanged(topic, downSigChanges_s, value);
-}
+std::string _registerSigChangeFun(const std::string &topic, downSigChange_s fun);
+
+void callTopicChanged(const std::string &topic, const float &value);
+
+void callTopicChanged(const std::string &topic, const std::string &value);
