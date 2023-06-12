@@ -246,6 +246,8 @@ class SigInfo(object):
         receviers = re.findall(e_i,self.Recevier)
         if self.Sender in receviers:
             receviers.remove(self.Sender)
+        if len(receviers) == 0:
+            receviers.append("Vector__XXX")
         self.Recevier = ",".join(receviers)
 
 class MessageInfo(object):

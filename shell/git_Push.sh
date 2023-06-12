@@ -47,7 +47,7 @@ elif [ ${!#} == "-n" ];then
 elif [ ${!#} == "-a" ];then
     git add -A
     git commit --amend 
-    git push $prefix HEAD:refs/for/$branch
+    git push --no-thin $prefix HEAD:refs/for/$branch
 else
     git add -A
     git commit -s

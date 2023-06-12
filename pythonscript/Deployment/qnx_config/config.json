@@ -41,7 +41,8 @@
         "libscreenshot_plugin.so": "../../output/binary/opt/apps/latest/qt/bin",
         "screenshot_app": "../../output/binary/opt/apps/latest/qt/bin",
         "libic_screenshot.so": "lib/",
-        "ictelltale_config_roll.json": "../../qt/ic_qt/resources/config"
+        "ictelltale_config_roll.json": "../../qt/ic_qt/resources/config",
+        "history_topic.json": "../../qt/ic_qt/resources/config"
     },
     "update": {
         "../../qt/ic_qt/resources/translate": "/opt/qt/translate/",
@@ -49,5 +50,6 @@
         "../../output/binary/opt/apps/latest/qt/bin": "/usr/bin/",
         "lib/": "/lib64/"
     },
-    "ictelltale_config_roll.json": "/opt/qt/config/"
+    "ictelltale_config_roll.json": "/opt/qt/config/",
+    "history_topic.json": "/opt/qt/config/"
 }

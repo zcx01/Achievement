@@ -3,6 +3,7 @@
 #include "ObjectFactory.h"
 #include <iostream>
 #include "init_signal_process.hpp"
+#include "fds_common_codes.hpp"
 
 void exec(std::list<std::string> names,std::string i)
 {
@@ -39,12 +40,12 @@ int main(int arg, char *argv[])
     ObjectFactory::getObjectName(names);
 
     init_signal_process_up();
-#ifndef NDEBUG
-    std::string cl;
-    std::cin >> cl;
-    exec(names, cl);
-    return 0;
-#endif
+// #ifndef NDEBUG
+//     std::string cl;
+//     std::cin >> cl;
+//     exec(names, cl);
+//     return 0;
+// #endif
 
     if (arg < 2)
     {

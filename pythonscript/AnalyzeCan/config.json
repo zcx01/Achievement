@@ -8,7 +8,7 @@
     "definefile": "src/ic_service/src/signal_process/include/topic/ipc_topic_new_def.h",
     "casePath": "/home/chengxiongzhu/Works/case/",
     "srcPath":"src/ic_service/src/",
-    "srcSendType": "/home/chengxiongzhu/Works/文档/event_handler_cfg.c",
+    "srcSendType": "/home/chengxiongzhu/Works/changan_mcu_dbc/C673/event_handler_cfg.c",
     "down": "qt/ic_qt/resources/config/down_config.json",
     "up":"qt/ic_qt/resources/config/up_config.json",
     "checkSigIgnore":"src/ic_service/parser/VendorFiles/check_sig_ignore.json"
