@@ -6,7 +6,7 @@ shellPath="$(dirname "${BASH_SOURCE[0]}")"
 cd $shellPath
 commonfun="commonfun.py"
 Analyzedbc="AnalyzeCan"
-
+basic_auth="basic_auth.py"
 for file_a in ./*
 do  
     if [ -d $file_a ]; then
@@ -18,6 +18,12 @@ do
             rm $Analyzedbc
             ln -s ../$Analyzedbc ./
             ln -s ../$Analyzedbc ./
+        fi
+        if [ $file_a == "./Gerrit" ] || [ $file_a == "./Jira" ];then
+            echo "生成"+$file_a+"链接"
+            rm $basic_auth
+            ln -s ../$basic_auth ./
+            ln -s ../$basic_auth ./
         fi
         cd ..
     fi
