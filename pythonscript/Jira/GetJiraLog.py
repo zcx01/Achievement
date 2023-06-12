@@ -35,11 +35,8 @@ import threading
 import socket
 from jira import JIRA
 import platform
+from basic_auth import *
 
-os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = ""
-
-basic_auth=("chengxiong.zhu","@Huan2870244352")
-ROOTLOGDIR="C:/Users/chengxiong.zhu/Downloads/log分析/"
 jira =JIRA("http://jira.i-tetris.com/",basic_auth=basic_auth)
 LOGDIR=""
 TIMEFORMAT="%Y-%m-%d"

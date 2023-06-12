@@ -39,8 +39,7 @@ import re
 import openpyxl
 import datetime
 from openpyxl.worksheet.worksheet import Worksheet
-
-basic_auth=("xxx","xxx")
+from basic_auth import *
 
 def getCellValue(src, row, col):
     return src.cell_value(row, col)
