@@ -34,7 +34,6 @@ import time
 import threading
 import socket
 from jira import JIRA
-from commonfun import *
 import platform
 
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = ""
@@ -48,6 +47,24 @@ TIMEFORMATDATA="%Y-%m"
 PORTMSG = 12345
 HOSTMSG = 'LOCALHOST'
 CODEMSG = 'utf-8'
+
+def printRed(infoStr):
+    print('\033[31m'+infoStr+'\033[0m')
+
+def printGreen(infoStr):
+    print('\033[32m'+infoStr+'\033[0m')
+    
+def printYellow(infoStr):
+    print('\033[33m'+infoStr+'\033[0m')
+
+def wirteFileDicts(file,data,replace=True):
+    cr = open(file, "w")
+    if replace:
+        for d in data:
+            cr.write(str(d).replace("\'","\"")+"\n")
+    else:
+        cr.writelines('\n'.join(data))
+    cr.close()
 
 def send_msg(msg):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
@@ -67,16 +84,32 @@ def getLogPath(bugId):
             smb=smb.replace('/','\\')
             print(smb)
 
+def copySmb(yip,dirlog):
+    assert isinstance(yip,str)
+    yiplastDir = yip.split("\\")
+    yiplastDir = dirlog+"/"+yiplastDir[len(yiplastDir)-1]
+    try:
+        shutil.rmtree(yiplastDir)
+    except:
+        pass
+    try:
+        shutil.copytree(yip,yiplastDir)
+    except Exception as e:
+        print(e)
+        printRed(f"下载 {yip} 失败")
+        pass
+
 def smbToWindow(text,dirlog):
     # if "smb:" in text:
     #     smb = re.findall(r"\bsmb:\S+\b",text,re.A)[0]
     #     smb=smb.replace("smb:","")
     #     smb=smb.replace('/','\\')
     #     return smb
-    ips = re.findall(r'\\\\10.\S+',text,re.A)
+    ips = re.findall(r'\\\\10.+\S+',text,re.A)
     for yip in ips:
         print("下载 "+yip)
-        os.system(f'cp -rf {yip} {dirlog}')
+        copySmb(yip,dirlog)
+        # os.system(fr'cp -rf {yip} {dirlog}')
         # try:
         #     shutil.copy2(yip,dirlog)
         # except:
@@ -99,17 +132,21 @@ def getOriDir(issue):
     return oriDir
 
 def printDir(dirPath):
-    if platform.system == "Windows":
+    if platform.system() == "Windows":
         dirPath = dirPath.replace('/','\\')
     return dirPath
     
-def displayIssue(issue,arg,signal):
-    dirlog=LOGDIR+issue.key
+def displayIssue(issue,arg,signal,isSearch):
+    # dirlog=LOGDIR+issue.key
+    dirlog =getOriDir(issue)
     if arg & 1:
         title='标题'
         # print(f'{title:<10}{issue.fields.summary}')
         try:
-            if not isExists(issue):
+            if not isSearch:
+                createLogDir(dirlog)
+                pass
+            elif not isExists(issue):
                 createLogDir(dirlog)
             else:
                 return
@@ -120,6 +157,7 @@ def displayIssue(issue,arg,signal):
     if not signal == None:
         signal(issue.permalink())
         dirlogTemp = printDir(dirlogTemp)
+        signal(dirlogTemp)
     printGreen("下载目录为: "+dirlogTemp)
     if arg & 2:
         title='详细'
@@ -139,15 +177,6 @@ def displayIssue(issue,arg,signal):
             with open(path,'wb') as f:
                 f.write(attachment.get())
 
-    try:
-        oriDir =getOriDir(issue)
-        if os.path.exists(oriDir):
-            shutil.rmtree(oriDir)
-        os.rename(dirlog,oriDir)
-        if not signal == None:
-            signal(printDir(oriDir))
-    except:
-        pass
     if not signal == None:
         signal("下载完成")
         printGreen("下载完成")
@@ -158,10 +187,10 @@ def getBugInfo(text,isSearch,signal):
         #fields = 'comment'不配置就没有备注,默认不存在
         issues = jira.search_issues(text,fields = ['comment','summary','description','attachment'])
         for issue in issues:
-            displayIssue(issue,15,signal)    
+            displayIssue(issue,15,signal,isSearch)    
     else:
         issue=jira.issue(text,fields = ['comment','summary','description','attachment'])
-        displayIssue(issue,15,signal)
+        displayIssue(issue,15,signal,isSearch)
 
 def getNoResolvedInfo(signal):
     #fields = 'comment'不配置就没有备注,默认不存在
@@ -221,7 +250,7 @@ def Reporting():
         for (dirpath,dirnames,filenames) in os.walk(dateDir):
             if dirpath == dateDir:
                 for dirname in dirnames:
-                    keys = re.findall(e_i,dirname,re.A)
+                    keys = re.findall(r"-?\b[a-zA-Z_0x0-9.]+\b",dirname,re.A)
                     if len(keys) > 1:
                         jiraBugKey = keys[0]+keys[1]
                         if jiraBugKey not in jiraBugKeys:
@@ -240,7 +269,21 @@ def Reporting():
 
     wirteFileDicts(file_path,reportContent)
     print("生成完成")
-    
+
+def getLoopJiraIdLog():
+    while(True):
+        cmd=input()
+        if len(cmd) == 0:
+            continue
+        jiraIds = cmd.splitlines()
+        getJiraIdLog(jiraIds)
+
+def getJiraIdLog(jiraIds):
+    global LOGDIR
+    LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime(TIMEFORMAT)+"/"
+    for jiraId in jiraIds:
+        getBugInfo(jiraId,False,send_msg)
+        
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
@@ -250,19 +293,17 @@ if __name__ == "__main__":
 
     # #这个是要解析 -f 后面的参数
     parser.add_argument('-i', '--jiraIds',help="JiraId",type=str,default=[],nargs='+')
-    parser.add_argument('-r', '--Reporting',help="生成报文",type=str,default='',nargs='?')
+    parser.add_argument('-r', '--Reporting',help="生成报告",type=str,default='',nargs='?')
     arg=parser.parse_args()
 
     if not os.path.isdir(ROOTLOGDIR):
         os.makedirs(ROOTLOGDIR)
     if '-i' in sys.argv:
-        LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime(TIMEFORMAT)+"/"
-        for jiraId in arg.jiraIds:
-            getBugInfo(jiraId,False,send_msg)
+        getJiraIdLog(arg.jiraIds)
     elif '-r' in sys.argv:
         Reporting()
     else:
-        # my_thread = threading.Thread(target=getNoResolvedInfo,args=(send_msg,))
-        # my_thread.setDaemon(True)
-        # my_thread.start()
+        my_thread = threading.Thread(target=getLoopJiraIdLog,args=())
+        my_thread.setDaemon(True)
+        my_thread.start()
         getNoResolvedInfo(send_msg)
