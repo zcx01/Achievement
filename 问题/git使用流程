@@ -124,3 +124,6 @@ git push mega HEAD:refs/for/master
 ---------------------git error Missing tree 解决办法---------------------
 提交的时候，加入一个参数 --no-thin
 git push --no-thin origin HEAD:refs/for/master
+
+-------------------commit-msg-------------------
+gitdir=$(git rev-parse --git-dir); scp -p -P 29418 chengxiong.zhu@git.i-tetris.com:hooks/commit-msg ${gitdir}/hooks/
