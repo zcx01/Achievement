@@ -13,7 +13,10 @@ import threading
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow,QTextEdit, QWidget
 from PyQt5.QtCore import Qt, QThread, pyqtSignal,QObject
-from PyQt5.QtGui import QCloseEvent,QKeyEvent
+from PyQt5.QtGui import QCloseEvent,QKeyEvent,QResizeEvent
+from PyQt5 import QtGui
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 import socket
 from commonfun import *
 
@@ -45,18 +48,24 @@ class UpdateThread(QObject):
 
 class MainWindow(QTextEdit):
     def initUI(self):
+        self.setWindowFlags(Qt.Window)
         self.subTheard = UpdateThread()
         self.subTheard.update_data.connect(self.updataText)
         self.subTheard.start()
 
     def updataText(self,text):
         if self.isHidden():
-            self.show()
+            self.showNormal()
         self.append(text)
 
     def closeEvent(self, a0: QCloseEvent) -> None:
         a0.ignore()
         self.hide()
+
+    # def resizeEvent(self, a0: QResizeEvent) -> None:
+    #     print(a0.size())
+    #     self.viewport().resize(a0.size())
+    #     return super().resizeEvent(a0)
     
     def keyPressEvent(self, e: QKeyEvent) -> None:
         modifier = e.modifiers()

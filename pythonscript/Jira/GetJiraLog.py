@@ -128,7 +128,7 @@ def getOriDir(issue):
     oriDir = LOGDIR+" "+issue.key+" "+ summary
     return oriDir
 
-def printDir(dirPath):
+def openDir(dirPath):
     if platform.system() == "Windows":
         dirPath = dirPath.replace('/','\\')
     return dirPath
@@ -153,7 +153,7 @@ def displayIssue(issue,arg,signal,isSearch):
     dirlogTemp = dirlog
     if not signal == None:
         signal(issue.permalink())
-        dirlogTemp = printDir(dirlogTemp)
+        dirlogTemp = openDir(dirlogTemp)
         signal(dirlogTemp)
     printGreen("下载目录为: "+dirlogTemp)
     if arg & 2:
@@ -198,18 +198,26 @@ def getNoResolvedInfo(signal):
         time.sleep(10)
     # getBugInfo('BGS-52779')
 
-def get_last_week_thursday_dates():
-    today = datetime.datetime.now()
+def get_last_week_thursday_dates(reporData):
+    if reporData == None or len(reporData) == 0:
+        today = datetime.datetime.now()
+    else:
+        try:
+            today= datetime.datetime.strptime(reporData,TIMEFORMAT)
+            print(today)
+        except:
+            printRed(f"输入的日期格式不正确{reporData}")
+            pass
     days_to_thursday = (3 - today.weekday()) % 7
     start_of_last_week = today - datetime.timedelta(days=6-days_to_thursday)
     dates = []
     for i in range(7):
         date = start_of_last_week + datetime.timedelta(days=i)
-        dates.append(date.strftime('%Y-%m-%d'))
+        dates.append(date.strftime(TIMEFORMAT))
     return dates
 
-def getCurrentWeekdDir():
-    dates = get_last_week_thursday_dates()
+def getCurrentWeekdDir(reporData):
+    dates = get_last_week_thursday_dates(reporData)
     dateDirs = []
     for date in dates:
         dateDir = ROOTLOGDIR+date
@@ -235,12 +243,12 @@ def getIssuesContet(issues,JiraContent):
         JiraContent.append(f"{index}、{issue.key} {issue.fields.summary}")
         index+=1
    
-def Reporting():
-    dateDirs,startDate,endDate,currentDate = getCurrentWeekdDir()
+def Reporting(reporData):
+    dateDirs,startDate,endDate,currentDate = getCurrentWeekdDir(reporData)
     file_path = ROOTLOGDIR+"Report/"
     if not os.path.isdir(file_path):
         os.makedirs(file_path)
-    file_path += currentDate+".txt"
+    file_path += endDate+".txt"
     reportContent=[]
     jiraBugKeys=[]
     for dateDir in dateDirs:
@@ -265,7 +273,8 @@ def Reporting():
     getIssuesContet(issues,reportContent)
 
     wirteFileDicts(file_path,reportContent)
-    print("生成完成")
+    printGreen(f"{file_path} 生成完成")
+    os.system(f'explorer {openDir(file_path)}')
 
 def getLoopJiraIdLog():
     while(True):
@@ -290,7 +299,7 @@ if __name__ == "__main__":
 
     # #这个是要解析 -f 后面的参数
     parser.add_argument('-i', '--jiraIds',help="JiraId",type=str,default=[],nargs='+')
-    parser.add_argument('-r', '--Reporting',help="生成报告",type=str,default='',nargs='?')
+    parser.add_argument('-r', '--reporData',help="生成报告的日期，没有默认是今天,格式是Y-m-d",type=str,default='',nargs='?')
     arg=parser.parse_args()
 
     if not os.path.isdir(ROOTLOGDIR):
@@ -298,7 +307,7 @@ if __name__ == "__main__":
     if '-i' in sys.argv:
         getJiraIdLog(arg.jiraIds)
     elif '-r' in sys.argv:
-        Reporting()
+        Reporting(arg.reporData)
     else:
         my_thread = threading.Thread(target=getLoopJiraIdLog,args=())
         my_thread.setDaemon(True)
