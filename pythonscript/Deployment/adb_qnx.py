@@ -1,5 +1,4 @@
 #!/bin/python
-from readline import parse_and_bind
 import sys
 import time
 from execCmd import *

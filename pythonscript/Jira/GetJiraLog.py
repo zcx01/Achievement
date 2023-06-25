@@ -196,9 +196,14 @@ def getNoResolvedInfo(signal):
         LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime(TIMEFORMAT)+"/"
         getBugInfo('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC',True,signal)
         time.sleep(10)
+        today = datetime.datetime.now()
+        if today.hour == 19:
+            dateDirs,startDate,endDate,currentDate = getCurrentWeekdDir(None)
+            if endDate == today.strftime(TIMEFORMAT):
+                Reporting()
     # getBugInfo('BGS-52779')
 
-def get_last_week_thursday_dates(reporData):
+def get_last_week_thursday_dates(reporData=None):
     if reporData == None or len(reporData) == 0:
         today = datetime.datetime.now()
     else:
@@ -216,7 +221,7 @@ def get_last_week_thursday_dates(reporData):
         dates.append(date.strftime(TIMEFORMAT))
     return dates
 
-def getCurrentWeekdDir(reporData):
+def getCurrentWeekdDir(reporData=None):
     dates = get_last_week_thursday_dates(reporData)
     dateDirs = []
     for date in dates:
@@ -243,7 +248,7 @@ def getIssuesContet(issues,JiraContent):
         JiraContent.append(f"{index}、{issue.key} {issue.fields.summary}")
         index+=1
    
-def Reporting(reporData):
+def Reporting(reporData=None):
     dateDirs,startDate,endDate,currentDate = getCurrentWeekdDir(reporData)
     file_path = ROOTLOGDIR+"Report/"
     if not os.path.isdir(file_path):
@@ -281,15 +286,21 @@ def getLoopJiraIdLog():
         cmd=input()
         if len(cmd) == 0:
             continue
-        jiraIds = cmd.splitlines()
-        getJiraIdLog(jiraIds)
+        cmds = cmd.splitlines()
+        if '-r' in cmds:
+            if len(cmds) > 1 :
+                Reporting(cmds[1])
+            else:
+                Reporting()
+        else:
+            getJiraIdLog(cmds)
 
 def getJiraIdLog(jiraIds):
     global LOGDIR
     LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime(TIMEFORMAT)+"/"
     for jiraId in jiraIds:
         getBugInfo(jiraId,False,send_msg)
-        
+    
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
