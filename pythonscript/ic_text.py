@@ -10,14 +10,14 @@ from xlrd.book import Book
 from xlrd.sheet import Sheet
 
 SOUCRELANGUAGESUFFIX="zh_CN.ts"
-ORILANGUAGESUFFIXS={"en_US.ts":"F","th_TH.ts":"G"} 
-SHELLNAME="IC"
+ORILANGUAGESUFFIXS={"en_US.ts":"D","th_TH.ts":"E"} 
+SHELLNAME="SIC"
 class translateConent(object):
     def __init__(self) -> None:
         self.path = ""
         self.sourceKey=""
         self.content=""
-        self.exisTranslates=[]
+        self.exisTranslatesList=[]
         self.translateContent=""
 
     def getList(self):
@@ -25,9 +25,19 @@ class translateConent(object):
         xlsContent.append(self.path)
         xlsContent.append(self.sourceKey)
         xlsContent.append(self.content)
-        for exisTranslate in self.exisTranslates:
+        for exisTranslate in self.exisTranslatesList:
             xlsContent.append(exisTranslate)
         return xlsContent
+    
+    def appendExis(self,exisTranslate):
+        if len(exisTranslate) != 0:
+            self.exisTranslatesList.append(exisTranslate)
+
+    def appendSh(self,sh,isCheckChange):
+        if not isCheckChange:
+            sh.append(self.getList())
+        elif len(self.exisTranslatesList)==0 and len(self.content) != 0:
+            sh.append(self.getList())
     
 def getTextCout(fileName):
     jsContents = getJScontent(fileName)
@@ -41,7 +51,13 @@ def getTextCout(fileName):
 def joint(f,t):
     return f'{f}__{t}'
 
-def translatesByTs(dirpath,oriName,translateConents):
+def getValue(src, row, col):
+    return src.cell_value(row,XlsCharToInt(col))
+
+def removeSuffix(conetnt):
+    return conetnt.replace(".ts","")
+
+def translatesByTs(dirpath,oriName,translateConents,isSource):
     translatePath_file = f'{dirpath}/{oriName}'
     domTree = parse(translatePath_file)
     assert isinstance(domTree,Document)
@@ -61,14 +77,18 @@ def translatesByTs(dirpath,oriName,translateConents):
             try:
                 content= messageNode.getElementsByTagName("translation")[0].childNodes[0].data
             except:
-                content = source
+                if isSource:
+                    content = source
+                else:
+                    content=""
+
             xlsContent = translateConent()
             xlsContent.path = joint(oriName,contentFile)
             xlsContent.sourceKey = source
             xlsContent.content = content
             translateConents[source] = xlsContent
 
-def coverXls(translatePath,jsonPath,outPath):
+def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
     # 创建一个Excel workbook 对象
     # if os.path.isfile(outPath):
     #     book = openpyxl.load_workbook(outPath)
@@ -93,28 +113,27 @@ def coverXls(translatePath,jsonPath,outPath):
         for oriName in filenames:
             if SOUCRELANGUAGESUFFIX in oriName:
                 soucreLanguages={}
-                translatesByTs(dirpath,oriName,soucreLanguages)
+                translatesByTs(dirpath,oriName,soucreLanguages,True)
                 existranslatelanguages = {}
 
                 for exisTranslate in exisTranslates:
                     existransName = oriName.replace(SOUCRELANGUAGESUFFIX,exisTranslate)
                     existranslatelanguage = {}
-                    translatesByTs(dirpath,existransName,existranslatelanguage)
+                    translatesByTs(dirpath,existransName,existranslatelanguage,False)
                     existranslatelanguages[exisTranslate] = existranslatelanguage
-
                 count = 0
                 for soucreLanguage in soucreLanguages:
                     xlsContent=soucreLanguages[soucreLanguage]
                     assert isinstance(xlsContent,translateConent)
                     for exisTranslate in exisTranslates:
                         try:
-                            xlsContent.exisTranslates.append(existranslatelanguages[exisTranslate][xlsContent.sourceKey].content)
+                            xlsContent.appendExis(existranslatelanguages[exisTranslate][xlsContent.sourceKey].content)
                         except:
                             # printYellow(f"{xlsContent.sourceKey} 不存在 {removeSuffix(exisTranslate)}")
                             pass
-                    sh.append(xlsContent.getList())
+                    xlsContent.appendSh(sh,isCheckChange)
                     count+=1
-                print(f"检测 {dirpath}/{oriName} 文件 一共有 {count}")
+                print(f"检测完 {dirpath}/{oriName} 文件 一共有 {count}")
 
     try:
         jsContents = getJScontent(jsonPath)
@@ -128,23 +147,17 @@ def coverXls(translatePath,jsonPath,outPath):
                     xlsContent.content = jsContents[top][grade][removeSuffix(SOUCRELANGUAGESUFFIX)]
                     for exisTranslate in exisTranslates:
                         try:
-                            xlsContent.exisTranslates.append(jsContents[top][grade][removeSuffix(exisTranslate)])
+                            xlsContent.appendExis(jsContents[top][grade][removeSuffix(exisTranslate)])
                         except:
                             printYellow(f"{top} 不存在 {removeSuffix(exisTranslate)}")
-                    sh.append(xlsContent.getList())
+                    xlsContent.appendSh(sh,isCheckChange)
                     count+=1
-        print(f"检测 {jsonPath} 文件 一共有{count}")
+        print(f"检测完 {jsonPath} 文件 一共有{count}")
     except:
         printRed(f"{jsonPath} 异常")
         pass
     book.save(outPath)
     printGreen("检测完成")
-
-def getValue(src, row, col):
-    return src.cell_value(row,XlsCharToInt(col))
-
-def removeSuffix(conetnt):
-    return conetnt.replace(".ts","")
     
 def xlsCover(translatePath,jsonPath,input):
     book = xlrd.open_workbook(input)
@@ -236,16 +249,6 @@ def xlsCover(translatePath,jsonPath,input):
             pass
     printGreen("更新完成")
 
-def translationText(fileName):
-    jsContents = getJScontent(fileName)
-    for top in jsContents:
-        for grade in jsContents[top]:
-            if isNumber(grade) :
-                tmp={}
-                tmp[removeSuffix(SOUCRELANGUAGESUFFIX)] = jsContents[top][grade]
-                jsContents[top][grade] =tmp
-    writeJs(fileName,jsContents)
-    printGreen("转化完成")
 
 #./ic_text.py -t /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/translate -j /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json -o ic-out.xlsx
 if __name__ == "__main__":
@@ -254,6 +257,7 @@ if __name__ == "__main__":
     aparse.add_argument('-j','--json',help='报警文字配置文件',type=str,nargs="?",default="")
     aparse.add_argument('-o','--outPath',help='生成xls文件路径',type=str)
     aparse.add_argument('-i','--input',help='输入xls文件路径',type=str)
+    aparse.add_argument('-c','--checkChange',help='检测修改的文本',type=str,nargs="?")
     arg = aparse.parse_args()
 
     if len(sys.argv) == 1:
@@ -262,5 +266,5 @@ if __name__ == "__main__":
         coverXls(arg.translatePath,arg.json,arg.outPath)
     elif "-i" in sys.argv:
         xlsCover(arg.translatePath,arg.json,arg.input)
-    elif "-j" in sys.argv:
-        translationText(arg.json)
+    if '-c' in sys.argv:
+        coverXls(arg.translatePath,arg.json,arg.checkChange,True)
