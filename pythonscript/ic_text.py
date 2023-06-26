@@ -11,10 +11,11 @@ from xlrd.sheet import Sheet
 
 SOUCRELANGUAGESUFFIX="zh_CN.ts"
 ORILANGUAGESUFFIXS={"en_US.ts":"D","th_TH.ts":"E"} 
+ORILANGUAGENAME={"en_US.ts":"英文","th_TH.ts":"泰文"} 
 SHELLNAME="SIC"
 class translateConent(object):
     def __init__(self) -> None:
-        self.path = ""
+        self.fileType = ""
         self.sourceKey=""
         self.content=""
         self.exisTranslatesList=[]
@@ -22,7 +23,7 @@ class translateConent(object):
 
     def getList(self):
         xlsContent = []
-        xlsContent.append(self.path)
+        xlsContent.append(self.fileType)
         xlsContent.append(self.sourceKey)
         xlsContent.append(self.content)
         for exisTranslate in self.exisTranslatesList:
@@ -57,7 +58,7 @@ def getValue(src, row, col):
 def removeSuffix(conetnt):
     return conetnt.replace(".ts","")
 
-def translatesByTs(dirpath,oriName,translateConents,isSource):
+def translatesByTs(dirpath,oriName,translateConents,repeatTranslateConents,isSource):
     translatePath_file = f'{dirpath}/{oriName}'
     domTree = parse(translatePath_file)
     assert isinstance(domTree,Document)
@@ -83,10 +84,16 @@ def translatesByTs(dirpath,oriName,translateConents,isSource):
                     content=""
 
             xlsContent = translateConent()
-            xlsContent.path = joint(oriName,contentFile)
+            xlsContent.fileType = getSuffix(oriName)
             xlsContent.sourceKey = source
             xlsContent.content = content
-            translateConents[source] = xlsContent
+
+            if repeatTranslateConents == None:
+                translateConents[source] = xlsContent
+            elif source not in repeatTranslateConents:
+                translateConents[source] = xlsContent
+                repeatTranslateConents[source] = xlsContent
+                
 
 def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
     # 创建一个Excel workbook 对象
@@ -97,29 +104,27 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
     book = openpyxl.Workbook()
     sh = book.active
     sh.title = SHELLNAME
-    sh['A1'] = '文件名'
+    sh['A1'] = '文件类型'
     sh['B1'] = '源key'
     sh['C1'] = '内容'
     count = 3
     exisTranslates = ORILANGUAGESUFFIXS.keys()
     for exisTranslate in exisTranslates:
-        sh[f'{XlsIntToChar(count)}1'] = exisTranslate
+        sh[f'{XlsIntToChar(count)}1'] = ORILANGUAGENAME[exisTranslate]
         count+=1
-    sh[f'{XlsIntToChar(count)}1'] = '翻译结果'
-    count+=1
-    sh[f'{XlsIntToChar(count)}1'] = '备注'
 
+    repeatSoucreLanguages={}
     for (dirpath,dirnames,filenames) in os.walk(translatePath):
         for oriName in filenames:
             if SOUCRELANGUAGESUFFIX in oriName:
                 soucreLanguages={}
-                translatesByTs(dirpath,oriName,soucreLanguages,True)
+                translatesByTs(dirpath,oriName,soucreLanguages,repeatSoucreLanguages,True)
                 existranslatelanguages = {}
 
                 for exisTranslate in exisTranslates:
                     existransName = oriName.replace(SOUCRELANGUAGESUFFIX,exisTranslate)
                     existranslatelanguage = {}
-                    translatesByTs(dirpath,existransName,existranslatelanguage,False)
+                    translatesByTs(dirpath,existransName,existranslatelanguage,None,False)
                     existranslatelanguages[exisTranslate] = existranslatelanguage
                 count = 0
                 for soucreLanguage in soucreLanguages:
@@ -142,7 +147,7 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
             for grade in jsContents[top]:
                 if isNumber(grade) :
                     xlsContent = translateConent()
-                    xlsContent.path = os.path.basename(jsonPath)
+                    xlsContent.fileType = getSuffix(jsonPath)
                     xlsContent.sourceKey = joint(top,grade)          
                     xlsContent.content = jsContents[top][grade][removeSuffix(SOUCRELANGUAGESUFFIX)]
                     for exisTranslate in exisTranslates:
@@ -172,7 +177,7 @@ def xlsCover(translatePath,jsonPath,input):
         printGreen(f"正在更新 {oriLanguageSuffix} ...")
         for row in range(sheel.nrows):
             xlsContent = translateConent()
-            xlsContent.path = getValue(sheel,row,"A")
+            xlsContent.fileType = getValue(sheel,row,"A")
             xlsContent.sourceKey = getValue(sheel,row,"B")
             xlsContent.content = getValue(sheel,row,"C")
             xlsContent.translateContent = getValue(sheel,row,"D")
@@ -184,10 +189,10 @@ def xlsCover(translatePath,jsonPath,input):
                 pass
             else:
                 xlsContent.translateContent = xlsContent.translateContent.replace(',',',\n')
-            if ".json" in xlsContent.path:
-                jsContent[joint(xlsContent.path,xlsContent.sourceKey)] = xlsContent
+            if "json" in xlsContent.fileType:
+                jsContent[joint(xlsContent.fileType,xlsContent.sourceKey)] = xlsContent
             else:
-                tsContent[joint(xlsContent.path,xlsContent.sourceKey)] = xlsContent
+                tsContent[joint(xlsContent.fileType,xlsContent.sourceKey)] = xlsContent
         
         for (dirpath,dirnames,filenames) in os.walk(translatePath):
             for oriName in filenames:
@@ -213,7 +218,7 @@ def xlsCover(translatePath,jsonPath,input):
                         messageNodes = context.getElementsByTagName("message")
                         for messageNode in messageNodes:
                             assert isinstance(messageNode,Element)
-                            path = joint(oriName.replace(oriLanguageSuffix,SOUCRELANGUAGESUFFIX),contentFile)
+                            path = getSuffix(oriName.replace(oriLanguageSuffix,SOUCRELANGUAGESUFFIX))
                             try:
                                 source = messageNode.getElementsByTagName("source")[0].childNodes[0].data
                             except:
@@ -239,7 +244,7 @@ def xlsCover(translatePath,jsonPath,input):
             for top in aimJsContents:
                 for grade in aimJsContents[top]:
                     if isNumber(grade) :
-                        path = os.path.basename(jsonPath)
+                        path = getSuffix(jsonPath)
                         source = joint(top,grade)  
                         path = joint(path,source)
                         if path in jsContent:     
