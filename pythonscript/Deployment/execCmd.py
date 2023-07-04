@@ -7,11 +7,18 @@ import pexpect
 
 
 process = None
-cmd_Outs={'telnet':'login','ssh':'password','adb push':'in','curl':'100'}
-new_spawn=['ssh','adb shell']
+cmd_Outs={}
+new_spawn=[]
 shellCmds=[]
 linux_end ='$'
 is_close_spawn=False
+
+def setDevice(dev):
+    global cmd_Outs
+    global new_spawn
+    cmd_Outs={'telnet':'login','ssh':'password',f'adb{dev} push':'in','curl':'100'}
+    new_spawn=['ssh',f'adb{dev} shell']
+setDevice("")
 
 def SetCloseSpawn(s):
     global is_close_spawn
@@ -76,14 +83,20 @@ class AndroidQnx(object):
         self.androidDir = "/sdcard"
         self.android_qnxDir = "/ota"
         self.qnxDir = "/ota/android"
+        self.device = ""
+        setDevice(self.device)
     
+    def setDevice(self,dev):
+        self.device = dev
+        setDevice(self.device)
+
     def pc_android_qnx(self,filePaths):
         fileNames=[]
         for path in filePaths:
-            keyStr(f'adb push {path} {self.androidDir}')
+            keyStr(f'adb{self.device} push {path} {self.androidDir}')
             fileNames .append(os.path.basename(path))
 
-        keyStr('adb shell')
+        keyStr(f'adb{self.device} shell')
         keyStr('init.mount_ota.sh',0,"#")
         for fileName in fileNames:
             keyStr(f'cp {self.androidDir}/{fileName} {self.android_qnxDir}',0,"#")

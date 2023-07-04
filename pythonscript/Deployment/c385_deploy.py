@@ -166,11 +166,11 @@ if __name__ == "__main__":
     parser.add_argument('-q','--qnx',help='cp for qnx',nargs='*')
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     parser.add_argument('-r','--not',help='是否重启',nargs='*')
-    parser.add_argument('-d','--dir',help='exe dir',default='',type=str)
     parser.add_argument('-f','-PcFileName',help="打印自带PC上文件的名称",nargs='*')
     parser.add_argument('-s','-sship',help="从远程复制",nargs='*',default=jsConfig.get("ssh_ip",""))
     parser.add_argument('-u','--updateConfig',help='添加文件到配置中',default='',type=str,nargs='?')
     parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c385/prebuilts/ic',type=str)
+    parser.add_argument('-d','--device',help='adb的device',default='',type=str)
     args = parser.parse_args()
     argv = sys.argv
     if '-f' in argv:
@@ -199,7 +199,12 @@ if __name__ == "__main__":
                 tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
                 ScpFile(tmpath,user,ssh_ip)
 
-    keyStr('adb root')
+    device = ""
+    if len(args.device) !=0:
+        device = f" -s {args.device}"
+
+    keyStr(f'adb{device} root')
+    androidQnx.setDevice(device)
     main(args,sys.argv)
     if '-a' in argv:
         copAbsolutePath(args.absolutePath)
@@ -222,8 +227,6 @@ if __name__ == "__main__":
         exe_proceesNames=[]
         for proceesName in proceesNames:
             execbin = getExecBin(proceesName,proceesName)
-            if len(args.dir) != 0:
-                execbin = args.dir
             exe_proceesNames.append(f'{execbin}/{proceesName}')
         androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
