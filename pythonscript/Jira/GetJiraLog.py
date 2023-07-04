@@ -93,7 +93,13 @@ def copySmb(yip,dirlog):
         shutil.copytree(yip,yiplastDir)
     except Exception as e:
         print(e)
-        printRed(f"下载 {yip} 失败")
+        print('进入文件下载模式')
+        try:
+            print(yiplastDir)
+            shutil.copyfile(yip,yiplastDir)
+        except Exception as e:
+            print(e)
+            printRed(f"下载 {yip} 失败")
         pass
 
 def smbToWindow(text,dirlog):

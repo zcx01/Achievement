@@ -18,7 +18,6 @@ from PyQt5 import QtGui
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 import socket
-from commonfun import *
 
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = ""
 
