@@ -22,7 +22,12 @@ if __name__ == "__main__":
     parser.add_argument('-rl','--remvelog', help='清除log', nargs='?',default=1,type=int)
     parser.add_argument('-np','--nextPage', help='下一页', nargs='?')
     parser.add_argument('-v','--value', help='值', nargs='?',default=1,type=int)
+    parser.add_argument('-d','--device',help='adb的device',default='',type=str)
     args = parser.parse_args()
+
+    device = ""
+    if len(args.device) !=0:
+        device = f" -s {args.device}"
 
     for j in range(120):
         adb_out = subprocess.getoutput("adb devices").split('\n')
@@ -33,10 +38,10 @@ if __name__ == "__main__":
         print(f"车机重启中...等待{j+1}秒")
         time.sleep(1)
         
-    keyStr('adb root')
-    keyStr("adb shell")
-    keyStr("telnet cdc-qnx",0,"login:")
-    keyStr("root",0,"#")
+    keyStr(f'adb{device} root')
+    keyStr(f"adb{device} shell")
+    keyStr(f"telnet cdc-qnx",0,"login:")
+    keyStr(f"root",0,"#")
 
     isExit = (args.interact == 0)
     value = args.value

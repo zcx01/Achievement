@@ -40,7 +40,18 @@ def GetCookie(url):
     cookies["Cookie"]=driverCookies
     print(cookies)
     return cookies
-       
+
+def guntargz(file,fileName,path):
+    print("解压中 "+file)
+    tagName = fileName.split(".")
+    if len(tagName) !=0:
+        tagName = tagName[0]
+    tagName=path+"/"+tagName
+    if os.path.exists(tagName):
+        shutil.rmtree(tagName)
+    os.makedirs(tagName)
+    os.system(f"tar -zxvf {file} -C {tagName}")
+
 def DownloadGerritTgz(url,path):
     assert isinstance(url,str)
     # url = "https://git.i-tetris.com/plugins/gitiles/qcom/sa/qnx/mega/prebuilts/bigsur/+/refs/heads/sop/bigsur_hqx.1.2.1_20230130"
@@ -55,20 +66,25 @@ def DownloadGerritTgz(url,path):
     print("写入 "+file)
     with open(file, "wb") as cr:
         cr.write(content)
-    print("解压中 "+file)
-    tagName = fileName.split(".")
-    if len(tagName) !=0:
-        tagName = tagName[0]
-    tagName=path+"/"+tagName
-    if os.path.exists(tagName):
-        shutil.rmtree(tagName)
-    os.makedirs(tagName)
-    os.system(f"tar -zxvf {file} -C {tagName}")
+    guntargz(file,fileName,path)
+    print("下载完成")
+
+def WDownload(url,path):
+    print("下载 "+url)
+    os.system(f"wget {url} --http-user={basic_auth[0]} --http-password={basic_auth[1]}")
+    urls = url.split("/")
+    fileName = urls[len(urls)-1]
+    file = path+"/"+fileName
+    guntargz(file,fileName,path)
     print("下载完成")
 
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(description='下载GerritTgz')
     parse.add_argument('-u','--url',help='url',type=str)
+    parse.add_argument('-w','--wurl',help='url',type=str)
     parse.add_argument('-p','--path',help='url',type=str,default=".",nargs="?")
     arg = parse.parse_args()
-    DownloadGerritTgz(arg.url,arg.path)
+    if '-u' in sys.argv:
+        DownloadGerritTgz(arg.url,arg.path)
+    elif '-w' in sys.argv:
+        WDownload(arg.wurl,arg.path)

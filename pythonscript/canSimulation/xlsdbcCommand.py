@@ -662,3 +662,13 @@ def SigNameChinese(configPath, wirteSigNames, canmatrix="",stype = 0):
             if outStr not in outStrs:
                 printGreen(outStr)
                 outStrs.append(outStr)
+
+
+def handleProjectPath(configPath,path):
+    jsConfig = getJScontent(configPath)
+    if path == None or len(path) == 0:
+        print(jsConfig.get("projectPath",""))
+    else:
+        jsConfig['projectPath'] = path
+        writeJs(configPath,jsConfig)
+        handleProjectPath(configPath,'')
