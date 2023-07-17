@@ -111,3 +111,4 @@ class AndroidQnx(object):
             if chmod:
                 keyStr(f'slay {file}')
                 keyStr(f"chmod +x {fileDict[file]}/{file}",0)
+                keyStr(f"ps -e | grep {file}")
