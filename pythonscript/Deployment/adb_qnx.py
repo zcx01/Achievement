@@ -38,6 +38,7 @@ if __name__ == "__main__":
         print(f"车机重启中...等待{j+1}秒")
         time.sleep(1)
         
+    setDevice(device)
     keyStr(f'adb{device} root')
     keyStr(f"adb{device} shell")
     keyStr(f"telnet cdc-qnx",0,"login:")

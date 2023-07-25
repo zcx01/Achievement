@@ -39,11 +39,11 @@ if [ ${!#} == "-c" ];then
     git status
     git add -A
     git rebase --continue
-    git push $prefix HEAD:refs/for/$branch
+    git push --no-thin $prefix HEAD:refs/for/$branch
 elif [ ${!#} == "-n" ];then
     git add -A
     git commit --amend --no-edit
-    git push $prefix HEAD:refs/for/$branch 
+    git push --no-thin $prefix HEAD:refs/for/$branch 
 elif [ ${!#} == "-a" ];then
     git add -A
     git commit --amend 
@@ -53,5 +53,5 @@ else
     git commit -s
     git fetch $prefix
     git rebase $prefix/$branch
-    git push $prefix HEAD:refs/for/$branch
+    git push --no-thin $prefix HEAD:refs/for/$branch
 fi
