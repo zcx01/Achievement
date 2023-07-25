@@ -73,7 +73,7 @@ class MainWindow(QTextEdit):
                 selected_text = str(self.textCursor().selectedText())
                 cmd = f"explorer {selected_text}"
                 os.system(cmd)
-        if modifier & Qt.ControlModifier:
+        if modifier & Qt.ShiftModifier:
             if e.key() == Qt.Key_C:
                 sys.exit()
         return super().keyPressEvent(e)
