@@ -5,7 +5,7 @@ from xlsdbcCommand import *
 
 # conversion(pyFileDir+"config.json","","/home/chengxiongzhu/Achievement/pythonscript/canSimulation/temp.xls")
 # conversion(pyFileDir+"config.json",'TboxLocalTiYear')
-# sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
+# sigNameChanged(pyFileDir+"config.json",'/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/parser/vendor/dbc_files/CAN0_C385EV_V2.1.1_20211009.dbc_old','B_C.txt')
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
         description='''
@@ -22,14 +22,14 @@ if __name__ == "__main__":
     parse.add_argument('-a', '--append', nargs='?', help='新增整个can矩阵表格（如果没有指定路径，使用就是配置文件中）、和+w一起使用则是dbc目录')
     parse.add_argument('-s', '--sigNames', help='新增信号名，是一个列表',
                        default=[], nargs='+', type=str)
-    parse.add_argument('-m', '--messages', help='新增messages，是一个列表',
+    parse.add_argument('-m', '--messages', help='新增messages，是一个列表,如 -m 50',
                        default=[], nargs='+', type=str)
     parse.add_argument('-f', '--fristMatrix',
                        help='比较dbc矩阵,比较的文件,没有指定就使用配置文件中的路径', default="")
     parse.add_argument('-t', '--twoMatrix', help='比较dbc矩阵,被比较的文件,也是旧的一方的文件')
     parse.add_argument('-r', '--resultPath', help='比较dbc矩阵结果路径', default='')
-    parse.add_argument('-md', '--modifyMessageInfo',
-                       help='替换message信息,有m就会替换，使用CAN矩阵的message替换', default=1, type=int, nargs='*')
+    parse.add_argument('-md', '--modifyMessage',
+                       help='替换message信息,有m就会替换，使用CAN矩阵的message替换,例如ICAN_50', default='', type=str, nargs='*')
     parse.add_argument('-d', '--dbcPath', help='比较新旧两个dbc,输入的是被比较的')
     parse.add_argument('-rs', '--rmsigs', help='删除信号,是一个集合,可以用10进制+信号名称,也可以是信号名',nargs='+')
     parse.add_argument('-rm', '--rmmsgs', help='删除message,是一个集合,是一个16进制',nargs='+')
@@ -60,6 +60,8 @@ if __name__ == "__main__":
     elif '-m' in sys.argv:
         for msg in arg.messages:
             conversion(arg.config, msg,canmatrix,True)
+    elif '-md' in sys.argv:
+        modifyMessageInfo(arg.config,arg.modifyMessage,canmatrix)
     elif "-a" in sys.argv and '-s' in sys.argv:
         for sigName in arg.sigNames:
             conversion(arg.config,sigName,canmatrix)
@@ -72,8 +74,6 @@ if __name__ == "__main__":
             conversion(arg.config, sigName)
     elif '-w' in sys.argv:
         addCan_parse_whitelist(arg.WhitelistPath)
-    elif '-md' in sys.argv:
-        modifyMessageInfo(arg.config)
     elif '-t' in sys.argv:
         diffCanMatrix(arg.fristMatrix, arg.twoMatrix, arg.config,arg.resultPath, '-u' in sys.argv)
     elif '-d' in sys.argv:

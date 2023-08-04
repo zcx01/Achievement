@@ -62,7 +62,7 @@ void pData()
 void signal_changed_callback(struct veh_signal *signal, int type)
 {
     IC_LOG_DEBUG("%s signal value----", signal->sig_name);
-    fds::SignalTransmission::instance()->signal_changed_callback(signal, true, false);
+    fds::SignalTransmission::instance()->signal_changed_callback(signal, true);
 }
 
 void set_can_parser_callbacks()

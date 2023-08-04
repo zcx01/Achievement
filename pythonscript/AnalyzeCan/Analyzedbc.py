@@ -121,7 +121,7 @@ class Analyze(object):
             if dbc not in channelSig:
                 channelSig[dbc] = []
             channelSig[dbc].append(msgInfo)
-        return channelSig
+        return channelSig,allMags
 
     def getSig(self,sigName,sender=""):
         dbc = self.getAnalyzeSingleByName(sigName,sender)
@@ -193,18 +193,18 @@ class Analyze(object):
                 dbc.removeSig(channelSig[dbc])
 
     def removeMessage(self,channal,*mags):
-        channelMsg= self.GetChannelMsg(channal,mags)
+        channelMsg,mags= self.GetChannelMsg(channal,mags)
         for dbc in channelMsg.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
                 dbc.removeMessage(channelMsg[dbc])
 
     def repalceMessage(self,*msgs):
-        channelSig= self.GetChannelMsg(msgs)
-        for dbc in channelSig.keys():
+        channelMsg,msgs= self.GetChannelMsg("",msgs)
+        for dbc in channelMsg.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
-                dbc.repalceMessage(channelSig[dbc])
+                dbc.repalceMessage(list(msgs))
 
     def isLocateSend(self,sigName):
         dbc = self.getAnalyzeSingleByName(sigName)

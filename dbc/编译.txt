@@ -11,12 +11,12 @@ cd ~/Works/Repos/tool_parser
 
 4、执行 make menuconfig
 选中Load an Alternate Configuration file
-在输入框中输入VendorFiles/config/.config
+在输入框中输入vendor/config/.config
 保存退出
 
 5.执行sudo make
 
 6.把output文件拷贝到~/Works/Repos/changan_c385/src/ic_service/parser/generated下
 
-(注*) 要在~/Works/Repos/tool_parser目录下创建软件链接VendorFiles指到~/Works/Repos/changan_c385/src/ic_service/parser/VendorFiles
+(注*) 要在~/Works/Repos/tool_parser目录下创建软件链接vendor指到~/Works/Repos/changan_c385/src/ic_service/parser/vendor
 

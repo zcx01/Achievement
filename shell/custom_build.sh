@@ -33,11 +33,9 @@ else
 fi
 
 make -j8
-if [ $# -eq 2 ]; then
-    ntoaarch64-strip ${par} -g -S -d --strip-debug
-fi
+ntoaarch64-strip ${par} -g -S -d --strip-debug
 
 make install
 cd $currentPath
 cd "build_script"
-./install_prebuilts.sh
+./build.sh install

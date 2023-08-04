@@ -8,7 +8,7 @@
 # EOF
 
 parser=$(cd `dirname ./`;pwd)
-toolDir=$parser/canmatrix_tool/tool_parser
+toolDir=$parser/canmatrix/
 
 cd  $toolDir 
 make

@@ -817,7 +817,8 @@ class AnalyzeFile(object):
         
         if len(deleteRows) != 0:
             linelist=removeListIndexs(linelist,deleteRows)
-            # print(f'替换 {msg.messageId} {msg.Row} {msg.cycleRow} {msg.frameRow}')
+            #print(f'替换 {msg.messageId} {msg.Row} {msg.cycleRow} {msg.frameRow}')
+        printGreen(f'替换 {msg.messageId}')
         wirteFileDicts(self.dbcPath, linelist, False)
 
     #物理值是否有效
@@ -845,7 +846,7 @@ class AnalyzeFile(object):
 
 
 
-# a=AnalyzeFile("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210318.dbc")
+# a=AnalyzeFile("/home/chengxiongzhu/Works/Repos/tool_parser/vendor/dbc_files/CAN0_C385EV-E_V2.1.0_20210318.dbc")
 # print(a.getMessage_Id_BySig("CdcDtc1HiByte"))
 # sig=SigInfo()
 # sig.endBit=104
