@@ -75,7 +75,7 @@ void MainWindow::on_canBtn_clicked()
 void MainWindow::on_startBtn_clicked()
 {
 //    sendPyCmd("python3 /home/chengxiongzhu/Works/Repos/back_play/mega_cantools_lib/blf_editor.py --replay can_log_20210927164452.blf");
-//    sendliCmd("candump vcan0 | cantools decode /home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210713.dbc");
+//    sendliCmd("candump vcan0 | cantools decode /home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/parser/vendor/dbc_files/CAN0_C385EV-E_V2.1.0_20210713.dbc");
     if(ui->filterline->text().isEmpty())
     {
         sendPyCmd(QString("python3 %1 --replay %2").arg(pyPath).arg(canlog));

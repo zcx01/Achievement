@@ -215,7 +215,7 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
             dbc = Analyze(dbcfile)
             msg = msgs.get(sig.getMessage_SubNet(), None)
             if msg == None:
-                print(f' {sig.name} 对应的 {sig.messageId} message不存在')
+                print(f'{row} {sig.name} 对应的 {sig.messageId} message不存在')
                 printYellow("可能的原因是:message没有加0x")
                 continue
             
@@ -554,25 +554,26 @@ def CopyEnum(configPath, dbcPath, resultPath):
             sigEnums.append(newsig)
     newdbc.repalceSigEnum(sigEnums)
 
-def modifyMessageInfo(configPath):
+def modifyMessageInfo(configPath,modifyMessages,canmatrix):
+
     jsConfig = getJScontent(configPath)
-    matrixFilePath = getKeyPath("canmatrix", jsConfig)
+    if canmatrix == '' :
+        matrixFilePath = getKeyPath("canmatrix", jsConfig)
+    else:
+        matrixFilePath = canmatrix
     book = xlrd.open_workbook(matrixFilePath)
     assert isinstance(book, Book)
-    print(book.sheet_names())
     messageSheel = book.sheet_by_name(Message_Matrix)
     assert isinstance(messageSheel, Sheet)
     dbc = Analyze(getKeyPath("dbcfile", jsConfig))
     msgs = getMessageInfo(messageSheel)
-    for messageId in dbc.dbcMessage:
-        try:
-            dbcMsg = dbc.dbcMessage[messageId]
-            assert isinstance(dbcMsg, MessageInfo)
-            dbcMsg = msgs[messageId]
-        except:
-            print(f'{dbc.dbcMessage[messageId].messageId} 在CAN矩阵没有找到')
+    modifyMgs=[]
 
-    dbc.repalceMessage(dbc.dbcMessage.values())
+    for modifyMessage in modifyMessages:
+        if modifyMessage in msgs:
+            modifyMgs.append(msgs[modifyMessage])
+            
+    dbc.repalceMessage(modifyMgs)
 
 def findsignalInfile(signal,filePath):
     try:

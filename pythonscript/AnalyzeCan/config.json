@@ -1,15 +1,15 @@
 {
-    "projectPath": "/home/chengxiongzhu/Works/Repos/changan_c673/",
+    "projectPath": "/home/chengxiongzhu/Works/Repos/changan_c385/",
     "newSig": "/home/chengxiongzhu/Works/newsig/newsig.txt",
-    "xlsNewSigPath":"/home/chengxiongzhu/Works/newsig/newsig.xlsx",
-    "can_parse_whitelist": "src/ic_service/parser/VendorFiles/can_parse_whitelist.txt",
+    "xlsNewSigPath": "/home/chengxiongzhu/Works/newsig/newsig.xlsx",
+    "can_parse_whitelist": "src/ic_service/parser/vendor/can_parse_whitelist.txt",
     "canmatrix": "C673项目CDC整车协议V2.1.1_1126.xlsx",
-    "dbcfile": "src/ic_service/parser/VendorFiles/dbc_files",
+    "dbcfile": "src/ic_service/parser/vendor/dbc_files",
     "definefile": "src/ic_service/src/signal_process/include/topic/ipc_topic_new_def.h",
     "casePath": "/home/chengxiongzhu/Works/case/",
-    "srcPath":"src/ic_service/src/",
+    "srcPath": "src/ic_service/src/",
     "srcSendType": "/home/chengxiongzhu/Works/changan_mcu_dbc/C673/event_handler_cfg.c",
     "down": "qt/ic_qt/resources/config/down_config.json",
-    "up":"qt/ic_qt/resources/config/up_config.json",
-    "checkSigIgnore":"src/ic_service/parser/VendorFiles/check_sig_ignore.json"
+    "up": "qt/ic_qt/resources/config/up_config.json",
+    "checkSigIgnore": "src/ic_service/parser/vendor/check_sig_ignore.json"
 }
