@@ -8,7 +8,7 @@ import argparse
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 from commonfun import*
-from AnalyzeCan.Analyzedbc import *
+from AnalyzeCan.analyze_dbc import *
 from AnalyzeCan.projectInI import *
 
 def getValue(src, row, col):

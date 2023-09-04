@@ -8,7 +8,7 @@ import argparse
 from AnalyzeCan.projectInI import *
 
 from commonfun import*
-from AnalyzeCan.Analyzedbc import *
+from AnalyzeCan.analyze_dbc import *
 
 
 def getSig(text):

@@ -13,7 +13,7 @@ from threading import Thread
 import argparse
 from commonfun import *
 from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
-from AnalyzeCan.Analyzedbc import *
+from AnalyzeCan.analyze_dbc import *
 from AnalyzeCan.projectInI import *
 
 jsConfig = getJScontent(pyFileDir+"config.json",)

@@ -10,7 +10,7 @@ from commonfun import *
 import openpyxl 
 import argparse
 import pyperclip
-from AnalyzeCan.Analyzedbc import *
+from AnalyzeCan.analyze_dbc import *
 
 SETSTR='/Set'
 jsConfig = getJScontent(pyFileDir+"config.json",)

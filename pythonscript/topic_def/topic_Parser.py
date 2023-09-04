@@ -6,7 +6,7 @@ import xlrd
 import subprocess
 import argparse
 from commonfun import *
-from AnalyzeCan.Analyzedbc import *
+from AnalyzeCan.analyze_dbc import *
 
 def getSigJson(jsConfig,msg,sig):
     filePath=jsConfig.get(msg,{}).get("filePath","")

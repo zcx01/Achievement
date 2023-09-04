@@ -6,7 +6,7 @@ pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 sys.path.append(pyFileDir)
 from commonfun import *
 from projectInI import *
-from AnalyzedbcFile import *
+from AnalyzeCan.analyze_dbc_file import *
 
 class Analyze(object):
     def __init__(self,dbc_dir=None) :
