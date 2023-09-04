@@ -6,7 +6,6 @@ from commonfun import *
 from projectInI import *
 '''
     Motorola格式的dbc中保存的start Bit 是MSB（高字节）
-    CANdb++ 显示的是start Bit 是LSB（第字节）
     MSB:表示CAN矩阵是不是高字节存储
     标准CAN:超过8字节
     CAN FD:最大64字节
@@ -271,6 +270,7 @@ class MessageInfo(object):
         self.sendTypeRow=-1
         self.sigMaxRow=-1
         self.threeCycleRow=-1
+        self.channel = 0
 
     def getMessage_Id(self):
         if len(self.message_Name) !=0:
@@ -316,13 +316,16 @@ class MessageInfo(object):
         return f'BA_ \"GenMsgSendType\" BO_ {self.getMId()} {self.sendType};'
 
 class AnalyzeFile(object):
-    def __init__(self,dbc_file=None) :
+    def __init__(self,dbc_file=None,channel=0) :
         if len(dbc_file) ==0:
             return
         self.dbcSigs={} #以 十进制ID+名称 为key
         self.dbcMessage={} # 以 十六进制ID 为key
         self.dbcPath=dbc_file
         self.maxSigRow=0
+        channels = re.findall(i_i,channel,re.A)
+        if len(channels) != 0:
+            self.channel = channels[0]
         self.control=[]
         self.analy()
     
@@ -355,6 +358,7 @@ class AnalyzeFile(object):
                         continue
                     dm.Row=rowIndex
                     dm.sigMaxRow=dm.Row+1
+                    dm.channel = self.channel
                     self.dbcMessage[dm.messageId]=dm
                     currentdbcMessage =dm
                 elif text.startswith("SG_"):
@@ -571,6 +575,9 @@ class AnalyzeFile(object):
             return self.dbcMessage[msgId]
         except:
             return None
+        
+    def getAllMessage(self):
+        return self.dbcMessage
 
     def getSigsByMessageId(self,msgId):
         sigs=[]

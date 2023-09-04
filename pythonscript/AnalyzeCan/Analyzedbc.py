@@ -18,7 +18,7 @@ class Analyze(object):
                     dbc_file = f'{dirpath}/{oriName}'
                     oriBaseName = oriName.split(".")[0]
                     can_Channel = oriBaseName.split("_")[0]
-                    dbc =  AnalyzeFile(dbc_file)
+                    dbc =  AnalyzeFile(dbc_file,can_Channel)
                     self.AnalyzeDict[can_Channel] = dbc
                     if can_Channel == main_can:
                         self.AnalyzeDictlist.insert(0,dbc)
@@ -146,6 +146,15 @@ class Analyze(object):
         if  dbc != None:
             return dbc.getMessage_Id_BySig(sigName)
         return ''
+
+    def getAllMessage(self):
+        msgInfos = {}
+        for can_Channel in self.AnalyzeDict:
+            dbc = self.AnalyzeDict[can_Channel]
+            assert isinstance(dbc,AnalyzeFile)
+            msgInfos[can_Channel] = dbc.getAllMessage()
+        return msgInfos
+
 
     def getMessage_Id_Sig(self,sigName):
         dbc = self.getAnalyzeSingleByName(sigName)

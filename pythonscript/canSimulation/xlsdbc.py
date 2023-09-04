@@ -39,7 +39,8 @@ if __name__ == "__main__":
     parse.add_argument('-ch', '--channal', help='删除message指定通道',nargs='?',default="") 
     parse.add_argument('-sc', '--SigNameChinese', help='获取信号的中文描述',default=[], nargs='+') 
     parse.add_argument('-fc', '--fileChinese', help='获取文件中信号的中文描述',default=[], nargs='+')
-    parse.add_argument('-p', '--projectPath', help='项目路径',default='', nargs='?',type=str)                   
+    parse.add_argument('-p', '--projectPath', help='项目路径',default='', nargs='?',type=str)
+    parse.add_argument('-i', '--addInputMsgConfig', help='添加input_signal_config.json文件,参数是16进制的信号名',default=[], nargs='?',type=str)                   
     arg = parse.parse_args()
 
     canmatrix = arg.append
@@ -84,3 +85,5 @@ if __name__ == "__main__":
         SigNameChinese(arg.config,arg.fileChinese,canmatrix,2)
     elif '-p' in sys.argv:
         handleProjectPath(arg.config,arg.projectPath)
+    elif '-i' in sys.argv:
+        addInputMsgConfig(arg.config,arg.addInputMsgConfig)

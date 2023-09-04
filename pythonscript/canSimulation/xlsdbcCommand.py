@@ -673,3 +673,54 @@ def handleProjectPath(configPath,path):
         jsConfig['projectPath'] = path
         writeJs(configPath,jsConfig)
         handleProjectPath(configPath,'')
+
+
+def updatenIputMsgContent(inputSignalContent,msgInfo):
+    print(type(msgInfo))
+    bus_id = msgInfo.channel
+    msg_id = msgInfo.messageId
+    update = msgInfo.sendType != 8
+    msg = []
+    isExist = False
+    if 'msg' in inputSignalContent:
+        msg = inputSignalContent['msg']
+    
+    for inputMsg in msg:
+        if  inputMsg["bus_id"] == bus_id and inputMsg["msg_id"] == msg_id:
+            inputMsg["update"] = update
+            isExist = True
+            printGreen(f"更新 bus_id:{bus_id},msg_id:{msg_id}")
+
+    if not isExist:
+        inputMsg={}
+        inputMsg["bus_id"] = "0x"+bus_id
+        inputMsg["msg_id"] = "0x"+msg_id
+        inputMsg["priority"] = 0
+        inputMsg["update"] = update
+        inputMsg["boot_qnx"] = True
+        inputMsg["boot_android"] = True
+        msg.append(inputMsg)
+        printGreen(f"添加 bus_id:{bus_id},msg_id:{msg_id}")
+    inputSignalContent['msg'] = msg
+'''
+添加 input_signal_config.json 文件
+https://docs.google.com/document/d/1oNexc9DOYv83p1JLMAdbCcdweU_pKZZ_S8vXjHoEzE4/edit#heading=h.1z8l8k9ig7e7
+'''
+def addInputMsgConfig(configPath,msgIds):
+    jsConfig = getJScontent(configPath)
+    inputSignalConfig = getKeyPath("input_signal_config",jsConfig)
+    dbcfile = getKeyPath("dbcfile", jsConfig)
+    print(dbcfile)
+
+    inputSignalContent = getJScontent(inputSignalConfig)
+
+    dbc = Analyze(dbcfile)
+    dbcMsgInfos = dbc.getAllMessage()
+    for dbcMsgInfo in dbcMsgInfos:
+        for msgInfo in dbcMsgInfos[dbcMsgInfo]:
+            if msgIds == None or len(msgIds) == 0 or msgInfo in msgIds:
+                updatenIputMsgContent(inputSignalContent,dbcMsgInfos[dbcMsgInfo][msgInfo])
+
+    writeJs(inputSignalConfig,inputSignalContent)
+    printGreen("添加完成")
+    print(inputSignalConfig)
