@@ -5,12 +5,12 @@ import os
 
 import xlrd
 import time
-pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/AnalyzeCan/"
+pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/analyze_dbc/"
 from commonfun import *
 import openpyxl 
 import argparse
 import pyperclip
-from AnalyzeCan.analyze_dbc import *
+from analyze_dbc.analyze_dbc import *
 
 SETSTR='/Set'
 jsConfig = getJScontent(pyFileDir+"config.json",)

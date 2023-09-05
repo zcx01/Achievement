@@ -144,6 +144,12 @@ def getSuffix(fileName):
         return suffixs[1]    
     return ''
 
+def getFileBaseName(fileName):
+    suffixs = os.path.splitext(fileName)
+    if len(suffixs) > 0 :
+        return suffixs[0]    
+    return ''
+
 def getKeyPath(key,jsConfig):
     return getFullPath(jsConfig.get(key,""),jsConfig)
 

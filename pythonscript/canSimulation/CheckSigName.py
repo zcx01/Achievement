@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import argparse
 from commonfun import*
-from AnalyzeCan.analyze_dbc import *
+from analyze_dbc.analyze_dbc import *
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 import xlrd

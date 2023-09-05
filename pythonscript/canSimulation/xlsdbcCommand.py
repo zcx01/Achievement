@@ -7,9 +7,9 @@ import argparse
 
 from xlrd.book import Book
 from xlrd.sheet import Sheet
-from commonfun import*
-from AnalyzeCan.analyze_dbc import *
-from AnalyzeCan.projectInI import *
+from analyze_dbc.commonfun import*
+from analyze_dbc.analyze_dbc import *
+from analyze_dbc.projectInI import *
 
 def getValue(src, row, col):
     return src.cell_value(row,XlsCharToInt(col))
