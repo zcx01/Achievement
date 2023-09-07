@@ -1,9 +1,6 @@
 #!/bin/python
 import os
-import sys
 import argparse
-import shutil
-from typing import Set
 
 # 获取脚本执行的目录
 script_dir = os.path.dirname(os.path.realpath(__file__))+"/"

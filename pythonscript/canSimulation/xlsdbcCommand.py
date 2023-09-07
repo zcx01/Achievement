@@ -17,6 +17,7 @@ def getValue(src, row, col):
 def getValueInt(src, row, col, lenght=-1):
     try:
         value = str(getValue(src,row,col))
+        value = value.replace('ms','')
         values = value.split(".")
         isallZero = True
 
@@ -37,41 +38,44 @@ def getValueInt(src, row, col, lenght=-1):
 
 def getSigInfo(sheel, row):
     sig = SigInfo()
-    sig.subNet = str(getValue(sheel, row, 0)).upper()
-    sig.Sender = str(getValue(sheel, row, 1)).upper()
-    temp = str(getValue(sheel, row, 2))
+    sig.subNet = str(getValue(sheel, row, sig_line_subNet)).upper()
+    sig.Sender = str(getValue(sheel, row, sig_line_Sender)).upper()
+    temp = str(getValue(sheel, row, sig_line_name))
     temps = re.findall(e_i, temp, re.A)
-    sig.name = "_".join(temps)
-    sig.chineseName = str(getValue(sheel, row, 3))
-    sig.messageId = str(getValue(sheel, row, 4)).split(".")[0].replace('0x', '')
-    sig.cycle = getValueInt(sheel, row, 5)
+    if "_" in temp:
+         sig.name = "".join(temps)
+    else:
+        sig.name = "_".join(temps)
+    sig.chineseName = str(getValue(sheel, row, sig_line_chineseName))
+    sig.messageId = str(getValue(sheel, row, sig_line_messageId)).split(".")[0].replace('0x', '')
+    sig.cycle = getValueInt(sheel, row, sig_line_cycle)
     if sig.cycle == 0:  # 没有周期，就解析为0
         sig.sendType = SigSendType.Event
 
-    posBit = getValueInt(sheel, row, 6)
+    posBit = getStartBit(sheel, row, getValueInt)
     if MSB == True:
         sig.startBit = posBit
     else:
         sig.endBit = posBit
-    sig.length = getValueInt(sheel, row, 7)
-    sig.factor = getValueInt(sheel, row, 8)
+    sig.length = getValueInt(sheel, row, sig_line_length)
+    sig.factor = getValueInt(sheel, row, sig_line_factor)
     if sig.factor == float(0) and len(sig.name) != 0:
         printYellow(f'{sig.name} 缩放不能为0，此处修改成1,行号为{row}')
         sig.factor = 1
-    sig.Offset = getValueInt(sheel, row, 9)
-    sig.min = getValueInt(sheel, row, 10)
-    sig.max = getValueInt(sheel, row, 11, sig.length)
-    if getValue(sheel, row, 12) == "Signed":
+    sig.Offset = getValueInt(sheel, row, sig_line_Offset)
+    sig.min = getValueInt(sheel, row, sig_line_min)
+    sig.max = getValueInt(sheel, row, sig_line_max, sig.length)
+    if getValue(sheel, row, sig_line_dataType) == "Signed":
         sig.dataType = "-"
-    sig.SetUnit(str(getValue(sheel, row, 13)))
-    if ISUSEDBCENUM: sig.enum = str(getValue(sheel, row, 14))
+    sig.SetUnit(str(getValue(sheel, row, sig_line_unit)))
+    if ISUSEDBCENUM: sig.enum = str(getValue(sheel, row, sig_line_enum))
     try:
         if str(getValue(sheel, row, 15)) != 'nan':
-            sig.initValue = int(getValue(sheel, row, 15), 16)  # 十进制
+            sig.initValue = int(getValue(sheel, row, sig_line_initValue), 16)  # 十进制
     except:
         pass
-    sig.invalidValue = getValue(sheel, row, 17)
-    sig.Recevier = getValue(sheel, row, 20)
+    sig.invalidValue = getValue(sheel, row, sig_line_invalidValue)
+    sig.Recevier = getValue(sheel, row, sig_line_Recevier)
     sig.RecevierRemoveSend()
     if sig.endBit != -1:
         sig.getStartBit()
@@ -85,15 +89,15 @@ def getMessageInfo(sheel):
     for row in range(sheel.nrows):
         try:
             msg = MessageInfo()
-            msg.subNet = sheel.cell_value(row, 0)
-            msg.sender = sheel.cell_value(row, 1)
-            sendingMode = str(sheel.cell(row, 2))
-            msg.messageId = getNoOx16(str(sheel.cell_value(row, 4)))
+            msg.subNet = str(getValue(sheel, row, msg_line_subNet)).upper()
+            msg.sender = str(getValue(sheel, row, msg_line_sender)).upper()
+            sendingMode = str(getValue(sheel, row, msg_line_sendingMode))
+            msg.messageId = getNoOx16(str(getValue(sheel,row, msg_line_messageId)))
             if 'event' in sendingMode.lower():
                 msg.sendType = 8
-            msg.cycle = getValueInt(sheel, row, 3)
+            msg.cycle = getValueInt(sheel, row, msg_line_cycle)
             if msg.cycle == 0:
-                cycleContent = str(getValue(sheel, row, 3))
+                cycleContent = str(getValue(sheel, row, msg_line_cycle))
                 cycleContents = re.findall(e_i, cycleContent, re.A)
                 if len(cycleContents) >= 2:
                     try:
@@ -101,9 +105,9 @@ def getMessageInfo(sheel):
                         msg.threeCycle = int(cycleContents[1])
                     except:
                         pass
-            msg.lenght = getValueInt(sheel, row, 5)
-            msg.Recevier = str(sheel.cell_value(row, 6))
-            frame = str(sheel.cell_value(row, 9))
+            msg.lenght = getValueInt(sheel, row, msg_line_lenght)
+            msg.Recevier = str(getValue(sheel,row, msg_line_Recevier))
+            frame = str(getValue(sheel,row, msg_line_frame))
             try:
                 if len(frame) == 0 or len(splitSpace(frame)) == 0:
                     frame = SubNet_Frame.get(msg.subNet, 0)
@@ -194,6 +198,9 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
 
         if row == 0:
             continue
+        if not isWriteSig(sheel,row,getValue):
+            print(f"{row} 项目中没有这个信号，无须导入")
+            continue
         sig = getSigInfo(sheel, row)
         if appoint(sig,wirteSigName,isMsg) or isAllAdd:
             if sig.name in threeFrames:
@@ -205,11 +212,11 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                 printRed(f'{sig.name} 极小值小于0,最小值为{sig.min},raw值{realMin}')
                 continue
             if realMax > pow(2, sig.length)-1 and sig.max != pow(2, sig.length)-1:
-                printRed(f'{sig.name} 极大值大于长度,最大值为{sig.max},raw值{realMax}，极限值为{pow(2, sig.length)}')
-                continue
-            if sig.min == sig.max:
-                printRed(f"{sig.name} 最大值和最小值相等最小值为{sig.min},最大值为{sig.max}")
-                continue
+                printYellow(f'{sig.name} 极大值大于长度,最大值为{sig.max},raw值{realMax}，极限值为{pow(2, sig.length)-1} 修改中...')
+                sig.max = pow(2, sig.length)-1
+            # if sig.min == sig.max:
+            #     printRed(f"{sig.name} 最大值和最小值相等最小值为{sig.min},最大值为{sig.max}")
+            #     continue
 
             isFind = True
             dbc = Analyze(dbcfile)
@@ -233,7 +240,7 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                         isWriteWhite = True
             if writedbcresult == WriteDBCResult.WriteComplete:
                 isWriteWhite = True
-            if isWriteWhite:
+            if isWriteWhite and (WRITEWHITE or not isAllAdd):
                 can_parse_whitelistPath = getKeyPath(
                     "can_parse_whitelist", jsConfig)
                 if os.path.isfile(can_parse_whitelistPath):
@@ -272,6 +279,33 @@ def conversionByOtherdbc(configPath, wirteSigNames, dbcfilPath=""):
 
     if len(wirteSigNames):
         print('没有找到的信号-------', wirteSigNames)
+
+def conversionMsgByOtherdbc(configPath,msgIds,dbcfilPaths):
+    assert isinstance(msgIds,list)
+    jsConfig = getJScontent(configPath)
+    ori_dbc = Analyze(getKeyPath("dbcfile", jsConfig))
+    modifyMgs={}
+
+    dbc = Analyze(dbcfilPaths)
+    dbcMsgInfos = dbc.getAllMessage()
+    isReurn = False
+    for dbcMsgInfo in dbcMsgInfos:
+        if  dbcMsgInfo not in File_SubNet:
+            printYellow(f"请在 File_SubNet 变量配置 {dbcMsgInfo} 对应的 SubNet")
+            isReurn = True
+    if isReurn: return
+    for dbcMsgInfo in dbcMsgInfos:
+        for dbcMsgId in dbcMsgInfos[dbcMsgInfo]:
+            if msgIds == None or len(msgIds) == 0 or dbcMsgId in msgIds:
+                msgInfo =dbcMsgInfos[dbcMsgInfo][dbcMsgId]
+                assert isinstance(msgInfo,MessageInfo)
+                msgInfo.subNet = File_SubNet[dbcMsgInfo]
+                modifyMgs[msgInfo.getMessage_SubNet()] = msgInfo
+
+    for msgInfo in list(modifyMgs.values()):
+        if msgInfo.messageId == '337':
+            print(msgInfo.getMessage_SubNet())
+    ori_dbc.repalceMessage(list(modifyMgs.values()))
 
 def RemoveSigs(configPath, sigNames):
     jsConfig = getJScontent(configPath)

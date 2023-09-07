@@ -296,7 +296,7 @@ class MessageInfo(object):
         return preStr+str(int(self.messageId,16))
 
     def getMessageRowContent(self):
-        return f'BO_  {self.getMId()} {self.getMessage_Id()}: {self.lenght} {self.sender}'
+        return f'BO_ {self.getMId()} {self.getMessage_Id()}: {self.lenght} {self.sender}'
 
     def getMessageCycle(self):
         return f'BA_ \"GenMsgCycleTime\" BO_ {self.getMId()} {self.cycle};'
@@ -316,7 +316,7 @@ class MessageInfo(object):
         return f'BA_ \"GenMsgSendType\" BO_ {self.getMId()} {self.sendType};'
 
 class AnalyzeFile(object):
-    def __init__(self,dbc_file=None,channel=0) :
+    def __init__(self,dbc_file=None,channel='0') :
         if len(dbc_file) ==0:
             return
         self.dbcSigs={} #以 十进制ID+名称 为key
@@ -804,10 +804,11 @@ class AnalyzeFile(object):
         for msg in msgs:
             assert isinstance(msg,MessageInfo)
             ori_msg = self.dbcMessage.get(msg.messageId,None)
-            assert isinstance(ori_msg,MessageInfo)
             if ori_msg == None:
-                print(f'{msg.messageId} 不存在')
+                print(f'{msg.messageId} 不存在 正在写入')
+                self.writeMessage(msg,linelist)
                 continue
+            assert isinstance(ori_msg,MessageInfo)
             self.repalceContent(linelist,ori_msg.Row, msg.getMessageRowContent())
             self.repalceContent(linelist,ori_msg.frameRow, msg.getMessageVFrameFormat())
             self.repalceContent(linelist,ori_msg.sendTypeRow, msg.getMessageSendType())

@@ -12,9 +12,11 @@ if __name__ == "__main__":
         这个脚本是用来通过生成dbc,比较CAN矩阵,
         d+r+t:信号名称的改变，并且修改配置的中源码的信号名称,
         d+s:从其他的dbc添加信号,
+        d+m:从其他的dbc添加msg
         d+r:从指定的dbc复制枚举到新的dbc中 r是输入比较后的结果
         a+w:把dbc目录下dbc文件中,所有的信号都写入白名单,
         a+s:把指定路径下的CAN矩阵中的指定的信号添加进入dbc
+        m+w:把msg加入到白名单当中
         ''')
 
     parse.add_argument('-c', '--config', help='配置文件路径',
@@ -23,7 +25,7 @@ if __name__ == "__main__":
     parse.add_argument('-s', '--sigNames', help='新增信号名，是一个列表',
                        default=[], nargs='+', type=str)
     parse.add_argument('-m', '--messages', help='新增messages，是一个列表,如 -m 50',
-                       default=[], nargs='+', type=str)
+                       default=[], nargs='*', type=str)
     parse.add_argument('-f', '--fristMatrix',
                        help='比较dbc矩阵,比较的文件,没有指定就使用配置文件中的路径', default="")
     parse.add_argument('-t', '--twoMatrix', help='比较dbc矩阵,被比较的文件,也是旧的一方的文件')
@@ -43,6 +45,7 @@ if __name__ == "__main__":
     parse.add_argument('-i', '--addInputMsgConfig', help='添加input_signal_config.json文件,参数是16进制的信号名',default=[], nargs='?',type=str)                   
     arg = parse.parse_args()
 
+    initWarnFile()
     canmatrix = arg.append
     if canmatrix == None:
         jsConfig = getJScontent(arg.config)
@@ -52,6 +55,8 @@ if __name__ == "__main__":
         sigNameChanged(arg.config, arg.dbcPath, arg.resultPath, arg.twoMatrix)
     elif '-d' in sys.argv and '-s' in sys.argv:
         conversionByOtherdbc(arg.config, arg.sigNames, arg.dbcPath)
+    elif '-d' in sys.argv and '-m' in sys.argv:
+        conversionMsgByOtherdbc(arg.config, arg.messages, arg.dbcPath)
     elif '-rs' in sys.argv:
         RemoveSigs(arg.config, arg.rmsigs)
     elif '-rm' in sys.argv:
