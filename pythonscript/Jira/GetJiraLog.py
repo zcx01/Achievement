@@ -58,6 +58,7 @@ def wirteFileDicts(file,data,replace=True):
     cr = open(file, "w")
     if replace:
         for d in data:
+            d = d.replace('\xa0', ' ')
             cr.write(str(d).replace("\'","\"")+"\n")
     else:
         cr.writelines('\n'.join(data))
@@ -103,10 +104,10 @@ def copySmb(yip,dirlog):
         pass
 
 def smbToWindow(text,dirlog):
-    # if "smb:" in text:
-    #     smb = re.findall(r"\bsmb:\S+\b",text,re.A)[0]
-    #     smb=smb.replace("smb:","")
-    #     smb=smb.replace('/','\\')
+    if "smb:" in text:
+        smb = re.findall(r"\bsmb:\S+\b",text,re.A)[0]
+        smb=smb.replace("smb:","")
+        text=smb.replace('/','\\')
     #     return smb
     ips = re.findall(r'\\\\10.+\S+',text,re.A)
     for yip in ips:
@@ -177,6 +178,7 @@ def displayIssue(issue,arg,signal,isSearch):
         for attachment in issue.fields.attachment:
             print("下载 "+attachment.filename)
             path = dirlog+"/"+attachment.filename
+            # if os.path.isExists(path):
             with open(path,'wb') as f:
                 f.write(attachment.get())
 
@@ -197,16 +199,18 @@ def getBugInfo(text,isSearch,signal):
 
 def getNoResolvedInfo(signal):
     #fields = 'comment'不配置就没有备注,默认不存在
+    isReporting = False
     while 1:
         global LOGDIR
         LOGDIR=ROOTLOGDIR+datetime.datetime.now().strftime(TIMEFORMAT)+"/"
         getBugInfo('issuetype = Bug AND resolution = Unresolved AND assignee in (currentUser()) ORDER BY updated ASC',True,signal)
         time.sleep(10)
         today = datetime.datetime.now()
-        if today.hour == 19:
+        if today.hour == 18:
             dateDirs,startDate,endDate,currentDate = getCurrentWeekdDir(None)
-            if endDate == today.strftime(TIMEFORMAT):
+            if endDate == today.strftime(TIMEFORMAT) and not isReporting:
                 Reporting()
+                isReporting = True
     # getBugInfo('BGS-52779')
 
 def get_last_week_thursday_dates(reporData=None):
@@ -243,9 +247,12 @@ def getJiraSolveBugContent(jiraKeys,JiraContent):
     for noSolveBugIssue in noSolveBugIssues:
         noSolveBug.append(noSolveBugIssue.key)
     for jiraKey in jiraKeys:
-        issue = jira.issue(jiraKey,fields = ['assignee','summary','status'])
-        if  issue.key not in noSolveBug:
-            issues.append(issue)
+        try:
+            issue = jira.issue(jiraKey,fields = ['assignee','summary','status'])
+            if  issue.key not in noSolveBug:
+                issues.append(issue)
+        except:
+            printYellow(f"没有{jiraKey}")
     getIssuesContet(issues,JiraContent)
 
 def getIssuesContet(issues,JiraContent):
@@ -278,7 +285,7 @@ def Reporting(reporData=None):
 
     reportContent.append("处理的Task")
     taskSearch = f'issuetype in (Task, Story) AND resolution in (Done, \"Won\'t Do\") AND resolved >= -1w AND assignee in (currentUser()) order by updated DESC' 
-    #taskSearch = f'issuetype in (Task, Story) AND resolution in (Done, \"Won\'t Do\") AND resolved >= {startDate} AND resolved <= {endDate} AND assignee in (currentUser()) order by updated DESC'  
+    # taskSearch = f'issuetype in (Task, Story) AND resolution in (Done, \"Won\'t Do\") AND resolved >= {startDate} AND resolved <= {endDate} AND assignee in (currentUser()) order by updated DESC'  
     print(taskSearch)
     issues = jira.search_issues(taskSearch,fields = ['assignee','summary','status'])
     getIssuesContet(issues,reportContent)
@@ -292,7 +299,7 @@ def getLoopJiraIdLog():
         cmd=input()
         if len(cmd) == 0:
             continue
-        cmds = cmd.splitlines()
+        cmds = re.findall(r"-?\b[a-zA-Z-0x0-9.]+\b",cmd,re.A)
         if '-r' in cmds:
             if len(cmds) > 1 :
                 Reporting(cmds[1])

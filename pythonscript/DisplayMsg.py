@@ -65,12 +65,16 @@ class MainWindow(QTextEdit):
     #     print(a0.size())
     #     self.viewport().resize(a0.size())
     #     return super().resizeEvent(a0)
-    
+
     def keyPressEvent(self, e: QKeyEvent) -> None:
         modifier = e.modifiers()
         if modifier & Qt.AltModifier:
             if e.key() == Qt.Key_Return:
-                selected_text = str(self.textCursor().selectedText())
+                cursor = self.textCursor()
+                selected_text = self.document().findBlockByLineNumber(cursor.blockNumber()).text()
+                #selected_text = str(cursor.selectedText())  # 获取选中的文本
+                # selected_text = str(self.textCursor().selectedText())
+                # selected_text = selected_text.replace("\n",'')
                 cmd = f"explorer {selected_text}"
                 os.system(cmd)
         if modifier & Qt.ShiftModifier:
@@ -88,6 +92,7 @@ if __name__ == "__main__":
     arg=parser.parse_args()
 
     app = QApplication(sys.argv)
+    app.setApplicationName("DisplayMsg")
     textEdit = MainWindow()
     textEdit.initUI()
     textEdit.show()
