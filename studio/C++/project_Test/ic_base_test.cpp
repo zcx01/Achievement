@@ -22,14 +22,14 @@ IcBaseTestTest::IcBaseTestTest(/* args */)
 
 
     int i = 0;
-    while (1)
-    {
-        SignalMsg tm{data,false};
-        data[0] = i;
-        test1->put(PolyIC::DataMsg<SignalMsg>(0, tm));
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        ++i;
-    }
+    // while (1)
+    // {
+    //     SignalMsg tm{data,false};
+    //     data[0] = i;
+    //     test1->put(PolyIC::DataMsg<SignalMsg>(0, tm));
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    //     ++i;
+    // }
      
 }
 
@@ -37,7 +37,8 @@ void IcBaseTestTest::dealData()
 {
     while (1)
     {
-        auto m = test1->get();
+        pthread_setname_np(pthread_self(),"IcBaseTestTest");
+        auto m = test1->getUnique();
         auto &dm = dynamic_cast<PolyIC::DataMsg<SignalMsg> &>(*m);
         if (&dm == nullptr)
         {
@@ -46,7 +47,7 @@ void IcBaseTestTest::dealData()
         IC_LOG_INFO("dm.getPayload");
         SignalMsg sig = dm.getPayload();
         IC_LOG_INFO(sig.signal_addr[0], test1->getSize());
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
 
