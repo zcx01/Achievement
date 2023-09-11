@@ -1,9 +1,8 @@
 #pragma once
 #include "commondefine.hpp"
 #include "nlohmann/json.hpp"
-#include "parser_can/parser_can_api.h"
-#include "parser_lin/parser_lin_api.h"
-#include "common_codes/parser_typedef.h"
+#include "can/can_api.h"
+#include "lin/lin_api.h"
 
 struct IpcMessage
 {

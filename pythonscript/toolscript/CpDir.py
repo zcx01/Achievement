@@ -23,8 +23,8 @@ def generate(oriDirs,dir):
                         shutil.copy(filePath,dir)
                         filePaths.append(dir+fileName)
                         print(filePath)
-                    except:
-                        print(f"跳过 {filePath}")
+                    except Exception as e:
+                        print(f"跳过 {str(e)}  {filePath}")
     print("拷贝完成")
     y = input("是否删除y/n")
     if y == 'y':

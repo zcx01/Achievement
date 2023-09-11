@@ -331,7 +331,7 @@ class AnalyzeNetParserFile(object):
 
 
 
-# a=AnalyzeNetParserFile("/home/chengxiongzhu/Works/Repos/tool_parser/VendorFiles/dbc_files/CAN0_C385EV-E_V2.1.0_20210318.dbc")
+# a=AnalyzeNetParserFile("/home/chengxiongzhu/Works/Repos/tool_parser/vendor/dbc_files/CAN0_C385EV-E_V2.1.0_20210318.dbc")
 # print(a.getMessage_Id_BySig("CdcDtc1HiByte"))
 # sig=NetSigInfo()
 # sig.endBit=104

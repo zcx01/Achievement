@@ -8,7 +8,7 @@ import openpyxl
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 from commonfun import *
-from AnalyzeCan.projectInI import *
+from analyze_dbc.projectInI import *
 pyFileDir = os.path.dirname(os.path.abspath(__file__))+"/"
 
 def getValue(shell,row,col):

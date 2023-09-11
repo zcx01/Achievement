@@ -23,11 +23,16 @@ if __name__ == "__main__":
     parser.add_argument('-np','--nextPage', help='下一页', nargs='?')
     parser.add_argument('-v','--value', help='值', nargs='?',default=1,type=int)
     parser.add_argument('-d','--device',help='adb的device',default='',type=str)
+    parser.add_argument('-q','--qnxPassword',help='user版本qnx的密码',type=int,nargs='*')
     args = parser.parse_args()
 
     device = ""
+    rootOut = "#"
     if len(args.device) !=0:
         device = f" -s {args.device}"
+
+    if "-q" in sys.argv:
+        rootOut = "Password"
 
     for j in range(120):
         adb_out = subprocess.getoutput("adb devices").split('\n')
@@ -37,12 +42,14 @@ if __name__ == "__main__":
             break
         print(f"车机重启中...等待{j+1}秒")
         time.sleep(1)
-        
+
     setDevice(device)
     keyStr(f'adb{device} root')
     keyStr(f"adb{device} shell")
     keyStr(f"telnet cdc-qnx",0,"login:")
-    keyStr(f"root",0,"#")
+    keyStr(f"root",0,rootOut)
+    if rootOut == "Password":
+        keyStr(f"@mega#cdc!",0,"#")
 
     isExit = (args.interact == 0)
     value = args.value
@@ -59,6 +66,11 @@ if __name__ == "__main__":
             # keyStr(f"on -T ic_apps_t -u ic_apps mega_ipc_sub -t  \"{args.subtopic}\" ")
             keyStr(sendMqtt(args.pulishtopic,value))
             isExit=True
+        except:
+            pass
+    if "-n" in sys.argv:
+        try:
+            keyStr(f"echo {args.logGrade}:n:7 >> /var/pps/verbose")
         except:
             pass
 
@@ -84,11 +96,6 @@ if __name__ == "__main__":
         except:
             pass
         
-    if "-n" in sys.argv:
-        try:
-            keyStr(f"echo {args.logGrade}:n:7 >> /var/pps/verbose")
-        except:
-            pass
     if '-r' in sys.argv:
         # keyStr("mcu_tool -g 2")
         # keyStr("reset -f",0.3,'PON_SOFT_RB_SPARE')

@@ -5,7 +5,7 @@ shellPath="$(dirname "${BASH_SOURCE[0]}")"
 
 cd $shellPath
 commonfun="commonfun.py"
-Analyzedbc="AnalyzeCan"
+Analyzedbc="analyze_dbc"
 basic_auth="basic_auth.py"
 for file_a in ./*
 do  

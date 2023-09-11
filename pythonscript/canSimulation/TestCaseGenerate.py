@@ -5,10 +5,10 @@ import sys
 import openpyxl 
 import xlrd
 import argparse
-from AnalyzeCan.projectInI import *
+from analyze_dbc.projectInI import *
 
 from commonfun import*
-from AnalyzeCan.Analyzedbc import *
+from analyze_dbc.analyze_dbc import *
 
 
 def getSig(text):

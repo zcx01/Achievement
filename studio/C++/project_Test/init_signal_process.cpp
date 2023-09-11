@@ -2,8 +2,8 @@
 
 #include "can_udp_packet_define.h"
 #include "signal_transmission.hpp"
-#include "parser_can_api.h"
-#include "parser_lin_api.h"
+#include "can_api.h"
+#include "lin_api.h"
 
 void LINData(can_udp_packet_t can_udp_packet)
 {
@@ -62,7 +62,7 @@ void pData()
 void signal_changed_callback(struct veh_signal *signal, int type)
 {
     IC_LOG_DEBUG("%s signal value----", signal->sig_name);
-    fds::SignalTransmission::instance()->signal_changed_callback(signal, true, false);
+    fds::SignalTransmission::instance()->signal_changed_callback(signal, true);
 }
 
 void set_can_parser_callbacks()

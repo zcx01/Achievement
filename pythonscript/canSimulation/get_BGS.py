@@ -29,7 +29,7 @@ import argparse
 from commonfun import *
 from jira import JIRA
 from signalxls import *
-# from AnalyzeCan.projectInI import *
+# from analyze_dbc.projectInI import *
          
 jira =JIRA("http://jira.i-tetris.com/",basic_auth=("chengxiong.zhu","@Huan2870244352"))
 useCases=[]

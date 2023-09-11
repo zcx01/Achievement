@@ -144,6 +144,12 @@ def getSuffix(fileName):
         return suffixs[1]    
     return ''
 
+def getFileBaseName(fileName):
+    suffixs = os.path.splitext(fileName)
+    if len(suffixs) > 0 :
+        return suffixs[0]    
+    return ''
+
 def getKeyPath(key,jsConfig):
     return getFullPath(jsConfig.get(key,""),jsConfig)
 
@@ -181,7 +187,9 @@ def is_chinese(string):
 
 def XlsCharToInt(col):
     if type(col) == str:
-        return ord(col) - ord('A')
+        cols = list(col)
+        colnum = len(cols) - 1
+        return colnum*26 + (ord(cols[colnum]) - ord('A'))
     return col
 
 def XlsIntToChar(col):
@@ -359,14 +367,38 @@ def getVariableText(variable,text,isEnd=False):
             return "".join(texts[1:]) if isEnd else texts[1],True
     return 0,False
 
+ 
+isWarnWrirteFile = False
+def initWarnFile():
+    global isWarnWrirteFile
+    isWarnWrirteFile = True    
+    try:
+        removeFile(os.getcwd() + "/red.txt")
+        removeFile(os.getcwd() + "/green.txt")
+        removeFile(os.getcwd() + "/yellow.txt")
+    except:
+        pass
+
+def removeFile(filePath):
+    if os.path.exists(filePath):
+        os.remove(filePath)
+
+def saveWarnFile(infoStr,type):
+    if isWarnWrirteFile:
+        filePath  = os.getcwd() + f"/{type}.txt"
+        os.system(f"echo {infoStr} >> {filePath}")
+
 def printRed(infoStr):
     print('\033[31m'+infoStr+'\033[0m')
+    saveWarnFile(infoStr,'red')
 
 def printGreen(infoStr):
     print('\033[32m'+infoStr+'\033[0m')
+    saveWarnFile(infoStr,'green')
     
 def printYellow(infoStr):
     print('\033[33m'+infoStr+'\033[0m')
+    saveWarnFile(infoStr,'yellow')
 # print(removeListIndexs([12,23,56],[0,2]))
 # def Temp(linelist):
 #     linelist.append('ddd')
