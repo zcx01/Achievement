@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import argparse
-from commonfun import*
+from analyze_dbc.commonfun import*
 from analyze_dbc.analyze_dbc import *
 from xlrd.book import Book
 from xlrd.sheet import Sheet
@@ -37,6 +37,7 @@ def getJsConfig(configPath="",down_config="",up_config="",isPrint = False):
     if isPrint:
         print("down_config:",down_config)
         print("up_config:",up_config)
+    print(dbcfile)
     dbc = Analyze(dbcfile)
     jsDown = getJScontent(down_config)
     jsUp = getJScontent(up_config)
@@ -236,7 +237,7 @@ def addConfigSig(sigs,isOriginal,configPath="",down_config="",up_config=""):
     writeJs(up_config,jsUp)
 
 def getCellValue(src, row, col):
-    return src.cell_value(row, col)
+    return src.cell_value(row,XlsCharToInt(col))
 
 class SigXls():
     def __init__(self) -> None:
@@ -247,6 +248,35 @@ class SigXls():
     def msgId_sigName(self):
         return self.Sender+"_"+self.msgid+'/'+self.sigName
 
+class ConfigXls():
+    def __init__(self) -> None:
+        self.topic = ""
+        self.dbcSigName =""
+        self.comments = ""
+        self.valueMap = {}
+        self.defaultValueType = ""
+        self.sender = ""
+
+    def addToConfig(self,jsConfig,isDown):
+        contentJson = {}
+        if len(self.comments) != 0:
+            contentJson['comments'] = self.comments
+        if len(self.valueMap) != 0:
+            contentJson['valueMap'] = self.valueMap
+        if len(self.defaultValueType) != 0:
+            contentJson['defaultValueType'] = self.defaultValueType
+        if isDown:
+            if self.topic not in jsConfig:
+                jsConfig[self.topic] = {}
+            jsConfig[self.topic][self.dbcSigName] = contentJson
+        else:
+            if self.dbcSigName not in jsConfig:
+                jsConfig[self.dbcSigName] = {}
+            jsConfig[self.dbcSigName][self.topic] = contentJson
+                
+
+        
+        
 def getSigXls(xlsFileName):
     sigs = []
     book = xlrd.open_workbook(xlsFileName)
@@ -270,7 +300,7 @@ def getSigXls(xlsFileName):
             pass
     return sigs
 
-def addConfigByXls(xlsFileName):
+def addConfigByCanXls(xlsFileName):
     sigs = []
     sigXls = getSigXls(xlsFileName)
     for sig in sigXls:
@@ -317,6 +347,75 @@ def addMultipleSig(canmatrix,msgIds,topics):
     else:
         addConfigSig(sigs,True,"",down_config,up_config)
 
+'''
+需要信号值转换的就填,格式如下："APP":SIC
+"1":2
+"2":4
+"3":7
+defaultValueType:0;  默认值(没有在"值映射"中的值)的处理方式,0是原值转发, 1是不处理,2是加自增1,3是发送无效,4 extension 相同就不发送,5整帧CAN报文透传
+'''
+
+def addConfigByTopicCanXls(xlsPath,configPath):
+    book = xlrd.open_workbook(xlsPath)
+    assert isinstance(book, Book)
+    sheel = book.sheet_by_index(0)
+    addConfigTopicCan(sheel,sheel.nrows,getCellValue,configPath)
+
+def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],configPath=""): 
+    jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
+    preComments = ""
+    for i in range(rowCount):
+        if not (i  in rowRange or len(rowRange) == 0):
+            continue
+        try:
+            sigName = getSheelValue(sheel,i,'C')
+            if len(sigName) == 0:
+                printRed(f'{i:<10}行是空的')
+                continue
+            configXls = ConfigXls()
+            configXls.dbcSigName,configXls.sender,isChanged = configConverdbc(sigName,dbc)
+            configXls.topic = getSheelValue(sheel,i,'B')
+            configXls.comments = getSheelValue(sheel,i,'A')
+            if configXls.comments == "" :
+                configXls.comments = preComments
+            else:
+                preComments = configXls.comments
+            if configXls.sender == None:
+                printRed(f"{sigName} 没有发送者")
+                continue
+
+            valueMapStr = getSheelValue(sheel,i,'F')
+            valueMapStrs = re.findall(e_i,valueMapStr,re.A)
+
+            for valueMapStrIndex in len(valueMapStrs):
+                fValue = valueMapStrs[valueMapStrIndex]
+                tIndex = valueMapStrIndex + 1
+                if tIndex >= len(valueMapStrs):
+                    printYellow(f"{i:<10} 值映射错误")
+                    continue
+                tValue = valueMapStrs[tIndex]
+                configXls.valueMap[fValue] = tValue
+
+            try:
+                defaultValueTypeStr = re.findall(f'defaultValueType:{i_i}',valueMapStr,re.A)[0]
+                assert isinstance(defaultValueTypeStr,str)
+                defaultValueTypeStrRow = defaultValueTypeStr.split(":")
+                configXls.defaultValueType = defaultValueTypeStrRow[1]
+            except:
+                pass
+                
+            if configXls.sender not in local_machine_Sender: 
+                configXls.addToConfig(jsUp,False)         
+            if configXls.sender in local_machine_Sender:
+                configXls.addToConfig(jsDown,True) 
+
+        except:
+            printRed(f"{sigName} 信号格式错误")
+            continue 
+
+        writeJs(down_config,jsDown)
+        writeJs(up_config,jsUp)
+
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
         description='''
@@ -332,6 +431,7 @@ if __name__ == "__main__":
     parse.add_argument('-u', '--upjson', help='上行文件路径，没有从配置中读取',type=str,default='', nargs='?')
     parse.add_argument('-t', '--topic', help='topic是列表和-m参数索引要对应',default=[], nargs='+', type=str)
     parse.add_argument('-m', '--messages', help='新增messages是一个列表',default=[], nargs='+', type=str)
+    parse.add_argument('-tc', '--topicCan', help='通过topic和CAN对应的xls添加配置文件',type=str,default='')
     arg = parse.parse_args()
     configPath = pyFileDir+"config.json"
 
@@ -344,7 +444,9 @@ if __name__ == "__main__":
     elif '-s' in sys.argv:
         addConfigSig(arg.addSig,False,configPath)
     elif '-a' in sys.argv:
-        addConfigByXls(arg.xls)
+        addConfigByCanXls(arg.xls)
+    elif 'tc' in sys.argv:
+        addConfigByTopicCanXls(arg.topicCan,configPath)
     else:
         CheckSigName(configPath,arg.downjson,arg.upjson)
     

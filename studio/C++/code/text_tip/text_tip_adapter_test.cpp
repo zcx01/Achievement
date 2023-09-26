@@ -29,11 +29,15 @@ TextTipAdapterTest::TextTipAdapterTest()
     // std::this_thread::sleep_for(std::chrono::milliseconds(2*1000));
     // d.addWarnInfo("icwarning/BcmVehLckAlrm",3); 
     
-    d.addWarnInfo("VCU_2A1/VcuExhiHalModSts", 1);
-    std::this_thread::sleep_for(std::chrono::milliseconds(2*1000));
-    d.addWarnInfo("GW_5F1/BdcBattlowUServiceDispReq",1);
-    d.addWarnInfo("GW_5F1/BdcBattlowUServiceDispReq",0);
-    d.addWarnInfo("VCU_2A1/VcuExhiHalModSts", 0);
+    d.addWarnInfo("C385/SafetyNotice/DynamicPreWarningSecondLevel", 15);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1100));
+    d.addWarnInfo("C385/SafetyNotice/DynamicPreWarningSecondLevel",0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    d.addWarnInfo("C385/SafetyNotice/DynamicPreWarningSecondLevel",12);
+    std::this_thread::sleep_for(std::chrono::milliseconds(80));
+    d.addWarnInfo("C385/SafetyNotice/DynamicPreWarningSecondLevel",0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(6));
+    d.addWarnInfo("C385/SafetyNotice/DynamicPreWarningSecondLevel",0);
     // std::this_thread::sleep_for(std::chrono::milliseconds(2*1000));
     // d.addWarnInfo("C385/IACCTextTakeOver",1); 
     // std::this_thread::sleep_for(std::chrono::milliseconds(5000));

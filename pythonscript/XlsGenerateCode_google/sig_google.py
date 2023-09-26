@@ -1,5 +1,10 @@
+#!/usr/bin/python
 from __future__ import print_function
 
+'''
+参考网站
+https://developers.google.com/sheets/api/quickstart/python?hl=zh-cn
+'''
 import os.path
 import argparse
 import sys
@@ -7,8 +12,8 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-sys.path.append(os.path.dirname(os.path.abspath(__file__))+"/../")
-from canSimulation.CheckSigName import *
+sys.path.append(os.path.dirname(os.path.abspath(__file__))+"./")
+from checksig import *
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -49,7 +54,7 @@ def getShellValueDrive(sample_spreadsheet_id):
     return values
 
 def GoValue(values, row, col):
-    return values[row][col]
+    return values[row][XlsCharToInt(col)]
 
 def addConfigs(ids):
     sigs = []
@@ -57,21 +62,33 @@ def addConfigs(ids):
         values = getShellValueDrive(id)
         for i in range(len(values)):
             try:
-                sigName = GoValue(values,i,XlsCharToInt('C'))
-                msgid =  GoValue(values,i,XlsCharToInt('E'))
-                Sender= GoValue(values,i,XlsCharToInt('B'))
+                sigName = GoValue(values,i,'C')
+                msgid =  GoValue(values,i,'E')
+                Sender= GoValue(values,i,'B')
                 msgId_sigName = Sender+"_"+msgid+'/'+sigName
                 sigs.append(msgId_sigName)
             except:
                 pass
     addConfigSig(sigs)
 
+def addConfigByTopicCan(startRow,endRow):
+    values = getShellValueDrive("1v4y6DCyc3wnzaY8AdIi51jg4hQnV1Ip8J051WbIGUcc")
+    rowRangs = []
+    if endRow == -1 : endRow = startRow+1
+    print(startRow,endRow)
+    for i in range(startRow,endRow):
+        rowRangs.append(i)
+    addConfigTopicCan(values,len(values),GoValue,rowRangs)
+
 if __name__ == '__main__':
-    parse = argparse.ArgumentParser(description='这个是通过topic表格生成生成newSig表格')
+    parse = argparse.ArgumentParser(description='生成配置文件的脚本')
     parse.add_argument('-s','--startRow',help='开始的行号',type=int,default=0)
     parse.add_argument('-e','--endRow',help='结束的行号',type=int,default=-1)
     parse.add_argument('-i', '--ids',help='id', nargs='+')
+    parse.add_argument('-tc', '--topicCan', help='通过topic和CAN对应的xls添加配置文件',nargs='?',type=str,default='')
     arg = parse.parse_args()
 
     if '-i' in sys.argv:
         addConfigs(arg.ids)
+    elif '-tc' in sys.argv:
+        addConfigByTopicCan(arg.startRow-1,arg.endRow)
