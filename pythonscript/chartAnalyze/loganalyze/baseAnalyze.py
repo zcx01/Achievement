@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 import re
 import typing
@@ -10,11 +11,23 @@ from commonfun import *
 # 使用getattr()获取属性值,获取方法并调用
 # 使用setattr()设置属性值
 
+class SearchStatus(Enum):
+    NOSTART=1
+    START = 2
+    STARTING = 3
+    FINISH =4
+    
 class logBase():
     def __init__(self) -> None:
         self.resCallFun = None
         self.currentSearchLine = None
+        self.searchStatusChangeFun = None
+        self.sendMsgFun = None
+        self.searchStatus = SearchStatus.NOSTART
         self.logThread = None
+        self.stop = False
+        self.tempIndex = -1
+        self.keyWordSeries = {}
         self.clear()
 
     def clear(self):
@@ -23,8 +36,13 @@ class logBase():
 
     def load(self,filePaths):
         self.filePaths.extend(filePaths)
+        filePathIndex = 0
         for filePath in self.filePaths:
+            assert isinstance(filePath,str)
             self.loadLogFile(filePath)
+            filePathIndex = filePathIndex + 1
+            self.currentSearchLineChanged(filePathIndex,len(self.filePaths))
+           
 
     def searchContentChanged(self,dateStr,value,content,series):
         if self.resCallFun != None:
@@ -32,12 +50,23 @@ class logBase():
         else:
             print(dateStr,"    ",value,"    ",content)
 
-    def currentSearchLineChanged(self,lineIndex):
+    def sendMsg(self,msg):
+        if self.sendMsgFun != None:
+            self.sendMsgFun(msg)
+
+    def searchStatusChange(self,status):
+        self.searchStatus = status
+        if self.searchStatusChangeFun != None:
+            self.searchStatusChangeFun(self.searchStatus)
+
+    def currentSearchLineChanged(self,lineIndex,count):
         if self.currentSearchLine!= None:
-            self.currentSearchLine(lineIndex) 
+            lineIndex = int(lineIndex / count *100)
+            if self.tempIndex != lineIndex:
+                self.tempIndex = lineIndex
+                self.currentSearchLine(self,lineIndex) 
         else:
             pass
-            # print(lineIndex)
 
     @typing.overload
     def loadLogFile(self,filePath):
@@ -47,32 +76,61 @@ class logBase():
     def getLoglineCount(self):
         return len(self.lineContents)
     
-    def startSearch(self,keyWords,series):
-        self.logThread = Thread(target=self.searchkeyWords,args=(keyWords,series,))
+    def setKeyWords(self,keyWordSeries):
+        self.keyWordSeries = keyWordSeries
+
+    def startSearchThread(self):
+        self.searchStatusChange(SearchStatus.NOSTART)
+        if self.getLoglineCount() == 0 or len(self.keyWordSeries) == 0: return
+        self.logThread = Thread(target=self.searchkeyWords)
         self.logThread.setDaemon(True)
         self.logThread.start()
 
-    def searchkeyWords(self,keyWords,series):
-        self.startAnalyze(keyWords,series)
+    def searchkeyWords(self):
+        self.startAnalyze()
 
     # @typing.overload
-    def startAnalyze(self,keyWords,series):
+    def startAnalyze(self):
+        self.searchStatusChange(SearchStatus.START)
         lineContentIndex = 0
+        keyConentCount = {}
+        keyValueConentCount = {}
+        searchCount = 0
+        isFirstPrint = True
+        for keyWord in self.keyWordSeries:
+            keyConentCount[keyWord] = 0
+            keyValueConentCount[keyWord] = 0
         for lineContent in self.lineContents:
             if self.stop : return
             assert isinstance(lineContent,str)
-            if re.search(keyWords,lineContent,re.A):
-                lineContentIndex = lineContentIndex+1
-                spaceContent = lineContent.split(" ")
-                dateStr = spaceContent[1] +" "+spaceContent[2]
-                contents = re.findall(e_i,lineContent,re.A)
-                for contentIndex in range(len(contents)):
-                    if "value" in contents[contentIndex]:
-                        contentNextIndex = contentIndex + 1
-                        value = contents[contentNextIndex]
-                        self.searchContentChanged(dateStr,value,lineContent,series)
-                        self.currentSearchLineChanged(lineContentIndex)
+            for keyWord,series in self.keyWordSeries.items():
+                if re.search(keyWord,lineContent,re.A):
+                    keyConentCount[keyWord] =  keyConentCount[keyWord] +1
+                    searchCount = searchCount + 1
+                    spaceContent = lineContent.split(" ")
+                    dateStr = spaceContent[1] +" "+spaceContent[2]
+                    contents = re.findall(e_i,lineContent,re.A)
+                    ishasValue = False
+                    for contentIndex in range(len(contents)):
+                        if "value" in contents[contentIndex]:
+                            contentNextIndex = contentIndex + 1
+                            value = contents[contentNextIndex]
+                            self.searchContentChanged(dateStr,value,lineContent,series)
+                            keyValueConentCount[keyWord] =  keyValueConentCount[keyWord] +1
+                            ishasValue = True
 
+                    if not ishasValue:
+                        if isFirstPrint:
+                            isFirstPrint = False
+                            self.sendMsg(f'不符合规则的解析规则:')
+                        self.sendMsg(f'{lineContent}')
+            lineContentIndex = lineContentIndex+1
+            self.currentSearchLineChanged(lineContentIndex,self.getLoglineCount())
+        self.searchStatusChange(SearchStatus.FINISH)
+        for keyWord in self.keyWordSeries:
+            self.sendMsg(f'搜索 {keyWord} 共 {keyConentCount[keyWord]}')
+            self.sendMsg(f'显示 {keyWord} 共 {keyValueConentCount[keyWord]}')
+        self.sendMsg(f"搜索完成,共 {searchCount}\n")
 
 class dltLogBase(logBase):
     def __init__(self) -> None:
@@ -111,23 +169,29 @@ class dltLogBase(logBase):
             return logFile
         return None
 
+    def dltToTxt(self,logPath,filePath,logFile):
+        filePath = os.path.basename(filePath)
+        logFile = os.path.basename(logFile)
+        os.system(f'cd {logPath} && {self.dltExe} -c {filePath} {logFile}')
+
     def loadLogFile(self,filePath):
         assert isinstance(filePath,str)
+        logFileDir = os.path.dirname(filePath)
         logFile = self.getConverTxt(filePath)
         if logFile == None:
             if getSuffix(filePath) == '.gz':
                 filePath = dltLogBase.gunZip(filePath)
                 if filePath == None:
                     return False
-            print(filePath)
             logFile = filePath.replace('.dlt','.txt')
-            os.system(f'{self.dltExe} -c {filePath} {logFile}')
+            self.dltToTxt(logFileDir,filePath,logFile)
         self.lineContents.extend(readFileLines(logFile))
         return True
 
 if __name__ == '__main__':
-    logObj = dltLogBase("D:/Soft/DltViewerSDK/dlt-viewer.exe")
-    logObj.load(["C:\\Users\\chengxiong.zhu\\Downloads\\log分析\\2023-07-26\\log_001521_20230724-193751.dlt.gz"])
-    logObj.startSearch("HUD_CDC_5C5")
+    logObj = dltLogBase()
+    logObj.setDltExe("D:/Soft/DltViewerSDK/dlt-viewer.exe")
+    logObj.load([r"C:/Users/chengxiong.zhu/Downloads/log分析/2023-09-24/ BGS-62018 385DAuserDF04镁佳1553左右手机端打开远程智能泊车CdcRemVideoPwrUpReq发送上高压请求退出远程智能泊车后座舱高压CdcRemVideoPwrUpReq未置为无请求没有下高压解锁座舱高压置为无请求/log_003460_20230922-153505.dlt"])
+    # logObj.startSearch("HUD_CDC_5C5")
     while 1 :
         time.sleep(10)

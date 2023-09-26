@@ -103,11 +103,13 @@ def copySmb(yip,dirlog):
             printRed(f"下载 {yip} 失败")
         pass
 
+
 def smbToWindow(text,dirlog):
     if "smb:" in text:
         smb = re.findall(r"\bsmb:\S+\b",text,re.A)[0]
-        smb=smb.replace("smb:","")
-        text=smb.replace('/','\\')
+        smbNew=smb.replace("smb:","")
+        smbNew=smbNew.replace('/','\\')
+        text = text.replace(smb,smbNew)
     #     return smb
     ips = re.findall(r'\\\\10.+\S+',text,re.A)
     for yip in ips:
