@@ -30,6 +30,12 @@ pip3 install jira
 https://my.oschina.net/u/4335406/blog/4437033
 
 
+7.Qt库
+pip install pyqt5
+pip install pyqt5-tools
+报错解决:
+https://blog.csdn.net/gmq_syy/article/details/108979300
+
 aenum                  3.1.0               
 apturl                 0.5.2               
 attrs                  21.2.0              

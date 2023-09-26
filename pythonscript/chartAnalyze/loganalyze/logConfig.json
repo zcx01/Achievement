@@ -1,0 +1,11 @@
+{
+    "logPath":"",
+    "dltExePath":"D:/Soft/DltViewerSDK/dlt-viewer.exe",
+    "valueMap":{
+        "keyWord" :{
+            "a":1,
+            "b":2,
+            "c":3
+        }
+    }
+}
