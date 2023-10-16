@@ -3,9 +3,9 @@ import time
 import sys
 import os
 import pexpect
+import platform
 if platform.system() == "Windows":
     import wexpect
-import platform
 
 
 process = None
