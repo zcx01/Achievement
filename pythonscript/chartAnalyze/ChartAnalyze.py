@@ -24,10 +24,28 @@ class MainWindow(QMainWindow):
         self.mouseClick = False
         self.startPos = None
 
+
+        # 创建菜单栏
+        menubar = self.menuBar()
+        # 创建文件菜单
+        set_menu = menubar.addMenu('文件')
+        # 创建动作（菜单项）
+        new_action = QtWidgets.QAction('dltExe', self)
+        # new_action.triggered.connect()
+        open_action =QtWidgets.QAction('打开', self)
+        save_action = QtWidgets.QAction('保存', self)
+
+        # 将动作添加到文件菜单中
+        set_menu.addAction(new_action)
+        set_menu.addAction(open_action)
+        set_menu.addAction(save_action)
+
+
         ui.tableWidget.setColumnCount(1)
         header_labels = ['名称']
         ui.tableWidget.setHorizontalHeaderLabels(header_labels)
         ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        ui.tableWidget.itemSelectionChanged.connect(self.tableWidgetSelectChanged)
 
         ui.progressBar.setVisible(False)
         ui.searchBtn.clicked.connect(self.searchkeyWords)
@@ -38,11 +56,10 @@ class MainWindow(QMainWindow):
         ui.openFileBtn.clicked.connect(self.openFile)
         self.ui.progressBar.setRange(0,100)
 
-         # 创建一个垂直布局，并将chart控件添加到布局中
+
+        # 创建一个垂直布局，并将chart控件添加到布局中
         chart_layout = ui.horizontalLayout_3
         self.chartManage = CustomGraphManage(chart_layout)
-        self.chartManage.setConfig(pyFileDir+"/loganalyze/logConfig.json")
-
         self.chartManage.update_Progress.connect(self.updataProgress)
         self.chartManage.send_msg.connect(self.disPlayMsg)
 
@@ -51,6 +68,26 @@ class MainWindow(QMainWindow):
         self.add_key("DrivingInfo/PowerStatus")
         self.add_key("DrivingInfo/Speed")
 
+
+        self.resize(1000,800)
+        self.show()
+        if not self.chartManage.setConfig(pyFileDir+"/loganalyze/logConfig.json"):
+            isTipSetDltExe = self.chartManage.getConfigValue('isTipSetDltExe',True)
+            if isTipSetDltExe:
+                if self.informationDlg("是否设置dltexe的路径"):
+                    file_dialog = QtWidgets.QFileDialog(self,'设置dltexe的路径')
+                    if file_dialog.exec_() == QtWidgets.QDialog.Accepted:
+                        selected_files = file_dialog.selectedFiles()
+                        if len(selected_files) != 0:
+                            print(selected_files[0])
+                            self.chartManage.setDltExe(selected_files[0])
+                else:
+                    self.chartManage.modifyConfig('isTipSetDltExe',False)
+
+    def informationDlg(self,content):
+        return QtWidgets.QMessageBox.information(self,'提示',content,
+                                             QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.Cancel) == QtWidgets.QMessageBox.Ok
+             
     
     def mousePressEvent(self, a0: QMouseEvent):
         if a0.button() == Qt.LeftButton and self.cursor() == Qt.SplitHCursor:
@@ -84,7 +121,7 @@ class MainWindow(QMainWindow):
         file_dialog.setDirectory(self.defaultDir)
         file_dialog.setNameFilters(["Text Files (*.txt *.dlt)"])  # 设置文件过滤器
         file_dialog.setFileMode(QtWidgets.QFileDialog.ExistingFiles)  # 设置文件对话框为多选模式
-        file_dialog.exec_()
+        if file_dialog.exec_() != QtWidgets.QDialog.Accepted: return
         selected_files = file_dialog.selectedFiles()
         if len(selected_files) == 0 : return
         self.ui.textEdit.clear()
@@ -99,9 +136,10 @@ class MainWindow(QMainWindow):
         dlg.exec()
 
     def removekey(self):
-        if QtWidgets.QMessageBox.information(self,'提示','是否删除选择的关键字',
-                                             QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.Cancel) != QtWidgets.QMessageBox.Ok:
-            return
+        if len(self.ui.tableWidget.selectedItems()) > 1:
+            if not self.informationDlg('是否删除选择的关键字'):
+                return
+            
         selected_rows = []
         for item in self.ui.tableWidget.selectedItems():
             if item.column() == 0:
@@ -150,6 +188,9 @@ class MainWindow(QMainWindow):
         self.chartManage.clearLog()
         self.chartManage.searchkeyWords()
 
+    def tableWidgetSelectChanged(self):
+        self.ui.removeKeyBtn.setEnabled(len(self.ui.tableWidget.selectedItems()) > 0)
+
     def updataProgress(self,currentProgress):
         if currentProgress == 100:
             self.ui.progressBar.setVisible(False)
@@ -161,7 +202,5 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.resize(1000,800)
-    window.show()
     app.exec_()
 

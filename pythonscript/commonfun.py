@@ -3,7 +3,7 @@ import json
 import re
 import sys
 import os
-
+import platform
 w_d=r'[a-zA-Z_]'                #匹配单词
 i_i=r"-?[0x0-9]"                #匹配数字
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"   #匹配单词和数字(包括小数和负数)
@@ -368,6 +368,7 @@ def getVariableText(variable,text,isEnd=False):
     return 0,False
 
  
+ #----------------------警告信息------------------
 isWarnWrirteFile = False
 def initWarnFile():
     global isWarnWrirteFile
@@ -399,6 +400,16 @@ def printGreen(infoStr):
 def printYellow(infoStr):
     print('\033[33m'+infoStr+'\033[0m')
     saveWarnFile(infoStr,'yellow')
+
+
+def openFileUseDefault(cmd):
+    if platform.system() == "Windows":
+        cmd = f"explorer {cmd}"
+        os.system(cmd)
+    else:
+        cmd = f"xdg-open {cmd}"
+        os.system(cmd)
+
 # print(removeListIndexs([12,23,56],[0,2]))
 # def Temp(linelist):
 #     linelist.append('ddd')

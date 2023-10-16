@@ -26,13 +26,19 @@ win:
 pip install pywin32
 
 6.jira库
-pip3 install jira
+pip3 install jira pyqtgraph
 https://my.oschina.net/u/4335406/blog/4437033
 
 
 7.Qt库
-pip install pyqt5
-pip install pyqt5-tools
+pip install pyqt5 pyqt5-tools
+
+8.管道命令库
+linux
+sudo pip install pexpect
+win:
+pip install wexpect
+
 报错解决:
 https://blog.csdn.net/gmq_syy/article/details/108979300
 

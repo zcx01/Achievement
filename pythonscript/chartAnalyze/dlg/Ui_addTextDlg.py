@@ -40,4 +40,4 @@ class Ui_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.addbtn.setText(_translate("Dialog", "添加"))
-        self.cancelBtn.setText(_translate("Dialog", "取消"))
+        self.cancelBtn.setText(_translate("Dialog", "关闭"))

@@ -15,6 +15,7 @@ QDATETIMEMSF='yyyy/MM/dd hh:mm:ss.zzz'
 QDATEF='yyyy/MM/dd'
 QTIMEF='hh:mm:ss'
 QDATETIMEMSSPANEF='yyyy/MM/dd\nhh:mm:ss.zzz'
+DLTEXEPATH = 'dltExePath'
 LableWidth = 60
 class DateAxis(pg.AxisItem):
     def __init__(self, orientation, pen=None, textPen=None, tickPen=None, linkView=None, parent=None, maxTickLength=-5, showValues=True, text='', units='', unitPrefix='', **args):
@@ -95,9 +96,12 @@ class logSeries(pg.PlotCurveItem):
         self.scatter.setData(self.dataX,self.dataY,hoverable=True,tip=self.getToolTip)
         self.plotItem.vb.setYRange(-1,1)
         self.plotItem.vb.sigYRangeChanged.connect(self.yRangeChanged)
+        self.isSame = True
 
     def yRangeChanged(self,obj1,obj2):
-        
+        if self.isSame:
+            if len(self.dataY) > 0:
+                self.plotItem.vb.setYRange(self.dataY[0]-1,self.dataY[0]+1)
 
     def appendData(self,date,value,content):
         lastSecs = QDateTime.fromString(date[:-3],QDATETIMEMSF).toMSecsSinceEpoch()
@@ -109,7 +113,22 @@ class logSeries(pg.PlotCurveItem):
         self.posTextItems.append(text)
         self.plotItem.vb.addItem(text)
         self.updateMyData()    
-    
+        if self.isSame:
+            self.isSame = valueIndex == self.dataY[0]
+
+    def getLineSpaceText(self,space1,space2):
+        if space2 < space1:
+            tmp = space1
+            space1 = space2
+            space2 = tmp
+        tmpIndexs=[]
+        for dataXIndex in range(len(self.dataX)):
+            dataX = self.dataX[dataXIndex]
+            if space1 <= dataX <= space2:
+                tmpIndexs.append(dataXIndex)
+        
+        pass
+
     def getToolTip(self,x,y,data):
         return QDateTime.fromMSecsSinceEpoch(x).toString(QDATETIMEMSF)
         
@@ -144,6 +163,7 @@ class CustomGraphManage(QObject):
         self.pgFirstPlotItem = None
         self.lines = []
         self.currentline = None
+        self.configPath = None
         self.currentlineVisibleCount = 0
         self.initPg()
         self.logAnalyzes = [logBase(),dltLogBase()]
@@ -176,8 +196,31 @@ class CustomGraphManage(QObject):
         self.update_data.emit(date,value,content,series)
 
     def setConfig(self,configPath):
-        self.configPath = getJScontent(configPath)
-        self.logAnalyzes[1].setDltExe(self.configPath["dltExePath"])
+        self.configPath = configPath
+        try:
+            self.logAnalyzes[1].setDltExe(self.getConfigValue(DLTEXEPATH))
+        except:
+            return False
+        return True
+
+    def setDltExe(self,dltExePath):
+        self.modifyConfig(DLTEXEPATH,dltExePath)
+        self.setConfig(self.configPath)
+
+    def modifyConfig(self,key,value):
+        configConent = getJScontent(self.configPath)
+        configConent[key] = value
+        writeJs(self.configPath,configConent)
+
+    def getConfigValue(self,key,defaultValue = None):
+        configConent = getJScontent(self.configPath)
+        if defaultValue == None:
+            return configConent[key]
+        else:
+            if key not in configConent:
+                return defaultValue
+            else:
+                return configConent[key]
 
     def clearLog(self):
         for serie in self.pgSeries.values():

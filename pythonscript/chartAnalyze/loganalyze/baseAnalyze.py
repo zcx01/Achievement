@@ -164,7 +164,7 @@ class dltLogBase(logBase):
         fileName = fileName.replace('.dlt','.txt')
         fileDir = os.path.dirname(filePath)+"/"
         logFile =  fileDir + fileName
-        print(logFile)
+        # print(logFile)
         if os.path.exists(logFile):
             return logFile
         return None
@@ -178,7 +178,7 @@ class dltLogBase(logBase):
         assert isinstance(filePath,str)
         logFileDir = os.path.dirname(filePath)
         logFile = self.getConverTxt(filePath)
-        if logFile == None:
+        if logFile == None and len(self.dltExe) != 0:
             if getSuffix(filePath) == '.gz':
                 filePath = dltLogBase.gunZip(filePath)
                 if filePath == None:
