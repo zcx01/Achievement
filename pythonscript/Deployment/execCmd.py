@@ -3,7 +3,8 @@ import time
 import sys
 import os
 import pexpect
-import wexpect
+if platform.system() == "Windows":
+    import wexpect
 import platform
 
 
