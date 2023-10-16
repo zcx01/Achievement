@@ -1,6 +1,8 @@
 #!/bin/python
 import os
 import argparse
+import subprocess
+import sys
 
 # 获取脚本执行的目录
 script_dir = os.path.dirname(os.path.realpath(__file__))+"/"
@@ -16,9 +18,13 @@ def command(cmd):
     os.system(cmd)
 
 
-def cpfile(oriPath,aimPath):
+def cpfile(oriPath,aimPath,isCreateDir=False):
     if os.path.exists(aimPath):
         command(f"rm -rf {aimPath}")
+    if isCreateDir:
+        aimPathDir = os.path.dirname(aimPath)
+        if not os.path.exists(aimPathDir):
+            os.makedirs(aimPathDir)
     command(f'cp -rf {oriPath} {aimPath}')
 
 def generate(generateDir,cpType):
@@ -42,10 +48,24 @@ def generate(generateDir,cpType):
                         if not dirname.startswith("."):
                             cpfile(f'{oriPath}/{dirname}',f'{resourcesDir}/{dirname}')
 
+def CpSameFile(fileNames):
+    if len(fileNames) == 0:
+        print("文件名是空的")
+        return
+    for fileName in fileNames:
+        shellCmd = f'locate {fileName} | grep changan_{oriProject}'
+        outputs = subprocess.check_output(shellCmd, shell=True).decode('utf-8').splitlines()
+        for output in outputs:
+            cpfile(output,output.replace(oriProject,generateProject),True)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='resources')
     parser.add_argument('-g','--generateDir',help='生成文件目录',nargs='*',default=[])
-    parser.add_argument('-t','--cpType',help='拷贝的类型，1是拷贝目录，2是拷贝目录，3是都拷贝',nargs='?',default=3,type=int)
+    parser.add_argument('-t','--cpType',help='拷贝的类型，1是拷贝文件，2是拷贝目录，3是都拷贝',nargs='?',default=3,type=int)
+    parser.add_argument('-f','--cpFileName',help='拷贝的文件名称',nargs='+',default=[],type=str)
     arg = parser.parse_args()
-    generate(arg.generateDir,arg.cpType)
+    if '-f' in sys.argv:
+        CpSameFile(arg.cpFileName)
+    else:
+        generate(arg.generateDir,arg.cpType)

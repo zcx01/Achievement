@@ -14,10 +14,19 @@ import argparse
 from commonfun import *
 from mega_cantools_lib.signal_monitor.signal_monitor import SignalMonitor
 from analyze_dbc.analyze_dbc import *
-from analyze_dbc.projectInI import *
 
-jsConfig = getJScontent(pyFileDir+"config.json",)
-dbc=Analyze(getKeyPath("dbcfile",jsConfig))
+try:
+    cwd = os.getcwd()
+    sys.path.append(cwd)
+    print(cwd)
+    from xls_transform_dbc_tool.analyze_dbc.projectInI import *
+    jsConfig = getJScontent(cwd+"/xls_transform_dbc_tool/analyze_dbc/config.json",)
+except:
+    print("使用默认配置...")
+    from analyze_dbc.projectInI import *
+    jsConfig = getJScontent(pyFileDir+"config.json",)
+
+dbc=Analyze(jsConfig.get("dbcfile",""))
 class useCase(object):
     def __init__(self):
         self.index=0
@@ -313,7 +322,7 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--Send',help="Send CAN",type=str,default='',nargs='?')
     parser.add_argument('-d', '--dbc',help="dbc",type=str,default=None,nargs='?')
     parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
-    parser.add_argument('-p', '--SendPowerSig', help="Send Power Sig", nargs='*', type=int,default=1)
+    parser.add_argument('-p', '--SendPowerSig', help="Send Power Sig", nargs='*', type=int,default=0)
     parser.add_argument('-t', '--dataType',help="get sig data type", default=[], nargs='+', type=str)
     parser.add_argument('-i', '--SequenceSendInitValue',help="按照指定的间隔发送信号初始值",type=int,default=2)
 

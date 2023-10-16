@@ -16,7 +16,11 @@ File_Dict={
     "/home/chengxiongzhu/Achievement/pythonscript/analyze_dbc/config.json":
     "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/config/can_matrix_config.json",
     "/home/chengxiongzhu/Achievement/pythonscript/analyze_dbc/projectInI.py":
-    "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/config/can_matrix_projectInI.py"
+    "/home/chengxiongzhu/Works/Repos/changan_c385/src/ic_service/config/can_matrix_projectInI.py",
+    "/home/chengxiongzhu/Achievement/pythonscript/canSimulation/checksig.py":
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/xls_transform_dbc_tool/checksig.py",
+    "/home/chengxiongzhu/Achievement/pythonscript/XlsGenerateCode_google/sig_google.py":
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/xls_transform_dbc_tool/sig_google.py"
 }
 
 def CpFile(file1,file2):
