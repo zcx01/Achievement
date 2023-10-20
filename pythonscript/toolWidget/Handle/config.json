@@ -5,5 +5,13 @@
     "icText": "/home/chengxiongzhu/Achievement/pythonscript/ic_text.py",
     "trXlsPathS": "/home/chengxiongzhu/Achievement/pythonscript/",
     "trXlsPath": "C:/Users/chengxiong.zhu/Downloads/2023.8.14整合版待翻译清单-欧盟_10语种_无丹麦_标记语言.xlsx",
-    "trChangeXlsPath": "C:/Users/chengxiong.zhu/Downloads"
+    "downLoadPath": "C:/Users/chengxiong.zhu/Downloads",
+    "projectNames": {
+        "c385": "~/Works/Repos/changan_c385",
+        "c673": "~/Works/Repos/changan_c673",
+        "j90a": "~/Works/Repos/changan_j90a"
+    },
+    "projectCommonPath": "~/Works/Repos/changan_{projectName}",
+    "currentProjectName": "c673",
+    "pushFile": "C:/Users/chengxiong.zhu/Desktop/Achievement/pythonscript/Deployment/c385_deploy.py"
 }

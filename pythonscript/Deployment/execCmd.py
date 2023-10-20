@@ -58,6 +58,8 @@ def closeSpawn():
         process=None
 
 def keyStr(cmd, t=0.3,out='',auto_exit=True):
+    if platform.system() == "Windows":
+        print(cmd)
     assert isinstance(cmd,str)
     global process
     global is_close_spawn

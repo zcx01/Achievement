@@ -137,6 +137,10 @@ def ScpFile(tmpath,user,ssh_ip):
     SetCloseSpawn(True)
     interact()
 
+def ScpFileWin(tmpath,tmpathS,user,ssh_ip):
+    keyStr(f"scp -r {user}@{ssh_ip}:{tmpathS} {tmpath}")
+
+
 def updateConfig(prjectDir,addFileName):
     updateDir = jsConfig['update']
     updateConfig = jsConfig
@@ -170,6 +174,7 @@ if __name__ == "__main__":
     parser.add_argument('-s','-sship',help="从远程复制",nargs='*',default=jsConfig.get("ssh_ip",""))
     parser.add_argument('-u','--updateConfig',help='添加文件到配置中',default='',type=str,nargs='?')
     parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c385/prebuilts/ic',type=str)
+    parser.add_argument('-w','--scpWinDir',help='Scp win的目录',default='C:/Users/chengxiong.zhu/Downloads',type=str)
     parser.add_argument('-d','--device',help='adb的device',default='',type=str)
     args = parser.parse_args()
     argv = sys.argv
@@ -178,6 +183,9 @@ if __name__ == "__main__":
         sys.exit()
     
     PrjectDir = args.PrjectDir
+    home_dir = os.path.expanduser("~").replace('\\','/')
+    PrjectDir = PrjectDir.replace(home_dir,"~")
+    print(home_dir)
     printYellow(PrjectDir)
     
     if '-u' in argv:
@@ -195,9 +203,15 @@ if __name__ == "__main__":
         if '-c' in sys.argv:
             proceesNames= args.customfile
             for proceesName in proceesNames:
-                execbin = getExecBin(proceesName,proceesName)
-                tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
-                ScpFile(tmpath,user,ssh_ip)
+                if platform.system() == "Windows":
+                    execbin = getExecBin(proceesName,proceesName)
+                    tmpathS = f'{PrjectDir}/{execbin}/{proceesName}'
+                    print(tmpathS)
+                    ScpFileWin(args.scpWinDir,tmpathS,user,ssh_ip)
+                else:
+                    execbin = getExecBin(proceesName,proceesName)
+                    tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
+                    ScpFile(tmpath,user,ssh_ip)
 
     device = ""
     if len(args.device) !=0:
@@ -222,11 +236,17 @@ if __name__ == "__main__":
         proceesNames= args.customfile
         if len(proceesNames) == 0:
             exit()
-        keyStr(f"cd {PrjectDir}")
+        if platform.system() == "Windows":
+            keyStr(f"cd {args.scpWinDir}")
+        else:
+            keyStr(f"cd {PrjectDir}")
 
         exe_proceesNames=[]
         for proceesName in proceesNames:
-            execbin = getExecBin(proceesName,proceesName)
+            if platform.system() == "Windows":
+                execbin = args.scpWinDir
+            else:
+                execbin = getExecBin(proceesName,proceesName)
             exe_proceesNames.append(f'{execbin}/{proceesName}')
         androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
