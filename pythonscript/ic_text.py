@@ -10,7 +10,7 @@ from xlrd.book import Book
 from xlrd.sheet import Sheet
 
 SOUCRELANGUAGESUFFIX="zh_CN.ts"
-ORILANGUAGESUFFIXS={"en_US.ts":"D","th_TH.ts":"E","de_DE.ts":"F"} 
+ORILANGUAGESUFFIXS={"en_US.ts":"C","th_TH.ts":"D","de_DE.ts":"F"} 
 ORILANGUAGENAME={"en_US.ts":"英文","th_TH.ts":"泰文","de_DE.ts":"德文"} 
 SHELLNAME="SIC"
 class translateConent(object):
@@ -163,6 +163,24 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
         pass
     book.save(outPath)
     printGreen("检测完成")
+
+#只有修改xls转化成输入的xls
+def getChangeTrInputXls(changeTrInput):
+    book = xlrd.open_workbook(changeTrInput)
+    assert isinstance(book, Book)
+
+    sheel = book.sheet_by_name(SHELLNAME)
+    assert isinstance(sheel, Sheet)
+
+    book = openpyxl.Workbook()
+    sh = book.active
+
+    for row in range(sheel.nrows):
+        moudleName = getValue(sheel,row,"A")
+        if moudleName == 'IC-OUT' or moudleName == "SIC" or moudleName == ".json" or moudleName == '.ts' or row == 1:
+            sh.append(row)
+    return sh
+
     
 def xlsCover(translatePath,jsonPath,input):
     book = xlrd.open_workbook(input)
@@ -180,8 +198,14 @@ def xlsCover(translatePath,jsonPath,input):
             xlsContent.content = getValue(sheel,row,"B")
             xlsContent.translateContent = getValue(sheel,row,"C")
             assert isinstance(xlsContent.translateContent,str)
-            newTranslateContent = getValue(sheel,row,oriLanguageSuffixCol)
-            if len(xlsContent.sourceKey) != 0:
+            try:
+                newTranslateContent = getValue(sheel,row,oriLanguageSuffixCol)
+            except:
+                if row == 0:
+                    break
+                else:
+                    continue
+            if len(xlsContent.sourceKey) == 0:
                 xlsContent.sourceKey = xlsContent.content
             if len(newTranslateContent)!=0:
                 xlsContent.translateContent = newTranslateContent
@@ -191,6 +215,8 @@ def xlsCover(translatePath,jsonPath,input):
                 xlsContent.translateContent = xlsContent.translateContent.replace(',',',\n')
 
             tsContent[xlsContent.sourceKey] = xlsContent
+        if len(tsContent) == 0:
+            break
         
         #创建文件
         for (dirpath,dirnames,filenames) in os.walk(translatePath):
@@ -235,13 +261,13 @@ def xlsCover(translatePath,jsonPath,input):
                         domTree.writexml(f,encoding='utf-8')
 
         try:
-            aimJsContents = getJScontent(jsonPath)
+            aimJsContents = getJScontent(jsonPath)  
             print(f"更新 {jsonPath} 文件")
             for top in aimJsContents:
                 for grade in aimJsContents[top]:
                     if isNumber(grade) :
                         source = joint(top,grade)  
-                        if source in tsContent:     
+                        if source in tsContent:
                             aimJsContents[top][grade][removeSuffix(oriLanguageSuffix)] = tsContent[source].translateContent
             writeJs(jsonPath,aimJsContents)
         except:
