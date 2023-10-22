@@ -3,7 +3,9 @@ import json
 import re
 import sys
 import os
+import datetime
 import platform
+
 w_d=r'[a-zA-Z_]'                #匹配单词
 i_i=r"-?[0x0-9]"                #匹配数字
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"   #匹配单词和数字(包括小数和负数)
@@ -368,15 +370,17 @@ def getVariableText(variable,text,isEnd=False):
     return 0,False
 
  
- #----------------------警告信息------------------
 isWarnWrirteFile = False
+warnFilePath = os.getcwd() + "/warninfopy/"+ sys.argv[0]+"/"+datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 def initWarnFile():
     global isWarnWrirteFile
     isWarnWrirteFile = True    
     try:
-        removeFile(os.getcwd() + "/red.txt")
-        removeFile(os.getcwd() + "/green.txt")
-        removeFile(os.getcwd() + "/yellow.txt")
+        if not os.path.exists(warnFilePath):
+            os.makedirs(warnFilePath,exist_ok=True)
+        removeFile(warnFilePath + "/red.txt")
+        removeFile(warnFilePath + "/green.txt")
+        removeFile(warnFilePath + "/yellow.txt")
     except:
         pass
 
@@ -386,7 +390,7 @@ def removeFile(filePath):
 
 def saveWarnFile(infoStr,type):
     if isWarnWrirteFile:
-        filePath  = os.getcwd() + f"/{type}.txt"
+        filePath  = warnFilePath + f"/{type}.txt"
         os.system(f"echo {infoStr} >> {filePath}")
 
 def printRed(infoStr):

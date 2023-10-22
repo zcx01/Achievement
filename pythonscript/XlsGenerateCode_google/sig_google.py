@@ -14,7 +14,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 sys.path.append(os.path.dirname(os.path.abspath(__file__))+"./")
 from checksig import *
-
+from xlsdbcCommand import *
+from analyze_dbc.projectInI import *
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
@@ -72,23 +73,34 @@ def addConfigs(ids):
     addConfigSig(sigs)
 
 def addConfigByTopicCan(startRow,endRow):
-    values = getShellValueDrive("1v4y6DCyc3wnzaY8AdIi51jg4hQnV1Ip8J051WbIGUcc")
+    if GOOGLESIGTOPICID == '':
+        print('表格id是空的')
+        return
+    values = getShellValueDrive(GOOGLESIGTOPICID)
     rowRangs = []
-    if endRow == -1 : endRow = startRow+1
-    print(startRow,endRow)
-    for i in range(startRow,endRow):
-        rowRangs.append(i)
-    addConfigTopicCan(values,len(values),GoValue,rowRangs)
+    if endRow == -1 : endRow = len(values)
+    elif endRow == 0 : endRow = startRow+1
+    if startRow > 0:
+        for i in range(startRow,endRow):
+            rowRangs.append(i)
+    
+    if len(rowRangs) != 1:
+         initWarnFile()
+
+    whitelistdbcSigNames = addConfigTopicCan(values,len(values),GoValue,rowRangs)
+    if whitelistdbcSigNames != None and len(whitelistdbcSigNames) != 0:
+        addCan_parse_whitelist(whitelistdbcSigNames)
 
 if __name__ == '__main__':
     parse = argparse.ArgumentParser(description='生成配置文件的脚本')
-    parse.add_argument('-s','--startRow',help='开始的行号',type=int,default=0)
-    parse.add_argument('-e','--endRow',help='结束的行号',type=int,default=-1)
+    parse.add_argument('-s','--startRow',help='开始的行号,0表示所有',type=int,default=0)
+    parse.add_argument('-e','--endRow',help='结束的行号,-1表到示最后，0表示和startRow相等',type=int,default=-1)
     parse.add_argument('-i', '--ids',help='id', nargs='+')
-    parse.add_argument('-tc', '--topicCan', help='通过topic和CAN对应的xls添加配置文件',nargs='?',type=str,default='')
     arg = parse.parse_args()
 
     if '-i' in sys.argv:
         addConfigs(arg.ids)
-    elif '-tc' in sys.argv:
-        addConfigByTopicCan(arg.startRow-1,arg.endRow)
+
+    startRow = arg.startRow-1
+    if startRow < 0 : startRow = 5
+    addConfigByTopicCan(startRow,arg.endRow)

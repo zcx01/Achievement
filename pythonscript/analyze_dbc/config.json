@@ -1,9 +1,9 @@
 {
-    "projectPath": "/home/chengxiongzhu/Works/Repos/changan_c385",
+    "projectPath": "../",
     "newSig": "/home/chengxiongzhu/Works/newsig/newsig.txt",
     "xlsNewSigPath": "/home/chengxiongzhu/Works/newsig/newsig.xlsx",
     "can_parse_whitelist": "src/ic_service/parser/vendor/can_parse_whitelist.txt",
-    "canmatrix": "C673项目CDC整车协议V2.1.1_1126.xlsx",
+    "canmatrix": "J90A项目协议_V1.0_20230915_REEV&EV THU.xlsx",
     "dbcfile": "src/ic_service/parser/vendor/dbc_files",
     "definefile": "src/ic_service/src/signal_process/include/topic/ipc_topic_new_def.h",
     "casePath": "/home/chengxiongzhu/Works/case/",

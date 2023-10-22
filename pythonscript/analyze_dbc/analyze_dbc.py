@@ -156,6 +156,14 @@ class Analyze(object):
             msgInfos[can_Channel] = dbc.getAllMessage()
         return msgInfos
 
+    #通过msgId获取所有的dbc中信号
+    def getSigsByMsgId(self,msgId):
+        singInfos = []
+        for can_Channel in self.AnalyzeDict:
+            dbc = self.AnalyzeDict[can_Channel]
+            assert isinstance(dbc,AnalyzeFile)
+            singInfos.extend(dbc.getSigsByMessageId(msgId))
+        return singInfos
 
     def getMessage_Id_Sig(self,sigName):
         dbc = self.getAnalyzeSingleByName(sigName)

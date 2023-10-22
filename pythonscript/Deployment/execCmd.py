@@ -53,7 +53,7 @@ def closeSpawn():
     SetCloseSpawn(True)
     global process
     if is_close_spawn and process != None:
-        time.sleep(6)
+        time.sleep(2)
         process.close()
         process=None
 
