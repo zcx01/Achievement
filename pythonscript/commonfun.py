@@ -404,6 +404,7 @@ def printYellow(infoStr):
 
 def openFileUseDefault(cmd):
     if platform.system() == "Windows":
+        cmd = cmd.replace('/','\\')
         cmd = f"explorer {cmd}"
         os.system(cmd)
     else:
