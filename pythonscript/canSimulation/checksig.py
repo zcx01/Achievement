@@ -5,6 +5,7 @@ from analyze_dbc.analyze_dbc import *
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 import xlrd
+import openpyxl
 
 '''
     可以检测的前提条件
@@ -82,7 +83,7 @@ def CheckSigName(configPath,down_config="",up_config=""):
         bar.printCurrnt()
         if is_chinese(sig):
             continue
-        dbcSigName,Sender,isChanged = configConverdbc(sig,dbc)
+        dbcSigName,Sender,isChanged,messageId = configConverdbc(sig,dbc)
 
         if Sender == None:
             if 'd' not in igCmd:
@@ -160,7 +161,7 @@ def configConverdbc(sig,dbc):
         dbcSig = dbc.getSig(sig)
         if dbcSig == None:
             printRed(f'{sig:<50}  信号格式错误')
-    return sig if dbcSig == None else dbcSig.getMessage_Name()+'/'+dbcSig.name, None if dbcSig == None else dbcSig.Sender,False
+    return sig if dbcSig == None else dbcSig.getMessage_Name()+'/'+dbcSig.name, None if dbcSig == None else dbcSig.Sender,False,None if dbcSig == None else dbcSig.messageId
 
 def addConfigDict(js,key,value):
     if value in js: del js[value] 
@@ -193,7 +194,7 @@ def ToConfigJson(javaPath,configPath,down_config="",up_config=""):
             tContent = re.findall(r'".*"',tContents[0])[0]
             assert isinstance(tContent,str)
             tContent=tContent.replace('\"',"")
-            dbcSigName,Sender,isChanged = configConverdbc(tContent,dbc)
+            dbcSigName,Sender,isChanged,messageId = configConverdbc(tContent,dbc)
             down_topic=addSet(tContent)
             if Sender == None:
                 continue
@@ -211,7 +212,7 @@ def addConfigSig(sigs,isOriginal,configPath="",down_config="",up_config=""):
     jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath,down_config,up_config)
     for sigName in sigs:
         assert isinstance(sigName,str)
-        dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
+        dbcSigName,Sender,isChanged,messageId = configConverdbc(sigName,dbc)
         if isOriginal or SETSTR in sigName:
             down_topic = addSet(sigName)
         else:
@@ -223,7 +224,6 @@ def addConfigSig(sigs,isOriginal,configPath="",down_config="",up_config=""):
             up_topic = dbcSigName
             
         if Sender == None:
-            printRed(f"{sigName} 没有发送者")
             continue
         if Sender not in local_machine_Sender: 
             reConfigDict(jsUp,dbcSigName,up_topic)       
@@ -259,24 +259,53 @@ class ConfigXls():
 
     def addToConfig(self,jsConfig,isDown):
         contentJson = {}
-        if len(self.comments) != 0:
-            contentJson['comments'] = self.comments
+        if self.topic == '':
+            self.topic = self.dbcSigName
+
+        if isDown:
+            if not self.topic.endswith(SETSTR): self.topic = self.topic +SETSTR
+        else:
+            if self.topic.endswith(SETSTR): self.topic = self.topic.rstrip(SETSTR)
         if len(self.valueMap) != 0:
             contentJson['valueMap'] = self.valueMap
         if len(self.defaultValueType) != 0:
             contentJson['defaultValueType'] = self.defaultValueType
+        if len(self.comments) != 0:
+            contentJson['comments'] = self.comments
+        contentJson['isXls'] = True
         if isDown:
             if self.topic not in jsConfig:
                 jsConfig[self.topic] = {}
             jsConfig[self.topic][self.dbcSigName] = contentJson
         else:
             if self.dbcSigName not in jsConfig:
-                jsConfig[self.dbcSigName] = {}
+                jsConfig[self.dbcSigName] = {"log":1}
             jsConfig[self.dbcSigName][self.topic] = contentJson
-                
 
-        
-        
+    def getList(self):
+        newSheel = []
+        newSheel.append(self.comments)
+        newSheel.append(self.topic)
+        newSheel.append(self.dbcSigName)
+        return newSheel
+
+    def getBindSigNames(self,sigName,dbc,whitelistdbcSigNames,jsConfig):
+        if sigName.startswith('0x'):
+            assert isinstance(dbc,Analyze)
+            msgId = getNoOx16(sigName)
+            sigs = dbc.getSigsByMsgId(msgId)
+            bindSigNames=[]
+            for dbcSig in sigs:
+                assert isinstance(dbcSig,SigInfo)
+                dbcSigName = dbcSig.getMessage_Name()+'/'+dbcSig.name
+                bindSigNames.append(dbcSigName)
+                whitelistdbcSigNames.append(dbcSig.name)
+            if self.topic not in jsConfig:
+                jsConfig[self.topic] = {}
+            jsConfig[self.topic]['bindSigNames'] = bindSigNames
+            return True
+        return False
+            
 def getSigXls(xlsFileName):
     sigs = []
     book = xlrd.open_workbook(xlsFileName)
@@ -326,7 +355,7 @@ def addMultipleSig(canmatrix,msgIds,topics):
             for sigName in sigs:
                 assert isinstance(sigName,str)
                 try:
-                    dbcSigName,Sender,isChanged = configConverdbc(sigName,dbc)
+                    dbcSigName,Sender,isChanged,messageId = configConverdbc(sigName,dbc)
                 except:
                     printRed(f"{sigName} 信号格式错误")
                     continue   
@@ -355,46 +384,121 @@ def addMultipleSig(canmatrix,msgIds,topics):
 defaultValueType:0;  默认值(没有在"值映射"中的值)的处理方式,0是原值转发, 1是不处理,2是加自增1,3是发送无效,4 extension 相同就不发送,5整帧CAN报文透传
 '''
 
+def clearXlsData(jsConfig):
+    tempJs = jsConfig
+    for fContent in tempJs:
+        for tContent in tempJs[fContent]:
+            contentJson = tempJs[fContent][tContent]
+            if 'isXls' in contentJson and contentJson['isXls']:
+                del jsConfig[fContent][tContent]
+
 def addConfigByTopicCanXls(xlsPath,configPath):
     book = xlrd.open_workbook(xlsPath)
     assert isinstance(book, Book)
     sheel = book.sheet_by_index(0)
     addConfigTopicCan(sheel,sheel.nrows,getCellValue,configPath)
 
+def getErrList(errorStrList):
+    errorList=[]
+    errorList.extend(errorStrList)
+    home_dir = os.path.expanduser("~").replace('/home','')
+    home_dir = home_dir.replace('/','')
+    errorList.append(home_dir)
+    current_date = datetime.datetime.now()
+    three_days_later = current_date + datetime.timedelta(days=3)
+    date_string = three_days_later.strftime("%Y.%m.%d")
+    errorList.append(date_string)
+    return errorList
+
 def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],configPath=""): 
     jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
     preComments = ""
+    whitelistdbcSigNames = []
+    book = openpyxl.Workbook()
+    sh = book.active
+    sh.title = "sheel"
+    sh['A1'] = '功能名称'
+    sh['B1'] = 'Topic'
+    sh['C1'] = '信号名'
+    isAll = len(rowRange) == rowCount or len(rowRange) == 0
+    if isAll:
+        clearXlsData(jsDown)
+        clearXlsData(jsUp)
+    
+    errBook = openpyxl.Workbook()
+    errsh = errBook.active
+    errsh.title = "sheel"
+    errsh['A1'] = '功能'
+    errsh['B1'] = '板块'
+    errsh['C1'] = '问题来源'
+    errsh['D1'] = '问题'
+    errsh['E1'] = '提出人'
+    errsh['F1'] = '期望解决时间'
+
+
     for i in range(rowCount):
+        sh.append([])
         if not (i  in rowRange or len(rowRange) == 0):
             continue
-        try:
-            sigName = getSheelValue(sheel,i,'C')
-            if len(sigName) == 0:
-                printRed(f'{i:<10}行是空的')
-                continue
+        if 1:
+        # try:
+
+            try:
+                customFds = int(getSheelValue(sheel,i,'L'))
+                if customFds == 1:
+                    printGreen(f'{i+1:<10}无须导入,有自定义的fds')
+                    continue
+            except:
+                pass
+
+            try:
+                sigName = getSheelValue(sheel,i,'C').replace(" ", "")
+                if len(sigName) == 0: raise Exception(f"是空的")
+            except:
+                    printYellow(f'{i+1:<10}行是空的')
+                    continue
             configXls = ConfigXls()
-            configXls.dbcSigName,configXls.sender,isChanged = configConverdbc(sigName,dbc)
             configXls.topic = getSheelValue(sheel,i,'B')
+            if configXls.getBindSigNames(sigName,dbc,whitelistdbcSigNames,jsUp):
+                printGreen(f"{i+1:<10} 写入完成")
+                continue
+            configXls.dbcSigName,configXls.sender,isChanged,messageId = configConverdbc(sigName,dbc)
             configXls.comments = getSheelValue(sheel,i,'A')
+            whitelistdbcSigNames.append(sigName)
             if configXls.comments == "" :
                 configXls.comments = preComments
             else:
                 preComments = configXls.comments
+
             if configXls.sender == None:
-                printRed(f"{sigName} 没有发送者")
+                errorStrList=[]
+                errorStrList.append(configXls.comments)
+                try:
+                    errorStrList.append(getSheelValue(sheel,i,'J'))
+                except:
+                    errorStrList.append('')
+                try:
+                    errorStrList.append(getSheelValue(sheel,i,'I'))
+                except:
+                    errorStrList.append('')
+                errorStrList.append(f'{sigName} 信号缺失')
+                errsh.append(getErrList(errorStrList))
                 continue
 
-            valueMapStr = getSheelValue(sheel,i,'F')
-            valueMapStrs = re.findall(e_i,valueMapStr,re.A)
-
-            for valueMapStrIndex in len(valueMapStrs):
-                fValue = valueMapStrs[valueMapStrIndex]
-                tIndex = valueMapStrIndex + 1
-                if tIndex >= len(valueMapStrs):
-                    printYellow(f"{i:<10} 值映射错误")
-                    continue
-                tValue = valueMapStrs[tIndex]
-                configXls.valueMap[fValue] = tValue
+            try:
+                valueMapStr = getSheelValue(sheel,i,'F')
+                valueMapStrs = re.findall(e_i,valueMapStr,re.A)
+                for valueMapStrIndex in range(len(valueMapStrs)):
+                    if valueMapStrIndex % 2 != 0 : continue
+                    fValue = valueMapStrs[valueMapStrIndex]
+                    tIndex = valueMapStrIndex + 1
+                    if tIndex >= len(valueMapStrs):
+                        printYellow(f"{i+1:<10} {tIndex} {len(valueMapStrs)}值映射错误")
+                        continue
+                    tValue = int(valueMapStrs[tIndex])
+                    configXls.valueMap[fValue] = tValue
+            except:
+                pass
 
             try:
                 defaultValueTypeStr = re.findall(f'defaultValueType:{i_i}',valueMapStr,re.A)[0]
@@ -409,12 +513,26 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],configPath=""):
             if configXls.sender in local_machine_Sender:
                 configXls.addToConfig(jsDown,True) 
 
-        except:
-            printRed(f"{sigName} 信号格式错误")
-            continue 
+            newSheel = configXls.getList()
+            sh.cell(row=i, column=1).value = newSheel[0]
+            sh.cell(row=i, column=2).value = newSheel[1]
+            sh.cell(row=i, column=3).value = newSheel[2]
+            printGreen(f"{i+1:<10} 写入完成")
 
-        writeJs(down_config,jsDown)
-        writeJs(up_config,jsUp)
+        # except:
+        #     printRed(f"{sigName} 信号格式错误")
+        #     continue 
+
+    print(jsUp)
+    writeJs(down_config,jsDown)
+    writeJs(up_config,jsUp)
+
+    book.save("./newTopicCan.xls")
+    errBookFile = './errSig.xls'
+    if os.path.exists(errBookFile):
+        os.remove(errBookFile)
+    errBook.save(errBookFile)
+    return whitelistdbcSigNames
 
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(

@@ -198,11 +198,11 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
 
         if row == 0:
             continue
-        if not isWriteSig(sheel,row,getValue):
-            print(f"{row} 项目中没有这个信号，无须导入")
-            continue
         sig = getSigInfo(sheel, row)
         if appoint(sig,wirteSigName,isMsg) or isAllAdd:
+            if not isWriteSig(sheel,row,getValue):
+                print(f"{row} 项目中没有这个信号，无须导入")
+                continue
             if sig.name in threeFrames:
                 sig.sendType = SigSendType.Three
             # print(type(sig.min),type(sig.max),type(sig.Offset),type(sig.factor))
@@ -222,8 +222,8 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
             dbc = Analyze(dbcfile)
             msg = msgs.get(sig.getMessage_SubNet(), None)
             if msg == None:
-                print(f'{row} {sig.name} 对应的 {sig.messageId} message不存在')
-                printYellow("可能的原因是:message没有加0x")
+                printYellow(f'{row} {sig.name} 对应的 {sig.messageId} message不存在')
+                print("可能的原因是:message没有加0x")
                 continue
             
             isWriteWhite = False
@@ -246,7 +246,7 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                 if os.path.isfile(can_parse_whitelistPath):
                     WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
     if not isFind:
-        print(f"{wirteSigName} 在CAN矩阵中不存在")
+        printRed(f"{wirteSigName} 在CAN矩阵中不存在")
 
 def WriteWhitelistPath(messages=[]):
     jsConfig=getJScontent(pyFileDir+"config.json")

@@ -33,7 +33,7 @@ class SigSendType(Enum):
 
 class SigInfo(object):
     def __init__(self) :
-        self.messageId = ""
+        self.messageId = "" #16进制
         self.name=""
         self.startBit=-1
         self.endBit=-1
