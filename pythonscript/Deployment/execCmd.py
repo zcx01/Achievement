@@ -53,11 +53,13 @@ def closeSpawn():
     SetCloseSpawn(True)
     global process
     if is_close_spawn and process != None:
-        time.sleep(6)
+        time.sleep(2)
         process.close()
         process=None
 
 def keyStr(cmd, t=0.3,out='',auto_exit=True):
+    if platform.system() == "Windows":
+        print(cmd)
     assert isinstance(cmd,str)
     global process
     global is_close_spawn
