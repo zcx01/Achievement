@@ -231,12 +231,12 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
             if writedbcresult == WriteDBCResult.AlreadyExists:
                 if isAllAdd:
                     # printYellow(f'{sig.getMessage_Sig()} 被替换')
-                    dbc.repalceSig(sig)
+                    dbc.repalceSig(sig,msg=msg)
                     isWriteWhite = True
                 else:
                     isRepalce = input(f'{sig.getMessage_Sig()} 是否替換 y/n ')
                     if 'y' in isRepalce:
-                        dbc.repalceSig(sig)
+                        dbc.repalceSig(sig,msg=msg)
                         isWriteWhite = True
             if writedbcresult == WriteDBCResult.WriteComplete:
                 isWriteWhite = True

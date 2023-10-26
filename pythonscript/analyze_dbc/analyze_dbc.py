@@ -196,12 +196,12 @@ class Analyze(object):
                 assert isinstance(dbc,AnalyzeFile)
                 dbc.repalceSigEnum(channelSig[dbc])
     
-    def repalceSig(self,*sigs):
+    def repalceSig(self,*sigs,msg):
         channelSig= self.GetChannelSig(sigs)
         for dbc in channelSig.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
-                dbc.repalceSig(channelSig[dbc])
+                dbc.repalceSig(channelSig[dbc],msg)
 
     def removeSig(self,*sigs):
         channelSig= self.GetChannelSig(sigs)

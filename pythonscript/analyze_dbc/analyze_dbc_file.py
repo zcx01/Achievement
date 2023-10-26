@@ -633,6 +633,63 @@ class AnalyzeFile(object):
             pass
         return dataTypeStr
 
+    def byteConflict(self,sig,msg,isRepalceSig,linelist=[]):
+        assert isinstance(sig,SigInfo)
+        assert isinstance(msg,MessageInfo)
+        if len(linelist) == 0:
+            linelist=readFileLines(self.dbcPath)
+            
+        dm = self.dbcMessage.get(sig.messageId)
+        assert isinstance(dm,MessageInfo)
+        #如果大小不一致，取最大的值
+        if msg.lenght > dm.lenght:
+            linelist[dm.Row] = msg.getMessageRowContent()
+
+        startRow = dm.Row+1
+        insertRowIndex=-1
+        userIndex={}
+        while(startRow < dm.sigMaxRow):
+            lineSig = AnalyzeFile.analySG(linelist[startRow])
+            if lineSig.startBit > sig.startBit and insertRowIndex == -1:
+                insertRowIndex = startRow 
+            startRow+=1
+            if not (isRepalceSig and sig.name == lineSig.name):
+                userIndex[lineSig.name] = lineSig.useBit
+
+        if insertRowIndex == -1:
+            insertRowIndex = dm.sigMaxRow
+        
+        #判断信号是否合理
+        sigUsrIndexs=sig.useBit
+        cover_count = 0
+        user_sigName = []
+        for user in userIndex:
+            is_user = False
+            for sigUsrIndex in sigUsrIndexs:
+                if sigUsrIndex in userIndex[user]:
+                    cover_count+=1
+                    # print(sigUsrIndex,str(userIndex[user]),user,"----------")
+                    is_user = True
+            if cover_count == 0:
+                continue
+            if cover_count == len(userIndex[user]) and cover_count == len(sigUsrIndexs) and len(user_sigName) == 0:
+                printYellow(f"{sig.name}: {str(sigUsrIndexs)} 与 {user}: {userIndex[user]} 字节相同+++++  ")
+                return WriteDBCResult.SignalCoverage,dm,insertRowIndex
+            elif is_user:
+                user_sigName.append(user)
+                
+        if cover_count == len(sigUsrIndexs):
+            if  not (isRepalceSig and sig.name == user_sigName):
+                return WriteDBCResult.SignalCoverage,dm,insertRowIndex
+        elif cover_count != 0:
+            if len(user_sigName) ==1:
+                user = user_sigName[0]
+                printRed(f"{sig.name} 信号有覆盖:开始字节 {sig.startBit} ,结束的字节 {sig.endBit} ,占用的字节 {sigUsrIndexs} ,与 {user} 覆盖字节 {userIndex[user]}")
+            else:
+                printYellow(f"{sig.name} 与 {user_sigName} 字节冲突")
+            return WriteDBCResult.SignalCoverage,dm,insertRowIndex
+        return WriteDBCResult.WriteComplete,dm,insertRowIndex
+
     def writeSig(self,sig,msg):
         assert isinstance(sig,SigInfo)
         assert isinstance(msg,MessageInfo)
@@ -642,80 +699,32 @@ class AnalyzeFile(object):
             # print(f"{sig.name}信号已经存在")
             return WriteDBCResult.AlreadyExists
         try:
-            dm = self.dbcMessage.get(sig.messageId)
-            assert isinstance(dm,MessageInfo)
-            #如果大小不一致，取最大的值
-            if msg.lenght > dm.lenght:
-                linelist[dm.Row] = msg.getMessageRowContent()
+            byteConflictResult,dm,insertRowIndex =self.byteConflict(sig,msg,False,linelist)
+            if byteConflictResult != WriteDBCResult.WriteComplete:
+                return byteConflictResult
+            
+            linelist.insert(insertRowIndex,sig.getSG())
+            msg.message_Name = dm.message_Name
+            sig.messgae_Name = dm.message_Name
+            insertRow = AnalyzeFile.appendKey(linelist,sig.getStartValue())
+            if sig.sendType != SigSendType.Normal:
+                AnalyzeFile.appendKey(linelist,sig.getSigSendType(),insertRow)
 
-            startRow = dm.Row+1
-            insertRowIndex=-1
-            try:
-                userIndex={}
-                while(startRow < dm.sigMaxRow):
-                    lineSig = AnalyzeFile.analySG(linelist[startRow])
-                    userIndex[lineSig.name] = lineSig.useBit
-                    if lineSig.startBit > sig.startBit and insertRowIndex == -1:
-                        insertRowIndex = startRow 
-                    startRow+=1
+            #写入BU
+            if sig.Sender not in self.control:
+                self.control.append(sig.Sender)
+                for row in range(linelistSize):
+                    if linelist[row].startswith("BU_:"):
+                        linelist[row]=linelist[row].replace(linelist[row],self.getBU())
+                        break
+                
+            #写入枚举
+            enumStr=sig.getEnum()
+            if len(enumStr) != 0:
+                linelist.append(enumStr) 
 
-                if insertRowIndex == -1:
-                    insertRowIndex = dm.sigMaxRow
-              
-                #判断信号是否合理
-                sigUsrIndexs=sig.useBit
-                cover_count = 0
-                user_sigName = []
-                for user in userIndex:
-                    is_user = False
-                    for sigUsrIndex in sigUsrIndexs:
-                        if sigUsrIndex in userIndex[user]:
-                            cover_count+=1
-                            # print(sigUsrIndex,str(userIndex[user]),user,"----------")
-                            is_user = True
-                    if cover_count == 0:
-                        continue
-                    if cover_count == len(userIndex[user]) and cover_count == len(sigUsrIndexs) and len(user_sigName) == 0:
-                        printYellow(f"{sig.name}: {str(sigUsrIndexs)} 与 {user}: {userIndex[user]} 字节相同+++++  ")
-                        return WriteDBCResult.SignalCoverage
-                    elif is_user:
-                        user_sigName.append(user)
-                        
-                if cover_count == len(sigUsrIndexs):
-                    printYellow(f"{sig.name} 与 {user_sigName} 字节相同")
-                    return WriteDBCResult.SignalCoverage
-                elif cover_count != 0:
-                    if len(user_sigName) ==1:
-                        user = user_sigName[0]
-                        printRed(f"{sig.name} 信号有覆盖:开始字节 {sig.startBit} ,结束的字节 {sig.endBit} ,占用的字节 {sigUsrIndexs} ,与 {user} 覆盖字节 {userIndex[user]}")
-                    else:
-                        printYellow(f"{sig.name} 与 {user_sigName} 字节冲突")
-                    return WriteDBCResult.SignalCoverage
-
-                linelist.insert(insertRowIndex,sig.getSG())
-                msg.message_Name = dm.message_Name
-                sig.messgae_Name = dm.message_Name
-                insertRow = AnalyzeFile.appendKey(linelist,sig.getStartValue())
-                if sig.sendType != SigSendType.Normal:
-                    AnalyzeFile.appendKey(linelist,sig.getSigSendType(),insertRow)
- 
-                #写入BU
-                if sig.Sender not in self.control:
-                    self.control.append(sig.Sender)
-                    for row in range(linelistSize):
-                        if linelist[row].startswith("BU_:"):
-                            linelist[row]=linelist[row].replace(linelist[row],self.getBU())
-                            break
-                 
-                #写入枚举
-                enumStr=sig.getEnum()
-                if len(enumStr) != 0:
-                    linelist.append(enumStr) 
-
-                wirteFileDicts(self.dbcPath,linelist,False)
-                printGreen(f"{sig.name} 写入完成")
-            except Exception as e:
-                printRed(f"{sig.name} 写入失败:{str(e)}")
+            wirteFileDicts(self.dbcPath,linelist,False)
+            printGreen(f"{sig.name} 写入完成")
         except:
             print(f'{sig.name} 正在写入message')
             if not self.writeMessage(msg,linelist):
@@ -743,10 +752,14 @@ class AnalyzeFile(object):
             print(sig.name,'-------',enumStr)
         wirteFileDicts(self.dbcPath, linelist, False)
 
-    def repalceSig(self,sigs):
+    def repalceSig(self,sigs,msg):
         linelist = readFileLines(self.dbcPath)
         for sig in sigs:
             assert isinstance(sig,SigInfo)
+            byteConflictResult,dm,insertRowIndex =self.byteConflict(sig,msg,True,linelist)
+            if byteConflictResult != WriteDBCResult.WriteComplete:
+                return byteConflictResult
+            
             ori_sig = self.getSig(str(sig.getMId())+sig.name)
             if ori_sig == None:
                 print(f'{sig.name} 不存在')
@@ -761,6 +774,7 @@ class AnalyzeFile(object):
                 else:
                     linelist[ori_sig.enumRow] = enumStr
         wirteFileDicts(self.dbcPath, linelist, False) 
+        return WriteDBCResult.WriteComplete
 
     def removeSig(self,sigs,isWirte=True):
         removeIndex = []
