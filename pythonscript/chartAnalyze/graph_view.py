@@ -126,8 +126,7 @@ class logSeries(pg.PlotCurveItem):
             dataX = self.dataX[dataXIndex]
             if space1 <= dataX <= space2:
                 tmpIndexs.append(dataXIndex)
-        
-        pass
+        return tmpIndexs
 
     def getToolTip(self,x,y,data):
         return QDateTime.fromMSecsSinceEpoch(x).toString(QDATETIMEMSF)
@@ -333,6 +332,7 @@ class CustomGraphManage(QObject):
     def mouseCliked(self,event):
         if self.currentline != None and event.button() == Qt.LeftButton:
             self.currentline.movable = not self.currentline.movable
+            self.updateLineData(False,True)
 
     def mouseMoved(self,evt):
         if self.currentline != None:
@@ -347,7 +347,7 @@ class CustomGraphManage(QObject):
                     self.currentline.label.setText(startDate)
         self.updateLineData(False)
 
-    def updateLineData(self,isUpdateLable):
+    def updateLineData(self,isUpdateLable,printTextCount=False):
         if self.pgFirstPlotItem != None:
             bottomAxis = self.pgFirstPlotItem.getAxis('bottom')
             timeStampStr = ''
@@ -357,6 +357,12 @@ class CustomGraphManage(QObject):
             endTime = self.pgFirstPlotItem.mapToView(endValue).x()
             if self.currentlineVisibleCount == 2:
                 timeStampStr = str(abs(round((startTime -endTime)/1000,3)))
+                if printTextCount:
+                    for keyWord in self.pgSeries:
+                        series = self.pgSeries[keyWord]
+                        assert isinstance(series,logSeries)
+                        spaceTextIndexs = series.getLineSpaceText(startTime,endTime)
+                        self.send_msg.emit(f"{keyWord} 一个{len(spaceTextIndexs)}")
             bottomAxis.setLabel(text=timeStampStr,units='s')
 
             if isUpdateLable:

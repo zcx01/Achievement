@@ -4,6 +4,7 @@ import re
 import sys
 import os
 import datetime
+import platform
 
 w_d=r'[a-zA-Z_]'                #匹配单词
 i_i=r"-?[0x0-9]"                #匹配数字
@@ -403,6 +404,17 @@ def printGreen(infoStr):
 def printYellow(infoStr):
     print('\033[33m'+infoStr+'\033[0m')
     saveWarnFile(infoStr,'yellow')
+
+
+def openFileUseDefault(cmd):
+    if platform.system() == "Windows":
+        cmd = cmd.replace('/','\\')
+        cmd = f"explorer {cmd}"
+        os.system(cmd)
+    else:
+        cmd = f"xdg-open {cmd}"
+        os.system(cmd)
+
 # print(removeListIndexs([12,23,56],[0,2]))
 # def Temp(linelist):
 #     linelist.append('ddd')
