@@ -49,14 +49,14 @@ if __name__ == "__main__":
 
     initWarnFile()
     canmatrix = arg.append
+    jsConfig = getJScontent(arg.config)
     if canmatrix == None:
-        jsConfig = getJScontent(arg.config)
         canmatrix = getKeyPath("canmatrix", jsConfig)
-        canmatrix_version = getKeyPath("canmatrix_version", jsConfig)
-        if canmatrix_version != '':
-            with open(canmatrix_version, 'a') as file:
-                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                file.write(f"{current_time} {canmatrix}" + '\n')
+    canmatrix_version = getKeyPath("canmatrix_version", jsConfig)
+    if canmatrix_version != '':
+        with open(canmatrix_version, 'a') as file:
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            file.write(f"{current_time} {os.path.basename(canmatrix)}" + '\n')
 
     if '-d' in sys.argv and '-r' in sys.argv and '-t' in sys.argv:
         sigNameChanged(arg.config, arg.dbcPath, arg.resultPath, arg.twoMatrix)
@@ -80,6 +80,8 @@ if __name__ == "__main__":
             conversion(arg.config,sigName,canmatrix)
     elif "-a" in sys.argv and '-w' in sys.argv:
         WriteWhitelistPath()
+    elif '-fm' in sys.argv:
+        canMatrixNoMsg(arg.config,canmatrix)
     elif "-a" in sys.argv:
         conversion(arg.config, "", canmatrix)
     elif '-s' in sys.argv:
@@ -99,5 +101,3 @@ if __name__ == "__main__":
         handleProjectPath(arg.config,arg.projectPath)
     elif '-i' in sys.argv:
         addInputMsgConfig(arg.config,arg.addInputMsgConfig)
-    elif '-fm' in sys.argv:
-        canMatrixNoMsg(arg.config,canmatrix)

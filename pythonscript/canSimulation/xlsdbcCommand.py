@@ -352,7 +352,7 @@ def canMatrixNoMsg(configPath,canmatrix):
     jsConfig = getJScontent(configPath)
     print(canmatrix)
     canmatrixName = os.path.basename(canmatrix)
-    
+
     dbcfile = getKeyPath("dbcfile", jsConfig)
     print(dbcfile)
     book = xlrd.open_workbook(canmatrix)
@@ -367,13 +367,20 @@ def canMatrixNoMsg(configPath,canmatrix):
         printRed("messaage 不存在或者解析错误")
         return
     
-    print(f'{canmatrixName} 不存在的')
     dbc = Analyze(dbcfile)
-    msgInfos = dbc.getAllMessageInfo()
-    for msgInfo in msgInfos:
-        assert isinstance(msgInfo,MessageInfo)
-        if msgInfo not in msgs:
-            print(f'0x{msgInfo.messageId}')
+    msgInfos = dbc.getAllMessage()
+    for msgsSubId,msg in msgs.items():
+        assert isinstance(msg,MessageInfo)
+        can_Channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
+        dbcMsgInfos = msgInfos[can_Channel]
+        if msg.messageId in dbcMsgInfos:
+            del msgInfos[can_Channel][msg.messageId]
+
+    for can_Channel in msgInfos:
+        print(f'{can_Channel}不存在的msg')
+        for msgInfo in msgInfos[can_Channel]:
+            print(f'0x{msgInfo}')
+           
     printGreen('执行完成')
                     
 def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser):
@@ -686,7 +693,7 @@ def addCan_parse_whitelist(sigs):
         message=analy.getMessage_Id_BySig(sig)
         if len(message)==0:
             print(f'{sig} 对应的message不存在')
-            break
+            continue
         messagesig=analy.getMessage_Id_Sig(sig)
         can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
         WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,False)

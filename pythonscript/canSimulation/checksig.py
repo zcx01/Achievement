@@ -444,7 +444,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],configPath=""):
         # try:
 
             try:
-                customFds = int(getSheelValue(sheel,i,'L'))
+                customFds = int(getSheelValue(sheel,i,'N'))
                 if customFds == 1:
                     printGreen(f'{i+1:<10}无须导入,有自定义的fds')
                     continue
@@ -464,7 +464,6 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],configPath=""):
                 continue
             configXls.dbcSigName,configXls.sender,isChanged,messageId = configConverdbc(sigName,dbc)
             configXls.comments = getSheelValue(sheel,i,'A')
-            whitelistdbcSigNames.append(sigName)
             if configXls.comments == "" :
                 configXls.comments = preComments
             else:
@@ -474,19 +473,20 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],configPath=""):
                 errorStrList=[]
                 errorStrList.append(configXls.comments)
                 try:
-                    errorStrList.append(getSheelValue(sheel,i,'J'))
+                    errorStrList.append(getSheelValue(sheel,i,'L'))
                 except:
                     errorStrList.append('')
                 try:
-                    errorStrList.append(getSheelValue(sheel,i,'I'))
+                    errorStrList.append(getSheelValue(sheel,i,'K'))
                 except:
                     errorStrList.append('')
                 errorStrList.append(f'{sigName} 信号缺失')
                 errsh.append(getErrList(errorStrList))
                 continue
 
+            whitelistdbcSigNames.append(sigName)
             try:
-                valueMapStr = getSheelValue(sheel,i,'F')
+                valueMapStr = getSheelValue(sheel,i,'H')
                 valueMapStrs = re.findall(e_i,valueMapStr,re.A)
                 for valueMapStrIndex in range(len(valueMapStrs)):
                     if valueMapStrIndex % 2 != 0 : continue
@@ -523,7 +523,6 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],configPath=""):
         #     printRed(f"{sigName} 信号格式错误")
         #     continue 
 
-    print(jsUp)
     writeJs(down_config,jsDown)
     writeJs(up_config,jsUp)
 

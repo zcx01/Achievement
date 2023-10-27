@@ -88,8 +88,10 @@ def addConfigByTopicCan(startRow,endRow):
          initWarnFile()
 
     whitelistdbcSigNames = addConfigTopicCan(values,len(values),GoValue,rowRangs)
+    printGreen('写入白名单中...')
     if whitelistdbcSigNames != None and len(whitelistdbcSigNames) != 0:
         addCan_parse_whitelist(whitelistdbcSigNames)
+    printGreen('执行完成')
 
 if __name__ == '__main__':
     parse = argparse.ArgumentParser(description='生成配置文件的脚本')
