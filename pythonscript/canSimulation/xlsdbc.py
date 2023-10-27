@@ -17,6 +17,7 @@ if __name__ == "__main__":
         a+w:把dbc目录下dbc文件中,所有的信号都写入白名单,
         a+s:把指定路径下的CAN矩阵中的指定的信号添加进入dbc
         m+w:把msg加入到白名单当中
+        a+fm:过滤出来在CAN矩阵没有但是dbc中有的msg
         ''')
 
     parse.add_argument('-c', '--config', help='配置文件路径',
@@ -42,7 +43,8 @@ if __name__ == "__main__":
     parse.add_argument('-sc', '--SigNameChinese', help='获取信号的中文描述',default=[], nargs='+') 
     parse.add_argument('-fc', '--fileChinese', help='获取文件中信号的中文描述',default=[], nargs='+')
     parse.add_argument('-p', '--projectPath', help='项目路径',default='', nargs='?',type=str)
-    parse.add_argument('-i', '--addInputMsgConfig', help='添加input_signal_config.json文件,参数是16进制的信号名',default=[], nargs='?',type=str)                   
+    parse.add_argument('-i', '--addInputMsgConfig', help='添加input_signal_config.json文件,参数是16进制的信号名',default=[], nargs='?',type=str) 
+    parse.add_argument('-fm', '--filterateMsg', help='过滤出来在CAN矩阵没有但是dbc中有的msg', nargs='?')                   
     arg = parse.parse_args()
 
     initWarnFile()
@@ -50,6 +52,11 @@ if __name__ == "__main__":
     if canmatrix == None:
         jsConfig = getJScontent(arg.config)
         canmatrix = getKeyPath("canmatrix", jsConfig)
+        canmatrix_version = getKeyPath("canmatrix_version", jsConfig)
+        if canmatrix_version != '':
+            with open(canmatrix_version, 'a') as file:
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                file.write(f"{current_time} {canmatrix}" + '\n')
 
     if '-d' in sys.argv and '-r' in sys.argv and '-t' in sys.argv:
         sigNameChanged(arg.config, arg.dbcPath, arg.resultPath, arg.twoMatrix)
@@ -92,3 +99,5 @@ if __name__ == "__main__":
         handleProjectPath(arg.config,arg.projectPath)
     elif '-i' in sys.argv:
         addInputMsgConfig(arg.config,arg.addInputMsgConfig)
+    elif '-fm' in sys.argv:
+        canMatrixNoMsg(arg.config,canmatrix)

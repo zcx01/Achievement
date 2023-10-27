@@ -12,5 +12,6 @@
     "down": "qt/ic_qt/resources/config/down_config.json",
     "up": "qt/ic_qt/resources/config/up_config.json",
     "checkSigIgnore": "src/ic_service/parser/vendor/check_sig_ignore.json",
-    "input_signal_config": "prebuilts/ic/config/ic_service/input_signal_config.json"
+    "input_signal_config": "prebuilts/ic/config/ic_service/input_signal_config.json",
+    "canmatrix_version": "src/ic_service/parser/canmatrixversion.txt"
 }
