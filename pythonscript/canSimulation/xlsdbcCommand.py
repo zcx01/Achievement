@@ -173,6 +173,7 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
     if len(canmatrix) == 0:
         canmatrix = getKeyPath("canmatrix", jsConfig)
         isAllAdd = False
+    
     print(canmatrix)
 
     dbcfile = getKeyPath("dbcfile", jsConfig)
@@ -231,12 +232,12 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
             if writedbcresult == WriteDBCResult.AlreadyExists:
                 if isAllAdd:
                     # printYellow(f'{sig.getMessage_Sig()} 被替换')
-                    dbc.repalceSig(sig)
+                    dbc.repalceSig(sig,msg=msg)
                     isWriteWhite = True
                 else:
                     isRepalce = input(f'{sig.getMessage_Sig()} 是否替換 y/n ')
                     if 'y' in isRepalce:
-                        dbc.repalceSig(sig)
+                        dbc.repalceSig(sig,msg=msg)
                         isWriteWhite = True
             if writedbcresult == WriteDBCResult.WriteComplete:
                 isWriteWhite = True
@@ -346,10 +347,48 @@ def filterNoUser(no_use, sig_results, use_sig):
             sig_results_cpoy.append(sig_result)
     return sig_results_cpoy
 
+
+def canMatrixNoMsg(configPath,canmatrix):
+    jsConfig = getJScontent(configPath)
+    print(canmatrix)
+    canmatrixName = os.path.basename(canmatrix)
+
+    dbcfile = getKeyPath("dbcfile", jsConfig)
+    print(dbcfile)
+    book = xlrd.open_workbook(canmatrix)
+    assert isinstance(book, Book)
+
+    messageSheel = book.sheet_by_name(Message_Matrix)
+    assert isinstance(messageSheel, Sheet)
+
+    msgs = getMessageInfo(messageSheel)
+    assert isinstance(msgs, dict)
+    if len(msgs) == 0:
+        printRed("messaage 不存在或者解析错误")
+        return
+    
+    dbc = Analyze(dbcfile)
+    msgInfos = dbc.getAllMessage()
+    for msgsSubId,msg in msgs.items():
+        assert isinstance(msg,MessageInfo)
+        can_Channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
+        dbcMsgInfos = msgInfos[can_Channel]
+        if msg.messageId in dbcMsgInfos:
+            del msgInfos[can_Channel][msg.messageId]
+
+    for can_Channel in msgInfos:
+        print(f'{can_Channel}不存在的msg')
+        for msgInfo in msgInfos[can_Channel]:
+            print(f'0x{msgInfo}')
+           
+    printGreen('执行完成')
+                    
 def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser):
     jsConfig = getJScontent(configPath)
     if len(fristMatrix) == 0:
         fristMatrix = getKeyPath("canmatrix", jsConfig)
+    fristMatrixName = os.path.basename(fristMatrix)
+    twoMatrixName = os.path.basename(twoMatrix)
     book1 = xlrd.open_workbook(fristMatrix)
     sheel1 = book1.sheet_by_name(Sig_Matrix)
     book2 = xlrd.open_workbook(twoMatrix)
@@ -409,7 +448,7 @@ def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser
     no_use = []
     #过滤掉没有使用信号
     if isfilterNoUser:
-        no_use.insert(0, '--------------目前还没有使用的信号--------------')
+        no_use.insert(0, f'--------------在白名单中不存在的-------------')
         use_sig = getUseMessage_Sig(jsConfig)
         results = filterNoUser(no_use, results, use_sig)
         messageDifSig = filterNoUser(no_use, messageDifSig, use_sig)
@@ -420,14 +459,14 @@ def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser
     statistics.append('--------------统计--------------')
     statistics.append(f'存在差异的信号有{len(results)}个')
     statistics.append(f'message不同的信号{len(messageDifSig)}个')
-    statistics.append(f'在原来的矩阵是不存在的有{len(noExit)}个')
-    statistics.append(f'删除信号{len(deleteSig)}个')
+    statistics.append(f'在{fristMatrixName}中不存在的有{len(noExit)}个')
+    statistics.append(f'在{twoMatrixName}中不存在的有{len(deleteSig)}个')
     statistics.append("具体如下:")
     statistics.append(" ")
 
     messageDifSig.insert(0, '---------------不同message的信号----------------')
-    deleteSig.insert(0, '---------------删除的信号----------------')
-    noExit.insert(0, '--------------不在存在的信号--------------')
+    noExit.insert(0, f'--------------{fristMatrixName}不在存在的信号--------------')
+    deleteSig.insert(0, f'--------------{twoMatrixName}不存在的信号-------------')
 
     if len(resultPath) != 0:
         print(f"写入{resultPath}文件...")
@@ -654,7 +693,7 @@ def addCan_parse_whitelist(sigs):
         message=analy.getMessage_Id_BySig(sig)
         if len(message)==0:
             print(f'{sig} 对应的message不存在')
-            break
+            continue
         messagesig=analy.getMessage_Id_Sig(sig)
         can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
         WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,False)
