@@ -14,8 +14,8 @@ sudo pip install pyperclip
 sudo apt-get install xsel xclip 
 
 4.excel
-pip install xlrd==1.2.0
 注意：xlrd 新版本只支持 xls 格式，所以我们这里指定安装 1.2.0 老版本，可以支持xlsx格式
+pip install xlrd==1.2.0
 pip install openpyxl
 
 5.模拟键盘、鼠标

@@ -5,10 +5,11 @@ from PyQt5 import *
 jsContent = None
 UiKey= {}
 projectUis= []
-def getJsValue(key):
+configFilePath=''
+def getJsValue(key,defaultValue=''):
     if jsContent == None:
-        return ""
-    return jsContent.get(key,"")
+        return defaultValue
+    return jsContent.get(key,defaultValue)
 
 def setJsaValue(key,value):
     jsContent[key] = value
@@ -20,12 +21,31 @@ def getProjectPath(prjectName):
         return projectCommonPath.replace('{projectName}',prjectName)
     return ''
 
+def addGeneratedFiles(filePath):
+    global jsContent
+    if 'generatedFiles' not in jsContent:
+        jsContent['generatedFiles'] = []
+    jsContent['generatedFiles'].append(filePath)
+    saveConfigKey('generatedFiles')
+
+def getGeneratedFiles():
+    return getJsValue('generatedFiles',[])
+
+def removeGeneratedFiles():
+    generatedFiles = getGeneratedFiles()
+    for generatedFile in generatedFiles:
+        os.rename(generatedFile)
+    jsContent['generatedFiles'] = []
+    saveConfigKey('generatedFiles')
+
 def initUI(ui,configPath,projectNameLayout,projectBtnLayout,projectBtnFun,projecGroup):
     assert isinstance(ui,Ui_MainWindow)
     global jsContent
     global UiKey
     global projectUis
-    jsContent = getJScontent(configPath)
+    global configFilePath
+    configFilePath = configPath
+    jsContent = getJScontent(configFilePath)
     UiKey[ui.ipLE] = 'ip'
     UiKey[ui.userLE] = 'user'
     UiKey[ui.pwLE] = 'pw'
@@ -89,6 +109,8 @@ def removePrject(projectNameLayout,projectBtnLayout,btn):
         index = index + 1
 
 def saveUI(ui,configPath):
+    if configPath == '':
+        configPath = configFilePath
     assert isinstance(ui,Ui_MainWindow)
     for le,keyValue in UiKey.items():
         setJsaValue(keyValue,le.text())
@@ -98,3 +120,8 @@ def saveUI(ui,configPath):
         projectNames[labeText] = lineEeditText
     setJsaValue('projectNames',projectNames)
     writeJs(configPath,jsContent)
+
+def saveConfigKey(key):
+    tmepJsContent = getJScontent(configFilePath)
+    tmepJsContent[key] = jsContent[key]
+    writeJs(configFilePath,jsContent)

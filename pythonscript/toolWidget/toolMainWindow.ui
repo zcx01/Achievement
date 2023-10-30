@@ -677,6 +677,13 @@ p, li { white-space: pre-wrap; }
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="clearFileBtn">
+        <property name="text">
+         <string>清理</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="saveBtn">
         <property name="text">
          <string>应用</string>

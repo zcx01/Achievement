@@ -12,6 +12,7 @@ def keyStrCmd(cmd,t=0.3,out='$',auto_exit=True):
     if disPlayMsg != None:
         disPlayMsg(cmd)
     keyStr(cmd,t,out,auto_exit)
+       
 
 def setDisPlayMsg(disPlayMsgFun):
     global disPlayMsg
@@ -55,7 +56,7 @@ def trHanle(xlsPath):
     icwarning_config = getCurrentProjectPath()+'/qt/ic_qt/resources/config/icwarning_config.json'
     keyStrCmd(f'scp {xlsPath} {REMOTEHOST}:{trXlsPathS}')
     sshIp()
-    # keyStrCmd(f'rm {trXlsPathS}test',disPlayMsg)
+    keyStrCmd(f'rm {trXlsPathS}test',disPlayMsg)
     keyStrCmd(f'python3 {icTextLE} -t {translate} -j {icwarning_config} -i {trXlsPathS}{xlsPathFileName}')
     closeIp()
     disPlayMsg('执行完成')
@@ -78,11 +79,14 @@ def trChangedHanle(downLoadPath,setTrChangedFilePath):
     keyStrCmd(f'python3 {icTextLE} -t {translate} -j {icwarning_config} -c {trXlsPathS}{xlsPathFileName}')
     closeIp()
     keyStrCmd(f'scp {REMOTEHOST}:{trXlsPathS}{xlsPathFileName} {downLoadPath}')
+    time.sleep(6)
     sshIp()
     keyStrCmd(f'rm {trXlsPathS}{xlsPathFileName}')
     closeIp()
     disPlayMsg('执行完成')
-    setTrChangedFilePath(f'{downLoadPath}/{xlsPathFileName}')
+    trChangedFilePath = f'{downLoadPath}/{xlsPathFileName}'
+    addGeneratedFiles(trChangedFilePath)
+    setTrChangedFilePath(trChangedFilePath)
 
 class CanHanleType(Enum):
     UpdateXls = 1
@@ -91,11 +95,17 @@ class CanHanleType(Enum):
 
 def canHanle(handleType,texts):
     assert isinstance(handleType,CanHanleType)
-    REMOTEHOST = sshIp()
     xls_can_path =  getCurrentProjectPath()+'/xls_transform_dbc_tool/'
+    REMOTEHOST = sshIp()
     keyStrCmd(f'cd {xls_can_path}',)
     if handleType ==  CanHanleType.UpdateXls:
         keyStrCmd(f'python3 sig_google.py')
+        closeIp()
+        downLoadPath = getJsValue('downLoadPath')
+        keyStrCmd(f'scp {REMOTEHOST}:{xls_can_path}errSig.xls {downLoadPath}')
+        errSig = f'{downLoadPath}/errSig.xls'
+        openFileUseDefault(errSig)
+        addGeneratedFiles(errSig)
     
     if texts == None or len(texts) == '':
         disPlayMsg('请添加信号名')
@@ -103,9 +113,12 @@ def canHanle(handleType,texts):
     
     if handleType == CanHanleType.AddSig:
         keyStrCmd(f'python3 xlsdbc.py -s {texts}')
+        closeIp()
     elif handleType == CanHanleType.AddWSig:
         keyStrCmd(f'python3 xlsdbc.py -w {texts}')
+        closeIp()
     disPlayMsg('执行完成')
+    return ''
 
 def getPushFiles():
     pushFile = getJsValue('pushFile')

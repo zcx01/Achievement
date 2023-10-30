@@ -90,6 +90,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(msg)
 
     def setTrChangedFilePath(self,path):
+        print(path)
         self.trChangedFilePaths.append(path)
 
     def openTrChangedFile(self):
