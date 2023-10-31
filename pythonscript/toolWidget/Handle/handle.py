@@ -75,16 +75,13 @@ def trChangedHanle(downLoadPath,setTrChangedFilePath):
     trXlsPathS = os.path.dirname(icTextLE)+"/"
     translate = getCurrentProjectPath()+'/qt/ic_qt/resources/translate'
     icwarning_config = getCurrentProjectPath()+'/qt/ic_qt/resources/config/icwarning_config.json'
-    REMOTEHOST = sshIp()
-    keyStrCmd(f'python3 {icTextLE} -t {translate} -j {icwarning_config} -c {trXlsPathS}{xlsPathFileName}')
-    closeIp()
-    keyStrCmd(f'scp {REMOTEHOST}:{trXlsPathS}{xlsPathFileName} {downLoadPath}')
-    time.sleep(6)
-    sshIp()
-    keyStrCmd(f'rm {trXlsPathS}{xlsPathFileName}')
-    closeIp()
-    disPlayMsg('执行完成')
     trChangedFilePath = f'{downLoadPath}/{xlsPathFileName}'
+    REMOTEHOST = sshIp()
+    keyStrCmd(f'python3 {icTextLE} -t {translate} -j {icwarning_config} -c {trXlsPathS}changed.xlsx')
+    closeIp()
+    keyStrCmd(f'scp {REMOTEHOST}:{trXlsPathS}changed.xlsx {trChangedFilePath}')
+    interact()
+    disPlayMsg('执行完成')
     addGeneratedFiles(trChangedFilePath)
     setTrChangedFilePath(trChangedFilePath)
 
@@ -103,6 +100,7 @@ def canHanle(handleType,texts):
         closeIp()
         downLoadPath = getJsValue('downLoadPath')
         keyStrCmd(f'scp {REMOTEHOST}:{xls_can_path}errSig.xls {downLoadPath}')
+        interact()
         errSig = f'{downLoadPath}/errSig.xls'
         openFileUseDefault(errSig)
         addGeneratedFiles(errSig)
