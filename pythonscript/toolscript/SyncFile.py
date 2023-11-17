@@ -1,31 +1,34 @@
 #!/bin/python
 import os
 import argparse
+import shutil
 
 File_Dict={
     "/home/chengxiongzhu/Achievement/pythonscript/analyze_dbc/analyze_dbc_file.py":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/xls_transform_dbc_tool/analyze_dbc/analyze_dbc_file.py",
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/analyze_dbc/analyze_dbc_file.py",
     "/home/chengxiongzhu/Achievement/pythonscript/analyze_dbc/analyze_dbc.py":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/xls_transform_dbc_tool/analyze_dbc/analyze_dbc.py",
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/analyze_dbc/analyze_dbc.py",
     "/home/chengxiongzhu/Achievement/pythonscript/commonfun.py":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/xls_transform_dbc_tool/analyze_dbc/commonfun.py",
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/analyze_dbc/commonfun.py",
     "/home/chengxiongzhu/Achievement/pythonscript/canSimulation/xlsdbcCommand.py":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/xls_transform_dbc_tool/xlsdbcCommand.py",
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/xlsdbcCommand.py",
     "/home/chengxiongzhu/Achievement/pythonscript/canSimulation/xlsdbc.py":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/xls_transform_dbc_tool/xlsdbc.py",
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/xlsdbc.py",
     "/home/chengxiongzhu/Achievement/pythonscript/analyze_dbc/config.json":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/config/can_matrix_config.json",
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/analyze_dbc/config.json",
     "/home/chengxiongzhu/Achievement/pythonscript/analyze_dbc/projectInI.py":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/config/can_matrix_projectInI.py",
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/analyze_dbc/projectInI.py",
     "/home/chengxiongzhu/Achievement/pythonscript/canSimulation/checksig.py":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/xls_transform_dbc_tool/checksig.py",
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/checksig.py",
     "/home/chengxiongzhu/Achievement/pythonscript/XlsGenerateCode_google/sig_google.py":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/xls_transform_dbc_tool/sig_google.py"
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/sig_google.py"
 }
 
 def CpFile(file1,file2):
-    cmd = f'cp -rf {file1} {file2}'
-    os.system(cmd)
+    if os.path.exists(file2):
+        os.remove(file2)
+    cmd = f'cp {file1} {file2}'
+    shutil.copy2(file1, file2)
     print(cmd)
 
 def sync(syncType):

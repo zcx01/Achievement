@@ -21,6 +21,9 @@ else
     if [ $1 == "-r" ];then
         repo forall -c "git clean -df" && repo forall -c "git reset --hard; git checkout ."
         exit 0
+    elif [ $1 == "-rh" ];then
+        git reset --soft HEAD^
+        exit 0
     else
         cd $1
     fi
@@ -55,3 +58,4 @@ else
     git rebase $prefix/$branch
     git push --no-thin $prefix HEAD:refs/for/$branch
 fi
+

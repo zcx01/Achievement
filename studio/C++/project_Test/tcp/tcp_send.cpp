@@ -1,6 +1,6 @@
-#include "tcp_client.hpp"
-#include "ObjectFactory.h"
-#include "commondefine.hpp"
+#include "tcp_send.hpp"
+#include "ic_log.h"
+#include "tcp_data_fill.hpp"
 #include <iostream>
 
 
@@ -15,28 +15,45 @@
 #include<unistd.h>
 #define MAXLINE 4096
 
-TcpClientTest::TcpClientTest(/* args */) 
+TcpSend::TcpSend(Token token) 
 {
-    connectPort("127.0.0.1",6666);
-    while (1)
-    {
-        char sendline[MAXLINE];
-        IC_LOG_INFO("send msg to server:");
-        fgets(sendline, 4096, stdin);
-        IC_LOG_INFO("send:%u",sendline);
-        if (send(sockfd, sendline, strlen(sendline), 0) < 0)
-        {
-            IC_LOG_INFO("send msg error: %s(errno: %d)", strerror(errno), errno);
-        }
-    }
+    connectPort(TCP_IP,TCP_PORT);
 }
 
-TcpClientTest::~TcpClientTest() 
+TcpSend::~TcpSend() 
 {
     if(sockfd != 0) close(sockfd);
 }
 
-int TcpClientTest::connectPort(std::string ip, int port) 
+void TcpSend::sendAppData(uint8_t *app_data, int lenght)
+{
+    TcpDataFill::fillAppDataAndCall(app_data, lenght, std::bind(&TcpSend::sendMsg, this, std::placeholders::_1, std::placeholders::_2,true));
+}
+
+void TcpSend::sendMessage(MessageData msgData,MessageBody body)
+{
+    TcpDataFill::fillMessagAndCall(msgData, body, std::bind(&TcpSend::sendAppData, this, std::placeholders::_1, std::placeholders::_2));
+}
+
+void TcpSend::setRecMessageFun(RecDataFun fun)
+{
+    m_RecMessageFun = fun;
+}
+
+void TcpSend::sendMsg(uint8_t *data, int msgLenght,bool isAck)
+{
+    if (m_RecMessageFun && isAck)
+    {
+        m_RecMessageFun(data, msgLenght);
+    }
+    TD::printHex("send msg:", data, msgLenght);
+    if (send(sockfd, data, msgLenght, 0) < 0)
+    {
+        IC_LOG_INFO("send msg error: %s(errno: %d)", strerror(errno), errno);
+    }
+}
+
+int TcpSend::connectPort(std::string ip, int port) 
 {
     IC_LOG_INFO("%s:%u",ip.c_str(),port);
     struct sockaddr_in  servaddr;
@@ -66,5 +83,3 @@ int TcpClientTest::connectPort(std::string ip, int port)
 
     return 0;
 }
-
-CUSTOMEGISTER(TcpClient,TcpClientTest)

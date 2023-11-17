@@ -1,8 +1,8 @@
 /**
-* @file         ./out/bigsur_c385/qnx/libecu_config.h
+* @file         ./out/solvang_c673/qnx/libecu_config.h
 * @author       Binxin.cao
-* @version      V20230615
-* @date         2023.06.15
+* @version      V20231025
+* @date         2023.10.25
 * @brief         
 * @note          
 * @attention    COPYRIGHT MEGA
@@ -496,7 +496,7 @@
 #define ECU_TABLE_USER_WHUD                                     477 /*WHUD设置*/
 #define ECU_TABLE_USER_MUSICAL_RHYTHM                           478 /*音乐律动设置*/
 #define ECU_TABLE_USER_MAIN_DRIVER_AIRBAG                       479 /*主驾安全气囊软开关*/
-#define ECU_TABLE_USER_PASSENGER_AIRBAG                         480 /*副驾安全气囊软开关*/
+#define ECU_TABLE_USER_PASSENGER_AIRBAG                         480 /*Passenger airbag*/
 #define ECU_TABLE_USER_SIMULATE_SOUND                           481 /*模拟声浪*/
 #define ECU_TABLE_USER_INTERNEL_LIGHT_WELCOME                   482 /*车内灯光迎宾*/
 #define ECU_TABLE_USER_REAR_SUNROOF                             483 /*后排天窗配置*/
@@ -529,7 +529,7 @@
 #define ECU_TABLE_USER_COUNTRY_OR_REGION                        510 /*country or region*/
 #define ECU_TABLE_USER_HEATING_GEAR                             511 /*Heating gear*/
 #define ECU_TABLE_USER_VENTILATION_GEAR                         512 /*Ventilation gear*/
-#define ECU_TABLE_USER_LIGHT_SENSOR_TYPE                        513 /*光线传感器类型*/
+#define ECU_TABLE_USER_LIGHT_SENSOR_TYPE                        513 /*自动亮度光线传感器类型(仅 C385 适用)*/
 #define ECU_TABLE_USER_STEERING_MEM                             514 /*电动调节方向盘记忆*/
 #define ECU_TABLE_USER_PASSENGERSEAT_MEMORY                     515 /*副驾座椅记忆*/
 #define ECU_TABLE_USER_AUTO_FOG_REMOVAL                         516 /*自动除雾*/
@@ -637,8 +637,85 @@
 #define ECU_TABLE_USER_PPMI                                     618 /*PPMI*/
 #define ECU_TABLE_USER_ICM_IDLE_START_STOP_TYPE                 619 /*Idle start-stop type*/
 #define ECU_TABLE_USER_FAPA_HIL                                 620 /*视频盒子内部配置字*/
-#define ECU_TABLE_USER_C385_VEHICLE_TYPE                        621 /*C385系列车型类别*/
+#define ECU_TABLE_USER_C385_VEHICLE_TYPE                        621 /*C385系列车型类别(车模类别)*/
 #define ECU_TABLE_USER_DVR_STORAGE_MEDIUM                       622 /*DVR存储方式*/
+#define ECU_TABLE_USER_IC_ELK_LIGHT_TIPS                        623 /*仪表-ELK左右灯光提示*/
+#define ECU_TABLE_USER_DMS_CMS_TYPE                             624 /*镁佳DMS_CMS算法地区*/
+#define ECU_TABLE_USER_DISCHARGE_TYPE                           625 /*放电功能类型*/
+#define ECU_TABLE_USER_STOP_CHARGING                            626 /*直流充电功能-停止充电*/
+#define ECU_TABLE_USER_RANGE_TYPE                               627 /*续航里程类型*/
+#define ECU_TABLE_USER_SCENARIO_REBUILD                         628 /*场景重构*/
+#define ECU_TABLE_USER_OVERSEAS_LANGUAGE                        629 /*海外版系统语言*/
+#define ECU_TABLE_USER_ALCOLOCK                                 630 /*酒精锁*/
+#define ECU_TABLE_USER_OVERSEAS_MUSIC                           631 /*海外多媒体-音乐*/
+#define ECU_TABLE_USER_CHILD_LEAVE_CHECK                        632 /*儿童遗留检测*/
+#define ECU_TABLE_USER_VOICE_VERSION                            633 /*语音版本*/
+#define ECU_TABLE_USER_STOVE_MODE_SEAT_HEAT                     634 /*炉火模式-座椅加热*/
+#define ECU_TABLE_USER_LOW_SPEED_PEDESTRIAN_WARNING             635 /*低速行人自动报警音开关*/
+#define ECU_TABLE_USER_SYSTEM_BACKGROUND_MODE                   636 /*系统设置-背景模式*/
+#define ECU_TABLE_USER_ELECTRIC_UNHOOK                          637 /*电动脱钩*/
+#define ECU_TABLE_USER_ECALL_LAWS                               638 /*e-CALL法规*/
+#define ECU_TABLE_USER_DRAGGING_MODE                            639 /*拖挂模式*/
+#define ECU_TABLE_USER_TIRE_PRESSURE_FAULT_COLOR                640 /*胎压显示故障颜色*/
+#define ECU_TABLE_USER_PASSENGER_CUSHION                        641 /*副驾坐垫倾角调节*/
+#define ECU_TABLE_USER_CONSOLE                                  642 /*Console类型*/
+#define ECU_TABLE_USER_REAR_ROOF_SCREEN                         643 /*二排车顶屏*/
+#define ECU_TABLE_USER_REAR_HAVC                                644 /*后排空调*/
+#define ECU_TABLE_USER_HEADREST_AUDIO                           645 /*头枕音响*/
+#define ECU_TABLE_USER_SEAT_NUMBER                              646 /*座位数*/
+#define ECU_TABLE_USER_REAR_SEAT_HEATING_LEFT                   647 /*二排左侧座椅加热*/
+#define ECU_TABLE_USER_REAR_SEAT_HEATING_RIGHT                  648 /*二排右侧座椅加热*/
+#define ECU_TABLE_USER_REAR_SEAT_VENTILATE_LEFT                 649 /*二排左侧座椅通风*/
+#define ECU_TABLE_USER_REAR_SEAT_VENTILATE_RIGHT                650 /*二排右侧座椅通风*/
+#define ECU_TABLE_USER_REAR_SEAT_MASSAGE_LEFT                   651 /*二排左侧座椅按摩*/
+#define ECU_TABLE_USER_REAR_SEAT_MASSAGE_RIGHT                  652 /*二排右侧座椅按摩*/
+#define ECU_TABLE_USER_ZERO_GRAVITY_SEATS                       653 /*零重力座椅*/
+#define ECU_TABLE_USER_SECOND_BLUETOOTH                         654 /*副蓝牙*/
+#define ECU_TABLE_USER_INCUBATOR                                655 /*恒温箱*/
+#define ECU_TABLE_USER_STREAMING_REAR_MIRROR                    656 /*流媒体后视镜*/
+#define ECU_TABLE_USER_DVR_CAMERA                               657 /*DVR摄像头位置*/
+#define ECU_TABLE_USER_BATTERY_PACK_CONFIG                      658 /*电池包配置*/
+#define ECU_TABLE_USER_NEW_STEER                                659 /*新课题-转向*/
+#define ECU_TABLE_USER_NEW_SUSPENSION_CHASSIS                   660 /*新课题-悬架+底盘域控*/
+#define ECU_TABLE_USER_NEW_FCV                                  661 /*新课题- FCV*/
+#define ECU_TABLE_USER_NEW_800V                                 662 /*新课题-800V超充*/
+#define ECU_TABLE_USER_ELECTRONIC_GEAR_SHIFT_STRU               663 /*Electronic Gear Shift Structure*/
+#define ECU_TABLE_USER_NUM_OF_SPEARKERS                         664 /*Number of full-range speakers*/
+#define ECU_TABLE_USER_HEADLIGHT_TYPE                           665 /*Headlight Type*/
+#define ECU_TABLE_USER_THREE_ROW_AIR_COND                       666 /*Three Row Independent Air Conditioning*/
+#define ECU_TABLE_USER_ELECTRONIC_AUX_HEATING                   667 /*Electric auxiliary heating*/
+#define ECU_TABLE_USER_AIR_COND_MODET                           668 /*Air conditioning modet*/
+#define ECU_TABLE_USER_WELCOME_LIGHT_MODE                       669 /*Intelligent welcome light mode*/
+#define ECU_TABLE_USER_REAR_ASOP_LIGHT                          670 /*Rear atmosphere light*/
+#define ECU_TABLE_USER_TENCENT_ECOLOGY                          671 /*Tencent Ecology*/
+#define ECU_TABLE_USER_CIR                                      672 /*CIR*/
+#define ECU_TABLE_USER_REAT_WINDOW_HEATING                      673 /*Rear Window With Heating Function*/
+#define ECU_TABLE_USER_TWO_AIR_COND                             674 /*Two-row air conditioner*/
+#define ECU_TABLE_USER_START_STOP_SCHEMA                        675 /*Start-stop schema type*/
+#define ECU_TABLE_USER_MAIN_DRIVER_SEAT_MASSAGE                 676 /*Main driver seat massage function*/
+#define ECU_TABLE_USER_PHEV_TYPE                                677 /*PHEV type*/
+#define ECU_TABLE_USER_COKPIT_ECOLOGY_SOFTWARE                  678 /*Cockpit ecology software*/
+#define ECU_TABLE_USER_SIMULATED_SOUND_WAVE                     679 /*Simulated sound wave*/
+#define ECU_TABLE_USER_CFG_TOTODOMTRBKPENABLE                   680 /*里程备份使能标志*/
+#define ECU_TABLE_USER_AIR_COND                                 681 /*Intelligent mode of air conditioning*/
+#define ECU_TABLE_USER_SPECIAL_PARK_MODE                        682 /*Special parking mode*/
+#define ECU_TABLE_USER_CPD                                      683 /*CPD*/
+#define ECU_TABLE_USER_NOC                                      684 /*NOC*/
+#define ECU_TABLE_USER_HIGHWAY_ASSISTANCE                       685 /*Highway Assistance*/
+#define ECU_TABLE_USER_SPEED_ASSISTANCE                         686 /*Intelligent Speed Assistance*/
+#define ECU_TABLE_USER_FRONT_FOG_LAMP                           687 /*前雾灯*/
+#define ECU_TABLE_USER_FRONT_AIR_HEATING                        688 /*前风挡加热*/
+#define ECU_TABLE_USER_PURE_ELECTRIC_MILEAGE                    689 /*纯电里程*/
+#define ECU_TABLE_USER_IAWD                                     690 /*ICM AWD*/
+#define ECU_TABLE_USER_PILGRIMAGE_COMPASS                       691 /*朝拜指南针*/
+#define ECU_TABLE_USER_DETECTION_CHILDREN                       692 /*车内儿童检测*/
+#define ECU_TABLE_USER_LANGUAGE_RECOGNITION                     693 /*语言识别方式*/
+#define ECU_TABLE_USER_PAB_SHIELDING                            694 /*PAB屏蔽*/
+#define ECU_TABLE_USER_SALES_AREA                               695 /*销售区域（ICC）*/
+#define ECU_TABLE_USER_BATTERY_CAPACITY                         696 /*电池包容量*/
+#define ECU_TABLE_USER_UNIT_CHANGE                              697 /*单位切换*/
+#define ECU_TABLE_USER_REAR_FOG_LAMPS                           698 /*车辆配置-后雾灯*/
+#define ECU_TABLE_USER_REAR_SEAT_BELT_HUMAN_DETECTION           699 /*后排安全带人员检测*/
 
 
 

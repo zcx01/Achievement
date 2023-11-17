@@ -16,7 +16,8 @@ def generate(oriDirs,dir):
                 if os.path.isfile(filePath) and dirpath != dir:
                     try:
                         if fileName in repeatPaths:
-                            cmd = input(f'{fileName}是存在，原来的是{repeatPaths[fileName]},现在是{filePath} 是否替换y/n')
+                            cmd = 'y'
+                            # cmd = input(f'{fileName}是存在，原来的是{repeatPaths[fileName]},现在是{filePath} 是否替换y/n')
                             if cmd == "n":
                                 continue
                         repeatPaths[fileName] = filePath

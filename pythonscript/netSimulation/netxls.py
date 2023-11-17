@@ -26,8 +26,7 @@ def getValueInt(src, row, col, lenght=-1):
                 if c != '0':
                     isallZero = False
                     break
-
-        if not isallZero or 'e' in value.lower():
+        if not isallZero or 'e' in value.lower():          
             return eConverf(float(value))
         return int(values[0])
     except:
@@ -37,43 +36,46 @@ def getValueInt(src, row, col, lenght=-1):
 
 def getSigInfo(sheel, row):
     sig = NetSigInfo()
-    sig.subNet = str(getValue(sheel, row, 'A')).upper()
-    sig.Sender = str(getValue(sheel, row, 'B')).upper()
-    temp = str(getValue(sheel, row, 'F'))
+    sig.subNet = str(getValue(sheel, row, sig_line_subNet)).upper()
+    sig.Sender = str(getValue(sheel, row, sig_line_Sender)).upper()
+    temp = str(getValue(sheel, row, sig_line_name))
     temps = re.findall(e_i, temp, re.A)
     sig.name = "_".join(temps)
-    sig.chineseName = str(getValue(sheel, row, 'G'))
-    sig.messageId = str(getValue(sheel, row, 'H')).split(".")[0].replace('0x', '')
-    sig.cycle = getValueInt(sheel, row, 'I')
-    sig.start_by_byte = getValueInt(sheel, row, 'J')
-    sig.length_byte = getValueInt(sheel, row, 'K')
-    sig.length_bits = getValueInt(sheel, row, 'L')
-    sig.factor = getValueInt(sheel, row, 'M')
+    sig.chineseName = str(getValue(sheel, row, sig_line_chineseName))
+    sig.messagaType = str(getValue(sheel, row, sig_line_messageId)).split(".")[0].replace('0x', '')
+    sig.cycle = getValueInt(sheel, row, sig_line_cycle)
+    sig.start_by_byte = getValueInt(sheel, row, sig_line_start_by_byte)
+    sig.length_byte = getValueInt(sheel, row, sig_line_length_byte)
+    if len(sig_line_length_bits) !=0:
+        sig.length_bits = getValueInt(sheel, row, sig_line_length_bits)
+    else:
+        sig.length_bits = 8 * sig.length_byte
+    sig.factor = getValueInt(sheel, row, sig_line_factor)
     if sig.factor == float(0) and len(sig.name) != 0:
         printYellow(f'{sig.name} 缩放不能为0，此处修改成1,行号为{row}')
         sig.factor = 1
-    sig.offset = getValueInt(sheel, row, 'N')
-    sig.phy_min = getValueInt(sheel, row, 'O')
-    sig.phy_max = getValueInt(sheel, row, 'P', sig.length_bits)
-    if getValue(sheel, row, 'Q') == "Signed":
+    sig.offset = getValueInt(sheel, row, sig_line_Offset)
+    sig.phy_min = getValueInt(sheel, row, sig_line_min)
+    sig.phy_max = getValueInt(sheel, row, sig_line_max, sig.length_bits)
+    if getValue(sheel, row, sig_line_dataType) == "Signed":
         sig.dataType = "-"
-    sig.SetUnit(str(getValue(sheel, row, 'R')))
+    sig.SetUnit(str(getValue(sheel, row,sig_line_unit)))
     if ISUSEDBCENUM: sig.enum = str(getValue(sheel, row, 14))
     try:
-        if str(getValue(sheel, row, 'T')) != 'nan':
+        if str(getValue(sheel, row, sig_line_initValue)) != 'nan':
             sig.initValue = int(getValue(sheel, row, 15), 16)  # 十进制
     except:
         pass
-    sig.invalidValue = getValue(sheel, row, 'U')
-    sig.Recevier = getValue(sheel, row, 'X')
+    sig.invalidValue = getValue(sheel, row, sig_line_invalidValue)
+    sig.Recevier = getValue(sheel, row, sig_line_Recevier)
     return sig
 
 def appoint(sig,wirteSigName, isMsg): #是否是指定添加的信号
     assert isinstance(sig,NetSigInfo)
     if not isMsg:
-        return sig.name.upper() == wirteSigName.upper() or sig.messageId+sig.name.upper() == wirteSigName.upper()
+        return sig.name.upper() == wirteSigName.upper() or sig.messagaType+sig.name.upper() == wirteSigName.upper()
     else:
-        return sig.messageId == wirteSigName.upper()
+        return sig.messagaType == wirteSigName.upper()
 
 def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
     jsConfig = getJScontent(configPath)
@@ -89,8 +91,6 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
     assert isinstance(book, Book)
 
     sheel = book.sheet_by_name(Sig_Matrix)
-    messageSheel = book.sheet_by_name(Message_Matrix)
-    assert isinstance(messageSheel, Sheet)
     isFind = False
 
     net = AnalyzeNetParserFile(netfile)
@@ -102,13 +102,15 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
             realMin = (float(sig.phy_min)-float(sig.offset)) / float(sig.factor)
             realMax = (float(sig.phy_max)-float(sig.offset)) / float(sig.factor)
             if realMin < 0 and sig.dataType == "+":
-                printRed(f'{sig.name} 极小值小于0,最小值为{sig.phy_min},raw值{realMin}')
+                phy_min =  float(sig.offset)
+                printRed(f'{sig.name} 极小值小于0,表中最小物理值值为{sig.phy_min},能达到的最小物理值为{phy_min}')
                 continue
             if realMax > pow(2, sig.length_bits)-1 and sig.phy_max != pow(2, sig.length_bits)-1:
-                printRed(f'{sig.name} 极大值大于长度,最大值为{sig.phy_max},raw值{realMax}，极限值为{pow(2, sig.length_bits)}')
+                phy_max = (pow(2, sig.length_bits)-1) * float(sig.factor) + float(sig.offset)
+                printRed(f'{sig.name} 极大值大于长度,表中最大物理值为{sig.phy_max}，能达到的最大物理值为{phy_max}')
                 continue
             if sig.phy_min == sig.phy_max:
-                printRed(f"{sig.name} 最大值和最小值相等最小值为{sig.length_bits},最大值为{sig.phy_max}")
+                printRed(f"{sig.name} 最大值和最小值相等值为{sig.phy_max}")
                 continue
 
             isFind = True

@@ -41,7 +41,7 @@ class NetSigInfo(object):
         self.Recevier=''
         self.Sender=''
         self.cycle=0
-        self.messageId ='' 
+        self.messagaType = 0x0
         #----------代码中独有的------------
         self.structRow=-1
         self.externRow=-1
@@ -66,9 +66,16 @@ class NetSigInfo(object):
     def getExtern(self):
         return 'extern struct NetSignal Net_{};'.format(self.name)
 
-    def getNetMsg(self):
+    def getNetName(self):
         return '	&Net_{},'.format(self.name)
+    
+    def getExternNetMsg(self):
+        return f'extern struct NetSignal * {NetSigInfo.getNetMsgName(self.messagaType)}[];'
 
+    @staticmethod
+    def getNetMsgName(messagaType):
+        return f'Net_{messagaType}_Msg'
+    
     def getVariableNameAndValue(self,variableName,variable,digit=0):
         if type(variable) == int and digit != 0:
             return '.{} = {}.0,'.format(variableName,variable)
@@ -114,7 +121,6 @@ class AnalyzeNetParserFile(object):
         self.maxSigRow=0
         self.analy()
 
-    
     def analy(self):
         self.netSigs={}
         self.maxSigRow=0
@@ -187,21 +193,6 @@ class AnalyzeNetParserFile(object):
                         if exist:
                             sigInfo.is_timeout = strToBool(variableValue)
 
-    @staticmethod
-    def RemoveOldbBock(lineTexts,beginStr,endStr):
-        assert isinstance(lineTexts,list)
-        tmp=[]
-        isRemove = False
-        for lineText in lineTexts:
-            if BUILDINGBLOCKSBEGIN in lineText:
-                tmp.append(lineText)
-                isRemove = True
-            elif BUILDINGBLOCKEND in lineText:
-                tmp.append(lineText)
-                isRemove = True
-            if not isRemove:
-                tmp.append(lineText)
-        return tmp
                 
     def repalceContent(self,linelist,row,content,isTip = True):
         if len(content) != 0 and row > 0:
@@ -215,11 +206,11 @@ class AnalyzeNetParserFile(object):
 
     def checkOneSigBit(self,sigInfo,useBtye):
         assert isinstance(sigInfo,NetSigInfo)
-        if sigInfo.messageId not in useBtye:
-            useBtye[sigInfo.messageId]=[]
-        conflictByte=sigInfo.getUseByte(useBtye[sigInfo.messageId])
+        if sigInfo.messagaType not in useBtye:
+            useBtye[sigInfo.messagaType]=[]
+        conflictByte=sigInfo.getUseByte(useBtye[sigInfo.messagaType])
         if len(conflictByte) != 0:
-            printRed(f'{sigInfo.name}字节有冲突，冲突的字节为{conflictByte}')
+            printRed(f'{sigInfo.name} 字节有冲突，冲突的字节为 {conflictByte}')
             return False
         return True
 
@@ -285,11 +276,50 @@ class AnalyzeNetParserFile(object):
         sigInfos=[]
         for sigInfo in allsigInfos:
             assert isinstance(sigInfo,NetSigInfo)
-            if str(sigInfo.messageId) == str(msgId):
+            if str(sigInfo.messagaType) == str(msgId):
                 sigInfos.append(sigInfo)
         self.removeSigs(sigInfos)
 
 
+    def getNetMsg(netInfos):
+        for messagaType,sigNetNames in netInfos.items():
+            with CBaseBlock('struct NetSignal * '+NetSigInfo.getNetMsgName(messagaType)+'[] = {',block_segmenter=('','};')) as block_l0:
+                for sigNetName in sigNetNames:
+                    block_l0.add_code_line(sigNetName,termination='')
+        return block_l0.data
+    
+    def getMsgParserNet():
+        netName = 'NetMsg'
+        with CBaseBlock('bool parser_msg_net'+f'(struct NetSignal* {netName},int messagaType,char *data, int length) ',block_segmenter=('{','};')) as block_l0:
+            block_l0.add_code_line(f'int size = sizeof({netName})/sizeof(struct NetSignal*);',termination='')
+            block_l0.add_code_line('bool ret = true;',termination='')
+            with CBaseBlock('for (int i = 0; i < size; ++i) {', block_segmenter=('','}'), parent=block_l0) as block_l1:
+                block_l1.add_code_line(f'int start_by_byte = {netName}[i]->start_by_byte;',termination='')
+                block_l1.add_code_line(f'int signal_length_byte = {netName}[i]->length_byte;',termination='')
+                block_l1.add_code_line(f'double factor = {netName}[i]->factor;',termination='')
+                block_l1.add_code_line(f'double offset = {netName}[i]->offset;',termination='')
+                with CBaseBlock('if (signal_length_byte <= 4) {', block_segmenter=('','}'), parent=block_l1) as block_l2:
+                    block_l2.add_code_line(f'uint64_t raw_value = convertBigEndianToInt64(data+NUM_BYTES_HEAD+start_by_byte,signal_length_byte);',termination='')
+                    block_l2.add_code_line(f'double phy_value = raw_value*factor + offset;',termination='')
+                    block_l2.add_code_line(f'{netName}[i]->raw_value = raw_value;',termination='')
+                    block_l2.add_code_line(f'{netName}[i]->phy_value = phy_value;',termination='')
+                with CBaseBlock('else', block_segmenter=('','}'), parent=block_l1) as block_l3:
+                    block_l3.add_code_line(f'ret = false;',termination='')
+                with CBaseBlock('if(ret){', block_segmenter=('','}'), parent=block_l1) as block_l4:
+                    block_l4.add_code_line(f'if (net_updata_fun != NULL)',termination='')
+                    block_l4.add_code_line(f'net_updata_fun(messagaType);',termination='')
+                block_l1.add_blank_line('return ret;',termination='')
+        return block_l0.data  
+
+    def getParserNet(messagaTypes):
+        with CBaseBlock('',block_segmenter=('','')) as block_l0:
+            block_l0.add_code_line(f'PACKET_HEADER head;',termination='')
+            block_l0.add_code_line(f'memcpy(&head,data,NUM_BYTES_HEAD);',termination='')
+            for messagaType in messagaTypes:
+                with CBaseBlock(f'if(head.message_type == 0x{messagaType})', block_segmenter=('{','}'), parent=block_l0) as block_l1:
+                    block_l1.add_code_line(f'return parser_msg_net({NetSigInfo.getNetMsgName(messagaType)},messagaType,data,length);',termination='')
+        return block_l0.data
+        
     def writeFile(self,isCheck=True,isTip=True):
         if isCheck and not self.checkSigBit(): return WriteResult.SignalCoverage
         sigInfos = list(self.netSigs.values())
@@ -303,22 +333,31 @@ class AnalyzeNetParserFile(object):
                 if not isExistence: continue
                 if suffix == HEADFILNE:
                     tmp = []
+                    msgTmp = set()
                     for sigInfo in sigInfos:
                         assert isinstance(sigInfo,NetSigInfo)
                         tmp.append(sigInfo.getExtern())
+                        msgTmp.add(sigInfo.getExternNetMsg())
                     behindStr(lineTexts,BUILDINGBLOCKSBEGIN,tmp,0)
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,list(msgTmp),0)
+                    
                 
                 elif suffix == SOURCE:
                     strcutCode = []
-                    netMsg = []
+                    netMsg = {}
                     for sigInfo in sigInfos:
                         assert isinstance(sigInfo,NetSigInfo)
                         strcutCodes = sigInfo.getStrcutCode()
                         for scode in strcutCodes:
                             strcutCode.append(scode)
-                        netMsg.append(sigInfo.getNetMsg())
+                        if sigInfo.messagaType not in netMsg:
+                            netMsg[sigInfo.messagaType] = []
+                        else:
+                            netMsg[sigInfo.messagaType].append(sigInfo.getNetName())
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,self.getMsgParserNet(),0)
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,self.getNetMsg(netMsg),0)
                     behindStr(lineTexts,BUILDINGBLOCKSBEGIN,strcutCode,0)
-                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,netMsg,1)
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,self.getParserNet(netMsg.keys()),1)
                 wirteFileDicts(filename,lineTexts)
         if isTip : printGreen("写入完成")
         return WriteResult.WriteComplete

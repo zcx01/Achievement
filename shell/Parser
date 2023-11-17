@@ -8,7 +8,15 @@
 # EOF
 
 parser=$(cd `dirname ./`;pwd)
+
+if [ $# -ge 1 ]; then
+    parser=$parser/$1
+fi
 toolDir=$parser/canmatrix/
+
+if [ ! -d "$toolDir" ]; then
+    toolDir=$parser/src/ic_service/tools/canmatrix
+fi
 
 cd  $toolDir 
 make
@@ -27,7 +35,7 @@ make
 # echo "开始拷贝"
 # cp -r $toolDir/output/* $parser/src/ic_service/parser/generated/
 
-cd $parser/src/ic_service/parser
+cd $parser/src/ic_service
 git status
 
 # echo "拷贝完成"

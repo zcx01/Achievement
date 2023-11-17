@@ -1,9 +1,9 @@
-#include "tcp_service.hpp"
-#include "ObjectFactory.h"
-#include "commondefine.hpp"
+#include "tcp_receive.hpp"
+#include "ic_log.h"
 #include <iostream>
 
 
+#include<thread>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -20,18 +20,32 @@
  * 
  * */
 
-#define MAXLINE 4096
-TcpServiceTest::TcpServiceTest(/* args */) 
+TcpService::TcpService(Token token) 
 {
-    listenPort(6666);
+    data_analy.setCallFun([=](uint8_t *data, int lenght)
+                          { onMessageArrival(data, lenght); });
+    std::thread(&TcpService::listenPort, this, TCP_PORT).detach();
 }
 
-int TcpServiceTest::listenPort(int port) 
+void TcpService::onMessageArrival(uint8_t *msg, int lenght)
+{
+    for(auto fun : m_funs)
+    {
+        fun(msg,lenght);
+    }
+}
+
+void TcpService::addCallFun(RecDataFun fun)
+{
+    m_funs.push_back(fun);
+}
+
+int TcpService::listenPort(int port) 
 {
     int listenfd, connfd=0;
     struct sockaddr_in servaddr;
-    char buff[MAXLINE];
-    int n=0;
+    char buff[MAX_LENGHT];
+    int n = 0;
 
     /* **
      * AF_INET:IPv4、 AF_INET6:IPv6
@@ -46,7 +60,7 @@ int TcpServiceTest::listenPort(int port)
 
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);//也可以是ip地址
     servaddr.sin_port = htons(port);
     //设置端口可重用
     // int contain;
@@ -76,7 +90,7 @@ int TcpServiceTest::listenPort(int port)
     {
         if(connfd != 0)
         {
-            n = recv(connfd, buff, MAXLINE, 0);
+            n = recv(connfd, buff, MAX_LENGHT, 0);
         }
         if(n <= 0 && errno != EINTR && connfd !=0)
         {
@@ -87,16 +101,49 @@ int TcpServiceTest::listenPort(int port)
                 IC_LOG_INFO("accept socket error: %s(errno: %d)", strerror(errno), errno);
             }
         }
-        if(m_call != nullptr)
-        {
-            m_call(buff,n);
-        }
-        buff[n] = '\0';
-        IC_LOG_INFO("recv msg from client: %s", buff);
+        data_analy.add(buff,n);
     }
     IC_LOG_INFO("close:%u",listenfd);
     close(listenfd);
     return 0;
 }
 
-CUSTOMEGISTER(TcpService,TcpServiceTest)
+TcpReceive::TcpReceive()
+{
+    TcpService::instance().addCallFun([=](uint8_t *data, int lenght)
+                                      { dealAppData(data, lenght); });
+}
+
+TcpReceive::~TcpReceive()
+{
+}
+
+void TcpReceive::dealAppData(uint8_t *app_data, int app_lenght)
+{
+    if(!onAppDatarrival(app_data,app_lenght))
+    {
+        return;
+    }
+    MessageData msgData =  TcpDataAnaly::getMessageData(app_data,app_lenght);
+    if (msgData.up_down == 0x02)
+    {
+        if (!onMessageDataArrival(msgData))
+        {
+            return;
+        }
+        MessageBody msgBody = TcpDataAnaly::getMessageBody(app_data, app_lenght, convertBigEndianToInt(msgData.messageBodyLenght, sizeof(msgData.messageBodyLenght)));
+        if (!onMessageBodyArrival(msgBody))
+        {
+            return;
+        }
+        if (!onMessageDataAndBodyArrival(msgData, msgBody))
+        {
+            return;
+        }
+    }
+    else
+    {
+        IC_LOG_INFO("Receive data not is down,is:%d", (int)msgData.up_down);
+        return;
+    }
+}
