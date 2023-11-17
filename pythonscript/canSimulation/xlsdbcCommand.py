@@ -210,14 +210,21 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
             realMin = (float(sig.min)-float(sig.Offset)) / float(sig.factor)
             realMax = (float(sig.max)-float(sig.Offset)) / float(sig.factor)
             if realMin < 0 and sig.dataType == "+":
-                printRed(f'{sig.name} 极小值小于0,最小值为{sig.min},raw值{realMin}')
+                phy_min =  float(sig.offset)
+                printRed(f'{sig.name} 极小值小于0,表中最小物理值值为{sig.phy_min},能达到的最小物理值为{phy_min}')
                 continue
             if realMax > pow(2, sig.length)-1 and sig.max != pow(2, sig.length)-1:
-                printYellow(f'{sig.name} 极大值大于长度,最大值为{sig.max},raw值{realMax}，极限值为{pow(2, sig.length)-1} 修改中...')
-                sig.max = pow(2, sig.length)-1
-            # if sig.min == sig.max:
-            #     printRed(f"{sig.name} 最大值和最小值相等最小值为{sig.min},最大值为{sig.max}")
-            #     continue
+                phy_max = (pow(2, sig.length_bits)-1) * float(sig.factor) + float(sig.offset)
+                if  sig.max == phy_max+1:
+                    printYellow(f'{sig.name} 表中最大物理值为{sig.max}，能达到的最大物理值为{phy_max} 修改中...')
+                    sig.max = phy_max-1
+                else:
+                    printRed(f'{sig.name} 表中最大物理值为{sig.max}，能达到的最大物理值为{phy_max}')
+                    continue
+
+            if sig.min == sig.max:
+                printRed(f"{sig.name} 最大值和最小值相等值为{sig.min}")
+                continue
 
             isFind = True
             dbc = Analyze(dbcfile)
