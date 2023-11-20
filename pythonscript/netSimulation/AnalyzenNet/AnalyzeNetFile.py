@@ -23,6 +23,8 @@ class CompareResult(Enum):
     Name=2          #名字相同,包括message名称也相同
     SigName=3       #仅仅信号名相同
 
+MSGHEAD = 'struct NetSignal * '
+SIGHEAD = 'struct NetSignal Net_'
 class NetSigInfo(object):
     def __init__(self) :
         self.name=""
@@ -61,16 +63,16 @@ class NetSigInfo(object):
         self.Unit = f'\"{value}\"'
 
     def getStrcutName(self):
-        return 'struct NetSignal Net_{} = '.format(self.name)+'{'
+        return SIGHEAD+self.name+' = {'
 
     def getExtern(self):
-        return 'extern struct NetSignal Net_{};'.format(self.name)
+        return f'extern {SIGHEAD}{self.name};'
 
     def getNetName(self):
         return '	&Net_{},'.format(self.name)
     
     def getExternNetMsg(self):
-        return f'extern struct NetSignal * {NetSigInfo.getNetMsgName(self.messagaType)}[];'
+        return f'extern {MSGHEAD}{NetSigInfo.getNetMsgName(self.messagaType)}[];'
 
     @staticmethod
     def getNetMsgName(messagaType):
@@ -121,6 +123,16 @@ class AnalyzeNetParserFile(object):
         self.maxSigRow=0
         self.analy()
 
+    #得到文本名称，包括msg的id，和信号名称
+    @staticmethod
+    def getTextName(text):
+        net = r"Net_.\w+"
+        texts = re.findall(net,text,re.A)
+        if len(texts) != 0:
+            tmpName = EesyStr.removeAll( texts[0],'Net_')
+            return tmpName
+        return ''
+        
     def analy(self):
         self.netSigs={}
         self.maxSigRow=0
@@ -132,20 +144,27 @@ class AnalyzeNetParserFile(object):
                 with open(filename,"r") as f:
                     linelist=f.readlines()
                     rowIndex=-1
+                    msgStrs = getTextBlock(linelist,MSGHEAD,'};')
+                    msgTypes = {}
+                    for msgStr,sigNames in msgStrs.items():
+                        msgType = re.findall(i_i,msgStr,re.A)[0]
+                        for sigName in sigNames:
+                            sigName = AnalyzeNetParserFile.getTextName(sigName)
+                            msgTypes[sigName] = msgType
+
                     for text in linelist:
                         rowIndex+=1
                         text=text.strip()
                         if len(text) == 0:
                             continue
-                        if text.startswith("struct NetSignal Net_"):
+                        if text.startswith(SIGHEAD):
                             try:
                                 sigInfo = NetSigInfo()
-                                net = r"Net_.\w+"
-                                texts = re.findall(net,text,re.A)
-                                if len(texts) != 0:
-                                    tmpName = EesyStr.removeAll( texts[0],'Net_')
-                                    sigInfo.name = tmpName
+                                sigInfo.name = AnalyzeNetParserFile.getTextName(text)
                                 self.netSigs[sigInfo.name] = sigInfo
+                                if sigInfo.name in msgTypes:
+                                    sigInfo.messagaType = msgTypes[sigInfo.name]
+                                    # print(sigInfo.name,sigInfo.messagaType)
                             except:
                                 pass
                             continue
@@ -250,6 +269,9 @@ class AnalyzeNetParserFile(object):
             return WriteResult.SignalCoverage
         self.netSigs[sigInfo.name] = sigInfo
         return WriteResult.WriteComplete
+    
+    def clearSig(self):
+        self.netSigs.clear()
 
     def repalceSig(self,sigInfo):
         assert isinstance(sigInfo,NetSigInfo)
@@ -280,18 +302,20 @@ class AnalyzeNetParserFile(object):
                 sigInfos.append(sigInfo)
         self.removeSigs(sigInfos)
 
-
+    @staticmethod
     def getNetMsg(netInfos):
+        netSignalStr=[]
         for messagaType,sigNetNames in netInfos.items():
-            with CBaseBlock('struct NetSignal * '+NetSigInfo.getNetMsgName(messagaType)+'[] = {',block_segmenter=('','};')) as block_l0:
+            with CBaseBlock(MSGHEAD+NetSigInfo.getNetMsgName(messagaType)+'[] = {',block_segmenter=('','};')) as block_l0:
                 for sigNetName in sigNetNames:
                     block_l0.add_code_line(sigNetName,termination='')
-        return block_l0.data
+            netSignalStr.extend(block_l0.data)
+        return netSignalStr
     
+    @staticmethod
     def getMsgParserNet():
         netName = 'NetMsg'
-        with CBaseBlock('bool parser_msg_net'+f'(struct NetSignal* {netName},int messagaType,char *data, int length) ',block_segmenter=('{','};')) as block_l0:
-            block_l0.add_code_line(f'int size = sizeof({netName})/sizeof(struct NetSignal*);',termination='')
+        with CBaseBlock('static bool parser_msg_net'+f'(struct NetSignal* {netName}[],int size,int messagaType,char *data, int length) ',block_segmenter=('{','}')) as block_l0:
             block_l0.add_code_line('bool ret = true;',termination='')
             with CBaseBlock('for (int i = 0; i < size; ++i) {', block_segmenter=('','}'), parent=block_l0) as block_l1:
                 block_l1.add_code_line(f'int start_by_byte = {netName}[i]->start_by_byte;',termination='')
@@ -299,31 +323,34 @@ class AnalyzeNetParserFile(object):
                 block_l1.add_code_line(f'double factor = {netName}[i]->factor;',termination='')
                 block_l1.add_code_line(f'double offset = {netName}[i]->offset;',termination='')
                 with CBaseBlock('if (signal_length_byte <= 4) {', block_segmenter=('','}'), parent=block_l1) as block_l2:
-                    block_l2.add_code_line(f'uint64_t raw_value = convertBigEndianToInt64(data+NUM_BYTES_HEAD+start_by_byte,signal_length_byte);',termination='')
+                    block_l2.add_code_line(f'uint64_t raw_value = convertEndianToInt64(data+NUM_BYTES_HEAD+start_by_byte,signal_length_byte);',termination='')
                     block_l2.add_code_line(f'double phy_value = raw_value*factor + offset;',termination='')
                     block_l2.add_code_line(f'{netName}[i]->raw_value = raw_value;',termination='')
                     block_l2.add_code_line(f'{netName}[i]->phy_value = phy_value;',termination='')
-                with CBaseBlock('else', block_segmenter=('','}'), parent=block_l1) as block_l3:
+                with CBaseBlock('else{', block_segmenter=('','}'), parent=block_l1) as block_l3:
                     block_l3.add_code_line(f'ret = false;',termination='')
                 with CBaseBlock('if(ret){', block_segmenter=('','}'), parent=block_l1) as block_l4:
                     block_l4.add_code_line(f'if (net_updata_fun != NULL)',termination='')
                     block_l4.add_code_line(f'net_updata_fun(messagaType);',termination='')
-                block_l1.add_blank_line('return ret;',termination='')
+            block_l0.add_code_line('return ret;',termination='')
         return block_l0.data  
 
+    @staticmethod
     def getParserNet(messagaTypes):
         with CBaseBlock('',block_segmenter=('','')) as block_l0:
             block_l0.add_code_line(f'PACKET_HEADER head;',termination='')
             block_l0.add_code_line(f'memcpy(&head,data,NUM_BYTES_HEAD);',termination='')
             for messagaType in messagaTypes:
                 with CBaseBlock(f'if(head.message_type == 0x{messagaType})', block_segmenter=('{','}'), parent=block_l0) as block_l1:
-                    block_l1.add_code_line(f'return parser_msg_net({NetSigInfo.getNetMsgName(messagaType)},messagaType,data,length);',termination='')
+                    block_l1.add_code_line(f'return parser_msg_net({NetSigInfo.getNetMsgName(messagaType)},head.message_type\
+,sizeof({NetSigInfo.getNetMsgName(messagaType)})/sizeof(struct NetSignal*),data,length);',termination='')
+            block_l0.add_code_line('return false;',termination='')
         return block_l0.data
         
     def writeFile(self,isCheck=True,isTip=True):
         if isCheck and not self.checkSigBit(): return WriteResult.SignalCoverage
         sigInfos = list(self.netSigs.values())
-        sigInfos.sort(key=lambda siginfo: siginfo.start_by_byte)
+        sigInfos.sort(key=lambda siginfo: int(siginfo.start_by_byte) | int(siginfo.messagaType) << 16)
         for (dirpath,dirnames,filenames) in os.walk(self.netParserFile):
             for filename in filenames:
                 filename=dirpath+filename
@@ -352,12 +379,11 @@ class AnalyzeNetParserFile(object):
                             strcutCode.append(scode)
                         if sigInfo.messagaType not in netMsg:
                             netMsg[sigInfo.messagaType] = []
-                        else:
-                            netMsg[sigInfo.messagaType].append(sigInfo.getNetName())
-                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,self.getMsgParserNet(),0)
-                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,self.getNetMsg(netMsg),0)
+                        netMsg[sigInfo.messagaType].append(sigInfo.getNetName())
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,AnalyzeNetParserFile.getMsgParserNet(),0)
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,AnalyzeNetParserFile.getNetMsg(netMsg),0)
                     behindStr(lineTexts,BUILDINGBLOCKSBEGIN,strcutCode,0)
-                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,self.getParserNet(netMsg.keys()),1)
+                    behindStr(lineTexts,BUILDINGBLOCKSBEGIN,AnalyzeNetParserFile.getParserNet(netMsg.keys()),1)
                 wirteFileDicts(filename,lineTexts)
         if isTip : printGreen("写入完成")
         return WriteResult.WriteComplete

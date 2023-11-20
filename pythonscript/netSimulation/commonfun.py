@@ -5,7 +5,7 @@ import sys
 import os
 
 w_d=r'[a-zA-Z_]'                #匹配单词
-i_i=r"-?[0x0-9]"                #匹配数字
+i_i=r"\d+"                      #匹配数字
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"   #匹配单词和数字(包括小数和负数)
 d_t=r"\bIPC_\S+\b"              #匹配以IPC开头一句话
 s_i = r"CANSIG_.*_g"    
@@ -312,6 +312,30 @@ def RemoveBlock(lineTexts,beginStr,endStr):
         if not isRemove:
             tmp.append(lineText)
     return tmp, isExistence
+
+'''
+获取文本块
+lineTexts:文本
+beginStr:开始标志
+endStr:结束标志
+返回的文本块：这个是开头位key，文本内容为value
+'''
+def getTextBlock(lineTexts,beginStr,endStr):
+    assert isinstance(lineTexts,list)
+    tmp={}
+    isBlockStart = False
+    currentHead=''
+    for lineText in lineTexts:
+        if beginStr in lineText:
+            isBlockStart = True
+            tmp[lineText]=[]
+            currentHead = lineText
+        elif endStr in lineText and isBlockStart:
+            isBlockStart = False
+            continue
+        if isBlockStart:
+            tmp[currentHead].append(lineText)
+    return tmp
 
 #得到关联的类名
 def getRelationClassName(text):

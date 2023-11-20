@@ -94,6 +94,8 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
     isFind = False
 
     net = AnalyzeNetParserFile(netfile)
+    if isAllAdd:
+        net.clearSig()
     for row in range(sheel.nrows):
         if row == 0:
             continue

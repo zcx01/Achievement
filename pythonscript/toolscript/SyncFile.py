@@ -28,8 +28,9 @@ def CpFile(file1,file2):
     if os.path.exists(file2):
         os.remove(file2)
     cmd = f'cp {file1} {file2}'
-    shutil.copy2(file1, file2)
+    # os.system(cmd)
     print(cmd)
+    shutil.copy2(file1, file2) #防止拷贝软连接
 
 def sync(syncType):
     for file1,file2 in File_Dict.items():
