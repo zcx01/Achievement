@@ -90,3 +90,4 @@ CMakeCache*
 pythonscript/Deployment/qnx/ic_service.core
 pythonscript/Deployment/qnx/ic_service
 *.startup.sh
+pythonscript/*/commonfun.py
