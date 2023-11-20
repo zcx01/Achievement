@@ -9,6 +9,7 @@ import pyperclip
 import xlrd
 import re
 import time
+import random
 from threading import Thread
 import argparse
 from commonfun import *
@@ -151,7 +152,33 @@ class useCase(object):
             print(self.monitorSignals)
             self.MonitorSig(self.monitorSignals)
         self.interactiveSendCanSig(sendSig)
+
     
+    def SimulationCanTimeOut(self):
+        sendSig={}
+        if not ignore_init_send: self.AddPowerSig()
+        for sigName in self.sendSignals:
+            if len(self.sendSignals[sigName]) > 1:
+                print(f'{sigName}:{self.sendSignals[sigName]} 索引')
+                index = int(input())
+            else:
+                index=0
+            try:
+                sendSig[sigName] = self.sendSignals[sigName][index]
+            except:
+                printYellow(f'{sigName} 没有合适的值')
+        self.startSig(sendSig)
+        index = 0
+        while True:
+            random_number = random.randint(900, 1400) / 1000
+            for sigName in sendSig:
+                self.sendSim.stop_task(sigName)
+            time.sleep(random_number)
+            self.sendSim.add_task(sendSig)
+            print(f'第{index:<5}发送 超时{random_number} s')
+            time.sleep(5)
+            index = index +1
+
     def SequenceSendInitValue(self,timeSpace=2):
         self.SendPowerSig()
         temp = []
@@ -320,9 +347,10 @@ if __name__ == "__main__":
     parser.add_argument('-b','--bugxlsx',help="jira xlsx file")
     parser.add_argument('-c','--casexlsx',help="generate case xlsx file")
     parser.add_argument('-s', '--Send',help="Send CAN",type=str,default='',nargs='?')
+    parser.add_argument('-st', '--SendTimeOut',help="模拟超时报文,是16进制",type=str,default='',nargs='?')
     parser.add_argument('-d', '--dbc',help="dbc",type=str,default=None,nargs='?')
     parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
-    parser.add_argument('-p', '--SendPowerSig', help="Send Power Sig", nargs='*', type=int,default=0)
+    parser.add_argument('-p', '--SendPowerSig', help="Send Power Sig", type=int,default=0)
     parser.add_argument('-t', '--dataType',help="get sig data type", default=[], nargs='+', type=str)
     parser.add_argument('-i', '--SequenceSendInitValue',help="按照指定的间隔发送信号初始值",type=int,default=2)
 
@@ -340,6 +368,12 @@ if __name__ == "__main__":
         if arg.Send != None and len(arg.Send) != 0:
             ReMatchStr(str(arg.Send),use)
         use.SimulationCan()
+    elif '-st' in sys.argv:
+        if arg.SendPowerSig==1:
+            use.AddPowerSig()
+        if arg.SendTimeOut != None and len(arg.SendTimeOut) != 0:
+            ReMatchStr(str(arg.SendTimeOut),use)
+        use.SimulationCanTimeOut()
     elif '-m' in sys.argv:
         if arg.SendPowerSig==1:
             use.SendPowerSig()
