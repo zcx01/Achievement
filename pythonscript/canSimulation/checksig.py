@@ -6,12 +6,15 @@ from xlrd.book import Book
 from xlrd.sheet import Sheet
 import xlrd
 import openpyxl
+import copy
 
 '''
     可以检测的前提条件
     message名称必须是id结尾
 '''
 
+ISXLS = 'isXls'
+LOGSTR = 'log'
 def findsignalInfile(signal,content):
     try:
         for text in content:
@@ -272,14 +275,14 @@ class ConfigXls():
             contentJson['defaultValueType'] = self.defaultValueType
         if len(self.comments) != 0:
             contentJson['comments'] = self.comments
-        contentJson['isXls'] = True
+        contentJson[ISXLS] = True
         if isDown:
             if self.topic not in jsConfig:
                 jsConfig[self.topic] = {}
             jsConfig[self.topic][self.dbcSigName] = contentJson
         else:
             if self.dbcSigName not in jsConfig:
-                jsConfig[self.dbcSigName] = {"log":1}
+                jsConfig[self.dbcSigName] = {LOGSTR:1}
             jsConfig[self.dbcSigName][self.topic] = contentJson
 
     def getList(self):
@@ -385,12 +388,18 @@ defaultValueType:0;  默认值(没有在"值映射"中的值)的处理方式,0�
 '''
 
 def clearXlsData(jsConfig):
-    tempJs = jsConfig
+    assert isinstance(jsConfig,dict)
+    tempJs = copy.deepcopy(jsConfig)
     for fContent in tempJs:
         for tContent in tempJs[fContent]:
             contentJson = tempJs[fContent][tContent]
-            if 'isXls' in contentJson and contentJson['isXls']:
+            if type(contentJson) == dict and ISXLS in contentJson and contentJson[ISXLS]:
                 del jsConfig[fContent][tContent]
+                if len(jsConfig[fContent]) == 0:
+                    del jsConfig[fContent]
+                elif len(jsConfig[fContent]) == 1:
+                    if  LOGSTR in jsConfig[fContent]:
+                        del jsConfig[fContent]
 
 def addConfigByTopicCanXls(xlsPath,configPath):
     book = xlrd.open_workbook(xlsPath)
@@ -410,7 +419,7 @@ def getErrList(errorStrList):
     errorList.append(date_string)
     return errorList
 
-def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],configPath=""): 
+def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,configPath=""): 
     jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
     preComments = ""
     whitelistdbcSigNames = []
@@ -420,11 +429,13 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],configPath=""):
     sh['A1'] = '功能名称'
     sh['B1'] = 'Topic'
     sh['C1'] = '信号名'
-    isAll = len(rowRange) == rowCount or len(rowRange) == 0
+    isAll = isAll or len(rowRange) == rowCount or len(rowRange) == 0 
     if isAll:
         clearXlsData(jsDown)
         clearXlsData(jsUp)
-    
+    #     writeJs(down_config,jsDown)
+    #     writeJs(up_config,jsUp)
+    # exit()
     errBook = openpyxl.Workbook()
     errsh = errBook.active
     errsh.title = "sheel"

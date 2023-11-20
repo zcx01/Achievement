@@ -87,7 +87,8 @@ def addConfigByTopicCan(startRow,endRow):
     if len(rowRangs) != 1:
          initWarnFile()
 
-    whitelistdbcSigNames = addConfigTopicCan(values,len(values),GoValue,rowRangs)
+    isAll = endRow == len(values) and startRow == 5
+    whitelistdbcSigNames = addConfigTopicCan(values,len(values),GoValue,rowRangs,isAll)
     printGreen('写入白名单中...')
     if whitelistdbcSigNames != None and len(whitelistdbcSigNames) != 0:
         addCan_parse_whitelist(whitelistdbcSigNames)

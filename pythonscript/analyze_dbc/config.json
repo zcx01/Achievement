@@ -1,17 +1,17 @@
 {
-    "projectPath": "../",
+    "projectPath": "../../../../",
     "newSig": "/home/chengxiongzhu/Works/newsig/newsig.txt",
     "xlsNewSigPath": "/home/chengxiongzhu/Works/newsig/newsig.xlsx",
-    "can_parse_whitelist": "src/ic_service/parser/vendor/can_parse_whitelist.txt",
+    "can_parse_whitelist": "src/ic_service/vendor/can_parse_whitelist.txt",
     "canmatrix": "J90A项目协议_V1.0_20230915_REEV&EV THU.xlsx",
-    "dbcfile": "src/ic_service/parser/vendor/dbc_files",
+    "dbcfile": "src/ic_service/vendor/dbc_files",
     "definefile": "src/ic_service/src/signal_process/include/topic/ipc_topic_new_def.h",
     "casePath": "/home/chengxiongzhu/Works/case/",
     "srcPath": "src/ic_service/src/",
     "srcSendType": "/home/chengxiongzhu/Works/changan_mcu_dbc/C673/event_handler_cfg.c",
     "down": "qt/ic_qt/resources/config/down_config.json",
     "up": "qt/ic_qt/resources/config/up_config.json",
-    "checkSigIgnore": "src/ic_service/parser/vendor/check_sig_ignore.json",
+    "checkSigIgnore": "src/ic_service/vendor/check_sig_ignore.json",
     "input_signal_config": "prebuilts/ic/config/ic_service/input_signal_config.json",
-    "canmatrix_version": "src/ic_service/parser/canmatrixversion.txt"
+    "canmatrix_version": "src/ic_service/vendor/canmatrixversion.txt"
 }
