@@ -38,7 +38,7 @@ if __name__ == "__main__":
     parse.add_argument('-rm', '--rmmsgs', help='删除message,是一个集合,是一个16进制',nargs='+')
     parse.add_argument('-u', '--isfilterNoUser',
                        help='是否过滤掉没有使用过的信号,用于比较can矩阵', nargs='*')
-    parse.add_argument('-w', '--WhitelistPath', help='和-a组合是白名单路径，单独是信号名称',default=[], nargs='+', type=str) 
+    parse.add_argument('-w', '--WhitelistPath', help='和-a组合是白名单路径，单独是信号名称',default=[], nargs='?', type=str) 
     parse.add_argument('-ch', '--channal', help='删除message指定通道',nargs='?',default="") 
     parse.add_argument('-sc', '--SigNameChinese', help='获取信号的中文描述',default=[], nargs='+') 
     parse.add_argument('-fc', '--fileChinese', help='获取文件中信号的中文描述',default=[], nargs='+')

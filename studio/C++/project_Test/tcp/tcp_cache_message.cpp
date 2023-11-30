@@ -65,5 +65,5 @@ void TcpCacheMessage::timeOut(int timerId)
     TcpDataFill::fillReSendData(data,lenght);
     TcpSend::instance().sendMsg(data, lenght, false);
     m_CacheDatas[msgId].count -= 1;
-    IC_LOG_INFO("%dcount:%d", msgId, (int)m_CacheDatas[msgId].count);
+    IC_LOG_INFO("%lu count:%d", msgId,(int)m_CacheDatas[msgId].count);
 }

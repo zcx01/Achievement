@@ -20,6 +20,8 @@ private:
     {
         std::vector<uint8_t> msgData;
         int count = RESENDCOUNT;
+        CacheData(){}
+        CacheData(const std::vector<uint8_t> &d){msgData =d;}
     };
     
     /* data */

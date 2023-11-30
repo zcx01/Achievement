@@ -463,7 +463,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 pass
 
             try:
-                sigName = getSheelValue(sheel,i,'C').replace(" ", "")
+                sigName = getSheelValue(sheel,i,'C').replace(" ", "").replace("\n", "")
                 if len(sigName) == 0: raise Exception(f"是空的")
             except:
                     printYellow(f'{i+1:<10}行是空的')
@@ -494,7 +494,13 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 errorStrList.append(f'{sigName} 信号缺失')
                 errsh.append(getErrList(errorStrList))
                 continue
-
+           
+            # try:
+            #     threeSig = getSheelValue(sheel,i,'I')
+            #     if len(threeSig) != 0:
+            #         print(f'{i} {sigName:<15} {threeSig}')
+            # except:
+            #     pass
             whitelistdbcSigNames.append(sigName)
             try:
                 valueMapStr = getSheelValue(sheel,i,'H')

@@ -56,7 +56,7 @@ void TcpDataAnaly::dealData()
     if (is_new_data)
     {
         //解析头
-        auto head_lenght = sizeof(head_data);
+        int head_lenght = sizeof(head_data);
         while (fill_lenght - use_lenght > head_lenght)
         {
             uint8_t headflg  = pack_data[use_lenght];

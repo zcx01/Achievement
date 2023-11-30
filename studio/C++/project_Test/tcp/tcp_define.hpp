@@ -14,8 +14,8 @@
 #define CRC16_INIT_VALUE 0
 #define CRC16_ISINITENABLE true
 #define MAX_LENGHT 2048
-#define TCP_IP "127.0.0.1"
-#define TCP_PORT 6666
+#define TCP_IP "172.16.2.29"
+#define TCP_PORT 50001
 
 using RecDataFun = std::function<void (uint8_t *, int)>;
 
@@ -42,7 +42,7 @@ namespace TD
     static uint64_t convertBigEndianToInt(const uint8_t *bytes, uint32_t lenght)
     {
         uint64_t value = 0;
-        for (int i = 0; i < lenght; i++)
+        for (uint32_t i = 0; i < lenght; i++)
         {
             value = (value << 8) | bytes[i];
         }
@@ -51,7 +51,7 @@ namespace TD
 
     static void convertIntToBigEndianArray(int value, uint8_t *array, uint32_t size)
     {
-        for (auto i = 0; i < size; i++)
+        for (uint32_t i = 0; i <  size; i++)
         {
             array[i] = static_cast<uint8_t>((value >> (8 * (size - 1 - i))) & 0xFF);
         }
@@ -168,7 +168,7 @@ namespace TD
         std::vector<TLVConent> getTLV(uint8_t fixedlenghtSize,std::vector<uint8_t> lenghtSizes={})
         {
             std::vector<TLVConent> TLVContents;
-            auto TLVLenghtInt = TLVs.size();
+            int TLVLenghtInt = TLVs.size();
  
             int uselenght = 0;
             auto TLVData = TLVs.data();
@@ -188,7 +188,7 @@ namespace TD
                 uselenght += sizeof(lenght);
 
                 auto intLenght = convertBigEndianToInt(lenght, sizeof(lenght));
-                for (int i = 0; i < intLenght; ++i)
+                for (uint64_t i = 0; i < intLenght; ++i)
                 {
                     uint8_t value;
                     memcpy(&value, TLVData + uselenght, sizeof(value));
