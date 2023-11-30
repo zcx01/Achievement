@@ -11,7 +11,7 @@ if [ $# -lt 1 ]; then
     project=`repo status -q`
     for f in $project;
     do
-        if [ $f != "prebuilts/" ] && [ $f != "project" ] && [ $f != "common-prebuilts/" ] && [ $f != "src/ic_service/tools/auto_gen/" ];then
+        if [ $f != "prebuilts/" ] && [ $f != "project" ] && [ $f != "common-prebuilts/" ] && [ $f != "src/ic_service/tools/auto_gen/" ] && [ $f != "qt/prebuilt/" ];then
             repo status $f
             repo forall $f -c "git branch -vv" 
         fi

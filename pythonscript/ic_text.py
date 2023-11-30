@@ -10,15 +10,28 @@ from xlrd.book import Book
 from xlrd.sheet import Sheet
 
 SOUCRELANGUAGESUFFIX="zh_CN.ts"
-ORILANGUAGESUFFIXS={"en_US.ts":"C","th_TH.ts":"D","de_DE.ts":"F"} 
-ORILANGUAGENAME={"en_US.ts":"英文","th_TH.ts":"泰文","de_DE.ts":"德文"} 
+ORILANGUAGESUFFIXS={"ar_EG.ts":"D","da_DK.ts":"E","es_ES.ts":"M","fi_FI.ts":"I","fr_FR.ts":"H","it_IT.ts":"N","de_DE.ts":"F","nl_NL.ts":"J","nb_NO.ts":"O","ru_RU.ts":"G","pt_PT.ts":"K","sv_SE.ts":"L"} 
+ORILANGUAGENAME={"ar_EG.ts":"阿拉伯语","da_DK.ts":"丹麦语","es_ES.ts":"西班牙语","fi_FI.ts":"芬兰语","fr_FR.ts":"法语","it_IT.ts":"意大利语","de_DE.ts":"德语","nl_NL.ts":"荷兰语","nb_NO.ts":"挪威语","ru_RU.ts":"俄语","pt_PT.ts":"葡萄牙语","sv_SE.ts":"瑞典语"} 
 SHELLNAME="SIC"
+
+def getExistranslateCols():
+    if len(ORILANGUAGESUFFIXS) == 0:
+        return "C"
+    exisTranslates = list(ORILANGUAGESUFFIXS.values())
+    exisTranslates.sort()
+    return exisTranslates[-1]
+
+EXISTRANSLATEMAXCOLS = XlsCharToInt(getExistranslateCols()) #翻译最大的行数
+EXISTRANSLATESTARTCOL = 2   #翻译开始的行数
 class translateConent(object):
     def __init__(self) -> None:
         self.sourceKey=""
         self.content=""
         self.exisTranslatesList=[]
         self.translateContent=""
+        self.changedCount = EXISTRANSLATESTARTCOL
+        for i in range(EXISTRANSLATESTARTCOL,EXISTRANSLATEMAXCOLS+1):
+            self.exisTranslatesList.append('')
 
     def getList(self):
         xlsContent = []
@@ -28,14 +41,15 @@ class translateConent(object):
             xlsContent.append(exisTranslate)
         return xlsContent
     
-    def appendExis(self,exisTranslate):
+    def appendExis(self,key,exisTranslate):
         if len(exisTranslate) != 0:
-            self.exisTranslatesList.append(exisTranslate)
+            self.exisTranslatesList[XlsCharToInt(ORILANGUAGESUFFIXS[key])-EXISTRANSLATESTARTCOL] = exisTranslate
+            self.changedCount = self.changedCount+1
 
     def appendSh(self,sh,isCheckChange):
         if not isCheckChange:
             sh.append(self.getList())
-        elif len(self.exisTranslatesList)==0 and len(self.content) != 0:
+        elif self.changedCount < EXISTRANSLATEMAXCOLS and len(self.content) != 0:
             sh.append(self.getList())
             
     
@@ -105,11 +119,10 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
     sh.title = SHELLNAME
     sh['A1'] = '源key'
     sh['B1'] = '内容'
-    count = 2
+    for exisTranslate,col in ORILANGUAGESUFFIXS.items():
+        sh[f'{col}1'] = ORILANGUAGENAME[exisTranslate]
+
     exisTranslates = ORILANGUAGESUFFIXS.keys()
-    for exisTranslate in exisTranslates:
-        sh[f'{XlsIntToChar(count)}1'] = ORILANGUAGENAME[exisTranslate]
-        count+=1
 
     repeatSoucreLanguages={}
     for (dirpath,dirnames,filenames) in os.walk(translatePath):
@@ -133,15 +146,16 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
                     assert isinstance(xlsContent,translateConent)
                     for exisTranslate in exisTranslates:
                         try:
-                            xlsContent.appendExis(existranslatelanguages[exisTranslate][xlsContent.sourceKey].content)
+                            xlsContent.appendExis(exisTranslate,existranslatelanguages[exisTranslate][xlsContent.sourceKey].content)
                         except:
                             # printYellow(f"{xlsContent.sourceKey} 不存在 {removeSuffix(exisTranslate)}")
                             pass
                     xlsContent.appendSh(sh,isCheckChange)
                     count+=1
                 print(f"检测完 {dirpath}/{oriName} 文件 一共有 {count}")
-
+    
     try:
+        exisTranslates = ORILANGUAGESUFFIXS.keys()
         jsContents = getJScontent(jsonPath)
         count=0
         for top in jsContents:
@@ -152,9 +166,9 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
                     xlsContent.content = jsContents[top][grade][removeSuffix(SOUCRELANGUAGESUFFIX)]
                     for exisTranslate in exisTranslates:
                         try:
-                            xlsContent.appendExis(jsContents[top][grade][removeSuffix(exisTranslate)])
+                            xlsContent.appendExis(exisTranslate,jsContents[top][grade][removeSuffix(exisTranslate)])
                         except:
-                            printYellow(f"{top} 不存在 {removeSuffix(exisTranslate)}")
+                            printYellow(f"{top} {grade}不存在 {removeSuffix(exisTranslate)}")
                     xlsContent.appendSh(sh,isCheckChange)
                     count+=1
         print(f"检测完 {jsonPath} 文件 一共有{count}")
@@ -199,7 +213,7 @@ def xlsCover(translatePath,jsonPath,input):
             xlsContent.translateContent = getValue(sheel,row,"C")
             assert isinstance(xlsContent.translateContent,str)
             try:
-                newTranslateContent = getValue(sheel,row,oriLanguageSuffixCol)
+                newTranslateContent = str(getValue(sheel,row,oriLanguageSuffixCol))
             except:
                 if row == 0:
                     break
@@ -274,6 +288,15 @@ def xlsCover(translatePath,jsonPath,input):
             pass
     printGreen("更新完成")
 
+def buildScript():
+    for key in ORILANGUAGESUFFIXS:
+        ts = 'ic_qt_' + key
+        print(r'$${PWD}/../resources/translate/'+ts+'\\')
+
+    print('--------------------------')
+    for key in ORILANGUAGESUFFIXS:
+        qm = 'ic_qt_' + key.replace('.ts','')
+        print(f'/opt/qt/translate/{qm}.qm=../mega/prebuilts/bigsur/ic/qt/translate/{qm}.qm')
 
 #./ic_text.py -t /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/translate -j /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json -o ic-out.xlsx
 if __name__ == "__main__":
@@ -283,6 +306,7 @@ if __name__ == "__main__":
     aparse.add_argument('-o','--outPath',help='生成xls文件路径',type=str,nargs="?",default='./changed.xlsx')
     aparse.add_argument('-i','--input',help='输入xls文件路径',type=str)
     aparse.add_argument('-c','--checkChange',help='检测修改的文本',type=str,nargs="?")
+    aparse.add_argument('-b','--buildScript',help='生成部署命令',nargs="?")
     arg = aparse.parse_args()
 
     if len(sys.argv) == 1:
@@ -291,5 +315,7 @@ if __name__ == "__main__":
         coverXls(arg.translatePath,arg.json,arg.outPath)
     elif "-i" in sys.argv:
         xlsCover(arg.translatePath,arg.json,arg.input)
-    if '-c' in sys.argv:
+    elif '-c' in sys.argv:
         coverXls(arg.translatePath,arg.json,arg.checkChange,True)
+    elif "-b" in sys.argv:
+        buildScript()
