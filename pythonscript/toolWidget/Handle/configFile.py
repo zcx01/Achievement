@@ -51,6 +51,7 @@ def initUI(ui,configPath,projectNameLayout,projectBtnLayout,projectBtnFun,projec
     UiKey[ui.pwLE] = 'pw'
     UiKey[ui.icTextLE] = 'icText'
     UiKey[ui.trXlsPathS] = 'trXlsPathS'
+    UiKey[ui.trXlsPathW] = 'trXlsPathW'
     UiKey[ui.trXlsPath] = 'trXlsPath'
     UiKey[ui.downLoadPath] = 'downLoadPath'
     UiKey[ui.projectCommonPath] = 'projectCommonPath'
