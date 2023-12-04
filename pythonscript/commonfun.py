@@ -4,7 +4,6 @@ import re
 import sys
 import os
 import datetime
-import shutil
 
 w_d=r'[a-zA-Z_]'                #匹配单词
 i_i=r"-?[0x0-9]"                #匹配数字
@@ -154,25 +153,6 @@ def getFileBaseName(fileName):
 
 def getKeyPath(key,jsConfig):
     return getFullPath(jsConfig.get(key,""),jsConfig)
-
-def CpFile(file1,file2,cpFilePath):
-    if os.path.isfile(file1):
-        if os.path.exists(file2):
-            os.remove(file2)
-        shutil.copy2(file1,file2) #防止拷贝软连接
-        cpFilePath.append(file2)
-    elif os.path.isdir(file1):
-        if os.path.exists(file2):
-            shutil.rmtree(file2)
-        os.makedirs(file2)
-        for (dirpath,dirnames,filenames) in os.walk(file1):
-                assert isinstance(dirpath,str)
-                for fileName in filenames:
-                    filePath = dirpath+'/'+fileName
-                    if os.path.isfile(filePath):
-                        aimPath = filePath.replace(file1,file2)
-                        shutil.copy2(filePath,aimPath) #防止拷贝软连接
-                        cpFilePath.append(aimPath)
 
 #-------------------------------字符串相关操作-------------------------------
 def splitSpace(text):

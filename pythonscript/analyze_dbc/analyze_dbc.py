@@ -164,6 +164,21 @@ class Analyze(object):
             assert isinstance(dbc,AnalyzeFile)
             msgInfos.extend(dbc.getAllMessage().values())
         return msgInfos
+    
+    def reNameMsg(self):
+        dbcMsgInfo={}
+        for dbc in self.AnalyzeDictlist:
+            assert isinstance(dbc,AnalyzeFile)
+            for msgId,msgInfo in dbc.dbcMessage.items():
+                assert isinstance(msgInfo,MessageInfo)
+                if msgInfo.getMessage_Id() in dbcMsgInfo:
+                    tmp = msgInfo.getMessage_Id()
+                    msgInfo.sender = msgInfo.sender + msgInfo.channel
+                    msgInfo.message_Name = '' #去除原来的名称
+                    print(f'重命名 {tmp} -> {msgInfo.getMessage_Id()}')
+                    dbc.repalceMessage([msgInfo])
+                dbcMsgInfo[msgInfo.getMessage_Id()] = msgInfo
+            
 
     #通过msgId获取所有的dbc中信号
     def getSigsByMsgId(self,msgId):

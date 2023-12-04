@@ -210,11 +210,11 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
             realMin = (float(sig.min)-float(sig.Offset)) / float(sig.factor)
             realMax = (float(sig.max)-float(sig.Offset)) / float(sig.factor)
             if realMin < 0 and sig.dataType == "+":
-                phy_min =  float(sig.offset)
-                printRed(f'{sig.name} 极小值小于0,表中最小物理值值为{sig.phy_min},能达到的最小物理值为{phy_min}')
+                phy_min =  float(sig.Offset)
+                printRed(f'{sig.name} 极小值小于0,表中最小物理值值为{sig.min},能达到的最小物理值为{phy_min} {realMin}')
                 continue
             if realMax > pow(2, sig.length)-1 and sig.max != pow(2, sig.length)-1:
-                phy_max = (pow(2, sig.length_bits)-1) * float(sig.factor) + float(sig.offset)
+                phy_max = (pow(2, sig.length)-1) * float(sig.factor) + float(sig.Offset)
                 if  sig.max == phy_max+1:
                     printYellow(f'{sig.name} 表中最大物理值为{sig.max}，能达到的最大物理值为{phy_max} 修改中...')
                     sig.max = phy_max-1
@@ -222,7 +222,7 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                     printRed(f'{sig.name} 表中最大物理值为{sig.max}，能达到的最大物理值为{phy_max}')
                     continue
 
-            if sig.min == sig.max:
+            if sig.min == sig.max and sig.max !=0:
                 printRed(f"{sig.name} 最大值和最小值相等值为{sig.min}")
                 continue
 
@@ -253,6 +253,8 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                     "can_parse_whitelist", jsConfig)
                 if os.path.isfile(can_parse_whitelistPath):
                     WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
+    dbc = Analyze(dbcfile)
+    dbc.reNameMsg()
     if not isFind:
         printRed(f"{wirteSigName} 在CAN矩阵中不存在")
 

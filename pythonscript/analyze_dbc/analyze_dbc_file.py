@@ -690,6 +690,15 @@ class AnalyzeFile(object):
             return WriteDBCResult.SignalCoverage,dm,insertRowIndex
         return WriteDBCResult.WriteComplete,dm,insertRowIndex
 
+    #写入BU
+    def writeBu(self,sender,linelist):
+        if sender not in self.control:
+            self.control.append(sender)
+            for row in range(len(linelist)):
+                if linelist[row].startswith("BU_:"):
+                    linelist[row]=linelist[row].replace(linelist[row],self.getBU())
+                    break
+
     def writeSig(self,sig,msg):
         assert isinstance(sig,SigInfo)
         assert isinstance(msg,MessageInfo)
@@ -711,13 +720,8 @@ class AnalyzeFile(object):
                 AnalyzeFile.appendKey(linelist,sig.getSigSendType(),insertRow)
 
             #写入BU
-            if sig.Sender not in self.control:
-                self.control.append(sig.Sender)
-                for row in range(linelistSize):
-                    if linelist[row].startswith("BU_:"):
-                        linelist[row]=linelist[row].replace(linelist[row],self.getBU())
-                        break
-                
+            self.writeBu(sig.Sender,linelistSize)
+
             #写入枚举
             enumStr=sig.getEnum()
             if len(enumStr) != 0:
@@ -823,6 +827,7 @@ class AnalyzeFile(object):
                 self.writeMessage(msg,linelist)
                 continue
             assert isinstance(ori_msg,MessageInfo)
+            self.writeBu(msg.sender,linelist)
             self.repalceContent(linelist,ori_msg.Row, msg.getMessageRowContent())
             self.repalceContent(linelist,ori_msg.frameRow, msg.getMessageVFrameFormat())
             self.repalceContent(linelist,ori_msg.sendTypeRow, msg.getMessageSendType())
