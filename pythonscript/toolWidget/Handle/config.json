@@ -13,5 +13,8 @@
     },
     "projectCommonPath": "~/Works/Repos/changan_{projectName}",
     "currentProjectName": "j90a",
-    "pushFile": "C:/Users/chengxiong.zhu/Desktop/Achievement/pythonscript/Deployment/c385_deploy.py"
+    "pushFile": "C:/Users/chengxiong.zhu/Desktop/Achievement/pythonscript/Deployment/c385_deploy.py",
+    "generatedFiles": [
+    ],
+    "trXlsPathW": "https://docs.google.com/spreadsheets/d/1HZVgz7F_ngGWGVqmcg88Mdbivrt6JY-w/edit#gid=1774571119"
 }

@@ -138,6 +138,7 @@ def ScpFile(tmpath,user,ssh_ip):
     interact()
 
 def ScpFileWin(tmpath,tmpathS,user,ssh_ip):
+    print('download...')
     keyStr(f"scp -r {user}@{ssh_ip}:{tmpathS} {tmpath}")
 
 
@@ -170,8 +171,8 @@ if __name__ == "__main__":
     parser.add_argument('-q','--qnx',help='cp for qnx',nargs='*')
     parser.add_argument('-e','--excess',help='excess commad',nargs='*',default=[])
     parser.add_argument('-r','--not',help='是否重启',nargs='*')
-    parser.add_argument('-f','-PcFileName',help="打印自带PC上文件的名称",nargs='*')
-    parser.add_argument('-s','-sship',help="从远程复制",nargs='*',default=jsConfig.get("ssh_ip",""))
+    parser.add_argument('-f','--PcFileName',help="打印自带PC上文件的名称",nargs='*')
+    parser.add_argument('-s','--scp',help="从远程复制",nargs='?',default=0,type=int)
     parser.add_argument('-u','--updateConfig',help='添加文件到配置中',default='',type=str,nargs='?')
     parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c385/prebuilts/ic',type=str)
     parser.add_argument('-w','--scpWinDir',help='Scp win的目录',default='C:/Users/chengxiong.zhu/Downloads',type=str)
@@ -212,6 +213,8 @@ if __name__ == "__main__":
                     execbin = getExecBin(proceesName,proceesName)
                     tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
                     ScpFile(tmpath,user,ssh_ip)
+        if args.scp == 1:
+            sys.exit()
 
     device = ""
     if len(args.device) !=0:

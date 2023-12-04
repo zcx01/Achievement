@@ -17,6 +17,7 @@ from Handle.handle import *
 from dlg.addTextDlg import *
 from customWidget.lableLineEdit import *
 import threading
+import webbrowser
 
 class MainWindow(QtWidgets.QMainWindow):
     send_msg = QtCore.pyqtSignal(str) 
@@ -32,6 +33,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.pushCbx.addItems(getPushFiles())
 
         setDisPlayMsg(self.send_msg.emit)
+        self.ui.openXlsWBtn.clicked.connect(self.openTsW)
         self.ui.openTsBtn.clicked.connect(self.openFile)
         self.ui.saveBtn.clicked.connect(self.saveUI)
         self.ui.trBtn.clicked.connect(self.trHandle)
@@ -47,7 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.pushFileBtn.clicked.connect(self.pushFileHanleBtn)
         self.ui.pushFileEdit.textChanged.connect(self.pushFileEditChanged)
         self.send_msg.connect(self.disPlayMsg)
-        self.disPlayMsg(f"当前进程ID：{os.getpid()}")
+        self.disPlayMsg(f"当前进程ID: {os.getpid()}")
 
         #ui状态
         self.ui.groupBox.setEnabled(getJsValue('icText') != 0)
@@ -61,12 +63,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def openFile(self):
         file_dialog = QtWidgets.QFileDialog()
         file_dialog.setNameFilters(["Text Files (*.xlsx)"])  # 设置文件过滤器
+        trXlsPath = self.ui.trXlsPath.text()
+        if len(trXlsPath) != 0:
+            file_dialog.setDirectory(os.path.dirname(trXlsPath))
         if file_dialog.exec_() != QtWidgets.QDialog.Accepted: return
         selected_files = file_dialog.selectedFiles()
         if len(selected_files) == 0 : return
         for selected_file in selected_files:
             self.ui.trXlsPath.setText(selected_file)
     
+    def openTsW(self):
+        webbrowser.open(self.ui.trXlsPathW.text())
+
     def savePath(self):
         directory  = QtWidgets.QFileDialog.getExistingDirectory(None, '选择目录')
         if len(directory) == 0 : return
@@ -92,6 +100,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setTrChangedFilePath(self,path):
         print(path)
         self.trChangedFilePaths.append(path)
+        self.ui.trXlsPath.setText(path)
 
     def openTrChangedFile(self):
         if len(self.trChangedFilePaths) != 0:
@@ -150,7 +159,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def pushFileHanleBtn(self):
         fileName = self.ui.pushCbx.currentText()
-        my_thread = threading.Thread(target=pushFileHanle,args=(fileName,self.ui.scpFileBtn.isChecked(),))
+        my_thread = threading.Thread(target=pushFileHanle,args=(fileName,self.ui.scpFileBtn.isChecked(),self.ui.onlyScpFileBtn.isChecked(),))
         my_thread.setDaemon(True)
         my_thread.start()
 

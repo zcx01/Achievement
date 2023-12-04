@@ -56,8 +56,8 @@ def trHanle(xlsPath):
     icwarning_config = getCurrentProjectPath()+'/qt/ic_qt/resources/config/icwarning_config.json'
     keyStrCmd(f'scp {xlsPath} {REMOTEHOST}:{trXlsPathS}')
     sshIp()
-    keyStrCmd(f'rm {trXlsPathS}test',disPlayMsg)
     keyStrCmd(f'python3 {icTextLE} -t {translate} -j {icwarning_config} -i {trXlsPathS}{xlsPathFileName}')
+    keyStrCmd(f'rm {trXlsPathS}{xlsPathFileName}')
     closeIp()
     disPlayMsg('执行完成')
 
@@ -129,7 +129,7 @@ def getPushFiles():
     (output, err) = cmd.communicate()
     return output.decode('utf-8').splitlines()
 
-def pushFileHanle(fileName,isScp):
+def pushFileHanle(fileName,isScp,isOnlyScp):
     if fileName == None or fileName == '':
         disPlayMsg("请选择文件")
         return
@@ -137,7 +137,7 @@ def pushFileHanle(fileName,isScp):
     pushFile = getJsValue('pushFile')
     downLoadPath = getJsValue('downLoadPath')
     ScpCmd =''
-    if isScp : ScpCmd = ' -s'
+    if isScp : ScpCmd = f' -s {int(isOnlyScp)}'
     cmdStr = f'python {pushFile} -p {projectPath} -w {downLoadPath} -c {fileName}{ScpCmd}'
     disPlayMsg(cmdStr)
     p = subprocess.Popen(cmdStr,
