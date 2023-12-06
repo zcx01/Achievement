@@ -165,6 +165,22 @@ class Analyze(object):
             msgInfos.extend(dbc.getAllMessage().values())
         return msgInfos
     
+    #得到所有的信号信息，不区分can_Channel
+    def getAllSigInfo(self):
+        sigInfos = []
+        for can_Channel in self.AnalyzeDict:
+            dbc = self.AnalyzeDict[can_Channel]
+            assert isinstance(dbc,AnalyzeFile)
+            sigInfos.extend(dbc.dbcSigs.values())
+        return sigInfos
+    
+    def getMessageBySigInfo(self,sig):
+        assert isinstance(sig,SigInfo)
+        dbc = self.getAnalyzeSingleBySigInfo(sig)
+        if dbc != None:
+            return dbc.dbcMessage[sig.messageId]
+        return None
+
     def reNameMsg(self):
         dbcMsgInfo={}
         for dbc in self.AnalyzeDictlist:
@@ -220,12 +236,12 @@ class Analyze(object):
                 assert isinstance(dbc,AnalyzeFile)
                 dbc.repalceSigEnum(channelSig[dbc])
     
-    def repalceSig(self,*sigs,msg):
+    def repalceSig(self,*sigs,msg,isCheckByteConflict=True):
         channelSig= self.GetChannelSig(sigs)
         for dbc in channelSig.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
-                dbc.repalceSig(channelSig[dbc],msg)
+                dbc.repalceSig(channelSig[dbc],msg,isCheckByteConflict)
 
     def removeSig(self,*sigs):
         channelSig= self.GetChannelSig(sigs)

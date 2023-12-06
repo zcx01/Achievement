@@ -463,7 +463,8 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 pass
 
             try:
-                sigName = getSheelValue(sheel,i,'C').replace(" ", "").replace("\n", "")
+                sigName = getSheelValue(sheel,i,'C').replace(" ", "").replace("\n", "").replace("\r", "")
+                print(sigName)
                 if len(sigName) == 0: raise Exception(f"是空的")
             except:
                     printYellow(f'{i+1:<10}行是空的')

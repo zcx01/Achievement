@@ -27,7 +27,7 @@ sig_line_enum='P'
 sig_line_initValue='Q'
 sig_line_invalidValue='R'
 sig_line_Recevier='U'
-sig_line_Project='AN'
+sig_line_Project='Y'
 
 def getStartBit(sheel,row,getValueInt):
     startPos =  getValueInt(sheel, row, sig_line_startBit)
