@@ -19,7 +19,6 @@ from analyze_dbc.analyze_dbc import *
 try:
     cwd = os.getcwd()
     sys.path.append(cwd)
-    print(cwd)
     from xls_transform_dbc_tool.analyze_dbc.projectInI import *
     jsConfig = getJScontent(cwd+"/xls_transform_dbc_tool/analyze_dbc/config.json",)
 except:
@@ -236,6 +235,7 @@ def ReMatchStr(text,case=None):
     signals = tempSignals
     if len(signals)== 0:
         return case
+    print(signals)
     index=0
     while(index < len(signals)):
         values=[]

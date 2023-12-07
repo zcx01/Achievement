@@ -13,9 +13,17 @@ current_dir = os.getcwd()
 generateProject = "j90a"
 oriProject = "c385"
 
+ignore=[".o"]
+
 def command(cmd):
     print(cmd)
     os.system(cmd)
+
+def getSuffix(fileName):
+    suffixs = os.path.splitext(fileName)
+    if len(suffixs) > 1 :
+        return suffixs[1]    
+    return ''
 
 
 def cpfile(oriPath,aimPath,isCreateDir=False):
@@ -48,7 +56,7 @@ def generate(generateDir,cpType):
                         if not dirname.startswith("."):
                             cpfile(f'{oriPath}/{dirname}',f'{resourcesDir}/{dirname}')
 
-def CpSameFile(fileNames):
+def CpSameFile(fileNames,generateDir):
     if len(fileNames) == 0:
         print("文件名是空的")
         return
@@ -56,7 +64,11 @@ def CpSameFile(fileNames):
         shellCmd = f'locate {fileName} | grep changan_{oriProject}'
         outputs = subprocess.check_output(shellCmd, shell=True).decode('utf-8').splitlines()
         for output in outputs:
-            cpfile(output,output.replace(oriProject,generateProject),True)
+            if getSuffix(output) not in ignore:
+                if len(generateDir) == 0:
+                    cpfile(output,output.replace(oriProject,generateProject),True)
+                else:
+                    cpfile(output,generateDir[0],True)
 
 
 if __name__ == "__main__":
@@ -66,6 +78,6 @@ if __name__ == "__main__":
     parser.add_argument('-f','--cpFileName',help='拷贝的文件名称',nargs='+',default=[],type=str)
     arg = parser.parse_args()
     if '-f' in sys.argv:
-        CpSameFile(arg.cpFileName)
+        CpSameFile(arg.cpFileName,arg.generateDir)
     else:
         generate(arg.generateDir,arg.cpType)

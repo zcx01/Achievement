@@ -322,6 +322,30 @@ def RemoveBlock(lineTexts,beginStr,endStr):
             tmp.append(lineText)
     return tmp, isExistence
 
+'''
+获取文本块
+lineTexts:文本
+beginStr:开始标志
+endStr:结束标志
+返回的文本块：这个是开头位key，文本内容为value
+'''
+def getTextBlock(lineTexts,beginStr,endStr):
+    assert isinstance(lineTexts,list)
+    tmp={}
+    isBlockStart = False
+    currentHead=''
+    for lineText in lineTexts:
+        if beginStr in lineText:
+            isBlockStart = True
+            tmp[lineText]=[]
+            currentHead = lineText
+        elif endStr in lineText and isBlockStart:
+            isBlockStart = False
+            continue
+        if isBlockStart:
+            tmp[currentHead].append(lineText)
+    return tmp
+
 #得到关联的类名
 def getRelationClassName(text):
     n_i = r'new.*\('
