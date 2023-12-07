@@ -72,7 +72,7 @@ def addConfigs(ids):
                 pass
     addConfigSig(sigs)
 
-def addConfigByTopicCan(startRow,endRow):
+def addConfigByTopicCan(startRow,endRow,isGetThreeSig):
     if GOOGLESIGTOPICID == '':
         print('表格id是空的')
         return
@@ -88,17 +88,21 @@ def addConfigByTopicCan(startRow,endRow):
          initWarnFile()
 
     isAll = endRow == len(values) and startRow == 5
-    whitelistdbcSigNames = addConfigTopicCan(values,len(values),GoValue,rowRangs,isAll)
-    printGreen('写入白名单中...')
-    if whitelistdbcSigNames != None and len(whitelistdbcSigNames) != 0:
-        addCan_parse_whitelist(whitelistdbcSigNames)
-    printGreen('执行完成')
+    if isGetThreeSig:
+        getThreeSig(values,len(values),GoValue,rowRangs)
+    else:
+        whitelistdbcSigNames = addConfigTopicCan(values,len(values),GoValue,rowRangs,isAll)
+        printGreen('写入白名单中...')
+        if whitelistdbcSigNames != None and len(whitelistdbcSigNames) != 0:
+            addCan_parse_whitelist(whitelistdbcSigNames)
+        printGreen('执行完成')
 
 if __name__ == '__main__':
     parse = argparse.ArgumentParser(description='生成配置文件的脚本')
     parse.add_argument('-s','--startRow',help='开始的行号,0表示所有',type=int,default=0)
     parse.add_argument('-e','--endRow',help='结束的行号,-1表到示最后，0表示和startRow相等',type=int,default=-1)
     parse.add_argument('-i', '--ids',help='id', nargs='+')
+    parse.add_argument('-t', '--three',help='是否是获取三帧', nargs='?')
     arg = parse.parse_args()
 
     if '-i' in sys.argv:
@@ -106,4 +110,4 @@ if __name__ == '__main__':
 
     startRow = arg.startRow-1
     if startRow < 0 : startRow = 5
-    addConfigByTopicCan(startRow,arg.endRow)
+    addConfigByTopicCan(startRow,arg.endRow,'-t' in sys.argv)
