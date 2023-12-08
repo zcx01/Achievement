@@ -46,9 +46,18 @@
         "ictelltale_config_roll.json": "../../qt/ic_qt/resources/config",
         "history_topic.json": "../../qt/ic_qt/resources/config"
     },
+    "backUpPath":{
+        "PC":{
+            "up_config.json": "../../src/ic_service/vendor/config",
+            "down_config.json": "../../src/ic_service/vendor/config"
+        },
+        "down_config.json": "/opt/ic_service/config/",
+        "up_config.json": "/opt/ic_service/config/"
+    },
     "update": {
         "../../qt/ic_qt/resources/translate": "/opt/qt/translate/",
         "../../qt/ic_qt/resources/config": "/opt/qt/config/",
+        "../../src/ic_service/vendor/config":"/opt/ic_service/config/",
         "../../output/binary/opt/apps/latest/qt/bin": "/usr/bin/",
         "lib/": "/lib64/"
     },
