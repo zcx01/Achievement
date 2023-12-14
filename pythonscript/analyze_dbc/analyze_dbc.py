@@ -86,7 +86,6 @@ class Analyze(object):
     def getAnalyzeSingleByMsgInfo(self,msg):
         assert isinstance(msg,MessageInfo)
         can_Channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
-        print(can_Channel, self.AnalyzeDict)
         dbc =  self.AnalyzeDict.get(can_Channel,None)
         assert isinstance(dbc,AnalyzeFile)
         return dbc

@@ -4,7 +4,7 @@ import sys
 
 import xlrd
 import argparse
-
+import copy
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 from analyze_dbc.commonfun import*
@@ -310,21 +310,27 @@ def conversionMsgByOtherdbc(configPath,msgIds,dbcfilPath,isWriteSig):
             printYellow(f"请在 File_SubNet 变量配置 {dbcMsgInfo} 对应的 SubNet")
             isReurn = True
     if isReurn: return
-    wirteSigs={}
+    wirteSigs={} 
+    copyMsgIds = copy.deepcopy(msgIds)
     for dbcMsgInfo in dbcMsgInfos:
         for dbcMsgId in dbcMsgInfos[dbcMsgInfo]:
-            if msgIds == None or len(msgIds) == 0 or dbcMsgId in msgIds:
+            if copyMsgIds == None or len(copyMsgIds) == 0 or dbcMsgId in copyMsgIds:
+                print(dbcMsgId)
                 msgInfo =dbcMsgInfos[dbcMsgInfo][dbcMsgId]
                 assert isinstance(msgInfo,MessageInfo)
                 msgInfo.subNet = File_SubNet[dbcMsgInfo]
                 modifyMgs[msgInfo.getMessage_SubNet()] = msgInfo
                 wirteSigs[msgInfo] = dbc.getSigsByMsgId(msgInfo.messageId)
+                if dbcMsgId in msgIds: msgIds.remove(dbcMsgId)
+    if len(msgIds) !=0:
+        noMsgIdsStr = '、'.join(msgIds)
+        printYellow(f'原dbc没有 {noMsgIdsStr} 报文')
     ori_dbc.repalceMessage(list(modifyMgs.values()))
     if isWriteSig:
         for wirteMsg,wirteSigs in wirteSigs.items():
-            dbc = Analyze(dbcfile)
+            ori_dbc = Analyze(dbcfile)
             for wirteSig in wirteSigs:
-                dbc.writeSig(wirteSig, wirteMsg)
+                ori_dbc.writeSig(wirteSig, wirteMsg)
 
 def RemoveSigs(configPath, sigNames):
     jsConfig = getJScontent(configPath)
