@@ -541,6 +541,23 @@ def getNameChangedDict(nameChangeds):
             sigNameDict[old_SigName] = new_SigName
     return sigNameDict
 
+
+def getSrcSig(srcPath):
+    srcSigNames=set()
+    for (dirpath, dirnames, filenames) in os.walk(srcPath):
+        for fileName in filenames:
+            suffix = os.path.splitext(fileName)[1]
+            if suffix == '.cpp' or suffix == '.hpp' or suffix == '.h':
+                filePath = dirpath+'/'+fileName
+                content = readFileAll(filePath)
+                sigNames = re.findall(s_i, content, re.A)
+                sigNames = list(set(sigNames))
+                for sigName in sigNames:
+                    assert isinstance(sigName, str)
+                    srcSigNames.add(sigName)
+    for srcSigName in srcSigNames:
+        print(srcSigName)
+
 def repalceSrcSig(nameChangeds, jsConfig):
     srcPath = getKeyPath("srcPath", jsConfig)
     sigNameDict = getNameChangedDict(nameChangeds)

@@ -26,7 +26,7 @@ if __name__ == "__main__":
                        default=pyFileDir+"config.json")
     parse.add_argument('-a', '--append', nargs='?', help='新增整个can矩阵表格（如果没有指定路径，使用就是配置文件中）、和+w一起使用则是dbc目录')
     parse.add_argument('-s', '--sigNames', help='新增信号名，是一个列表',
-                       default=[], nargs='?', type=str)
+                       default=[], nargs='*', type=str)
     parse.add_argument('-m', '--messages', help='新增messages，是一个列表,如 -m 50',
                        default=[], nargs='*', type=str)
     parse.add_argument('-f', '--fristMatrix',
@@ -48,6 +48,7 @@ if __name__ == "__main__":
     parse.add_argument('-i', '--addInputMsgConfig', help='添加input_signal_config.json文件,参数是16进制的信号名',default=[], nargs='?',type=str) 
     parse.add_argument('-fm', '--filterateMsg', help='过滤出来在CAN矩阵没有但是dbc中有的msg', nargs='?') 
     parse.add_argument('-mv', '--mvMsg', help='重命名message避免解析重复', nargs='?')                   
+    parse.add_argument('-ss', '--srcSig', help='获取源码中使用的信号，后接的是路径', nargs='?',default='./')                 
     arg = parse.parse_args()
 
     initWarnFile()
@@ -111,3 +112,5 @@ if __name__ == "__main__":
         addInputMsgConfig(arg.config,arg.addInputMsgConfig)
     elif '-mv' in sys.argv:
         reNameMsg(arg.config)
+    elif '-ss' in sys.argv:
+        getSrcSig(arg.srcSig)

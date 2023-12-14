@@ -249,7 +249,7 @@ class SigInfo(object):
         if len(receviers) == 0:
             receviers.append("Vector__XXX")
         if local_machine_Sender != self.Sender and local_machine_Sender not in receviers:
-            receviers.append(local_machine_Sender)
+            receviers.extend(local_machine_Sender)
         self.Recevier = ",".join(receviers)
 
 class MessageInfo(object):
@@ -709,35 +709,35 @@ class AnalyzeFile(object):
         if str(sig.getMId())+sig.name in self.dbcSigs:
             # print(f"{sig.name}信号已经存在")
             return WriteDBCResult.AlreadyExists
-        try:
-            byteConflictResult,dm,insertRowIndex =self.byteConflict(sig,msg,False,linelist)
-            if byteConflictResult != WriteDBCResult.WriteComplete:
-                return byteConflictResult
-            
-            linelist.insert(insertRowIndex,sig.getSG())
-            msg.message_Name = dm.message_Name
-            sig.messgae_Name = dm.message_Name
-            insertRow = AnalyzeFile.appendKey(linelist,sig.getStartValue())
-            if sig.sendType != SigSendType.Normal:
-                AnalyzeFile.appendKey(linelist,sig.getSigSendType(),insertRow)
+        # try:
+        byteConflictResult,dm,insertRowIndex =self.byteConflict(sig,msg,False,linelist)
+        if byteConflictResult != WriteDBCResult.WriteComplete:
+            return byteConflictResult
+        
+        linelist.insert(insertRowIndex,sig.getSG())
+        msg.message_Name = dm.message_Name
+        sig.messgae_Name = dm.message_Name
+        insertRow = AnalyzeFile.appendKey(linelist,sig.getStartValue())
+        if sig.sendType != SigSendType.Normal:
+            AnalyzeFile.appendKey(linelist,sig.getSigSendType(),insertRow)
 
-            #写入BU
-            self.writeBu(sig.Sender,linelist)
+        #写入BU
+        self.writeBu(sig.Sender,linelist)
 
-            #写入枚举
-            enumStr=sig.getEnum()
-            if len(enumStr) != 0:
-                linelist.append(enumStr) 
+        #写入枚举
+        enumStr=sig.getEnum()
+        if len(enumStr) != 0:
+            linelist.append(enumStr) 
 
-            wirteFileDicts(self.dbcPath,linelist,False)
-            printGreen(f"{sig.name} 写入完成")
-        except:
-            print(f'{sig.name} 正在写入message')
-            if not self.writeMessage(msg,linelist):
-                print(f'{sig.name} 没有message')
-                return WriteDBCResult.NoMessage
-            self.analy()
-            self.writeSig(sig,msg)
+        wirteFileDicts(self.dbcPath,linelist,False)
+        printGreen(f"{sig.name} 写入完成")
+        # except:
+        #     print(f'{sig.name} 正在写入message')
+        #     if not self.writeMessage(msg,linelist):
+        #         print(f'{sig.name} 没有message')
+        #         return WriteDBCResult.NoMessage
+        #     self.analy()
+        #     self.writeSig(sig,msg)
         return WriteDBCResult.WriteComplete
 
     def repalceSigEnum(self,sigs):
