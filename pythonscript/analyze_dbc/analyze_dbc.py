@@ -135,6 +135,16 @@ class Analyze(object):
             return dbc.sigExist(sigName)
         return False
 
+    def messageExist(self,messageName):
+        for can_Channel in self.AnalyzeDict:
+            dbc = self.AnalyzeDict[can_Channel]
+            assert isinstance(dbc,AnalyzeFile)
+            for id,info in dbc.getAllMessage().items():
+                assert isinstance(info,MessageInfo)
+                if info.getMessage_Id() == messageName:
+                    return True
+        return False
+
     def sender(self,sigName):
         dbc = self.getAnalyzeSingleByName(sigName)
         if  dbc != None:

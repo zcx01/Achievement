@@ -746,6 +746,35 @@ def findsignalInfile(signal,filePath):
     except:
         return False
 
+'''
+清除白名单不在dbc中信息
+'''
+def clearCan_parse_whitelist(configPath):
+    jsConfig=getJScontent(configPath)
+    dbc=Analyze(getKeyPath("dbcfile",jsConfig))
+    can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
+    can_parse_whitelist_content_lines = readFileLines(can_parse_whitelistPath)
+    deleteIndex = []
+    index = 0
+    for can_parse_whitelist_content_line in can_parse_whitelist_content_lines:
+        can_parse_whitelist_content_line = can_parse_whitelist_content_line.strip()
+        if not can_parse_whitelist_content_line.startswith('#'):
+           infos = can_parse_whitelist_content_line.split(' ')
+           if len(infos) !=0 :
+            info=infos[0]
+            if "message" in can_parse_whitelist_content_line:
+                if not dbc.messageExist(info):
+                    deleteIndex.append(index)
+                    print(f'删除报文 {info}')
+            elif "signal" in can_parse_whitelist_content_line:
+                if not dbc.sigExist(info):
+                    deleteIndex.append(index)
+                    print(f'删除信号 {info}')
+        index = index+1
+    can_parse_whitelist_content_lines = removeListIndexs(can_parse_whitelist_content_lines,deleteIndex)
+    wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_lines,False)
+
+
 def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return):
     if os.path.isfile(can_parse_whitelistPath):  
         if  findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
@@ -769,7 +798,7 @@ def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_pars
             return 2
     return 1
 
-def addCan_parse_whitelist(sigs):
+def addCan_parse_whitelist(sigs,isPrint=False):
     jsConfig=getJScontent(pyFileDir+"config.json")
     analy=Analyze(getKeyPath("dbcfile",jsConfig))
     for sig in sigs:
@@ -780,7 +809,7 @@ def addCan_parse_whitelist(sigs):
         messagesig=analy.getMessage_Id_Sig(sig)
         can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
         WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,False)
-
+        if isPrint: print(f'{sig} 添加成功')
 '''
 获取信号名称对应的中文名称
 stype：输入的类型

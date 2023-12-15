@@ -48,7 +48,8 @@ if __name__ == "__main__":
     parse.add_argument('-i', '--addInputMsgConfig', help='添加input_signal_config.json文件,参数是16进制的信号名',default=[], nargs='?',type=str) 
     parse.add_argument('-fm', '--filterateMsg', help='过滤出来在CAN矩阵没有但是dbc中有的msg', nargs='?') 
     parse.add_argument('-mv', '--mvMsg', help='重命名message避免解析重复', nargs='?')                   
-    parse.add_argument('-ss', '--srcSig', help='获取源码中使用的信号，后接的是路径', nargs='?',default='./')                 
+    parse.add_argument('-ss', '--srcSig', help='获取源码中使用的信号，后接的是路径', nargs='?',default='./')
+    parse.add_argument('-cw', '--clearCanParseWhitelist', help='CAN的白名单不在dbc中的报文和信号', nargs='?',default='')                 
     arg = parse.parse_args()
 
     initWarnFile()
@@ -92,7 +93,7 @@ if __name__ == "__main__":
         for sigName in arg.sigNames:
             conversion(arg.config, sigName)
     elif '-w' in sys.argv:
-        addCan_parse_whitelist(arg.WhitelistPath)
+        addCan_parse_whitelist(arg.WhitelistPath,True)
     elif '-t' in sys.argv and '-r' in sys.argv:
         if os.path.isfile(arg.twoMatrix):
             diffCanMatrix(arg.fristMatrix, arg.twoMatrix, arg.config,arg.resultPath, '-u' in sys.argv)
@@ -114,3 +115,5 @@ if __name__ == "__main__":
         reNameMsg(arg.config)
     elif '-ss' in sys.argv:
         getSrcSig(arg.srcSig)
+    elif '-cw' in sys.argv:
+        clearCan_parse_whitelist(arg.config)
