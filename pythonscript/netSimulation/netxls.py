@@ -4,7 +4,7 @@ import sys
 
 import xlrd
 import argparse
-
+import copy
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 from commonfun import*
@@ -77,6 +77,61 @@ def appoint(sig,wirteSigName, isMsg): #是否是指定添加的信号
     else:
         return sig.messagaType == wirteSigName.upper()
 
+
+def addSig(sig,wirteSigName,isMsg,isAllAdd,net):
+    assert isinstance(sig,NetSigInfo)
+    assert isinstance(net,AnalyzeNetParserFile)
+    if appoint(sig,wirteSigName,isMsg) or isAllAdd:
+        realMin = (float(sig.phy_min)-float(sig.offset)) / float(sig.factor)
+        realMax = (float(sig.phy_max)-float(sig.offset)) / float(sig.factor)
+        if realMin < 0 and sig.dataType == "+":
+            phy_min =  float(sig.offset)
+            printRed(f'{sig.name} 极小值小于0,表中最小物理值值为{sig.phy_min},能达到的最小物理值为{phy_min}')
+            return
+        if realMax > pow(2, sig.length_bits)-1 and sig.phy_max != pow(2, sig.length_bits)-1:
+            phy_max = (pow(2, sig.length_bits)-1) * float(sig.factor) + float(sig.offset)
+            printRed(f'{sig.name} 极大值大于长度,表中最大物理值为{sig.phy_max}，能达到的最大物理值为{phy_max}')
+            return
+        if sig.phy_min == sig.phy_max:
+            printRed(f"{sig.name} 最大值和最小值相等值为{sig.phy_max}")
+            return
+
+        isFind = True
+        writedbcresult = net.addSig(sig)
+        if writedbcresult == WriteResult.AlreadyExists:
+            if isAllAdd:
+                net.repalceSig(sig)
+            else:
+                isRepalce = input(f'{sig.name()} 是否替換 y/n ')
+                if 'y' in isRepalce:
+                    net.repalceSig(sig)
+    return isFind
+
+
+'''
+sig:信号名称
+sigSheelName:sheet的中的名称
+space:信号的间隔，比如XYXY,就是2，XYZXYZ就是3
+'''
+def getExpandSig(sig,sigSheelName,space):
+    assert isinstance(sig,NetSigInfo)
+    expandSigs=[]
+    match = re.search(r'\((.*?)\)', sigSheelName)
+    if match:  
+        substring = match.group(1)
+        rangeIndex = re.findall(i_i,substring,re.A)
+        expandSigName = sigSheelName.replace('('+substring+')','')
+        startIndex = int(rangeIndex[0])
+        endIndex = int(rangeIndex[1])
+        start_by_byte = sig.start_by_byte
+        for index in range(startIndex,endIndex+1):
+            expandSig = copy.deepcopy(sig)
+            expandSig.name = expandSigName.replace(expand_flag,str(index))
+            expandSig.start_by_byte = start_by_byte
+            start_by_byte = start_by_byte + sig.length_byte * space 
+            expandSigs.append(expandSig)
+        return expandSigs
+
 def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
     jsConfig = getJScontent(configPath)
     isAllAdd = (len(wirteSigName) == 0)
@@ -96,35 +151,34 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
     net = AnalyzeNetParserFile(netfile)
     if isAllAdd:
         net.clearSig()
+    
+    expandSigs={}
     for row in range(sheel.nrows):
         if row == 0:
             continue
         sig = getSigInfo(sheel, row)
-        if appoint(sig,wirteSigName,isMsg) or isAllAdd:
-            realMin = (float(sig.phy_min)-float(sig.offset)) / float(sig.factor)
-            realMax = (float(sig.phy_max)-float(sig.offset)) / float(sig.factor)
-            if realMin < 0 and sig.dataType == "+":
-                phy_min =  float(sig.offset)
-                printRed(f'{sig.name} 极小值小于0,表中最小物理值值为{sig.phy_min},能达到的最小物理值为{phy_min}')
-                continue
-            if realMax > pow(2, sig.length_bits)-1 and sig.phy_max != pow(2, sig.length_bits)-1:
-                phy_max = (pow(2, sig.length_bits)-1) * float(sig.factor) + float(sig.offset)
-                printRed(f'{sig.name} 极大值大于长度,表中最大物理值为{sig.phy_max}，能达到的最大物理值为{phy_max}')
-                continue
-            if sig.phy_min == sig.phy_max:
-                printRed(f"{sig.name} 最大值和最小值相等值为{sig.phy_max}")
-                continue
-
+        if sig.name == None or len(sig.name) ==0:
+            continue
+        isExpand = False
+        for expand_field in expand_fields:
+            if expand_field in sig.chineseName:
+                sig.name = str(getValue(sheel, row, sig_line_name))
+                if sig.messagaType not in expandSigs:
+                    expandSigs[sig.messagaType]=[]
+                expandSigs[sig.messagaType].append(sig)
+                isExpand = True
+                break
+        if isExpand: continue
+        if addSig(sig,wirteSigName,isMsg,isAllAdd,net):
             isFind = True
-            writedbcresult = net.addSig(sig)
-            if writedbcresult == WriteResult.AlreadyExists:
-                if isAllAdd:
-                    net.repalceSig(sig)
-                else:
-                    isRepalce = input(f'{sig.name()} 是否替換 y/n ')
-                    if 'y' in isRepalce:
-                        net.repalceSig(sig)
 
+    for messagaType,expandSigList in expandSigs.items():
+        for sig in expandSigList:
+            siglist = getExpandSig(sig,sig.name,len(expandSigList))
+            for expandSig in siglist:
+                if addSig(expandSig,wirteSigName,isMsg,isAllAdd,net):
+                    isFind = True
+    
     if not isFind:
         print(f"{wirteSigName} 在矩阵中不存在")
     else:

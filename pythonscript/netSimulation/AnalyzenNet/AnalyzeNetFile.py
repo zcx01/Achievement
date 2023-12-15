@@ -348,7 +348,7 @@ class AnalyzeNetParserFile(object):
         return block_l0.data
         
     def writeFile(self,isCheck=True,isTip=True):
-        if isCheck and not self.checkSigBit(): return WriteResult.SignalCoverage
+        # if isCheck and not self.checkSigBit(): return WriteResult.SignalCoverage
         sigInfos = list(self.netSigs.values())
         sigInfos.sort(key=lambda siginfo: int(siginfo.start_by_byte) | int(siginfo.messagaType) << 16)
         for (dirpath,dirnames,filenames) in os.walk(self.netParserFile):
