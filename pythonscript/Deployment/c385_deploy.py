@@ -22,9 +22,8 @@ def setProjectType(defultDir,execName):
         
 def getPusPath(proceesName):
     tmpPath = ''
-    try:
-        tmpPath = getKeyPath(proceesName,jsConfig[projectType])
-    except:
+    tmpPath = getKeyPath(proceesName,jsConfig[projectType])
+    if len(tmpPath) == 0:
         tmpPath = getKeyPath(proceesName,jsConfig)
     return tmpPath
 
