@@ -6,7 +6,7 @@ import os
 import datetime
 
 w_d=r'[a-zA-Z_]'                #匹配单词
-i_i=r"-?[0x0-9]"                #匹配数字
+i_i=r"\d+"                      #匹配数字
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"   #匹配单词和数字(包括小数和负数)
 d_t=r"\bIPC_\S+\b"              #匹配以IPC开头一句话
 s_i = r"CANSIG_.*_g"    

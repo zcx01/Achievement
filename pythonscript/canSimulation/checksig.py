@@ -486,7 +486,6 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
 
             try:
                 sigName = getSheelValue(sheel,i,'C').replace(" ", "").replace("\n", "").replace("\r", "")
-                print(sigName)
                 if len(sigName) == 0: raise Exception(f"是空的")
             except:
                     printYellow(f'{i+1:<10}行是空的')
@@ -524,7 +523,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
             #         print(f'{i} {sigName:<15} {threeSig}')
             # except:
             #     pass
-            whitelistdbcSigNames.append(sigName)
+            whitelistdbcSigNames.append(configXls.dbcSigName.replace('/','__'))
             try:
                 valueMapStr = getSheelValue(sheel,i,'H')
                 valueMapStrs = re.findall(e_i,valueMapStr,re.A)
