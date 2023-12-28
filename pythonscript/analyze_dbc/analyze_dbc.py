@@ -86,7 +86,6 @@ class Analyze(object):
     def getAnalyzeSingleByMsgInfo(self,msg):
         assert isinstance(msg,MessageInfo)
         can_Channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
-        print(can_Channel, self.AnalyzeDict)
         dbc =  self.AnalyzeDict.get(can_Channel,None)
         assert isinstance(dbc,AnalyzeFile)
         return dbc
@@ -136,6 +135,16 @@ class Analyze(object):
             return dbc.sigExist(sigName)
         return False
 
+    def messageExist(self,messageName):
+        for can_Channel in self.AnalyzeDict:
+            dbc = self.AnalyzeDict[can_Channel]
+            assert isinstance(dbc,AnalyzeFile)
+            for id,info in dbc.getAllMessage().items():
+                assert isinstance(info,MessageInfo)
+                if info.getMessage_Id() == messageName:
+                    return True
+        return False
+
     def sender(self,sigName):
         dbc = self.getAnalyzeSingleByName(sigName)
         if  dbc != None:
@@ -164,6 +173,37 @@ class Analyze(object):
             assert isinstance(dbc,AnalyzeFile)
             msgInfos.extend(dbc.getAllMessage().values())
         return msgInfos
+    
+    #得到所有的信号信息，不区分can_Channel
+    def getAllSigInfo(self):
+        sigInfos = []
+        for can_Channel in self.AnalyzeDict:
+            dbc = self.AnalyzeDict[can_Channel]
+            assert isinstance(dbc,AnalyzeFile)
+            sigInfos.extend(dbc.dbcSigs.values())
+        return sigInfos
+    
+    def getMessageBySigInfo(self,sig):
+        assert isinstance(sig,SigInfo)
+        dbc = self.getAnalyzeSingleBySigInfo(sig)
+        if dbc != None:
+            return dbc.dbcMessage[sig.messageId]
+        return None
+
+    def reNameMsg(self):
+        dbcMsgInfo={}
+        for dbc in self.AnalyzeDictlist:
+            assert isinstance(dbc,AnalyzeFile)
+            for msgId,msgInfo in dbc.dbcMessage.items():
+                assert isinstance(msgInfo,MessageInfo)
+                if msgInfo.getMessage_Id() in dbcMsgInfo:
+                    tmp = msgInfo.getMessage_Id()
+                    msgInfo.sender = msgInfo.sender + msgInfo.channel
+                    msgInfo.message_Name = '' #去除原来的名称
+                    print(f'重命名 {tmp} -> {msgInfo.getMessage_Id()}')
+                    dbc.repalceMessage([msgInfo])
+                dbcMsgInfo[msgInfo.getMessage_Id()] = msgInfo
+            
 
     #通过msgId获取所有的dbc中信号
     def getSigsByMsgId(self,msgId):
@@ -205,12 +245,12 @@ class Analyze(object):
                 assert isinstance(dbc,AnalyzeFile)
                 dbc.repalceSigEnum(channelSig[dbc])
     
-    def repalceSig(self,*sigs,msg):
+    def repalceSig(self,*sigs,msg,isCheckByteConflict=True):
         channelSig= self.GetChannelSig(sigs)
         for dbc in channelSig.keys():
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
-                dbc.repalceSig(channelSig[dbc],msg)
+                dbc.repalceSig(channelSig[dbc],msg,isCheckByteConflict)
 
     def removeSig(self,*sigs):
         channelSig= self.GetChannelSig(sigs)

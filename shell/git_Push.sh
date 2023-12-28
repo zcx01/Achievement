@@ -6,15 +6,25 @@ shellPath="/home/chengxiongzhu/Achievement/pythonscript/getgitpath.py"
 #branch="dev_hqx.1.2.1"
 branch="master"
 prefix="mega"
+filterPath=("prebuilts/" "project" "common-prebuilts/" "src/ic_service/tools/auto_gen/" "qt/prebuilt/" "prebuilts/common/")
+
 if [ $# -lt 1 ]; then
     echo "选择路径:"
     project=`repo status -q`
     for f in $project;
     do
-        if [ $f != "prebuilts/" ] && [ $f != "project" ] && [ $f != "common-prebuilts/" ] && [ $f != "src/ic_service/tools/auto_gen/" ] && [ $f != "qt/prebuilt/" ];then
+        if [[ " ${filterPath[@]} " =~ " $f " ]]; then
+            continue
+        else
+            echo $f
             repo status $f
             repo forall $f -c "git branch -vv" 
         fi
+
+        # if [ $f != "prebuilts/" ] && [ $f != "project" ] && [ $f != "common-prebuilts/" ] && [ $f != "src/ic_service/tools/auto_gen/" ] && [ $f != "qt/prebuilt/" ];then
+        #     repo status $f
+        #     repo forall $f -c "git branch -vv" 
+        # fi
     done
     exit 0
 else

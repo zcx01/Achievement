@@ -4,10 +4,9 @@ import re
 import sys
 import os
 import datetime
-import shutil
 
 w_d=r'[a-zA-Z_]'                #匹配单词
-i_i=r"-?[0x0-9]"                #匹配数字
+i_i=r"\d+"                      #匹配数字
 e_i=r"-?\b[a-zA-Z_0x0-9.]+\b"   #匹配单词和数字(包括小数和负数)
 d_t=r"\bIPC_\S+\b"              #匹配以IPC开头一句话
 s_i = r"CANSIG_.*_g"    
@@ -154,25 +153,6 @@ def getFileBaseName(fileName):
 
 def getKeyPath(key,jsConfig):
     return getFullPath(jsConfig.get(key,""),jsConfig)
-
-def CpFile(file1,file2,cpFilePath):
-    if os.path.isfile(file1):
-        if os.path.exists(file2):
-            os.remove(file2)
-        shutil.copy2(file1,file2) #防止拷贝软连接
-        cpFilePath.append(file2)
-    elif os.path.isdir(file1):
-        if os.path.exists(file2):
-            shutil.rmtree(file2)
-        os.makedirs(file2)
-        for (dirpath,dirnames,filenames) in os.walk(file1):
-                assert isinstance(dirpath,str)
-                for fileName in filenames:
-                    filePath = dirpath+'/'+fileName
-                    if os.path.isfile(filePath):
-                        aimPath = filePath.replace(file1,file2)
-                        shutil.copy2(filePath,aimPath) #防止拷贝软连接
-                        cpFilePath.append(aimPath)
 
 #-------------------------------字符串相关操作-------------------------------
 def splitSpace(text):
@@ -341,6 +321,30 @@ def RemoveBlock(lineTexts,beginStr,endStr):
         if not isRemove:
             tmp.append(lineText)
     return tmp, isExistence
+
+'''
+获取文本块
+lineTexts:文本
+beginStr:开始标志
+endStr:结束标志
+返回的文本块：这个是开头位key，文本内容为value
+'''
+def getTextBlock(lineTexts,beginStr,endStr):
+    assert isinstance(lineTexts,list)
+    tmp={}
+    isBlockStart = False
+    currentHead=''
+    for lineText in lineTexts:
+        if beginStr in lineText:
+            isBlockStart = True
+            tmp[lineText]=[]
+            currentHead = lineText
+        elif endStr in lineText and isBlockStart:
+            isBlockStart = False
+            continue
+        if isBlockStart:
+            tmp[currentHead].append(lineText)
+    return tmp
 
 #得到关联的类名
 def getRelationClassName(text):

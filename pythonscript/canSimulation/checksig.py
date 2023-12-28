@@ -145,7 +145,7 @@ def splitSig(sig):
     return sigs
         
 
-def configConverdbc(sig,dbc):
+def configConverdbc(sig,dbc,isPrint=True):
     assert isinstance(dbc,Analyze)
     assert isinstance(sig,str)
     sigs = splitSig(sig)
@@ -156,13 +156,14 @@ def configConverdbc(sig,dbc):
             prefix= f"{sigs[0]}_{sigs[1]}"
             dbcSig = dbc.getSig(sig16,sigs[0])
             if dbcSig != None and dbcSig.getMessage_Name() != prefix:
-                printYellow(f' {sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
+                if isPrint:
+                    printYellow(f' {sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
                 return sig.replace(prefix,dbcSig.getMessage_Name()),dbcSig.Sender,True
         except:
             pass
     if dbcSig==None:
         dbcSig = dbc.getSig(sig)
-        if dbcSig == None:
+        if dbcSig == None and isPrint:
             printRed(f'{sig:<50}  信号格式错误')
     return sig if dbcSig == None else dbcSig.getMessage_Name()+'/'+dbcSig.name, None if dbcSig == None else dbcSig.Sender,False,None if dbcSig == None else dbcSig.messageId
 
@@ -419,6 +420,27 @@ def getErrList(errorStrList):
     errorList.append(date_string)
     return errorList
 
+def getThreeSig(sheel,rowCount,getSheelValue,rowRange=[],configPath=""): 
+    jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
+    for i in range(rowCount):
+        if not (i  in rowRange or len(rowRange) == 0):
+            continue
+        try:
+            sigName = getSheelValue(sheel,i,'C').replace(" ", "").replace("\n", "").replace("\r", "")
+            if len(sigName) == 0: raise Exception(f"是空的")
+        except:
+                continue
+        configXls = ConfigXls()
+        configXls.dbcSigName,configXls.sender,isChanged,messageId = configConverdbc(sigName,dbc,False)
+        if configXls.sender == None:
+            continue           
+        try:
+            threeSig = getSheelValue(sheel,i,'I')
+            if len(threeSig) != 0:
+                print(f'{i} {configXls.dbcSigName:<15} {threeSig}')
+        except:
+            pass
+
 def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,configPath=""): 
     jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
     preComments = ""
@@ -463,7 +485,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 pass
 
             try:
-                sigName = getSheelValue(sheel,i,'C').replace(" ", "").replace("\n", "")
+                sigName = getSheelValue(sheel,i,'C').replace(" ", "").replace("\n", "").replace("\r", "")
                 if len(sigName) == 0: raise Exception(f"是空的")
             except:
                     printYellow(f'{i+1:<10}行是空的')
@@ -501,7 +523,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
             #         print(f'{i} {sigName:<15} {threeSig}')
             # except:
             #     pass
-            whitelistdbcSigNames.append(sigName)
+            whitelistdbcSigNames.append(configXls.dbcSigName.replace('/','__'))
             try:
                 valueMapStr = getSheelValue(sheel,i,'H')
                 valueMapStrs = re.findall(e_i,valueMapStr,re.A)

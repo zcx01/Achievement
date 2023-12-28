@@ -45,3 +45,11 @@ elif CANTYPE == "APA":
     sig_line_initValue='S'
     sig_line_invalidValue='T'
     sig_line_Recevier='W'
+
+'''
+检测到中文中有expand_fields中的字段，就把信号展开
+把信号名称中expand_flag字段替换成索引
+检测到的信号的sig_line_start_by_byte必须是第一个信号的开始字节
+'''
+expand_fields = ['Xn','Yn']
+expand_flag = 'n'

@@ -13,9 +13,17 @@ current_dir = os.getcwd()
 generateProject = "j90a"
 oriProject = "c385"
 
+ignore=[".o"]
+
 def command(cmd):
     print(cmd)
     os.system(cmd)
+
+def getSuffix(fileName):
+    suffixs = os.path.splitext(fileName)
+    if len(suffixs) > 1 :
+        return suffixs[1]    
+    return ''
 
 
 def cpfile(oriPath,aimPath,isCreateDir=False):
@@ -37,6 +45,7 @@ def generate(generateDir,cpType):
         resourcesDir = os.path.abspath(resourcesDir)
         print(resourcesDir)
         oriPath = resourcesDir.replace(generateProject,oriProject)
+        print(oriPath)
         for (dirpath,dirnames,filenames) in os.walk(oriPath):
             assert isinstance(dirpath,str)
             if dirpath == oriPath:
@@ -48,7 +57,7 @@ def generate(generateDir,cpType):
                         if not dirname.startswith("."):
                             cpfile(f'{oriPath}/{dirname}',f'{resourcesDir}/{dirname}')
 
-def CpSameFile(fileNames):
+def CpSameFile(fileNames,generateDir):
     if len(fileNames) == 0:
         print("文件名是空的")
         return
@@ -56,7 +65,11 @@ def CpSameFile(fileNames):
         shellCmd = f'locate {fileName} | grep changan_{oriProject}'
         outputs = subprocess.check_output(shellCmd, shell=True).decode('utf-8').splitlines()
         for output in outputs:
-            cpfile(output,output.replace(oriProject,generateProject),True)
+            if getSuffix(output) not in ignore:
+                if len(generateDir) == 0:
+                    cpfile(output,output.replace(oriProject,generateProject),True)
+                else:
+                    cpfile(output,generateDir[0],True)
 
 
 if __name__ == "__main__":
@@ -64,8 +77,15 @@ if __name__ == "__main__":
     parser.add_argument('-g','--generateDir',help='生成文件目录',nargs='*',default=[])
     parser.add_argument('-t','--cpType',help='拷贝的类型，1是拷贝文件，2是拷贝目录，3是都拷贝',nargs='?',default=3,type=int)
     parser.add_argument('-f','--cpFileName',help='拷贝的文件名称',nargs='+',default=[],type=str)
+    parser.add_argument('-o','--oriProjectName',help='原项目名称',nargs='?',default='c385',type=str)
+    parser.add_argument('-p','--projectName',help='当前项目名称',nargs='?',default='j90a',type=str)
     arg = parser.parse_args()
+    
+    if len(arg.oriProjectName) != 0:
+        oriProject = arg.oriProjectName
+    if len(arg.projectName) != 0:
+        generateProject = arg.projectName
     if '-f' in sys.argv:
-        CpSameFile(arg.cpFileName)
+        CpSameFile(arg.cpFileName,arg.generateDir)
     else:
         generate(arg.generateDir,arg.cpType)

@@ -73,6 +73,7 @@ class SigInfo(object):
         return int(self.messageId,16)
 
     def getSG(self):
+        self.RecevierRemoveSend()
         return f' SG_ {self.name} : {self.startBit}|{self.length}@0{self.dataType} ({self.factor},{self.Offset}) [{self.min}|{self.max}] {self.Unit}  {self.Recevier}'
     
     def getEnum(self):
@@ -218,8 +219,8 @@ class SigInfo(object):
                 result.append(f'最大值:{other.max}{link}{self.max}')
             if self.initValue != other.initValue:
                 result.append(f'初始值:{other.initValue}{link}{self.initValue}')
-            if self.sendType != other.sendType:
-                result.append(f'类型:{other.sendType}{link}{self.sendType}')
+            # if self.sendType != other.sendType:
+            #     result.append(f'类型:{other.sendType}{link}{self.sendType}')
             if self.cycle != other.cycle:
                 result.append(f'周期:{other.cycle}{link}{self.cycle}')
             # if len(result) != 0:
@@ -247,6 +248,8 @@ class SigInfo(object):
             receviers.remove(self.Sender)
         if len(receviers) == 0:
             receviers.append("Vector__XXX")
+        if local_machine_Sender != self.Sender and local_machine_Sender not in receviers:
+            receviers.extend(local_machine_Sender)
         self.Recevier = ",".join(receviers)
 
 class MessageInfo(object):
@@ -690,11 +693,19 @@ class AnalyzeFile(object):
             return WriteDBCResult.SignalCoverage,dm,insertRowIndex
         return WriteDBCResult.WriteComplete,dm,insertRowIndex
 
+    #写入BU
+    def writeBu(self,sender,linelist):
+        if sender not in self.control:
+            self.control.append(sender)
+            for row in range(len(linelist)):
+                if linelist[row].startswith("BU_:"):
+                    linelist[row]=linelist[row].replace(linelist[row],self.getBU())
+                    break
+
     def writeSig(self,sig,msg):
         assert isinstance(sig,SigInfo)
         assert isinstance(msg,MessageInfo)
         linelist=readFileLines(self.dbcPath)
-        linelistSize=len(linelist)
         if str(sig.getMId())+sig.name in self.dbcSigs:
             # print(f"{sig.name}信号已经存在")
             return WriteDBCResult.AlreadyExists
@@ -711,13 +722,8 @@ class AnalyzeFile(object):
                 AnalyzeFile.appendKey(linelist,sig.getSigSendType(),insertRow)
 
             #写入BU
-            if sig.Sender not in self.control:
-                self.control.append(sig.Sender)
-                for row in range(linelistSize):
-                    if linelist[row].startswith("BU_:"):
-                        linelist[row]=linelist[row].replace(linelist[row],self.getBU())
-                        break
-                
+            self.writeBu(sig.Sender,linelist)
+
             #写入枚举
             enumStr=sig.getEnum()
             if len(enumStr) != 0:
@@ -752,18 +758,21 @@ class AnalyzeFile(object):
             print(sig.name,'-------',enumStr)
         wirteFileDicts(self.dbcPath, linelist, False)
 
-    def repalceSig(self,sigs,msg):
+    def repalceSig(self,sigs,msg,isCheckByteConflict):
         linelist = readFileLines(self.dbcPath)
         for sig in sigs:
             assert isinstance(sig,SigInfo)
-            byteConflictResult,dm,insertRowIndex =self.byteConflict(sig,msg,True,linelist)
-            if byteConflictResult != WriteDBCResult.WriteComplete:
-                return byteConflictResult
+            if isCheckByteConflict:
+                byteConflictResult,dm,insertRowIndex =self.byteConflict(sig,msg,True,linelist)
+                if byteConflictResult != WriteDBCResult.WriteComplete:
+                    return byteConflictResult
             
             ori_sig = self.getSig(str(sig.getMId())+sig.name)
             if ori_sig == None:
-                print(f'{sig.name} 不存在')
-                continue
+                ori_sig = sig
+                if ori_sig.Row == -1:
+                    print(f'{sig.name} 不存在')
+                    continue
             self.repalceContent(linelist,ori_sig.Row, sig.getSG())
             self.repalceContent(linelist,ori_sig.initRow, sig.getStartValue())
             self.repalceContent(linelist,ori_sig.sendTypeRow, sig.getSigSendType(),False)
@@ -823,6 +832,7 @@ class AnalyzeFile(object):
                 self.writeMessage(msg,linelist)
                 continue
             assert isinstance(ori_msg,MessageInfo)
+            self.writeBu(msg.sender,linelist)
             self.repalceContent(linelist,ori_msg.Row, msg.getMessageRowContent())
             self.repalceContent(linelist,ori_msg.frameRow, msg.getMessageVFrameFormat())
             self.repalceContent(linelist,ori_msg.sendTypeRow, msg.getMessageSendType())

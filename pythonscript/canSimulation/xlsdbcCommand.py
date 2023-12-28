@@ -4,7 +4,7 @@ import sys
 
 import xlrd
 import argparse
-
+import copy
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 from analyze_dbc.commonfun import*
@@ -76,7 +76,6 @@ def getSigInfo(sheel, row):
         pass
     sig.invalidValue = getValue(sheel, row, sig_line_invalidValue)
     sig.Recevier = getValue(sheel, row, sig_line_Recevier)
-    sig.RecevierRemoveSend()
     if sig.endBit != -1:
         sig.getStartBit()
     else:
@@ -210,11 +209,11 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
             realMin = (float(sig.min)-float(sig.Offset)) / float(sig.factor)
             realMax = (float(sig.max)-float(sig.Offset)) / float(sig.factor)
             if realMin < 0 and sig.dataType == "+":
-                phy_min =  float(sig.offset)
-                printRed(f'{sig.name} 极小值小于0,表中最小物理值值为{sig.phy_min},能达到的最小物理值为{phy_min}')
+                phy_min =  float(sig.Offset)
+                printRed(f'{sig.name} 极小值小于0,表中最小物理值值为{sig.min},能达到的最小物理值为{phy_min} {realMin}')
                 continue
             if realMax > pow(2, sig.length)-1 and sig.max != pow(2, sig.length)-1:
-                phy_max = (pow(2, sig.length_bits)-1) * float(sig.factor) + float(sig.offset)
+                phy_max = (pow(2, sig.length)-1) * float(sig.factor) + float(sig.Offset)
                 if  sig.max == phy_max+1:
                     printYellow(f'{sig.name} 表中最大物理值为{sig.max}，能达到的最大物理值为{phy_max} 修改中...')
                     sig.max = phy_max-1
@@ -222,7 +221,7 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                     printRed(f'{sig.name} 表中最大物理值为{sig.max}，能达到的最大物理值为{phy_max}')
                     continue
 
-            if sig.min == sig.max:
+            if sig.min == sig.max and sig.max !=0:
                 printRed(f"{sig.name} 最大值和最小值相等值为{sig.min}")
                 continue
 
@@ -253,9 +252,17 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                     "can_parse_whitelist", jsConfig)
                 if os.path.isfile(can_parse_whitelistPath):
                     WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
+    dbc = Analyze(dbcfile)
+    dbc.reNameMsg()
     if not isFind:
         printRed(f"{wirteSigName} 在CAN矩阵中不存在")
 
+def reNameMsg(configPath):
+    jsConfig = getJScontent(configPath)
+    dbcfile = getKeyPath("dbcfile", jsConfig)
+    dbc = Analyze(dbcfile)
+    dbc.reNameMsg()
+    
 def WriteWhitelistPath(messages=[]):
     jsConfig=getJScontent(pyFileDir+"config.json")
     dbcPath = getKeyPath("dbcfile",jsConfig)
@@ -288,13 +295,14 @@ def conversionByOtherdbc(configPath, wirteSigNames, dbcfilPath=""):
     if len(wirteSigNames):
         print('没有找到的信号-------', wirteSigNames)
 
-def conversionMsgByOtherdbc(configPath,msgIds,dbcfilPaths):
+def conversionMsgByOtherdbc(configPath,msgIds,dbcfilPath,isWriteSig):
     assert isinstance(msgIds,list)
     jsConfig = getJScontent(configPath)
-    ori_dbc = Analyze(getKeyPath("dbcfile", jsConfig))
+    dbcfile =  getKeyPath("dbcfile", jsConfig)
+    ori_dbc = Analyze(dbcfile)
     modifyMgs={}
 
-    dbc = Analyze(dbcfilPaths)
+    dbc = Analyze(dbcfilPath)
     dbcMsgInfos = dbc.getAllMessage()
     isReurn = False
     for dbcMsgInfo in dbcMsgInfos:
@@ -302,18 +310,27 @@ def conversionMsgByOtherdbc(configPath,msgIds,dbcfilPaths):
             printYellow(f"请在 File_SubNet 变量配置 {dbcMsgInfo} 对应的 SubNet")
             isReurn = True
     if isReurn: return
+    wirteSigs={} 
+    copyMsgIds = copy.deepcopy(msgIds)
     for dbcMsgInfo in dbcMsgInfos:
         for dbcMsgId in dbcMsgInfos[dbcMsgInfo]:
-            if msgIds == None or len(msgIds) == 0 or dbcMsgId in msgIds:
+            if copyMsgIds == None or len(copyMsgIds) == 0 or dbcMsgId in copyMsgIds:
+                print(dbcMsgId)
                 msgInfo =dbcMsgInfos[dbcMsgInfo][dbcMsgId]
                 assert isinstance(msgInfo,MessageInfo)
                 msgInfo.subNet = File_SubNet[dbcMsgInfo]
                 modifyMgs[msgInfo.getMessage_SubNet()] = msgInfo
-
-    for msgInfo in list(modifyMgs.values()):
-        if msgInfo.messageId == '337':
-            print(msgInfo.getMessage_SubNet())
+                wirteSigs[msgInfo] = dbc.getSigsByMsgId(msgInfo.messageId)
+                if dbcMsgId in msgIds: msgIds.remove(dbcMsgId)
+    if len(msgIds) !=0:
+        noMsgIdsStr = '、'.join(msgIds)
+        printYellow(f'原dbc没有 {noMsgIdsStr} 报文')
     ori_dbc.repalceMessage(list(modifyMgs.values()))
+    if isWriteSig:
+        for wirteMsg,wirteSigs in wirteSigs.items():
+            ori_dbc = Analyze(dbcfile)
+            for wirteSig in wirteSigs:
+                ori_dbc.writeSig(wirteSig, wirteMsg)
 
 def RemoveSigs(configPath, sigNames):
     jsConfig = getJScontent(configPath)
@@ -389,43 +406,25 @@ def canMatrixNoMsg(configPath,canmatrix):
             print(f'0x{msgInfo}')
            
     printGreen('执行完成')
-                    
-def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser):
-    jsConfig = getJScontent(configPath)
-    if len(fristMatrix) == 0:
-        fristMatrix = getKeyPath("canmatrix", jsConfig)
-    fristMatrixName = os.path.basename(fristMatrix)
-    twoMatrixName = os.path.basename(twoMatrix)
-    book1 = xlrd.open_workbook(fristMatrix)
-    sheel1 = book1.sheet_by_name(Sig_Matrix)
-    book2 = xlrd.open_workbook(twoMatrix)
-    sheel2 = book2.sheet_by_name(Sig_Matrix)
-    sigInfos = []
-    for row in range(sheel1.nrows):
-        if row == 0:
-            continue
-        info = getSigInfo(sheel1, row)
-        # info.name = info.name+" "+info.messageId
-        sigInfos.append(info)
 
+
+def diffSigInfos(fristSigInfos,twoSigInfos,fristMatrixName,twoMatrixName,isfilterNoUser,resultPath,jsConfig):
     results = []
     noExit = []
     noExitSigName = []
-    for row in range(sheel2.nrows):
-        if row == 0:
-            continue
-        info = getSigInfo(sheel2, row)
+    for info in twoSigInfos:
+        assert isinstance(info, SigInfo)
         # info.name = info.name+" "+info.messageId
         index = 0
         isSame = CompareResult.No
-        for compareSig in sigInfos:
+        for compareSig in fristSigInfos:
             assert isinstance(compareSig, SigInfo)
             isSame, result = compareSig.compare(info)
             if isSame != CompareResult.No:
                 if len(result) != 0:
                     result = addHeadEnd(result, info.getMessage_Sig())
                     results.append('\n'.join(result))
-                del sigInfos[index]
+                del fristSigInfos[index]
                 break
             index += 1
         if isSame == CompareResult.No:
@@ -435,7 +434,7 @@ def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser
     deleteSig = []
     messageDifSig = []
 
-    for info in sigInfos:
+    for info in fristSigInfos:
         assert isinstance(info, SigInfo)
         messageSigStr = ''
         while info.name in noExitSigName:
@@ -445,7 +444,7 @@ def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser
             del noExit[sigIndex]
 
         if len(messageSigStr) != 0:
-            messageSigStr = messageSigStr + f' 原来 {info.messageId}'
+            messageSigStr = messageSigStr + f' {fristMatrixName} {info.messageId}'
             messageSigStr = messageSigStr.replace(info.getMessage_Sig(), '')
             messageSigStr = info.getMessage_Sig() + messageSigStr
             messageDifSig.append(messageSigStr)
@@ -482,6 +481,62 @@ def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser
 
     print("比较完成!")
 
+def diffDbc(fristDbcPath,twoDbcPath,configPath,resultPath,isfilterNoUser):
+    jsConfig = getJScontent(configPath)
+    if len(fristDbcPath) == 0:
+        fristDbcPath = getKeyPath("dbcfile", jsConfig)
+    fristDbc = Analyze(fristDbcPath)
+    twoDbcDbc = Analyze(twoDbcPath)
+    diffSigInfos(fristDbc.getAllSigInfo(),twoDbcDbc.getAllSigInfo(),fristDbcPath,twoDbcPath,isfilterNoUser,resultPath,jsConfig)
+
+def repalceFirtDbcSigName(fristDbcPath,twoDbcPath,configPath):
+    jsConfig = getJScontent(configPath)
+    if len(fristDbcPath) == 0:
+        fristDbcPath = getKeyPath("dbcfile", jsConfig)
+    fristDbc = Analyze(fristDbcPath)
+    twoDbcDbc = Analyze(twoDbcPath)
+    fristSigInfos = fristDbc.getAllSigInfo()
+    twoSigInfos = twoDbcDbc.getAllSigInfo()
+    for info in twoSigInfos:
+        assert isinstance(info, SigInfo)
+        isSame = CompareResult.No
+        for compareSig in fristSigInfos:
+            assert isinstance(compareSig, SigInfo)
+            isSame, result = compareSig.compare(info)
+            if isSame != CompareResult.No and compareSig.name != info.name:
+                print(f'修改信号名称{compareSig.name:<20} -> {info.name} ')
+                compareSig.name = info.name
+                fristDbc.repalceSig(compareSig,msg=fristDbc.getMessageBySigInfo(compareSig),isCheckByteConflict=False)
+
+def diffCanMatrix(fristMatrix, twoMatrix, configPath, resultPath, isfilterNoUser):
+    jsConfig = getJScontent(configPath)
+    if len(fristMatrix) == 0:
+        fristMatrix = getKeyPath("canmatrix", jsConfig)
+    fristMatrixName = os.path.basename(fristMatrix)
+    twoMatrixName = os.path.basename(twoMatrix)
+    book1 = xlrd.open_workbook(fristMatrix)
+    sheel1 = book1.sheet_by_name(Sig_Matrix)
+    book2 = xlrd.open_workbook(twoMatrix)
+    sheel2 = book2.sheet_by_name(Sig_Matrix)
+    sigInfos = []
+    for row in range(sheel1.nrows):
+        if row == 0:
+            continue
+        info = getSigInfo(sheel1, row)
+        # info.name = info.name+" "+info.messageId
+        sigInfos.append(info)
+
+    twoSigInfos = []
+    for row in range(sheel2.nrows):
+        if row == 0:
+            continue
+        info = getSigInfo(sheel1, row)
+        # info.name = info.name+" "+info.messageId
+        twoSigInfos.append(info)
+    
+    diffSigInfos(sigInfos,twoSigInfos,fristMatrixName,twoMatrixName,isfilterNoUser,resultPath,jsConfig)
+  
+
 def getNameChangedDict(nameChangeds):
     sigNameDict = {}
     for sigName in nameChangeds:
@@ -491,6 +546,23 @@ def getNameChangedDict(nameChangeds):
             new_SigName = sigNames[1]
             sigNameDict[old_SigName] = new_SigName
     return sigNameDict
+
+
+def getSrcSig(srcPath):
+    srcSigNames=set()
+    for (dirpath, dirnames, filenames) in os.walk(srcPath):
+        for fileName in filenames:
+            suffix = os.path.splitext(fileName)[1]
+            if suffix == '.cpp' or suffix == '.hpp' or suffix == '.h':
+                filePath = dirpath+'/'+fileName
+                content = readFileAll(filePath)
+                sigNames = re.findall(s_i, content, re.A)
+                sigNames = list(set(sigNames))
+                for sigName in sigNames:
+                    assert isinstance(sigName, str)
+                    srcSigNames.add(sigName)
+    for srcSigName in srcSigNames:
+        print(srcSigName)
 
 def repalceSrcSig(nameChangeds, jsConfig):
     srcPath = getKeyPath("srcPath", jsConfig)
@@ -620,19 +692,23 @@ def CopyEnum(configPath, dbcPath, resultPath):
         sigNameDict = getNameChangedDict(nameChangeds)
         sigNameDict = dict(zip(sigNameDict.values(), sigNameDict.keys()))
 
-    for messageSigName in newdbc.dbcSigs:
-        newsig = newdbc.dbcSigs[messageSigName]
-        assert isinstance(newsig, SigInfo)
-        sig = dbc.getSig(newsig.name)
-        if sig == None and newsig.getMessage_Sig() in sigNameDict:
-            message_Sig = sigNameDict[newsig.getMessage_Sig()]
-            sig = dbc.getSig(message_Sig)
-        if sig != None:
-            assert isinstance(sig, SigInfo)
-            newsig.isdbcEnum = sig.isdbcEnum
-            newsig.enum = sig.enum
-            sigEnums.append(newsig)
-    newdbc.repalceSigEnum(sigEnums)
+    for can_Channel in newdbc.AnalyzeDict:
+        onedbc = newdbc.AnalyzeDict[can_Channel]
+        assert isinstance(onedbc,AnalyzeFile)
+        for messageSigName in onedbc.dbcSigs:
+            newsig = onedbc.dbcSigs[messageSigName]
+            assert isinstance(newsig, SigInfo)
+            sig = dbc.getSig(newsig.name)
+            if sig == None and newsig.getMessage_Sig() in sigNameDict:
+                message_Sig = sigNameDict[newsig.getMessage_Sig()]
+                sig = dbc.getSig(message_Sig)
+            if sig != None:
+                assert isinstance(sig, SigInfo)
+                newsig.isdbcEnum = sig.isdbcEnum
+                newsig.enum = sig.enum
+                sigEnums.append(newsig)
+        onedbc.repalceSigEnum(sigEnums)
+
 
 def modifyMessageInfo(configPath,modifyMessages,canmatrix):
 
@@ -670,6 +746,35 @@ def findsignalInfile(signal,filePath):
     except:
         return False
 
+'''
+清除白名单不在dbc中信息
+'''
+def clearCan_parse_whitelist(configPath):
+    jsConfig=getJScontent(configPath)
+    dbc=Analyze(getKeyPath("dbcfile",jsConfig))
+    can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
+    can_parse_whitelist_content_lines = readFileLines(can_parse_whitelistPath)
+    deleteIndex = []
+    index = 0
+    for can_parse_whitelist_content_line in can_parse_whitelist_content_lines:
+        can_parse_whitelist_content_line = can_parse_whitelist_content_line.strip()
+        if not can_parse_whitelist_content_line.startswith('#'):
+           infos = can_parse_whitelist_content_line.split(' ')
+           if len(infos) !=0 :
+            info=infos[0]
+            if "message" in can_parse_whitelist_content_line:
+                if not dbc.messageExist(info):
+                    deleteIndex.append(index)
+                    print(f'删除报文 {info}')
+            elif "signal" in can_parse_whitelist_content_line:
+                if not dbc.sigExist(info):
+                    deleteIndex.append(index)
+                    print(f'删除信号 {info}')
+        index = index+1
+    can_parse_whitelist_content_lines = removeListIndexs(can_parse_whitelist_content_lines,deleteIndex)
+    wirteFileDicts(can_parse_whitelistPath,can_parse_whitelist_content_lines,False)
+
+
 def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_parse_whitelist_return):
     if os.path.isfile(can_parse_whitelistPath):  
         if  findsignalInfile(f'{messagesig}',can_parse_whitelistPath):
@@ -693,7 +798,7 @@ def WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,can_pars
             return 2
     return 1
 
-def addCan_parse_whitelist(sigs):
+def addCan_parse_whitelist(sigs,isPrint=False):
     jsConfig=getJScontent(pyFileDir+"config.json")
     analy=Analyze(getKeyPath("dbcfile",jsConfig))
     for sig in sigs:
@@ -704,7 +809,7 @@ def addCan_parse_whitelist(sigs):
         messagesig=analy.getMessage_Id_Sig(sig)
         can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
         WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,False)
-
+        if isPrint: print(f'{sig} 添加成功')
 '''
 获取信号名称对应的中文名称
 stype：输入的类型
