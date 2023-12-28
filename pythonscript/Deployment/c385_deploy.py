@@ -214,6 +214,7 @@ if __name__ == "__main__":
                     tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
                     ScpFile(tmpath,user,ssh_ip)
         if args.scp == 1:
+            interact()
             sys.exit()
 
     device = ""
