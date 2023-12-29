@@ -29,6 +29,16 @@ sig_line_invalidValue='R'
 sig_line_Recevier='U'
 sig_line_Project='Y'
 
+#topic和signal表配置
+xls_comments = 'A'
+xls_topic_name = 'B'
+xls_sig_name = 'C'
+xls_value_mapstr = 'H'
+xls_ignore = 'N'
+xls_prd_name = 'K'
+xls_functional_module = 'L'
+GOOGLESIGTOPICID="1v4y6DCyc3wnzaY8AdIi51jg4hQnV1Ip8J051WbIGUcc"
+
 def getStartBit(sheel,row,getValueInt):
     startPos =  getValueInt(sheel, row, sig_line_startBit)
     segmentPos =  getValueInt(sheel, row, sig_line_bytes_segment)
@@ -57,4 +67,8 @@ ISUSEDBCENUM=False
 Jira_Project = "HUR"
 SETSTR='/Set'
 WRITEWHITE=False
-GOOGLESIGTOPICID="1v4y6DCyc3wnzaY8AdIi51jg4hQnV1Ip8J051WbIGUcc"
+gitStoreInfos={
+    "../../../../qt/ic_apps/ic_dashboard/":
+    ['content_Dark_j90a','content_Light_j90a']
+}
+gitnore=['ui.qml']

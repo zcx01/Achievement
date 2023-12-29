@@ -20,6 +20,14 @@ public:
     static MessageBody getMessageBody(uint8_t *app_data,const int &app_lenght,const int &body_lenght);
 
     static std::tuple<MessageData, MessageBody> getMessage(uint8_t *data,const int &msglenght);
+
+    static A35SendReply getA35SendReply(uint8_t *app_data,const int &app_lenght);
+
+    static uint64_t getMessageId(uint8_t *requestId,uint32_t requestIdLenght,uint8_t sid,uint8_t mid);
+
+    static std::vector<TLVConent> getTLV(const std::vector<uint8_t> &TLVs,uint8_t fixedlenghtSize, std::vector<uint8_t> lenghtSizes = {});
+
+    static void setTLV(const std::vector<TLVConent> &TLVContents,std::vector<uint8_t> &TLVs);
 private:
     void dealData();
 

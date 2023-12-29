@@ -2,27 +2,32 @@
 #include <string>
 #include "tcp_define.hpp"
 #include "singleton/singleton.h"
+#include "queue.h"
 
 using namespace TD;
 
-class TcpSend : public Singleton<TcpSend>
+class TcpSend : public Singleton<TcpSend> 
 {
 public:
     TcpSend(Token token);
     ~TcpSend();
 
-    void sendAppData(uint8_t *app_data,int lenght);
+    void init();
 
-    void sendMessage(MessageData msgData,MessageBody body);
+    void sendAppData(uint8_t *app_data,int lenght,bool isAck);
+
+    void sendMessage(AppData &data);
 
     void setRecMessageFun(RecDataFun fun);
 
     void sendMsg(uint8_t *data, int msgLenght,bool isAck);
-private:
-    int connectPort(std::string ip,int port);
 
-    int sockfd = 0;
+private:
+    void processAppDataThread(std::string topic,int status);
+
+    void processAppData();
 
     RecDataFun m_RecMessageFun = nullptr;
+    PolyIC::Queue m_Queue;
 };
 

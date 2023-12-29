@@ -1,6 +1,7 @@
 #include "tcp_cache_message.hpp"
 #include <algorithm>
 #include "tcp_send.hpp"
+#include "tcp_data_analy.hpp"
 #include "tcp_data_fill.hpp"
 
 TcpCacheMessage::TcpCacheMessage()
@@ -17,23 +18,48 @@ TcpCacheMessage::~TcpCacheMessage()
 /**
  * 性能优化，可以考虑使用线程
 */
-void TcpCacheMessage::addMessage(uint8_t* msgData, int msgLenght)
+void TcpCacheMessage::addMessage(uint8_t* data, int lenght)
 {
-    auto msg = TcpDataAnaly::getMessage(msgData,msgLenght);
-    auto msgId = TD::getMessageId(std::get<0>(msg),std::get<1>(msg));
-    m_CacheDatas[msgId] = CacheData{std::vector<uint8_t>(msgData,msgData+msgLenght)};
+    auto msg = TcpDataAnaly::getMessage(data,lenght);
+    MessageData msgData = std::get<0>(msg);
+    MessageBody msgBody = std::get<1>(msg);
+    auto msgId = TcpDataAnaly::getMessageId(msgData.requestId,sizeof(msgData.requestId),msgBody.sid,msgBody.mid);
+    m_CacheDatas[msgId] = CacheData{std::vector<uint8_t>(data,data+lenght)};
     auto timerId = m_timer->add(RESENDTIME,std::bind(&TcpCacheMessage::timeOut,this,std::placeholders::_1),RESENDTIME);
     m_timerId[msgId] = timerId;
 }
 
-bool TcpCacheMessage::onMessageDataAndBodyArrival(MessageData msgData,MessageBody msgBody)
+bool TcpCacheMessage::removeId(uint64_t msgId)
 {
-    auto msgId = TD::getMessageId(msgData,msgBody);
     m_CacheDatas.erase(msgId);
     m_timerId.erase(msgId);
     return true;
 }
- 
+
+bool TcpCacheMessage::onAppDataArrival(uint8_t *app_data, int app_lenght)
+{
+    if(app_data[0] == 0x3)
+    {
+        auto reply = TcpDataAnaly::getA35SendReply(app_data,app_lenght);
+        auto msgId = TcpDataAnaly::getMessageId(reply.requestId,sizeof(reply.requestId),reply.sid,reply.mid);
+        removeId(msgId);
+    }
+    else if (app_data[0] == 0x00)
+    {
+        auto msg = TcpDataAnaly::getMessage(app_data, app_lenght);
+        MessageData msgData = std::get<0>(msg);
+        MessageBody msgBody = std::get<1>(msg);
+        auto msgId = TcpDataAnaly::getMessageId(msgData.requestId, sizeof(msgData.requestId), msgBody.sid, msgBody.mid);
+        removeId(msgId);
+    }
+    return false;
+}
+
+uint32_t TcpCacheMessage::getType()
+{
+    return 0x0;
+}
+
 void TcpCacheMessage::timeOut(int timerId)
 {
     auto timer_Ptr = std::find_if(m_timerId.begin(), m_timerId.end(),

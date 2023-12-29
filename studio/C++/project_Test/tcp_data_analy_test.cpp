@@ -10,6 +10,8 @@
 #include <thread>
 #include <sstream>
 #include "tcp_cache_message.hpp"
+#include "tcp_client.hpp"
+
 
 class TcpReceiveTest : public TcpReceive
 {
@@ -54,12 +56,17 @@ std::vector<uint8_t> convertHexStringToArray(const std::string& hexString,uint8_
 
 TcpDataAnalyTestTest::TcpDataAnalyTestTest(/* args */) 
 {
-    TcpReceiveTest test;
+    TcpClient::instance().init();
+    TcpClient::instance().startConnectThread();
+    TcpSend::instance().init();
     TcpCacheMessage cacheMessage;
+
+    TcpReceiveTest test;
 
     uint8_t app_data[12]={};
     std::string userInput;
     MessageData msgData;
+    msgData.ackFlag = 1;
     MessageBody msgBody;
     msgBody.sid = 0x12;
     msgBody.mid = 0x18;
@@ -81,7 +88,8 @@ TcpDataAnalyTestTest::TcpDataAnalyTestTest(/* args */)
 
     msgBody.setTLV(contents);
 
-    TcpSend::instance().sendMessage(msgData,msgBody);
+    AppData appData{msgData,msgBody};
+    TcpSend::instance().sendMessage(appData);
 
     std::cout << "请输入内容（输入'exit'退出）：\n";
     while (1)
@@ -96,4 +104,4 @@ TcpDataAnalyTestTest::TcpDataAnalyTestTest(/* args */)
 }
 
 
-CUSTOMEGISTER(TcpDataAnalyTest,TcpDataAnalyTestTest)
+CUSTOMEGISTER(TcpDataAnalyTest,TcpDataAnalyTestTest) 

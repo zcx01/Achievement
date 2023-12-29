@@ -1,37 +1,35 @@
 #pragma once
 #include <string>
 #include "tcp_define.hpp"
-#include "tcp_data_analy.hpp"
 #include "singleton/singleton.h"
 
-class TcpService : public Singleton<TcpService>
+using namespace TD;
+class TcpBaseReceive
 {
-public:
-    TcpService(Token token);
-
-    void addCallFun(RecDataFun fun);
 private:
-    void onMessageArrival(uint8_t *msg, int lenght);
+    /* data */
+public:
+    TcpBaseReceive(/* args */);
+    ~TcpBaseReceive();
 
-    int listenPort(int port=TCP_PORT);
+protected:
+    virtual bool onAppDataArrival(uint8_t *app_data, int app_lenght){ return true;}
+    virtual void dealAppData(uint8_t *app_data, int app_lenght){};
+    virtual uint32_t getType() = 0;
 
-    TcpDataAnaly data_analy;
-
-    std::vector<RecDataFun> m_funs;
+private:
+    void receiveAppData(uint8_t *app_data, int app_lenght);
 };
 
-class TcpReceive
+class TcpTspReceive : public TcpBaseReceive
 {
 public:
-    TcpReceive(/* args */);
-    virtual ~TcpReceive();
-
-    virtual bool onAppDatarrival(uint8_t *msg, int lenght){ return true;}
+    using TcpBaseReceive::TcpBaseReceive;
     virtual bool onMessageDataArrival(MessageData msgData){ return true;}
     virtual bool onMessageBodyArrival(MessageBody msgBody){ return true;}
     virtual bool onMessageDataAndBodyArrival(MessageData msgData,MessageBody msgBody){ return true;}
 private:
     void dealAppData(uint8_t *app_data, int app_lenght);
-    /* data */
+    uint32_t getType();
 };
 

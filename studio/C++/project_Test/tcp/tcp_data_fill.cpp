@@ -41,10 +41,8 @@ void TcpDataFill::fillMessagAndCall(MessageData &msgData,MessageBody &body, RecD
 {
     int app_lenght = sizeof(MessageData) + body.getRSMlenght() + body.TLVs.size();
     int useLenght = 0;
-
     msgData.up_down = 0x01;
     msgData.statusCode = 0x00;
-    msgData.ackFlag = 0x01;
     convertTimeToBytes(msgData.requestId);
     static uint8_t serialNumber = 0;
     msgData.requestId[5] = 0x01 | serialNumber << 2;

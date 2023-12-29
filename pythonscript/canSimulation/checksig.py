@@ -2,6 +2,7 @@
 import argparse
 from analyze_dbc.commonfun import*
 from analyze_dbc.analyze_dbc import *
+from analyze_dbc.projectInI import *
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 import xlrd
@@ -477,7 +478,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
         # try:
 
             try:
-                customFds = int(getSheelValue(sheel,i,'N'))
+                customFds = int(getSheelValue(sheel,i,xls_ignore))
                 if customFds == 1:
                     printGreen(f'{i+1:<10}无须导入,有自定义的fds')
                     continue
@@ -485,18 +486,18 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 pass
 
             try:
-                sigName = getSheelValue(sheel,i,'C').replace(" ", "").replace("\n", "").replace("\r", "")
+                sigName = getSheelValue(sheel,i,xls_sig_name).replace(" ", "").replace("\n", "").replace("\r", "")
                 if len(sigName) == 0: raise Exception(f"是空的")
             except:
                     printYellow(f'{i+1:<10}行是空的')
                     continue
             configXls = ConfigXls()
-            configXls.topic = getSheelValue(sheel,i,'B')
+            configXls.topic = getSheelValue(sheel,i,xls_topic_name)
             if configXls.getBindSigNames(sigName,dbc,whitelistdbcSigNames,jsUp):
                 printGreen(f"{i+1:<10} 写入完成")
                 continue
             configXls.dbcSigName,configXls.sender,isChanged,messageId = configConverdbc(sigName,dbc)
-            configXls.comments = getSheelValue(sheel,i,'A')
+            configXls.comments = getSheelValue(sheel,i,xls_comments)
             if configXls.comments == "" :
                 configXls.comments = preComments
             else:
@@ -506,11 +507,11 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 errorStrList=[]
                 errorStrList.append(configXls.comments)
                 try:
-                    errorStrList.append(getSheelValue(sheel,i,'L'))
+                    errorStrList.append(getSheelValue(sheel,i,xls_functional_module))
                 except:
                     errorStrList.append('')
                 try:
-                    errorStrList.append(getSheelValue(sheel,i,'K'))
+                    errorStrList.append(getSheelValue(sheel,i,xls_prd_name))
                 except:
                     errorStrList.append('')
                 errorStrList.append(f'{sigName} 信号缺失')
@@ -525,7 +526,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
             #     pass
             whitelistdbcSigNames.append(configXls.dbcSigName.replace('/','__'))
             try:
-                valueMapStr = getSheelValue(sheel,i,'H')
+                valueMapStr = getSheelValue(sheel,i,xls_value_mapstr)
                 valueMapStrs = re.findall(e_i,valueMapStr,re.A)
                 for valueMapStrIndex in range(len(valueMapStrs)):
                     if valueMapStrIndex % 2 != 0 : continue

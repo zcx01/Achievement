@@ -17,6 +17,9 @@
 #define TCP_IP "172.16.2.29"
 #define TCP_PORT 50001
 
+#define TCPCONNECTSTATUS "TcpConnectStatus"
+#define TCPSENDSTATUS "TcpSendStatus"
+
 using RecDataFun = std::function<void (uint8_t *, int)>;
 
 namespace TD
@@ -105,8 +108,25 @@ namespace TD
         std::uniform_int_distribution<uint16_t> dis(0, 0xffff);
         convertIntToBigEndianArray(dis(gen), random,lenght);
     }
-
 #pragma pack(push, 1)
+
+    enum TcpConnectStatus
+    {
+        NoConnect,
+        Connecting,
+        ConnectFail,
+        ConnectSuccess,
+        DisConnect
+    };
+
+    enum TcpSendStatus
+    {
+        Sending,
+        SendFail,
+        SendFinish
+    };
+
+
     typedef struct tcp_packet_header
     {
         uint8_t flag;
@@ -136,6 +156,11 @@ namespace TD
         {
             memset(this,0,sizeof(message_data));
         }
+
+        bool isVaild()
+        {
+            return up_down != 0;
+        }
     } MessageData;
 
     struct TLVConent
@@ -163,81 +188,35 @@ namespace TD
         {
             return sizeof(Random)+sizeof(sid)+sizeof(mid);
         }
-
-
-        std::vector<TLVConent> getTLV(uint8_t fixedlenghtSize,std::vector<uint8_t> lenghtSizes={})
-        {
-            std::vector<TLVConent> TLVContents;
-            int TLVLenghtInt = TLVs.size();
- 
-            int uselenght = 0;
-            auto TLVData = TLVs.data();
-            uint8_t lenghtSize = fixedlenghtSize;
-            while (uselenght < TLVLenghtInt)
-            {
-                TLVConent content;
-                content.type = convertBigEndianToInt(TLVData + uselenght,sizeof(content.type));
-                uselenght += sizeof(content.type);
-
-                if (lenghtSize == 0 && lenghtSizes.size() > TLVContents.size())
-                {
-                    lenghtSize = lenghtSizes[TLVContents.size()];
-                }
-                uint8_t lenght[lenghtSize];
-                memcpy(lenght, TLVData + uselenght, sizeof(lenght));
-                uselenght += sizeof(lenght);
-
-                auto intLenght = convertBigEndianToInt(lenght, sizeof(lenght));
-                for (uint64_t i = 0; i < intLenght; ++i)
-                {
-                    uint8_t value;
-                    memcpy(&value, TLVData + uselenght, sizeof(value));
-                    uselenght += sizeof(value);
-                    content.values.push_back(value);
-                }
-                TLVContents.push_back(content);
-            }
-            return TLVContents;
-        }
-
-        void setTLV(const std::vector<TLVConent> &TLVContents)
-        {
-            int TLVslenght = 0;
-            int uselenght = 0;
-            for (auto content : TLVContents)
-            {
-                TLVslenght += sizeof(content.type) + content.valuesLenghtSize + content.values.size();
-            }
-            uint8_t TLVDatas[TLVslenght];
-            memset(TLVDatas,0,sizeof(TLVDatas));
-
-            for (auto content : TLVContents)
-            {
-                convertIntToBigEndianArray(content.type, TLVDatas + uselenght,  sizeof(content.type));
-                uselenght += sizeof(content.type);
-
-                uint8_t lenght[content.valuesLenghtSize];
-                convertIntToBigEndianArray(content.values.size(), lenght, sizeof(lenght));
-                memcpy(TLVDatas + uselenght, lenght, sizeof(lenght));
-                uselenght += sizeof(lenght);
-
-                memcpy(TLVDatas + uselenght, content.values.data(), content.values.size());
-                uselenght += content.values.size();
-            }
-            printHex("TLVDatas",TLVDatas,TLVslenght);
-            TLVs = std::vector<uint8_t>(TLVDatas,TLVDatas+TLVslenght);
-        }
-
     } MessageBody;
 
-    static uint64_t getMessageId(const MessageData &msgData,const MessageBody &msgBody)
+    typedef struct app_data
     {
-        uint64_t value = convertBigEndianToInt(msgData.requestId, sizeof(msgData.requestId)); // 占6位
-        value |= msgBody.mid << 6;
-        value |= msgBody.sid << 7;
-        return value;
-    }
-
+        MessageData data;
+        MessageBody body;
+        app_data(const MessageData &d, const MessageBody &b)
+        {
+            data = d;
+            body = b;
+        }
+    }AppData;
+ 
+    typedef struct a35_send_reply
+    {
+        uint8_t flag ;                  // AG35与8155相关状态同步为0x03
+        uint8_t noticeFlag;             // AG35通知8155报文发送结果状态
+        uint8_t sid;                    // sid
+        uint8_t mid;                    // mid
+        uint8_t requestId[6];           // 年月日,第6位为流水号 8bit 为偶数，前2个bit定义为0x01，剩下的bit循环计数
+        uint8_t status = 0;             // 报文发送结果状态0:发送成功1:发送失败
+        a35_send_reply()
+        {
+            memset(this,0,sizeof(a35_send_reply));
+            flag = 0x3;
+            noticeFlag = 0x1;
+        }
+    }A35SendReply;
+    
 #pragma pack(pop)
 
 } // TD
