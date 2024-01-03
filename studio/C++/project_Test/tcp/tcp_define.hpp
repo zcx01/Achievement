@@ -14,7 +14,7 @@
 #define CRC16_INIT_VALUE 0
 #define CRC16_ISINITENABLE true
 #define MAX_LENGHT 2048
-#define TCP_IP "172.16.2.29"
+#define TCP_IP "172.16.2.30"
 #define TCP_PORT 50001
 
 #define TCPCONNECTSTATUS "TcpConnectStatus"

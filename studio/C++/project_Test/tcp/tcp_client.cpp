@@ -28,7 +28,6 @@ void TcpClient::init()
     fds::callTopicChanged(TCPCONNECTSTATUS,TD::NoConnect);
     data_analy.setCallFun([=](uint8_t *data, int lenght)
                           { onMessageArrival(data, lenght); });
-    std::thread(&TcpClient::receiveMsg, this).detach();
 }
 
 void TcpClient::colse()
@@ -64,6 +63,7 @@ void TcpClient::connectSocket(std::string ip, int port)
     if(isSuccess)
     {
         setConnectStatus(TD::ConnectSuccess);
+        std::thread(&TcpClient::receiveMsg, this).detach();
     }
 }
 
@@ -80,7 +80,6 @@ void TcpClient::setSendStatus(const TcpSendStatus &status)
 int TcpClient::connectPort(std::string ip, int port) 
 {
     IC_LOG_INFO("%s:%u",ip.c_str(),port);
-    struct sockaddr_in  servaddr;
     if( ip.empty()){
         IC_LOG_INFO("usage: ./client <ipaddress>");
         return -1;
@@ -95,15 +94,22 @@ int TcpClient::connectPort(std::string ip, int port)
     int optval = 1;
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
-    memset(&servaddr, 0, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(port);
-    if( inet_pton(AF_INET, ip.c_str(), &servaddr.sin_addr) <= 0){
+    struct sockaddr_in  addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    if (inet_pton(AF_INET, ip.c_str(), &addr.sin_addr) <= 0)
+    {
         IC_LOG_INFO("inet_pton error for %s",ip.c_str());
         return -1;
     }
+    // struct sockaddr_in addr;
+    // addr.sin_family = AF_INET;
+    // addr.sin_port = htons(port);
+    // addr.sin_addr.s_addr = inet_addr(ip.c_str());
+    // bind(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 
-    if(connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0){
+    if(connect(sockfd, (struct sockaddr*)&addr, sizeof(addr)) < 0){
         IC_LOG_INFO("connect error: %s(errno: %d)",strerror(errno),errno);
         return -1;
     }
@@ -162,7 +168,7 @@ int TcpClient::receiveMsg()
         }
         if(n <= 0  && sockfd !=0)
         {
-            IC_LOG_INFO("TcpClient accept socket error: %s(errno: %d)", strerror(errno), errno);
+            IC_LOG_INFO("TcpClient accept socket error: %s(errno: %d) lenght: %d", strerror(errno), errno,n);
             continue;
         }
         // std::unique_lock<std::mutex> lk(m_mutex);

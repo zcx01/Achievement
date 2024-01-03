@@ -67,17 +67,17 @@ void TcpDataFill::fillReSendData(uint8_t *data, int msglenght)
     memcpy(data + startRand, body.Random, sizeof(startRand));
 
     uint8_t crc[CRCLENGHT] = {};
-    int app_lenght = msglenght - sizeof(TCP_PACKET_HEADER) - CRCLENGHT; // 2是crc
-    crcCalculate(crc, data + sizeof(TCP_PACKET_HEADER), app_lenght);
-    memcpy(data + msglenght - CRCLENGHT, crc, CRCLENGHT);
+    int data_Lenght = msglenght  - CRCLENGHT; // 2是crc
+    crcCalculate(crc, data, data_Lenght);
+    memcpy(data + data_Lenght - CRCLENGHT, crc, CRCLENGHT);
 }
 
 uint8_t* TcpDataFill::fillData(uint8_t *app_data, int app_dataLenght, int &sendLenght)
 {
     static uint16_t counter = 0;
     sendLenght = 0;
+
     uint8_t crc[CRCLENGHT]={};
-    crcCalculate(crc, (uint8_t *)app_data, app_dataLenght);
 
     TCP_PACKET_HEADER head;
     head.flag = 0x5a;
@@ -90,6 +90,8 @@ uint8_t* TcpDataFill::fillData(uint8_t *app_data, int app_dataLenght, int &sendL
     int lenght = 0;
     packData(sendMsg,&head,sizeof(head),lenght);
     packData(sendMsg,app_data,app_dataLenght,lenght);
+    
+    crcCalculate(crc, (uint8_t *)sendMsg, lenght);
     packData(sendMsg,crc,sizeof(crc),lenght);
 
     
