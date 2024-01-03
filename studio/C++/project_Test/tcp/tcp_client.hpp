@@ -19,16 +19,17 @@ public:
     //异步连接
     void startConnectThread(std::string ip = TCP_IP ,int port = TCP_PORT);
 
-    //同步连接
-    void connectSocket(std::string ip = TCP_IP ,int port = TCP_PORT);
-
-    void colse();
+    void closeConnect();
 
     void sendMsg(uint8_t *data, int msgLenght);
 
     void addCallFun(RecDataFun fun);
 
 private:
+    //同步连接
+    void connectSocket(std::string ip = TCP_IP ,int port = TCP_PORT);
+
+
     void onMessageArrival(uint8_t *msg, int lenght);
 
     int receiveMsg();
@@ -44,8 +45,6 @@ private:
     std::vector<RecDataFun> m_funs;
 
     int sockfd = 0;
-
-    int m_connetcount = 10;
 
     bool is_exitReceiveMsg = true;
 

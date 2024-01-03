@@ -69,7 +69,7 @@ void TcpDataFill::fillReSendData(uint8_t *data, int msglenght)
     uint8_t crc[CRCLENGHT] = {};
     int data_Lenght = msglenght  - CRCLENGHT; // 2是crc
     crcCalculate(crc, data, data_Lenght);
-    memcpy(data + data_Lenght - CRCLENGHT, crc, CRCLENGHT);
+    memcpy(data + data_Lenght, crc, CRCLENGHT);
 }
 
 uint8_t* TcpDataFill::fillData(uint8_t *app_data, int app_dataLenght, int &sendLenght)

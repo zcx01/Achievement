@@ -20,7 +20,7 @@ TcpClient::TcpClient(Token token)
 
 TcpClient::~TcpClient() 
 {
-    colse();
+    closeConnect();
 }
 
 void TcpClient::init()
@@ -28,9 +28,10 @@ void TcpClient::init()
     fds::callTopicChanged(TCPCONNECTSTATUS,TD::NoConnect);
     data_analy.setCallFun([=](uint8_t *data, int lenght)
                           { onMessageArrival(data, lenght); });
+    std::thread(&TcpClient::receiveMsg, this).detach();
 }
 
-void TcpClient::colse()
+void TcpClient::closeConnect()
 {
     if (sockfd != 0)
     {
@@ -47,23 +48,29 @@ void TcpClient::startConnectThread(std::string ip, int port)
 
 void TcpClient::connectSocket(std::string ip, int port)
 {
-    int currentConnetCount=0;
     setConnectStatus(TD::Connecting);
     int isSuccess = false;
-    while (currentConnetCount < m_connetcount)
+    while (1)
     {
-        if(connectPort(ip,port) ==0)
+        if(isSuccess)
+        {
+            int error = getsockopt(sockfd, SOL_SOCKET, SO_ERROR, NULL, NULL);
+            if(error !=0)
+            {
+                if(sockfd !=0)
+                {
+                    closeConnect();
+                }
+                isSuccess = false;
+                setConnectStatus(TD::DisConnect);
+            }
+        }
+        else if(connectPort(ip,port) ==0)
         {
             isSuccess = true;
-            break;
+            setConnectStatus(TD::ConnectSuccess);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        currentConnetCount++;
-    }
-    if(isSuccess)
-    {
-        setConnectStatus(TD::ConnectSuccess);
-        std::thread(&TcpClient::receiveMsg, this).detach();
     }
 }
 
@@ -168,7 +175,7 @@ int TcpClient::receiveMsg()
         }
         if(n <= 0  && sockfd !=0)
         {
-            IC_LOG_INFO("TcpClient accept socket error: %s(errno: %d) lenght: %d", strerror(errno), errno,n);
+            IC_LOG_DEBUG("TcpClient accept socket error: %s(errno: %d) lenght: %d", strerror(errno), errno,n);
             continue;
         }
         // std::unique_lock<std::mutex> lk(m_mutex);

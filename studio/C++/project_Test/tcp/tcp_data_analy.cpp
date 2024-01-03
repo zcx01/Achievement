@@ -133,7 +133,7 @@ void TcpDataAnaly::setTLV(const std::vector<TLVConent> &TLVContents, std::vector
         memcpy(TLVDatas + uselenght, content.values.data(), content.values.size());
         uselenght += content.values.size();
     }
-    printHex("TLVDatas", TLVDatas, TLVslenght);
+    // printHex("TLVDatas", TLVDatas, TLVslenght);
     TLVs = std::vector<uint8_t>(TLVDatas, TLVDatas + TLVslenght);
 }
 
@@ -153,6 +153,7 @@ void TcpDataAnaly::dealData()
             }
             else
             {
+                data_crc_start = use_lenght;
                 usePackData(&head_data,head_lenght);
                 is_new_data = false;
                 dealData();
@@ -177,22 +178,24 @@ void TcpDataAnaly::dealData()
         uint8_t app_data[app_data_lenght];
         usePackData(app_data, app_data_lenght);
 
+        data_crc_end = use_lenght - data_crc_start;
         uint8_t crc_data[CRCLENGHT];
         usePackData(crc_data,sizeof(crc_data));
         //校验
         printHex("crc_data",crc_data,sizeof(crc_data));
-        if(!checkCrc(crc_data,app_data,app_data_lenght))
+        if(!checkCrc(crc_data,(uint8_t*)pack_data+data_crc_start,data_crc_end))
         {
-            IC_LOG_ERROR("check crc fail!");
-            return;
+            IC_LOG_ERROR("check crc fail! start:%d,end %d",data_crc_start,data_crc_end);
         }
-        
-        //回调处理
-        printHex("deal Data:",app_data,app_data_lenght);
-
-        if (m_RecDataFun != nullptr)
+        else
         {
-            m_RecDataFun(app_data, app_data_lenght);
+            //回调处理
+            printHex("deal Data:",app_data,app_data_lenght);
+
+            if (m_RecDataFun != nullptr)
+            {
+                m_RecDataFun(app_data, app_data_lenght);
+            }
         }
         
         //处理下一包的数据
@@ -215,6 +218,8 @@ void TcpDataAnaly::resetData()
     is_new_data = true;
     fill_lenght = 0;
     use_lenght = 0;
+    data_crc_start = 0;
+    data_crc_end = 0;
 }
 
 

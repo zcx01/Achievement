@@ -43,5 +43,7 @@ private:
     bool            is_new_data = true;
     TCP_PACKET_HEADER   head_data;
     RecDataFun      m_RecDataFun=nullptr;
+    int             data_crc_start=0;
+    int             data_crc_end=0;
 };
 
