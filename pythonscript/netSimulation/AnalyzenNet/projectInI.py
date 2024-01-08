@@ -1,4 +1,4 @@
-Sig_Matrix='ADC_To_THUEDC'
+Sig_Matrix='THUEDC_To_ADC'
 CANTYPE="APA"
 HEADFILNE=".h"
 SOURCE='.c'

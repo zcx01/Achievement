@@ -13,7 +13,7 @@
 #include "tcp_client.hpp"
 
 
-class TcpReceiveTest : public TcpReceive
+class TcpReceiveTest : public TcpTspReceive
 {
 private:
     /* data */
@@ -22,7 +22,7 @@ public:
     {
         printHex("sid",&body.sid,sizeof(body.sid));
         printHex("mid",&body.mid,sizeof(body.mid));
-        std::vector<TLVConent> contents = body.getTLV(1);
+        std::vector<TLVConent> contents = TcpDataAnaly::getTLV(body.TLVs,1);
         for (auto content : contents)
         {
             IC_LOG_INFO(content.type);
@@ -32,7 +32,7 @@ public:
     }
 };
 
-class TcpReceiveTest2 : public TcpReceive
+class TcpReceiveTest2 : public TcpTspReceive
 {
 private:
     /* data */
@@ -57,7 +57,6 @@ std::vector<uint8_t> convertHexStringToArray(const std::string& hexString,uint8_
 TcpDataAnalyTestTest::TcpDataAnalyTestTest(/* args */) 
 {
     TcpClient::instance().init();
-    TcpClient::instance().startConnectThread();
     TcpSend::instance().init();
     TcpCacheMessage cacheMessage;
 
@@ -86,7 +85,7 @@ TcpDataAnalyTestTest::TcpDataAnalyTestTest(/* args */)
     content.values.push_back(0x03);
     contents.push_back(content);
 
-    msgBody.setTLV(contents);
+    TcpDataAnaly::setTLV(contents,msgBody.TLVs);
 
     AppData appData{msgData,msgBody};
     TcpSend::instance().sendMessage(appData);

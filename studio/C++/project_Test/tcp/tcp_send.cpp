@@ -23,9 +23,10 @@ void TcpSend::init()
 
 void TcpSend::processAppDataThread(std::string topic,int status)
 {
-    if(topic ==  TCPCONNECTSTATUS && status == TD::ConnectSuccess)
+    if(topic ==  TCPCONNECTSTATUS && status == TD::ConnectSuccess && !is_startThread)
     {
         std::thread(&TcpSend::processAppData,this).detach();
+        is_startThread = true;
     }
 }
 

@@ -93,6 +93,7 @@ int TcpService::listenPort(int port)
             {
                 IC_LOG_INFO("accept socket error: %s(errno: %d)", strerror(errno), errno);
             }
+            continue;
         }
         TD::printHex("service",(uint8_t*)buff,n);
         write(connfd, buff, n);

@@ -14,7 +14,7 @@
 #define CRC16_INIT_VALUE 0
 #define CRC16_ISINITENABLE true
 #define MAX_LENGHT 2048
-#define TCP_IP "172.16.2.30"
+#define TCP_IP "127.0.0.1"
 #define TCP_PORT 50001
 
 #define TCPCONNECTSTATUS "TcpConnectStatus"
@@ -24,6 +24,28 @@ using RecDataFun = std::function<void (uint8_t *, int)>;
 
 namespace TD
 {
+    static void printHex(const std::string &topic, uint8_t *data, uint8_t len)
+    {
+        char buff[512] = {0};
+        for (int i = 0; i < len; i++)
+        {
+            sprintf(buff + i * 3, "%02x ", data[i]);
+        }
+        IC_LOG_INFO("topic: %s %s\n", topic.c_str(), buff);
+    }
+
+    static void printVectorHex(std::string topic, const std::vector<uint8_t> &values)
+    {
+        if (values.empty())
+        {
+            IC_LOG_DEBUG("values is empty");
+            return;
+        }
+        const int &size = values.size();
+        uint8_t *data = const_cast<uint8_t *>(values.data());
+        printHex(topic, data, size);
+    }
+
     static void convertIntToLittleEndian(int16_t value, uint8_t *data)
     {
         data[0] = static_cast<uint8_t>(value & 0xFF);
@@ -64,6 +86,7 @@ namespace TD
     {
         uint8_t valueArray[2];
         memcpy(valueArray, &value, sizeof(uint16_t));
+        printHex("compareByteArrayWithUint16",valueArray,2);
         return memcmp(byteArray, valueArray, sizeof(uint16_t)) == 0;
     }
 
@@ -77,28 +100,6 @@ namespace TD
     {
         auto crc16 = crc16_calculate(CRC16_INIT_VALUE, app_data, app_data_lenght, CRC16_ISINITENABLE);
         convertIntToLittleEndian(crc16, crc);
-    }
-
-    static void printHex(const std::string &topic, uint8_t *data, uint8_t len)
-    {
-        char buff[512] = {0};
-        for (int i = 0; i < len; i++)
-        {
-            sprintf(buff + i * 3, "%02x ", data[i]);
-        }
-        IC_LOG_INFO("topic: %s %s\n", topic.c_str(), buff);
-    }
-
-    static void printVectorHex(std::string topic, const std::vector<uint8_t> &values)
-    {
-        if (values.empty())
-        {
-            IC_LOG_DEBUG("values is empty");
-            return;
-        }
-        const int &size = values.size();
-        uint8_t *data = const_cast<uint8_t *>(values.data());
-        printHex(topic, data, size);
     }
 
     static void Random16(uint8_t *random,int lenght)

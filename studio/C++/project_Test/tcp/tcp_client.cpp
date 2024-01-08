@@ -23,8 +23,10 @@ TcpClient::~TcpClient()
     closeConnect();
 }
 
-void TcpClient::init()
+void TcpClient::init(std::string ip ,int port)
 {
+    m_ip = ip;
+    m_port = port;
     fds::callTopicChanged(TCPCONNECTSTATUS,TD::NoConnect);
     data_analy.setCallFun([=](uint8_t *data, int lenght)
                           { onMessageArrival(data, lenght); });
@@ -39,11 +41,6 @@ void TcpClient::closeConnect()
         sockfd = 0;
         setConnectStatus(TD::DisConnect);
     }
-}
-
-void TcpClient::startConnectThread(std::string ip, int port)
-{
-    std::thread(&TcpClient::connectSocket, this, ip, port).detach();
 }
 
 void TcpClient::connectSocket(std::string ip, int port)
@@ -168,18 +165,22 @@ int TcpClient::receiveMsg()
         {
             n = recv(sockfd, buff, MAX_LENGHT, 0);
         }
-        else
+        if(n <= 0)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            continue;
-        }
-        if(n <= 0  && sockfd !=0)
-        {
-            IC_LOG_DEBUG("TcpClient accept socket error: %s(errno: %d) lenght: %d", strerror(errno), errno,n);
+            IC_LOG_INFO("TcpClient accept socket error: %s(errno: %d) lenght: %d", strerror(errno), errno,n);
+            if (sockfd != 0)
+            {
+                closeConnect();
+                setConnectStatus(TD::DisConnect);
+            }
+            if(connectPort(m_ip,m_port) ==0)
+            {
+                setConnectStatus(TD::ConnectSuccess);
+            }
+             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             continue;
         }
         // std::unique_lock<std::mutex> lk(m_mutex);
-        
         data_analy.add(buff,n);
     }
     return 0;

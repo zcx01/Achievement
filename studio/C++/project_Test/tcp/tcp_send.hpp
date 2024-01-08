@@ -29,5 +29,6 @@ private:
 
     RecDataFun m_RecMessageFun = nullptr;
     PolyIC::Queue m_Queue;
+    bool is_startThread = false;
 };
 

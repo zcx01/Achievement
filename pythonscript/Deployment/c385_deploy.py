@@ -22,24 +22,25 @@ def setProjectType(defultDir,execName):
         
 def getPusPath(proceesName):
     tmpPath = ''
-    tmpPath = getKeyPath(proceesName,jsConfig[projectType])
-    if len(tmpPath) == 0:
-        tmpPath = getKeyPath(proceesName,jsConfig)
+    tmpPath = getKeyPath(proceesName,jsConfig)
+    if not os.path.exists(tmpPath):
+        tmpPath = getKeyPath(proceesName,jsConfig[projectType])
     return tmpPath
 
 def getExecBin(defultDir,execName):
     tempDir=''
-    if projectType in jsConfig:
-        try:
-            tempDir = jsConfig[projectType]["PC"][execName]
-            if len(tempDir) != 0: return tempDir
-        except:
-            pass
-
     pcDirs = jsConfig.get("PC","")
     tempDir = pcDirs.get(execName,"")
     if len(tempDir) != 0:
         return tempDir
+    
+    if not os.path.exists(tempDir):
+        if projectType in jsConfig:
+            try:
+                tempDir = jsConfig[projectType]["PC"][execName]
+                if len(tempDir) != 0: return tempDir
+            except:
+                pass
     return defultDir
 
 def printPCFile():

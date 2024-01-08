@@ -14,10 +14,7 @@ public:
     TcpClient(Token token);
     ~TcpClient();
 
-    void init();
-
-    //异步连接
-    void startConnectThread(std::string ip = TCP_IP ,int port = TCP_PORT);
+    void init(std::string ip = TCP_IP ,int port = TCP_PORT);
 
     void closeConnect();
 
@@ -27,8 +24,7 @@ public:
 
 private:
     //同步连接
-    void connectSocket(std::string ip = TCP_IP ,int port = TCP_PORT);
-
+    void connectSocket(std::string ip,int port);
 
     void onMessageArrival(uint8_t *msg, int lenght);
 
@@ -49,4 +45,8 @@ private:
     bool is_exitReceiveMsg = true;
 
     std::mutex m_mutex;
+
+    std::string m_ip;
+
+    int m_port = 0;
 };
