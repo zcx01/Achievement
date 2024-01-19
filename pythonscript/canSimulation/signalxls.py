@@ -26,7 +26,18 @@ except:
     from analyze_dbc.projectInI import *
     jsConfig = getJScontent(pyFileDir+"config.json",)
 
-dbc=Analyze(jsConfig.get("dbcfile",""))
+dbc_dir = jsConfig.get("dbcfile","")
+signalMonitorDbc = None
+dbc=Analyze(dbc_dir)
+for (dirpath,dirnames,filenames) in os.walk(dbc_dir):
+    for oriName in filenames:
+        if ".dbc" in oriName and dirpath == dbc_dir:
+            dbc_file = f'{dirpath}/{oriName}'
+            oriBaseName = oriName.split(".")[0]
+            can_Channel = oriBaseName.split("_")[0]
+            if can_Channel == main_can:
+                signalMonitorDbc = os.path.abspath(dbc_file)
+                break
 class useCase(object):
     def __init__(self):
         self.index=0
@@ -122,6 +133,8 @@ class useCase(object):
                 while(index < len(cmd)):
                     sigName = cmd[index]
                     sigValue = cmd[index+1]
+                    if "0x" in sigValue:
+                        sigValue = str(int(sigValue,16))
 
                     if not isNumber(sigValue):
                         print("输入信号值错误")
@@ -346,10 +359,10 @@ if __name__ == "__main__":
     #这个是要解析 -f 后面的参数
     parser.add_argument('-b','--bugxlsx',help="jira xlsx file")
     parser.add_argument('-c','--casexlsx',help="generate case xlsx file")
-    parser.add_argument('-s', '--Send',help="Send CAN",type=str,default='',nargs='?')
+    parser.add_argument('-s', '--Send',help="发送 CAN",type=str,default='',nargs='?')
     parser.add_argument('-st', '--SendTimeOut',help="模拟超时报文,是16进制",type=str,default='',nargs='?')
-    parser.add_argument('-d', '--dbc',help="dbc",type=str,default=None,nargs='?')
-    parser.add_argument('-m', '--Monitor',help="Monitor CAN", default=[], nargs='+', type=str)
+    parser.add_argument('-d', '--dbc',help="dbc",type=str,default="",nargs='?')
+    parser.add_argument('-m', '--Monitor',help="监听 CAN", default=[], nargs='+', type=str)
     parser.add_argument('-p', '--SendPowerSig', help="Send Power Sig", type=int,default=0)
     parser.add_argument('-t', '--dataType',help="get sig data type", default=[], nargs='+', type=str)
     parser.add_argument('-i', '--SequenceSendInitValue',help="按照指定的间隔发送信号初始值",type=int,default=2)
@@ -357,7 +370,8 @@ if __name__ == "__main__":
     arg=parser.parse_args()
 
     use = useCase()
-    signalMonitorDbc = arg.dbc
+    if len(arg.dbc) !=0:
+        signalMonitorDbc = arg.dbc
     if "-b" in sys.argv:
         dealTest(arg.bugxlsx,1,26,arg.SendPowerSig)
     elif '-c' in sys.argv:

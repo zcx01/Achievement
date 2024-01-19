@@ -20,10 +20,20 @@ def setProjectType(defultDir,execName):
     if not os.path.exists(execbin):
         projectType = "backUpPath"
         
+def isProjectType(proceesName):
+    tempDir = ""
+    if projectType in jsConfig:
+        try:
+            tempDir = jsConfig[projectType]["PC"][proceesName]
+        except:
+            pass
+    return tempDir != ''
+
 def getPusPath(proceesName):
     tmpPath = ''
-    tmpPath = getKeyPath(proceesName,jsConfig)
-    if not os.path.exists(tmpPath):
+    if isProjectType(proceesName) == 0:
+        tmpPath = getKeyPath(proceesName,jsConfig)
+    else:
         tmpPath = getKeyPath(proceesName,jsConfig[projectType])
     return tmpPath
 
@@ -31,16 +41,15 @@ def getExecBin(defultDir,execName):
     tempDir=''
     pcDirs = jsConfig.get("PC","")
     tempDir = pcDirs.get(execName,"")
-    if len(tempDir) != 0:
-        return tempDir
     
     if not os.path.exists(tempDir):
         if projectType in jsConfig:
             try:
                 tempDir = jsConfig[projectType]["PC"][execName]
-                if len(tempDir) != 0: return tempDir
             except:
                 pass
+    if len(tempDir) != 0:
+        return tempDir
     return defultDir
 
 def printPCFile():
@@ -235,14 +244,14 @@ if __name__ == "__main__":
         if '-c' in sys.argv:
             proceesNames= args.customfile
             for proceesName in proceesNames:
+                execbin = getExecBin(proceesName,proceesName)
+                if os.path.isdir(execbin):
+                    execbin = f'{execbin}/{proceesName}'
+                tmpath = f'{PrjectDir}/{execbin}'
+                print(tmpath)
                 if platform.system() == "Windows":
-                    execbin = getExecBin(proceesName,proceesName)
-                    tmpathS = f'{PrjectDir}/{execbin}/{proceesName}'
-                    print(tmpathS)
-                    ScpFileWin(args.scpWinDir,tmpathS,user,ssh_ip)
+                    ScpFileWin(args.scpWinDir,tmpath,user,ssh_ip)
                 else:
-                    execbin = getExecBin(proceesName,proceesName)
-                    tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
                     ScpFile(tmpath,user,ssh_ip)
         if args.scp == 1:
             interact()
@@ -283,7 +292,9 @@ if __name__ == "__main__":
             else:
                 execbin = getExecBin(proceesName,proceesName)
                 print(execbin)
-            exe_proceesNames.append(f'{execbin}/{proceesName}')
+            if os.path.isdir(execbin):
+                execbin = f'{execbin}/{proceesName}'
+            exe_proceesNames.append(execbin)
         androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
         # copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)

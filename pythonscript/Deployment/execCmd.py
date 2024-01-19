@@ -134,14 +134,14 @@ class AndroidQnx(object):
         keyStr(f'adb{self.device} shell')
         keyStr('init.mount_ota.sh',0,"#")
         for fileName in fileNames:
-            keyStr(f'cp {self.androidDir}/{fileName} {self.android_qnxDir}',0,"#")
+            keyStr(f'cp -rf {self.androidDir}/{fileName} {self.android_qnxDir}',0,"#")
 
     def qnx_cp(self,fileDict,chmod):
         for file in fileDict:
             if len(fileDict[file]) != 0:
                 keyStr(f'md5 {fileDict[file]}{file}')
-                keyStr(f"rm {fileDict[file]}{file}")
-                keyStr(f"cp {self.qnxDir}/{file} {fileDict[file]}")
+                keyStr(f"rm -rf {fileDict[file]}{file}")
+                keyStr(f"cp -rf {self.qnxDir}/{file} {fileDict[file]}")
                 keyStr(f'md5 {fileDict[file]}{file}')
             if chmod:
                 keyStr(f'slay {file}')
