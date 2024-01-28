@@ -27,3 +27,9 @@
 32  usbfd   can0 ffffffff 255 0x0014 00000000 0000000a 00000005 00000000 0x0000
 33  usbfd   can1 ffffffff 255 0x001c 00000000 00000000 00000000 00000000 0x0000
 
+
+可能出现的错误：  
+1.其中，可能在make过程中出现错误，把226行dev->trans_start=jiffies和439行dev->last_rx=jiffies注释掉，
+写入netdev_get_tx_queue(dev,0)->trans_start=jiffies。 
+2.出现popt.h not found的错误，则输入   sudo apt-get install libpopt-dev   
+3.编译chardev出现内核版本问题。若出现/arch/x86/include/asm/uaccess.h:31:9: error: dereferencing pointer to incomplete type的错误，则将drivers中的pcan_main.c中的#include <asm/uaccess.h>更改为#include <linux/uaccess.h>

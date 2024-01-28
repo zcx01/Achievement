@@ -245,7 +245,7 @@ if __name__ == "__main__":
             proceesNames= args.customfile
             for proceesName in proceesNames:
                 execbin = getExecBin(proceesName,proceesName)
-                if os.path.isdir(execbin):
+                if not os.path.isfile(execbin):
                     execbin = f'{execbin}/{proceesName}'
                 tmpath = f'{PrjectDir}/{execbin}'
                 print(tmpath)
@@ -292,7 +292,7 @@ if __name__ == "__main__":
             else:
                 execbin = getExecBin(proceesName,proceesName)
                 print(execbin)
-            if os.path.isdir(execbin):
+            if not os.path.isfile(execbin):
                 execbin = f'{execbin}/{proceesName}'
             exe_proceesNames.append(execbin)
         androidQnx.pc_android_qnx(exe_proceesNames)
