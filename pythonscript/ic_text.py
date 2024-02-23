@@ -312,6 +312,8 @@ def xlsCover(translatePath,jsonPath,input):
                 for grade in aimJsContents[top]:
                     if isNumber(grade) :
                         source = joint(top,grade)  
+                        if source not in tsContent:
+                            source = aimJsContents[top][grade][removeSuffix(SOUCRELANGUAGESUFFIX)]
                         if source in tsContent:
                             aimJsContents[top][grade][removeSuffix(oriLanguageSuffix)] = tsContent[source].translateContent
             writeJs(jsonPath,aimJsContents)
@@ -332,8 +334,8 @@ def buildScript():
 #./ic_text.py -t /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/translate -j /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json -o ic-out.xlsx
 if __name__ == "__main__":
     aparse = argparse.ArgumentParser(description='python的脚本模板')
-    aparse.add_argument('-t','--translatePath',help='翻译文件所在目录',type=str,nargs="?",default="/home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/translate")
-    aparse.add_argument('-j','--json',help='报警文字配置文件',type=str,nargs="?",default="/home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json")
+    aparse.add_argument('-t','--translatePath',help='翻译文件所在目录',type=str,nargs="?",default="")
+    aparse.add_argument('-j','--json',help='报警文字配置文件',type=str,nargs="?",default="")
     aparse.add_argument('-o','--outPath',help='生成xls文件路径',type=str,nargs="?",default='./changed.xlsx')
     aparse.add_argument('-i','--input',help='输入xls文件路径',type=str)
     aparse.add_argument('-c','--checkChange',help='检测修改的文本',type=str,nargs="?")
