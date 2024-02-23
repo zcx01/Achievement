@@ -27,7 +27,7 @@ sig_line_enum='P'
 sig_line_initValue='Q'
 sig_line_invalidValue='R'
 sig_line_Recevier='U'
-sig_line_Project='Y'
+sig_line_Project='Z'
 
 #topic和signal表配置
 xls_comments = 'A'
@@ -66,9 +66,4 @@ MSB=False
 ISUSEDBCENUM=False
 Jira_Project = "HUR"
 SETSTR='/Set'
-WRITEWHITE=False
-gitStoreInfos={
-    "../../../../qt/ic_apps/ic_dashboard/":
-    ['content_Dark_j90a','content_Light_j90a']
-}
-gitnore=['ui.qml']
+WRITEWHITE=False    

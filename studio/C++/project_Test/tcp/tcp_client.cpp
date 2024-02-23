@@ -143,7 +143,7 @@ void TcpClient::sendMsg(uint8_t *data, int msgLenght)
         IC_LOG_INFO("sockfd error: %d", sockfd);
         return;
     }
-    TD::printHex("send msg:", data, msgLenght);
+    //TD::printHex("send msg:", data, msgLenght);
     setSendStatus(TD::Sending);
     std::unique_lock<std::mutex> lk(m_mutex);
     if (send(sockfd, data, msgLenght, 0) < 0)
@@ -171,13 +171,15 @@ int TcpClient::receiveMsg()
             if (sockfd != 0)
             {
                 closeConnect();
-                setConnectStatus(TD::DisConnect);
             }
             if(connectPort(m_ip,m_port) ==0)
             {
                 setConnectStatus(TD::ConnectSuccess);
             }
-             std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            else
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            }
             continue;
         }
         // std::unique_lock<std::mutex> lk(m_mutex);

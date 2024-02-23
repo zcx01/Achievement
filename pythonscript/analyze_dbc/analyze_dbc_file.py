@@ -248,8 +248,8 @@ class SigInfo(object):
             receviers.remove(self.Sender)
         if len(receviers) == 0:
             receviers.append("Vector__XXX")
-        if local_machine_Sender != self.Sender and local_machine_Sender not in receviers:
-            receviers.extend(local_machine_Sender)
+        if local_machine_Sender[0] != self.Sender and local_machine_Sender[0] not in receviers:
+            receviers.append(local_machine_Sender[0])
         self.Recevier = ",".join(receviers)
 
 class MessageInfo(object):

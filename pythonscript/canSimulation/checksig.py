@@ -274,7 +274,7 @@ class ConfigXls():
         if len(self.valueMap) != 0:
             contentJson['valueMap'] = self.valueMap
         if len(self.defaultValueType) != 0:
-            contentJson['defaultValueType'] = self.defaultValueType
+            contentJson['defaultValueType'] = int(self.defaultValueType)
         if len(self.comments) != 0:
             contentJson['comments'] = self.comments
         contentJson[ISXLS] = True
@@ -393,15 +393,16 @@ def clearXlsData(jsConfig):
     assert isinstance(jsConfig,dict)
     tempJs = copy.deepcopy(jsConfig)
     for fContent in tempJs:
-        for tContent in tempJs[fContent]:
-            contentJson = tempJs[fContent][tContent]
-            if type(contentJson) == dict and ISXLS in contentJson and contentJson[ISXLS]:
-                del jsConfig[fContent][tContent]
-                if len(jsConfig[fContent]) == 0:
-                    del jsConfig[fContent]
-                elif len(jsConfig[fContent]) == 1:
-                    if  LOGSTR in jsConfig[fContent]:
+        if type(tempJs[fContent]) == dict:
+            for tContent in tempJs[fContent]:
+                contentJson = tempJs[fContent][tContent]
+                if type(contentJson) == dict and ISXLS in contentJson and contentJson[ISXLS]:
+                    del jsConfig[fContent][tContent]
+                    if len(jsConfig[fContent]) == 0:
                         del jsConfig[fContent]
+                    elif len(jsConfig[fContent]) == 1:
+                        if  LOGSTR in jsConfig[fContent]:
+                            del jsConfig[fContent]
 
 def addConfigByTopicCanXls(xlsPath,configPath):
     book = xlrd.open_workbook(xlsPath)
@@ -532,22 +533,20 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                     if valueMapStrIndex % 2 != 0 : continue
                     fValue = valueMapStrs[valueMapStrIndex]
                     tIndex = valueMapStrIndex + 1
+                    if "defaultValueType" in fValue: continue 
                     if tIndex >= len(valueMapStrs):
                         printYellow(f"{i+1:<10} {tIndex} {len(valueMapStrs)}值映射错误")
                         continue
                     tValue = int(valueMapStrs[tIndex])
                     configXls.valueMap[fValue] = tValue
-            except:
-                pass
 
-            try:
                 defaultValueTypeStr = re.findall(f'defaultValueType:{i_i}',valueMapStr,re.A)[0]
                 assert isinstance(defaultValueTypeStr,str)
                 defaultValueTypeStrRow = defaultValueTypeStr.split(":")
                 configXls.defaultValueType = defaultValueTypeStrRow[1]
             except:
                 pass
-                
+
             if configXls.sender not in local_machine_Sender: 
                 configXls.addToConfig(jsUp,False)         
             if configXls.sender in local_machine_Sender:
@@ -573,6 +572,30 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
     errBook.save(errBookFile)
     return whitelistdbcSigNames
 
+
+def printKey(jsConfig,key):
+    print(f'{key}:{json.dumps(jsConfig[key],indent=4 ,ensure_ascii=False)}')
+
+def findJson(jsConfig,key):
+    assert isinstance(jsConfig,dict)
+    for fContent in jsConfig:
+        if key in fContent:
+            printKey(jsConfig,fContent)
+        if type(jsConfig[fContent]) == str:
+            if key in jsConfig[fContent]:
+                printKey(jsConfig,fContent)
+        elif type(jsConfig[fContent]) == dict:
+            for tContent in jsConfig[fContent]:
+                if key in tContent:
+                    printKey(jsConfig,fContent)
+        
+def findConfigInfo(key,configPath):
+    jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
+    printGreen('*************************下行*************************')
+    findJson(jsDown,key)
+    printGreen('*************************上行*************************')
+    findJson(jsUp,key)
+
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
         description='''
@@ -589,6 +612,7 @@ if __name__ == "__main__":
     parse.add_argument('-t', '--topic', help='topic是列表和-m参数索引要对应',default=[], nargs='+', type=str)
     parse.add_argument('-m', '--messages', help='新增messages是一个列表',default=[], nargs='+', type=str)
     parse.add_argument('-tc', '--topicCan', help='通过topic和CAN对应的xls添加配置文件',type=str,default='')
+    parse.add_argument('-f', '--findKey', help='发现对应的信息',type=str,default='')
     arg = parse.parse_args()
     configPath = pyFileDir+"config.json"
 
@@ -602,8 +626,10 @@ if __name__ == "__main__":
         addConfigSig(arg.addSig,False,configPath)
     elif '-a' in sys.argv:
         addConfigByCanXls(arg.xls)
-    elif 'tc' in sys.argv:
+    elif '-tc' in sys.argv:
         addConfigByTopicCanXls(arg.topicCan,configPath)
+    elif '-f' in sys.argv:
+        findConfigInfo(arg.findKey,configPath)
     else:
         CheckSigName(configPath,arg.downjson,arg.upjson)
     

@@ -6,6 +6,7 @@
 #include <functional>
 #include "ic_log.h"
 #include <random>
+#include "nlohmann/json.hpp"
 
 #define  BITSIZE 8  
 #define  HEADERFLAG 0x5a    //头标识
@@ -14,7 +15,7 @@
 #define CRC16_INIT_VALUE 0
 #define CRC16_ISINITENABLE true
 #define MAX_LENGHT 2048
-#define TCP_IP "127.0.0.1"
+#define TCP_IP "172.16.2.30"
 #define TCP_PORT 50001
 
 #define TCPCONNECTSTATUS "TcpConnectStatus"
@@ -24,28 +25,6 @@ using RecDataFun = std::function<void (uint8_t *, int)>;
 
 namespace TD
 {
-    static void printHex(const std::string &topic, uint8_t *data, uint8_t len)
-    {
-        char buff[512] = {0};
-        for (int i = 0; i < len; i++)
-        {
-            sprintf(buff + i * 3, "%02x ", data[i]);
-        }
-        IC_LOG_INFO("topic: %s %s\n", topic.c_str(), buff);
-    }
-
-    static void printVectorHex(std::string topic, const std::vector<uint8_t> &values)
-    {
-        if (values.empty())
-        {
-            IC_LOG_DEBUG("values is empty");
-            return;
-        }
-        const int &size = values.size();
-        uint8_t *data = const_cast<uint8_t *>(values.data());
-        printHex(topic, data, size);
-    }
-
     static void convertIntToLittleEndian(int16_t value, uint8_t *data)
     {
         data[0] = static_cast<uint8_t>(value & 0xFF);
@@ -74,7 +53,8 @@ namespace TD
         return value;
     }
 
-    static void convertIntToBigEndianArray(int value, uint8_t *array, uint32_t size)
+    template<class T>
+    static void convertIntToBigEndianArray(T value, uint8_t *array, uint32_t size)
     {
         for (uint32_t i = 0; i <  size; i++)
         {
@@ -86,7 +66,6 @@ namespace TD
     {
         uint8_t valueArray[2];
         memcpy(valueArray, &value, sizeof(uint16_t));
-        printHex("compareByteArrayWithUint16",valueArray,2);
         return memcmp(byteArray, valueArray, sizeof(uint16_t)) == 0;
     }
 
@@ -100,6 +79,28 @@ namespace TD
     {
         auto crc16 = crc16_calculate(CRC16_INIT_VALUE, app_data, app_data_lenght, CRC16_ISINITENABLE);
         convertIntToLittleEndian(crc16, crc);
+    }
+
+    static void printHex(const std::string &topic, uint8_t *data, uint8_t len)
+    {
+        char buff[512] = {0};
+        for (int i = 0; i < len; i++)
+        {
+            sprintf(buff + i * 3, "%02x ", data[i]);
+        }
+        IC_LOG_INFO("topic: %s %s\n", topic.c_str(), buff);
+    }
+
+    static void printVectorHex(std::string topic, const std::vector<uint8_t> &values)
+    {
+        if (values.empty())
+        {
+            IC_LOG_DEBUG("values is empty");
+            return;
+        }
+        const int &size = values.size();
+        uint8_t *data = const_cast<uint8_t *>(values.data());
+        printHex(topic, data, size);
     }
 
     static void Random16(uint8_t *random,int lenght)
@@ -162,12 +163,13 @@ namespace TD
         {
             return up_down != 0;
         }
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(message_data, flag, up_down, statusCode, ackFlag, requestId, encryptFlag, messageBodyLenght);
     } MessageData;
 
     struct TLVConent
     {
         uint16_t type = 0;
-        uint8_t valuesLenghtSize = 1; // values长度大小的字节
+        uint8_t valuesLenghtSize = 1; // 区分长短型，1，短型， 2长型
         std::vector<uint8_t> values;
     };
 
@@ -189,17 +191,20 @@ namespace TD
         {
             return sizeof(Random)+sizeof(sid)+sizeof(mid);
         }
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(message_body, Random, sid, mid, TLVs);
     } MessageBody;
 
     typedef struct app_data
     {
         MessageData data;
         MessageBody body;
+        app_data() {}
         app_data(const MessageData &d, const MessageBody &b)
         {
             data = d;
             body = b;
         }
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(app_data, data, body);
     }AppData;
  
     typedef struct a35_send_reply
