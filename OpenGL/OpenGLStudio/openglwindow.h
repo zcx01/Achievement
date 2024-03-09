@@ -55,6 +55,8 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLFunctions_3_3_Core>
+#include <cmath>
+#include <complex>
 
 QT_BEGIN_NAMESPACE
 class QPainter;
