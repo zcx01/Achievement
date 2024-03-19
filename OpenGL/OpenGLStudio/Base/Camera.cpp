@@ -1,4 +1,6 @@
 #include "Camera.h"
+#include <cmath>
+#include <complex>
 
 Camera::Camera()
 {
