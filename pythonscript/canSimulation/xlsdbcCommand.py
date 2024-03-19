@@ -253,7 +253,12 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                 if os.path.isfile(can_parse_whitelistPath):
                     WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
     dbc = Analyze(dbcfile)
-    dbc.reNameMsg()
+    try:
+        if RENAMEMSG:
+            dbc.reNameMsg()
+    except:
+        printRed(f"重命名失败，请配置 RENAMEMSG 变量")
+        
     if not isFind:
         printRed(f"{wirteSigName} 在CAN矩阵中不存在")
 
@@ -895,7 +900,6 @@ def addInputMsgConfig(configPath,msgIds):
     jsConfig = getJScontent(configPath)
     inputSignalConfig = getKeyPath("input_signal_config",jsConfig)
     dbcfile = getKeyPath("dbcfile", jsConfig)
-    print(dbcfile)
 
     inputSignalContent = getJScontent(inputSignalConfig)
 

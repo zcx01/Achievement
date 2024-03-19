@@ -37,6 +37,7 @@ xls_value_mapstr = 'H'
 xls_ignore = 'N'
 xls_prd_name = 'K'
 xls_functional_module = 'L'
+xls_value_type= 'D'
 GOOGLESIGTOPICID="1v4y6DCyc3wnzaY8AdIi51jg4hQnV1Ip8J051WbIGUcc"
 
 def getStartBit(sheel,row,getValueInt):
@@ -67,3 +68,4 @@ ISUSEDBCENUM=False
 Jira_Project = "HUR"
 SETSTR='/Set'
 WRITEWHITE=False    
+RENAMEMSG= True

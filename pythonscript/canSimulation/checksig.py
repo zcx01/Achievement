@@ -256,11 +256,13 @@ class SigXls():
 class ConfigXls():
     def __init__(self) -> None:
         self.topic = ""
+        self.sigName = ""
         self.dbcSigName =""
         self.comments = ""
         self.valueMap = {}
         self.defaultValueType = ""
         self.sender = ""
+        self.sigNameType = 0 #0是带msg,1只是信号名称
 
     def addToConfig(self,jsConfig,isDown):
         contentJson = {}
@@ -279,10 +281,25 @@ class ConfigXls():
             contentJson['comments'] = self.comments
         contentJson[ISXLS] = True
         if isDown:
+            configSigName = self.dbcSigName
+            if self.sigNameType == 1:
+                configSigName = self.sigName
+
+            if self.topic in jsConfig:
+                exTopic = jsConfig[self.topic]
+                if type(exTopic) == str:
+                    del jsConfig[self.topic]
+                    jsConfig[self.topic]={exTopic:{}}
+
             if self.topic not in jsConfig:
                 jsConfig[self.topic] = {}
-            jsConfig[self.topic][self.dbcSigName] = contentJson
+            jsConfig[self.topic][configSigName] = contentJson
         else:
+            if self.dbcSigName in jsConfig:
+                exTopic = jsConfig[self.dbcSigName]
+                if type(exTopic) == str:
+                    del jsConfig[self.dbcSigName]
+                    jsConfig[self.dbcSigName]={exTopic:{}}
             if self.dbcSigName not in jsConfig:
                 jsConfig[self.dbcSigName] = {LOGSTR:1}
             jsConfig[self.dbcSigName][self.topic] = contentJson
@@ -443,6 +460,7 @@ def getThreeSig(sheel,rowCount,getSheelValue,rowRange=[],configPath=""):
         except:
             pass
 
+# def remove
 def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,configPath=""): 
     jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
     preComments = ""
@@ -487,13 +505,21 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 pass
 
             try:
-                sigName = getSheelValue(sheel,i,xls_sig_name).replace(" ", "").replace("\n", "").replace("\r", "")
+                #strip()方法用于删除字符串左右两边的空格、特殊字符
+                #如果没有指定字符，则默认删除空格以及制表符、回车符、换行符等特殊字符
+                sigName = getSheelValue(sheel,i,xls_sig_name).strip()
                 if len(sigName) == 0: raise Exception(f"是空的")
             except:
                     printYellow(f'{i+1:<10}行是空的')
                     continue
             configXls = ConfigXls()
-            configXls.topic = getSheelValue(sheel,i,xls_topic_name)
+            configXls.sigName = sigName
+            try:
+                value_type = getSheelValue(sheel,i,xls_value_type).strip().upper()
+                if value_type == "STRING" or value_type == "MAP": configXls.sigNameType = 1
+            except:
+                pass
+            configXls.topic = getSheelValue(sheel,i,xls_topic_name).strip()
             if configXls.getBindSigNames(sigName,dbc,whitelistdbcSigNames,jsUp):
                 printGreen(f"{i+1:<10} 写入完成")
                 continue
