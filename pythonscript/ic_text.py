@@ -80,7 +80,7 @@ class translateConent(object):
     def appendSh(self,sh,isCheckChange):
         if not isCheckChange:
             sh.append(self.getList())
-        elif self.changedCount < EXISTRANSLATEMAXCOLS and len(self.content) != 0:
+        elif self.changedCount <= EXISTRANSLATEMAXCOLS and len(self.content) != 0:
             sh.append(self.getList())
             
     
