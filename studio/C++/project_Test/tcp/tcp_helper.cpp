@@ -46,13 +46,9 @@ void response(uint8_t status, uint16_t type, uint8_t sid, uint8_t mid, const std
     TcpDataAnaly::setTLV(TLVContents, body.TLVs);
 
     AppData appData{msgData, body};
-    nlohmann::json value(appData);
-    std::ostringstream os;
-    os << value.dump() << std::endl;
-    string str = os.str();
     {
-        IC_LOG_INFO("send to tsp, status %u, type %u, sid %u, mid %u, data %s", status, type, sid, mid, str.c_str());
         TcpSend::instance().sendMessage(appData);
+        print_app_data("", appData);
     }
 }
 
@@ -76,4 +72,19 @@ void parse_tlv(const std::vector<uint8_t> &input, std::map<int, std::vector<uint
             break;
         }
     }
+}
+
+void print_app_data(const std::string topic, const TD::AppData& appData)
+{
+    size_t len = appData.body.TLVs.size();
+    char* buff = new char[len * 3 + 1];
+    ::memset(buff, 0, len * 3+1);
+    for (size_t i = 0; i < len; i++)
+    {
+        sprintf(buff + i * 3, "%02x ", appData.body.TLVs[i]);
+    }
+
+    IC_LOG_DEBUG("topic: %s send to tsp, sid %u, mid %u, len %lu, datas %s", topic.c_str(), appData.body.sid, appData.body.mid, len, buff);
+
+    delete[] buff;
 }
