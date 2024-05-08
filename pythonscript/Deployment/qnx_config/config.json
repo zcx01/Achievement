@@ -2,8 +2,8 @@
     "startup.sh": "/scripts/",
     "icwarning_config.json": "/opt/qt/config/",
     "ictelltale_config.json": "/opt/qt/config/",
-    "down_config.json": "/opt/qt/config/",
-    "up_config.json": "/opt/qt/config/",
+    "down_config.json": "/opt/ic_service/config/",
+    "up_config.json": "/opt/ic_service/config/",
     "resources.rcc": "/opt/qt/",
     "ivi_compositor": "/usr/bin/",
     "ic_adas": "/usr/bin/",
@@ -20,6 +20,16 @@
     "release-bigsur_hqx.1.1_20211108": "hqx.1.1",
     "libresources_plugin.so": "/opt/qt/qml/Resources/",
     "total_info.json": "/persist/ic_service/",
+    "content_Dark_j90a_bev":"/opt/qt/qml/",
+    "content_Dark_j90a_rev":"/opt/qt/qml/",
+    "content_Light_j90a_bev":"/opt/qt/qml/",
+    "content_Light_j90a_rev":"/opt/qt/qml/",
+    "content_adas_Dark_j90a_rev":"/opt/qt/qml/",
+    "content_adas_Dark_j90a_bev":"/opt/qt/qml/",
+    "libic_dashboardplugin.so":"/opt/qt/qml/ic_dashboardplugin/",
+    "libic_adasplugin.so":"/opt/qt/qml/ic_adasplugin/",
+    "ic_dashboard":"/usr/bin/",
+    "libqtmegaplugin.so":"/opt/qt/qml/QtMega/",
     "Other": "hqx.1.2",
     "ssh_ip": "10.59.2.105",
     "user": "chengxiongzhu",
@@ -29,8 +39,8 @@
         "ic_adas": "../../output/binary/opt/apps/latest/qt/bin",
         "ic_avm": "../../output/binary/opt/apps/latest/qt/bin",
         "ic_telltale": "../../output/binary/opt/apps/latest/qt/bin",
-        "up_config.json": "../../qt/ic_qt/resources/config",
-        "down_config.json": "../../qt/ic_qt/resources/config",
+        "up_config.json": "../../src/ic_service/parser/vendor/config",
+        "down_config.json": "../../src/ic_service/parser/vendor/config", 
         "icwarning_config.json": "../../qt/ic_qt/resources/config",
         "ictelltale_config.json": "../../qt/ic_qt/resources/config",
         "libresources_plugin.so": "../../output/binary/opt/apps/latest/qt/qml/Resources",
@@ -44,23 +54,40 @@
         "screenshot_app": "../../output/binary/opt/apps/latest/qt/bin",
         "libic_screenshot.so": "lib/",
         "ictelltale_config_roll.json": "../../qt/ic_qt/resources/config",
-        "history_topic.json": "../../qt/ic_qt/resources/config"
+        "history_topic.json": "../../qt/ic_qt/resources/config",
+        "topic_value_map.json": "../../src/ic_service/vendor/config",
+        "content_Dark_j90a_bev":"qt/qml",
+        "content_Dark_j90a_rev":"qt/qml",
+        "content_Light_j90a_bev":"qt/qml",
+        "content_Light_j90a_rev":"qt/qml",
+        "content_adas_Dark_j90a_rev":"qt/qml",
+        "content_adas_Dark_j90a_bev":"qt/qml",
+        "libic_dashboardplugin.so":"qt/qml/ic_dashboardplugin",
+        "libic_adasplugin.so":"qt/qml/ic_adasplugin",
+        "ic_dashboard":"qt/bin/",
+        "libqtmegaplugin.so":"qt/qml/QtMega"
     },
-    "backUpPath":{
-        "PC":{
+    "backUpPath": {
+        "PC": {
             "up_config.json": "../../src/ic_service/vendor/config",
-            "down_config.json": "../../src/ic_service/vendor/config"
+            "down_config.json": "../../src/ic_service/vendor/config",
+            "icwarning_config.json": "../../src/ic_service/vendor/config",
+            "ic_adas":"qt/bin/"
         },
         "down_config.json": "/opt/ic_service/config/",
-        "up_config.json": "/opt/ic_service/config/"
+        "up_config.json": "/opt/ic_service/config/",
+        "icwarning_config.json": "/opt/ic_service/config/",
+        "ic_adas": "/usr/bin/"
     },
     "update": {
         "../../qt/ic_qt/resources/translate": "/opt/qt/translate/",
         "../../qt/ic_qt/resources/config": "/opt/qt/config/",
-        "../../src/ic_service/vendor/config":"/opt/ic_service/config/",
+        "../../src/ic_service/vendor/config": "/opt/ic_service/config/",
         "../../output/binary/opt/apps/latest/qt/bin": "/usr/bin/",
+        "qt/qml":"/opt/qt/qml/",
         "lib/": "/lib64/"
     },
     "ictelltale_config_roll.json": "/opt/qt/config/",
-    "history_topic.json": "/opt/qt/config/"
+    "history_topic.json": "/opt/qt/config/",
+    "topic_value_map.json": "/opt/ic_service/config/"
 }

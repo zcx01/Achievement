@@ -25,9 +25,11 @@ MessageData TcpDataAnaly::getMessageData(uint8_t *app_data,const int &app_lenght
 {
     MessageData messageData;
     int messageDataLenght =  sizeof(MessageData);
-    memset(&messageData, 0,messageDataLenght);
-    if (app_lenght >= messageDataLenght)
-        memcpy(&messageData, app_data, messageDataLenght);
+    if(app_lenght < messageDataLenght)
+    {
+        return messageData;
+    }
+    memcpy(&messageData, app_data, messageDataLenght);
     return messageData;
 }
 
@@ -51,6 +53,90 @@ std::tuple<MessageData, MessageBody> TcpDataAnaly::getMessage(uint8_t *data, con
     return std::make_tuple(messageData, messageBody);
 }
 
+A35SendReply TcpDataAnaly::getA35SendReply(uint8_t *app_data, const int &app_lenght)
+{
+    A35SendReply reply;
+    int replyLenght =  sizeof(A35SendReply);
+    if(app_lenght < replyLenght)
+    {
+        return reply;
+    }
+    memcpy(&reply, app_data, replyLenght);
+    return reply;
+}
+
+uint64_t TcpDataAnaly::getMessageId(uint8_t *requestId, uint32_t requestIdLenght, uint8_t sid, uint8_t mid)
+{
+    uint64_t value = 0;
+    value |= mid;
+    value |= sid << 1;
+    value |= convertBigEndianToInt(requestId, sizeof(requestIdLenght)) << 2;
+    return value;
+}
+
+std::vector<TLVConent> TcpDataAnaly::getTLV(const std::vector<uint8_t> &TLVs, uint8_t fixedlenghtSize, std::vector<uint8_t> lenghtSizes)
+{
+    std::vector<TLVConent> TLVContents;
+    int TLVLenghtInt = TLVs.size();
+
+    int uselenght = 0;
+    auto TLVData = TLVs.data();
+    uint8_t lenghtSize = fixedlenghtSize;
+    while (uselenght < TLVLenghtInt)
+    {
+        TLVConent content;
+        content.type = convertBigEndianToInt(TLVData + uselenght, sizeof(content.type));
+        uselenght += sizeof(content.type);
+
+        if (lenghtSize == 0 && lenghtSizes.size() > TLVContents.size())
+        {
+            lenghtSize = lenghtSizes[TLVContents.size()];
+        }
+        uint8_t lenght[lenghtSize];
+        memcpy(lenght, TLVData + uselenght, sizeof(lenght));
+        uselenght += sizeof(lenght);
+
+        auto intLenght = convertBigEndianToInt(lenght, sizeof(lenght));
+        for (uint64_t i = 0; i < intLenght; ++i)
+        {
+            uint8_t value;
+            memcpy(&value, TLVData + uselenght, sizeof(value));
+            uselenght += sizeof(value);
+            content.values.push_back(value);
+        }
+        TLVContents.push_back(content);
+    }
+    return TLVContents;
+}
+
+void TcpDataAnaly::setTLV(const std::vector<TLVConent> &TLVContents, std::vector<uint8_t> &TLVs)
+{
+    int TLVslenght = 0;
+    int uselenght = 0;
+    for (auto content : TLVContents)
+    {
+        TLVslenght += sizeof(content.type) + content.valuesLenghtSize + content.values.size();
+    }
+    uint8_t TLVDatas[TLVslenght];
+    memset(TLVDatas, 0, sizeof(TLVDatas));
+
+    for (auto content : TLVContents)
+    {
+        convertIntToBigEndianArray(content.type, TLVDatas + uselenght, sizeof(content.type));
+        uselenght += sizeof(content.type);
+
+        uint8_t lenght[content.valuesLenghtSize];
+        convertIntToBigEndianArray(content.values.size(), lenght, sizeof(lenght));
+        memcpy(TLVDatas + uselenght, lenght, sizeof(lenght));
+        uselenght += sizeof(lenght);
+
+        memcpy(TLVDatas + uselenght, content.values.data(), content.values.size());
+        uselenght += content.values.size();
+    }
+    // printHex("TLVDatas", TLVDatas, TLVslenght);
+    TLVs = std::vector<uint8_t>(TLVDatas, TLVDatas + TLVslenght);
+}
+
 void TcpDataAnaly::dealData()
 {
     if (is_new_data)
@@ -67,6 +153,7 @@ void TcpDataAnaly::dealData()
             }
             else
             {
+                data_crc_start = use_lenght;
                 usePackData(&head_data,head_lenght);
                 is_new_data = false;
                 dealData();
@@ -91,22 +178,24 @@ void TcpDataAnaly::dealData()
         uint8_t app_data[app_data_lenght];
         usePackData(app_data, app_data_lenght);
 
+        data_crc_end = use_lenght - data_crc_start;
         uint8_t crc_data[CRCLENGHT];
         usePackData(crc_data,sizeof(crc_data));
         //校验
         printHex("crc_data",crc_data,sizeof(crc_data));
-        if(!checkCrc(crc_data,app_data,app_data_lenght))
+        if(!checkCrc(crc_data,(uint8_t*)pack_data+data_crc_start,data_crc_end))
         {
-            IC_LOG_ERROR("check crc fail!");
-            return;
+            IC_LOG_ERROR("check crc fail! start:%d,end %d",data_crc_start,data_crc_end);
         }
-        
-        //回调处理
-        printHex("deal Data:",app_data,app_data_lenght);
-
-        if (m_RecDataFun != nullptr)
+        else
         {
-            m_RecDataFun(app_data, app_data_lenght);
+            //回调处理
+            printHex("deal Data:",app_data,app_data_lenght);
+
+            if (m_RecDataFun != nullptr)
+            {
+                m_RecDataFun(app_data, app_data_lenght);
+            }
         }
         
         //处理下一包的数据
@@ -129,6 +218,8 @@ void TcpDataAnaly::resetData()
     is_new_data = true;
     fill_lenght = 0;
     use_lenght = 0;
+    data_crc_start = 0;
+    data_crc_end = 0;
 }
 
 

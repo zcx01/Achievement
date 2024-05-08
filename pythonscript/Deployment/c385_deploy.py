@@ -14,30 +14,40 @@ jsConfig=getJScontent(qnxConfigPath)
 androidQnx=AndroidQnx()
 projectType=''
 
-def setProjectType(defultDir,execName):
+def setProjectType(defultDir,execName,prjectDir):
     global projectType
-    execbin = getExecBin(defultDir,execName)
+    execbin = getExecBin(defultDir,execName,prjectDir)
     if not os.path.exists(execbin):
         projectType = "backUpPath"
         
-def getPusPath(proceesName):
-    tmpPath = ''
-    tmpPath = getKeyPath(proceesName,jsConfig[projectType])
-    if len(tmpPath) == 0:
-        tmpPath = getKeyPath(proceesName,jsConfig)
-    return tmpPath
-
-def getExecBin(defultDir,execName):
-    tempDir=''
+def isProjectType(proceesName):
+    tempDir = ""
     if projectType in jsConfig:
         try:
-            tempDir = jsConfig[projectType]["PC"][execName]
-            if len(tempDir) != 0: return tempDir
+            tempDir = jsConfig[projectType]["PC"][proceesName]
         except:
             pass
+    return tempDir != ''
 
+def getPusPath(proceesName):
+    tmpPath = ''
+    if isProjectType(proceesName) == 0:
+        tmpPath = getKeyPath(proceesName,jsConfig)
+    else:
+        tmpPath = getKeyPath(proceesName,jsConfig[projectType])
+    return tmpPath
+
+def getExecBin(defultDir,execName,prjectDir):
+    tempDir=''
     pcDirs = jsConfig.get("PC","")
     tempDir = pcDirs.get(execName,"")
+    
+    if not os.path.exists(prjectDir+"/"+tempDir):
+        if projectType in jsConfig:
+            try:
+                tempDir = jsConfig[projectType]["PC"][execName]
+            except:
+                pass
     if len(tempDir) != 0:
         return tempDir
     return defultDir
@@ -199,7 +209,7 @@ if __name__ == "__main__":
     parser.add_argument('-f','--PcFileName',help="打印自带PC上文件的名称",nargs='*')
     parser.add_argument('-s','--scp',help="从远程复制",nargs='?',default=0,type=int)
     parser.add_argument('-u','--updateConfig',help='添加文件到配置中',default='',type=str,nargs='?')
-    parser.add_argument('-p','--PrjectDir',help='prject dir',default='~/Works/Repos/changan_c385/prebuilts/ic',type=str)
+    parser.add_argument('-p','--PrjectDir',help='prject dir',default='./prebuilts/ic',type=str)
     parser.add_argument('-w','--scpWinDir',help='Scp win的目录',default='C:/Users/chengxiong.zhu/Downloads',type=str)
     parser.add_argument('-d','--device',help='adb的device',default='',type=str)
     args = parser.parse_args()
@@ -211,7 +221,6 @@ if __name__ == "__main__":
     PrjectDir = args.PrjectDir
     home_dir = os.path.expanduser("~").replace('\\','/')
     PrjectDir = PrjectDir.replace(home_dir,"~")
-    print(home_dir)
     printYellow(PrjectDir)
     
     if '-u' in argv:
@@ -221,7 +230,7 @@ if __name__ == "__main__":
     if '-c' in sys.argv:
         proceesNames= args.customfile
         if len(proceesNames) != 0:
-            setProjectType(proceesNames[0],proceesNames[0])
+            setProjectType(proceesNames[0],proceesNames[0],PrjectDir)
 
     if "-s" in sys.argv:
         user=jsConfig.get("user",)
@@ -234,14 +243,13 @@ if __name__ == "__main__":
         if '-c' in sys.argv:
             proceesNames= args.customfile
             for proceesName in proceesNames:
+                execbin = getExecBin(proceesName,proceesName,PrjectDir)
+                if not os.path.isfile(execbin):
+                    execbin = f'{execbin}/{proceesName}'
+                tmpath = f'{PrjectDir}/{execbin}'
                 if platform.system() == "Windows":
-                    execbin = getExecBin(proceesName,proceesName)
-                    tmpathS = f'{PrjectDir}/{execbin}/{proceesName}'
-                    print(tmpathS)
-                    ScpFileWin(args.scpWinDir,tmpathS,user,ssh_ip)
+                    ScpFileWin(args.scpWinDir,tmpath,user,ssh_ip)
                 else:
-                    execbin = getExecBin(proceesName,proceesName)
-                    tmpath = f'{PrjectDir}/{execbin}/{proceesName}'
                     ScpFile(tmpath,user,ssh_ip)
         if args.scp == 1:
             interact()
@@ -280,9 +288,11 @@ if __name__ == "__main__":
             if platform.system() == "Windows":
                 execbin = args.scpWinDir
             else:
-                execbin = getExecBin(proceesName,proceesName)
+                execbin = getExecBin(proceesName,proceesName,PrjectDir)
                 print(execbin)
-            exe_proceesNames.append(f'{execbin}/{proceesName}')
+            if not os.path.isfile(execbin):
+                execbin = f'{execbin}/{proceesName}'
+            exe_proceesNames.append(execbin)
         androidQnx.pc_android_qnx(exe_proceesNames)
         adbPush(proceesNames,args.excess,argv)
         # copyStartfile(f'{qnxConfigDir}{devDir}/startup.sh',False)

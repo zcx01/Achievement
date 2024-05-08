@@ -198,9 +198,8 @@ class Analyze(object):
                 assert isinstance(msgInfo,MessageInfo)
                 if msgInfo.getMessage_Id() in dbcMsgInfo:
                     tmp = msgInfo.getMessage_Id()
-                    msgInfo.sender = msgInfo.sender + msgInfo.channel
-                    msgInfo.message_Name = '' #去除原来的名称
-                    print(f'重命名 {tmp} -> {msgInfo.getMessage_Id()}')
+                    msgInfo.message_Name = msgInfo.sender + msgInfo.channel + "_" + msgInfo.messageId
+                    print(f'重命名 {tmp} -> {msgInfo.message_Name}')
                     dbc.repalceMessage([msgInfo])
                 dbcMsgInfo[msgInfo.getMessage_Id()] = msgInfo
             

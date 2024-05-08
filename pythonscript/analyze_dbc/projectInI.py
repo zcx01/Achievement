@@ -27,7 +27,18 @@ sig_line_enum='P'
 sig_line_initValue='Q'
 sig_line_invalidValue='R'
 sig_line_Recevier='U'
-sig_line_Project='Y'
+sig_line_Project='Z'
+
+#topic和signal表配置
+xls_comments = 'A'
+xls_topic_name = 'B'
+xls_sig_name = 'C'
+xls_value_mapstr = 'H'
+xls_ignore = 'N'
+xls_prd_name = 'K'
+xls_functional_module = 'L'
+xls_value_type= 'D'
+GOOGLESIGTOPICID="1v4y6DCyc3wnzaY8AdIi51jg4hQnV1Ip8J051WbIGUcc"
 
 def getStartBit(sheel,row,getValueInt):
     startPos =  getValueInt(sheel, row, sig_line_startBit)
@@ -43,7 +54,7 @@ PC_PWD="123456"
 PROJECT_ID='c385ev'
 CHANNEL =0
 ignore_init_send =True
-PowerSig = {'BCM_PowerStatusFeedback':'2'}
+PowerSig = {'BCM_PowerStatusFeedback':'2','BCM_DriverDoorStatus':"1"}
 main_can = "CAN1"
 local_machine_Sender=['THU','THU0','THU2']
 SubNet_Frame ={'INFOCAN':14,'RCAN':0,'CDC私CAN':0,"DATACAN":14} 
@@ -56,5 +67,5 @@ MSB=False
 ISUSEDBCENUM=False
 Jira_Project = "HUR"
 SETSTR='/Set'
-WRITEWHITE=False
-GOOGLESIGTOPICID="1v4y6DCyc3wnzaY8AdIi51jg4hQnV1Ip8J051WbIGUcc"
+WRITEWHITE=False    
+RENAMEMSG= True

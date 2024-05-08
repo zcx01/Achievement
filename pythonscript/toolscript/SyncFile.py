@@ -21,7 +21,9 @@ File_Dict={
     "/home/chengxiongzhu/Achievement/pythonscript/canSimulation/sig_google.py":
     "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/sig_google.py",
     "/home/chengxiongzhu/Achievement/studio/C++/project_Test/tcp":
-    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/src/common/tcp"
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/src/common/tcp",
+    "/home/chengxiongzhu/Achievement/pythonscript/toolscript/SyncQt.py":
+    "/home/chengxiongzhu/Works/Repos/changan_j90a/src/ic_service/tools/xls_transform_dbc_tool/SyncQt.py"
 }
 
 def CpFile(file1,file2,cpFilePath):

@@ -7,6 +7,8 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <cmath>
+#include <complex>
 
 CameraWidget::CameraWidget()
 {

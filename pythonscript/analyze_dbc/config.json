@@ -13,5 +13,30 @@
     "up": "src/ic_service/vendor/config/up_config.json",
     "checkSigIgnore": "src/ic_service/vendor/check_sig_ignore.json",
     "input_signal_config": "prebuilts/ic/config/ic_service/input_signal_config.json",
-    "canmatrix_version": "src/ic_service/vendor/canmatrixversion.txt"
+    "canmatrix_version": "src/ic_service/vendor/canmatrixversion.txt",
+    "topic_value_map": "../../../../../src/ic_service/vendor/config/topic_value_map.json",
+    "chime_config": "../../../../../src/ic_chime/config/chime_config.json",
+    "chime_id_script": "../../../../../src/ic_chime/config/generate_chime_id.py",
+    "icwarning_config": "../../../../../src/ic_service/vendor/config/icwarning_config.json",
+    "WarningPopup": "../../../../../qt/ic_apps/ic_dashboard/content/",
+    "warning_toast": "../../../../../qt/ic_apps/ic_dashboard/app/ipc/warning_toast.json",
+    "gitStoreInfos": {
+        "../../../../../qt/ic_apps/ic_dashboard/content/": [
+            "Dark",
+            "Light",
+            "j90a_bev",
+            "j90a_rev"
+        ],
+        "../../../../../qt/ic_apps/ic_dashboard/": [
+            "assets_Light",
+            "assets_Dark"
+        ]
+    },
+    "gitnore": [],
+    "qrcPaths": [
+        "../../../../../qt/ic_apps/ic_dashboard/content_Dark_j90a_rev/content_Dark_j90a_rev.qrc",
+        "../../../../../qt/ic_apps/ic_dashboard/content_Dark_j90a_bev/content_Dark_j90a_bev.qrc",
+        "../../../../../qt/ic_apps/ic_dashboard/content_Light_j90a_rev/content_Light_j90a_rev.qrc",
+        "../../../../../qt/ic_apps/ic_dashboard/content_Light_j90a_bev/content_Light_j90a_bev.qrc"
+    ]
 }

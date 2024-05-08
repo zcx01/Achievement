@@ -2,6 +2,7 @@
 import argparse
 from analyze_dbc.commonfun import*
 from analyze_dbc.analyze_dbc import *
+from analyze_dbc.projectInI import *
 from xlrd.book import Book
 from xlrd.sheet import Sheet
 import xlrd
@@ -255,11 +256,13 @@ class SigXls():
 class ConfigXls():
     def __init__(self) -> None:
         self.topic = ""
+        self.sigName = ""
         self.dbcSigName =""
         self.comments = ""
         self.valueMap = {}
         self.defaultValueType = ""
         self.sender = ""
+        self.sigNameType = 0 #0是带msg,1只是信号名称
 
     def addToConfig(self,jsConfig,isDown):
         contentJson = {}
@@ -273,15 +276,30 @@ class ConfigXls():
         if len(self.valueMap) != 0:
             contentJson['valueMap'] = self.valueMap
         if len(self.defaultValueType) != 0:
-            contentJson['defaultValueType'] = self.defaultValueType
+            contentJson['defaultValueType'] = int(self.defaultValueType)
         if len(self.comments) != 0:
             contentJson['comments'] = self.comments
         contentJson[ISXLS] = True
         if isDown:
+            configSigName = self.dbcSigName
+            if self.sigNameType == 1:
+                configSigName = self.sigName
+
+            if self.topic in jsConfig:
+                exTopic = jsConfig[self.topic]
+                if type(exTopic) == str:
+                    del jsConfig[self.topic]
+                    jsConfig[self.topic]={exTopic:{}}
+
             if self.topic not in jsConfig:
                 jsConfig[self.topic] = {}
-            jsConfig[self.topic][self.dbcSigName] = contentJson
+            jsConfig[self.topic][configSigName] = contentJson
         else:
+            if self.dbcSigName in jsConfig:
+                exTopic = jsConfig[self.dbcSigName]
+                if type(exTopic) == str:
+                    del jsConfig[self.dbcSigName]
+                    jsConfig[self.dbcSigName]={exTopic:{}}
             if self.dbcSigName not in jsConfig:
                 jsConfig[self.dbcSigName] = {LOGSTR:1}
             jsConfig[self.dbcSigName][self.topic] = contentJson
@@ -392,15 +410,16 @@ def clearXlsData(jsConfig):
     assert isinstance(jsConfig,dict)
     tempJs = copy.deepcopy(jsConfig)
     for fContent in tempJs:
-        for tContent in tempJs[fContent]:
-            contentJson = tempJs[fContent][tContent]
-            if type(contentJson) == dict and ISXLS in contentJson and contentJson[ISXLS]:
-                del jsConfig[fContent][tContent]
-                if len(jsConfig[fContent]) == 0:
-                    del jsConfig[fContent]
-                elif len(jsConfig[fContent]) == 1:
-                    if  LOGSTR in jsConfig[fContent]:
+        if type(tempJs[fContent]) == dict:
+            for tContent in tempJs[fContent]:
+                contentJson = tempJs[fContent][tContent]
+                if type(contentJson) == dict and ISXLS in contentJson and contentJson[ISXLS]:
+                    del jsConfig[fContent][tContent]
+                    if len(jsConfig[fContent]) == 0:
                         del jsConfig[fContent]
+                    elif len(jsConfig[fContent]) == 1:
+                        if  LOGSTR in jsConfig[fContent]:
+                            del jsConfig[fContent]
 
 def addConfigByTopicCanXls(xlsPath,configPath):
     book = xlrd.open_workbook(xlsPath)
@@ -441,6 +460,7 @@ def getThreeSig(sheel,rowCount,getSheelValue,rowRange=[],configPath=""):
         except:
             pass
 
+# def remove
 def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,configPath=""): 
     jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
     preComments = ""
@@ -477,7 +497,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
         # try:
 
             try:
-                customFds = int(getSheelValue(sheel,i,'N'))
+                customFds = int(getSheelValue(sheel,i,xls_ignore))
                 if customFds == 1:
                     printGreen(f'{i+1:<10}无须导入,有自定义的fds')
                     continue
@@ -485,18 +505,26 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 pass
 
             try:
-                sigName = getSheelValue(sheel,i,'C').replace(" ", "").replace("\n", "").replace("\r", "")
+                #strip()方法用于删除字符串左右两边的空格、特殊字符
+                #如果没有指定字符，则默认删除空格以及制表符、回车符、换行符等特殊字符
+                sigName = getSheelValue(sheel,i,xls_sig_name).strip()
                 if len(sigName) == 0: raise Exception(f"是空的")
             except:
                     printYellow(f'{i+1:<10}行是空的')
                     continue
             configXls = ConfigXls()
-            configXls.topic = getSheelValue(sheel,i,'B')
+            configXls.sigName = sigName
+            try:
+                value_type = getSheelValue(sheel,i,xls_value_type).strip().upper()
+                if value_type == "STRING" or value_type == "MAP": configXls.sigNameType = 1
+            except:
+                pass
+            configXls.topic = getSheelValue(sheel,i,xls_topic_name).strip()
             if configXls.getBindSigNames(sigName,dbc,whitelistdbcSigNames,jsUp):
                 printGreen(f"{i+1:<10} 写入完成")
                 continue
             configXls.dbcSigName,configXls.sender,isChanged,messageId = configConverdbc(sigName,dbc)
-            configXls.comments = getSheelValue(sheel,i,'A')
+            configXls.comments = getSheelValue(sheel,i,xls_comments)
             if configXls.comments == "" :
                 configXls.comments = preComments
             else:
@@ -506,11 +534,11 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 errorStrList=[]
                 errorStrList.append(configXls.comments)
                 try:
-                    errorStrList.append(getSheelValue(sheel,i,'L'))
+                    errorStrList.append(getSheelValue(sheel,i,xls_functional_module))
                 except:
                     errorStrList.append('')
                 try:
-                    errorStrList.append(getSheelValue(sheel,i,'K'))
+                    errorStrList.append(getSheelValue(sheel,i,xls_prd_name))
                 except:
                     errorStrList.append('')
                 errorStrList.append(f'{sigName} 信号缺失')
@@ -525,28 +553,26 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
             #     pass
             whitelistdbcSigNames.append(configXls.dbcSigName.replace('/','__'))
             try:
-                valueMapStr = getSheelValue(sheel,i,'H')
+                valueMapStr = getSheelValue(sheel,i,xls_value_mapstr)
                 valueMapStrs = re.findall(e_i,valueMapStr,re.A)
                 for valueMapStrIndex in range(len(valueMapStrs)):
                     if valueMapStrIndex % 2 != 0 : continue
                     fValue = valueMapStrs[valueMapStrIndex]
                     tIndex = valueMapStrIndex + 1
+                    if "defaultValueType" in fValue: continue 
                     if tIndex >= len(valueMapStrs):
                         printYellow(f"{i+1:<10} {tIndex} {len(valueMapStrs)}值映射错误")
                         continue
                     tValue = int(valueMapStrs[tIndex])
                     configXls.valueMap[fValue] = tValue
-            except:
-                pass
 
-            try:
                 defaultValueTypeStr = re.findall(f'defaultValueType:{i_i}',valueMapStr,re.A)[0]
                 assert isinstance(defaultValueTypeStr,str)
                 defaultValueTypeStrRow = defaultValueTypeStr.split(":")
                 configXls.defaultValueType = defaultValueTypeStrRow[1]
             except:
                 pass
-                
+
             if configXls.sender not in local_machine_Sender: 
                 configXls.addToConfig(jsUp,False)         
             if configXls.sender in local_machine_Sender:
@@ -572,6 +598,30 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
     errBook.save(errBookFile)
     return whitelistdbcSigNames
 
+
+def printKey(jsConfig,key):
+    print(f'{key}:{json.dumps(jsConfig[key],indent=4 ,ensure_ascii=False)}')
+
+def findJson(jsConfig,key):
+    assert isinstance(jsConfig,dict)
+    for fContent in jsConfig:
+        if key in fContent:
+            printKey(jsConfig,fContent)
+        if type(jsConfig[fContent]) == str:
+            if key in jsConfig[fContent]:
+                printKey(jsConfig,fContent)
+        elif type(jsConfig[fContent]) == dict:
+            for tContent in jsConfig[fContent]:
+                if key in tContent:
+                    printKey(jsConfig,fContent)
+        
+def findConfigInfo(key,configPath):
+    jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
+    printGreen('*************************下行*************************')
+    findJson(jsDown,key)
+    printGreen('*************************上行*************************')
+    findJson(jsUp,key)
+
 if __name__ == "__main__":
     parse = argparse.ArgumentParser(
         description='''
@@ -588,6 +638,7 @@ if __name__ == "__main__":
     parse.add_argument('-t', '--topic', help='topic是列表和-m参数索引要对应',default=[], nargs='+', type=str)
     parse.add_argument('-m', '--messages', help='新增messages是一个列表',default=[], nargs='+', type=str)
     parse.add_argument('-tc', '--topicCan', help='通过topic和CAN对应的xls添加配置文件',type=str,default='')
+    parse.add_argument('-f', '--findKey', help='发现对应的信息',type=str,default='')
     arg = parse.parse_args()
     configPath = pyFileDir+"config.json"
 
@@ -601,8 +652,10 @@ if __name__ == "__main__":
         addConfigSig(arg.addSig,False,configPath)
     elif '-a' in sys.argv:
         addConfigByCanXls(arg.xls)
-    elif 'tc' in sys.argv:
+    elif '-tc' in sys.argv:
         addConfigByTopicCanXls(arg.topicCan,configPath)
+    elif '-f' in sys.argv:
+        findConfigInfo(arg.findKey,configPath)
     else:
         CheckSigName(configPath,arg.downjson,arg.upjson)
     

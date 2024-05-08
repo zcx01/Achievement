@@ -127,6 +127,25 @@ def getMessageInfo(sheel):
             pass
     return msgs
 
+'''
+    打印不在 xls 中的 msg 的id
+'''
+def printNoInXlsMgsId(xlsMsgs,dbc):
+    assert isinstance(dbc,Analyze)
+    msgInfos = dbc.getAllMessage()
+    for msgsSubId,msg in xlsMsgs.items():
+        assert isinstance(msg,MessageInfo)
+        can_Channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
+        dbcMsgInfos = msgInfos[can_Channel]
+        if msg.messageId in dbcMsgInfos:
+            del msgInfos[can_Channel][msg.messageId]
+
+    for can_Channel in msgInfos:
+        print(f'---------{can_Channel}不存在的msg(16进制)---------')
+        for msgInfo in msgInfos[can_Channel]:
+            printYellow(f'{msgInfo}')
+
+
 def getThreeFrame(jsConfig):
     srcSendType = getKeyPath("srcSendType", jsConfig)
     threeFrames = []
@@ -193,6 +212,7 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
 
     threeFrames = getThreeFrame(jsConfig)
     for row in range(sheel.nrows):
+        continue
         # xf = book.xf_list[getValue(sheel, row, 2).xf_index]
         # print(type(xf))
 
@@ -253,7 +273,15 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                 if os.path.isfile(can_parse_whitelistPath):
                     WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
     dbc = Analyze(dbcfile)
-    dbc.reNameMsg()
+    try:
+        if RENAMEMSG:
+            dbc.reNameMsg()
+    except:
+        printRed(f"重命名失败，请配置 RENAMEMSG 变量")
+
+    if isAllAdd:
+        printNoInXlsMgsId(msgs,dbc)   
+
     if not isFind:
         printRed(f"{wirteSigName} 在CAN矩阵中不存在")
 
@@ -895,7 +923,6 @@ def addInputMsgConfig(configPath,msgIds):
     jsConfig = getJScontent(configPath)
     inputSignalConfig = getKeyPath("input_signal_config",jsConfig)
     dbcfile = getKeyPath("dbcfile", jsConfig)
-    print(dbcfile)
 
     inputSignalContent = getJScontent(inputSignalConfig)
 

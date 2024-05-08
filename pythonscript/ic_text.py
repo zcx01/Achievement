@@ -10,8 +10,39 @@ from xlrd.book import Book
 from xlrd.sheet import Sheet
 
 SOUCRELANGUAGESUFFIX="zh_CN.ts"
-ORILANGUAGESUFFIXS={"ar_EG.ts":"D","da_DK.ts":"E","es_ES.ts":"M","fi_FI.ts":"I","fr_FR.ts":"H","it_IT.ts":"N","de_DE.ts":"F","nl_NL.ts":"J","nb_NO.ts":"O","ru_RU.ts":"G","pt_PT.ts":"K","sv_SE.ts":"L"} 
-ORILANGUAGENAME={"ar_EG.ts":"阿拉伯语","da_DK.ts":"丹麦语","es_ES.ts":"西班牙语","fi_FI.ts":"芬兰语","fr_FR.ts":"法语","it_IT.ts":"意大利语","de_DE.ts":"德语","nl_NL.ts":"荷兰语","nb_NO.ts":"挪威语","ru_RU.ts":"俄语","pt_PT.ts":"葡萄牙语","sv_SE.ts":"瑞典语"} 
+ORILANGUAGESUFFIXS={
+                "en_US.ts":"C",
+                "th_TH.ts":"D",
+                "ar_EG.ts":"E",
+                "da_DK.ts":"F",
+                "de_DE.ts":"G",
+                "ru_RU.ts":"H",
+                "fr_FR.ts":"I",
+                "fi_FI.ts":"J",
+                "nl_NL.ts":"K",
+                "pt_PT.ts":"L",
+                "sv_SE.ts":"M",
+                "es_ES.ts":"N",
+                "it_IT.ts":"O",
+                "nb_NO.ts":"P",
+                    }
+ 
+ORILANGUAGENAME={
+                "en_US.ts":"英文",
+                "th_TH.ts":"泰文",
+                "ar_EG.ts":"阿拉伯语",
+                "da_DK.ts":"丹麦语",
+                "de_DE.ts":"德语",
+                "ru_RU.ts":"俄语",
+                "fr_FR.ts":"法语",
+                "fi_FI.ts":"芬兰语",
+                "nl_NL.ts":"荷兰语",
+                "pt_PT.ts":"葡萄牙语",
+                "sv_SE.ts":"瑞典语",
+                "es_ES.ts":"西班牙语",
+                "it_IT.ts":"意大利语",
+                "nb_NO.ts":"挪威语",
+                } 
 SHELLNAME="SIC"
 
 def getExistranslateCols():
@@ -49,7 +80,7 @@ class translateConent(object):
     def appendSh(self,sh,isCheckChange):
         if not isCheckChange:
             sh.append(self.getList())
-        elif self.changedCount < EXISTRANSLATEMAXCOLS and len(self.content) != 0:
+        elif self.changedCount <= EXISTRANSLATEMAXCOLS and len(self.content) != 0:
             sh.append(self.getList())
             
     
@@ -210,7 +241,7 @@ def xlsCover(translatePath,jsonPath,input):
             xlsContent = translateConent()
             xlsContent.sourceKey = getValue(sheel,row,"A")
             xlsContent.content = getValue(sheel,row,"B")
-            xlsContent.translateContent = getValue(sheel,row,"C")
+            # xlsContent.translateContent = getValue(sheel,row,"C")
             assert isinstance(xlsContent.translateContent,str)
             try:
                 newTranslateContent = str(getValue(sheel,row,oriLanguageSuffixCol))
@@ -281,6 +312,8 @@ def xlsCover(translatePath,jsonPath,input):
                 for grade in aimJsContents[top]:
                     if isNumber(grade) :
                         source = joint(top,grade)  
+                        if source not in tsContent:
+                            source = aimJsContents[top][grade][removeSuffix(SOUCRELANGUAGESUFFIX)]
                         if source in tsContent:
                             aimJsContents[top][grade][removeSuffix(oriLanguageSuffix)] = tsContent[source].translateContent
             writeJs(jsonPath,aimJsContents)
@@ -301,8 +334,8 @@ def buildScript():
 #./ic_text.py -t /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/translate -j /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json -o ic-out.xlsx
 if __name__ == "__main__":
     aparse = argparse.ArgumentParser(description='python的脚本模板')
-    aparse.add_argument('-t','--translatePath',help='翻译文件所在目录',type=str,nargs="?",default="/home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/translate")
-    aparse.add_argument('-j','--json',help='报警文字配置文件',type=str,nargs="?",default="/home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json")
+    aparse.add_argument('-t','--translatePath',help='翻译文件所在目录',type=str,nargs="?",default="")
+    aparse.add_argument('-j','--json',help='报警文字配置文件',type=str,nargs="?",default="")
     aparse.add_argument('-o','--outPath',help='生成xls文件路径',type=str,nargs="?",default='./changed.xlsx')
     aparse.add_argument('-i','--input',help='输入xls文件路径',type=str)
     aparse.add_argument('-c','--checkChange',help='检测修改的文本',type=str,nargs="?")
