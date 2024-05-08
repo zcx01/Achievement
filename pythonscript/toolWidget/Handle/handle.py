@@ -33,6 +33,16 @@ def closeIp():
     keyStrCmd(f'exit',t=0.3,out='closed.')
     closeSpawn()
 
+def getTrInfo():
+    projectBtn = getCheckBtn(disPlayMsg)
+    if  projectBtn == None: return
+    projectPath,translate,icwarning_config  = getProjectInfo(projectBtn.text())
+    if translate == "":
+        translate = getCurrentProjectPath()+'/qt/ic_qt/resources/translate'
+    if icwarning_config == "":
+        icwarning_config = getCurrentProjectPath()+'/qt/ic_qt/resources/config/icwarning_config.json'
+    return translate,icwarning_config
+
 def trHanle(xlsPath):
     if len(xlsPath) == 0:
         xlsPath = getJsValue('xlsPath')
@@ -52,8 +62,7 @@ def trHanle(xlsPath):
         return
     REMOTEHOST = f'{user}@{ip}'
     xlsPathFileName = os.path.basename(xlsPath)
-    translate = getCurrentProjectPath()+'/qt/ic_qt/resources/translate'
-    icwarning_config = getCurrentProjectPath()+'/qt/ic_qt/resources/config/icwarning_config.json'
+    translate,icwarning_config = getTrInfo()
     keyStrCmd(f'scp {xlsPath} {REMOTEHOST}:{trXlsPathS}')
     sshIp()
     keyStrCmd(f'python3 {icTextLE} -t {translate} -j {icwarning_config} -i {trXlsPathS}{xlsPathFileName}')
@@ -73,8 +82,7 @@ def trChangedHanle(downLoadPath,setTrChangedFilePath):
         return
     xlsPathFileName = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '_changed.xlsx'
     trXlsPathS = os.path.dirname(icTextLE)+"/"
-    translate = getCurrentProjectPath()+'/qt/ic_qt/resources/translate'
-    icwarning_config = getCurrentProjectPath()+'/qt/ic_qt/resources/config/icwarning_config.json'
+    translate,icwarning_config = getTrInfo()
     trChangedFilePath = f'{downLoadPath}/{xlsPathFileName}'
     REMOTEHOST = sshIp()
     keyStrCmd(f'python3 {icTextLE} -t {translate} -j {icwarning_config} -c {trXlsPathS}changed.xlsx')
