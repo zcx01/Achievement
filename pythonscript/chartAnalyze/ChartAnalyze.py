@@ -54,14 +54,21 @@ class MainWindow(QMainWindow):
         ui.addKeyBtn.clicked.connect(self.onAddKeyTriggered)
         ui.removeKeyBtn.clicked.connect(self.removekey)
         ui.openFileBtn.clicked.connect(self.openFile)
+
+        ui.openFileBtn_sta.clicked.connect(self.openFileSta)
+        ui.statisticsBtn.clicked.connect(self.searchkeyWordsStatistics)
         self.ui.progressBar.setRange(0,100)
 
-
+        
         # 创建一个垂直布局，并将chart控件添加到布局中
         chart_layout = ui.horizontalLayout_3
         self.chartManage = CustomGraphManage(chart_layout)
         self.chartManage.update_Progress.connect(self.updataProgress)
         self.chartManage.send_msg.connect(self.disPlayMsg)
+
+        self.analyzeManage = CustomAnalyzehManage()
+        self.analyzeManage.update_Progress.connect(self.updataProgress)
+        self.analyzeManage.send_msg.connect(self.disPlayMsgSta)
 
         self.defaultDir = r'C:/Users/chengxiong.zhu/Downloads/log分析/'
         # self.chartManage.loadLog([r"C:/Users/chengxiong.zhu/Downloads/log分析/2023-09-13/log_000268_20230912-095121.dlt"])
@@ -83,6 +90,8 @@ class MainWindow(QMainWindow):
                             self.chartManage.setDltExe(selected_files[0])
                 else:
                     self.chartManage.modifyConfig('isTipSetDltExe',False)
+
+        self.analyzeManage.setConfig(self.chartManage.configPath)
 
     def informationDlg(self,content):
         return QtWidgets.QMessageBox.information(self,'提示',content,
@@ -116,13 +125,18 @@ class MainWindow(QMainWindow):
             self.setCursor(Qt.ArrowCursor)
         return super().mouseReleaseEvent(a0)
 
-    def openFile(self):
+
+    def openFileDialog(self):
         file_dialog = QtWidgets.QFileDialog()
         file_dialog.setDirectory(self.defaultDir)
         file_dialog.setNameFilters(["Text Files (*.txt *.dlt)"])  # 设置文件过滤器
         file_dialog.setFileMode(QtWidgets.QFileDialog.ExistingFiles)  # 设置文件对话框为多选模式
-        if file_dialog.exec_() != QtWidgets.QDialog.Accepted: return
+        if file_dialog.exec_() != QtWidgets.QDialog.Accepted: return []
         selected_files = file_dialog.selectedFiles()
+        return selected_files
+
+    def openFile(self):
+        selected_files = self.openFileDialog()
         if len(selected_files) == 0 : return
         self.ui.textEdit.clear()
         self.chartManage.loadLog(selected_files)
@@ -199,8 +213,26 @@ class MainWindow(QMainWindow):
     def disPlayMsg(self,msg):
         self.ui.textEdit.append(msg)
 
+    def disPlayMsgSta(self,msg):
+        self.ui.textEdit_sta.append(msg)
+
+    def openFileSta(self):
+        selected_files = self.openFileDialog()
+        if len(selected_files) == 0 : return
+        self.ui.textEdit_sta.clear()
+        self.analyzeManage.loadLog(selected_files)
+        for selected_file in selected_files:
+            self.defaultDir = os.path.dirname(selected_file)
+            self.disPlayMsgSta(os.path.basename(selected_file))
+
+    def searchkeyWordsStatistics(self):
+        self.ui.progressBar.setVisible(True)
+        self.analyzeManage.setkeyWords(self.ui.keyWords_sta.text())
+        self.analyzeManage.searchkeyWords()
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
+    print(os.getpid())
     app.exec_()
 
