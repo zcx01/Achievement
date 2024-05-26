@@ -8,6 +8,7 @@
 #include <QQmlProperty>
 #include <QQuickItem>
 #include "calenum.h"
+#include "loadfont_helper.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +17,13 @@ int main(int argc, char *argv[])
 #endif
 
     QGuiApplication app(argc, argv);
+    QFont chineseFont("思源黑体");
+    QFont englishFont("Roboto");
+
+
+    LoadFontHelper::loadFontFromFile("qrc:/../../../Works/Repos/changan_c385/qt/ic_qt/resources/fonts/Roboto-Regular.ttf");
+
+
     CalEnum cal;
 
     qmlRegisterType<MessageBoard>("TEST.messging",1,0,"MessageBoard");
