@@ -1,20 +1,38 @@
 {
-    "ip": "10.25.11.106",
+    "ip": "10.59.2.105",
     "user": "chengxiongzhu",
     "pw": "123456",
     "icText": "/home/chengxiongzhu/Achievement/pythonscript/ic_text.py",
     "trXlsPathS": "/home/chengxiongzhu/Achievement/pythonscript/",
-    "trXlsPath": "C:/Users/chengxiong.zhu/Downloads/2023.8.14整合版待翻译清单-欧盟_10语种_无丹麦_标记语言.xlsx",
+    "trXlsPath": "C:/Users/chengxiong.zhu/Downloads/2024_02_23_19_47_40_changed.xlsx",
     "downLoadPath": "C:/Users/chengxiong.zhu/Downloads",
     "projectNames": {
         "c385": "~/Works/Repos/changan_c385",
         "c673": "~/Works/Repos/changan_c673",
-        "j90a": "~/Works/Repos/changan_j90a"
+        "j90a": "~/Works/Repos/changan_j90a",
+        "mca": "~/Works/Repos/changan_mca_ica"
     },
     "projectCommonPath": "~/Works/Repos/changan_{projectName}",
     "currentProjectName": "j90a",
     "pushFile": "C:/Users/chengxiong.zhu/Desktop/Achievement/pythonscript/Deployment/c385_deploy.py",
     "generatedFiles": [
+        "C:/Users/chengxiong.zhu/Downloads/2024_04_15_17_16_49_changed.xlsx",
+        "C:/Users/chengxiong.zhu/Downloads/2024_04_15_17_17_48_changed.xlsx",
+        "C:/Users/chengxiong.zhu/Downloads/2024_04_15_17_19_05_changed.xlsx",
+        "C:/Users/chengxiong.zhu/Downloads/2024_04_15_17_34_01_changed.xlsx",
+        "C:/Users/chengxiong.zhu/Downloads/2024_04_23_18_53_38_changed.xlsx"
     ],
-    "trXlsPathW": "https://docs.google.com/spreadsheets/d/1HZVgz7F_ngGWGVqmcg88Mdbivrt6JY-w/edit#gid=1774571119"
+    "trXlsPathW": "https://docs.google.com/spreadsheets/d/1HZVgz7F_ngGWGVqmcg88Mdbivrt6JY-w/edit#gid=1774571119",
+    "tsPaths": {
+        "c385": "",
+        "c673": "",
+        "j90a": "~/Works/Repos/changan_j90a/qt/ic_apps/ic_dashboard/app/i18n/",
+        "mca": ""
+    },
+    "warnTextPaths": {
+        "c385": "",
+        "c673": "",
+        "j90a": "~/Works/Repos/changan_j90a/src/ic_service/vendor/config/icwarning_config.json",
+        "mca": ""
+    }
 }

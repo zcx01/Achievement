@@ -31,7 +31,7 @@
     "ic_dashboard": "/usr/bin/",
     "libqtmegaplugin.so": "/opt/qt/qml/QtMega/",
     "Other": "hqx.1.2",
-    "ssh_ip": "10.25.11.106",
+    "ssh_ip": "10.59.2.105",
     "user": "chengxiongzhu",
     "pwd": "123456",
     "PC": {

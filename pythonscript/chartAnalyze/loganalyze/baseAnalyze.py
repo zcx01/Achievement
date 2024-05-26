@@ -28,20 +28,22 @@ class logBase():
         self.stop = False
         self.tempIndex = -1
         self.keyWordSeries = {}
+        self.splitField = 'value'
+        self.lineContents={}
+        self.totalLineCount = 0
         self.clear()
 
     def clear(self):
-        self.filePaths = []
-        self.lineContents = []
+        self.totalLineCount = 0
+        self.lineContents.clear()
 
     def load(self,filePaths):
-        self.filePaths.extend(filePaths)
         filePathIndex = 0
-        for filePath in self.filePaths:
+        for filePath in filePaths:
             assert isinstance(filePath,str)
             self.loadLogFile(filePath)
             filePathIndex = filePathIndex + 1
-            self.currentSearchLineChanged(filePathIndex,len(self.filePaths))
+            self.currentSearchLineChanged(filePathIndex,len(self.lineContents))
            
 
     def searchContentChanged(self,dateStr,value,content,series):
@@ -70,19 +72,21 @@ class logBase():
 
     @typing.overload
     def loadLogFile(self,filePath):
-        self.lineContents.extend(readFileLines(filePath))
+        self.lineContents[filePath] = readFileLines(filePath)
+        self.totalLineCount = len(self.lineContents[filePath]) + self.totalLineCount
         return True
 
     def getLoglineCount(self):
-        return len(self.lineContents)
+        return self.totalLineCount
     
     def setKeyWords(self,keyWordSeries):
         self.keyWordSeries = keyWordSeries
 
-    def startSearchThread(self):
+    def startSearchThread(self,searchkeyFun=None):
         self.searchStatusChange(SearchStatus.NOSTART)
         if self.getLoglineCount() == 0 or len(self.keyWordSeries) == 0: return
-        self.logThread = Thread(target=self.searchkeyWords)
+        if searchkeyFun == None: searchkeyFun = self.searchkeyWords
+        self.logThread = Thread(target=searchkeyFun)
         self.logThread.setDaemon(True)
         self.logThread.start()
 
@@ -100,32 +104,33 @@ class logBase():
         for keyWord in self.keyWordSeries:
             keyConentCount[keyWord] = 0
             keyValueConentCount[keyWord] = 0
-        for lineContent in self.lineContents:
-            if self.stop : return
-            assert isinstance(lineContent,str)
-            for keyWord,series in self.keyWordSeries.items():
-                if re.search(keyWord,lineContent,re.A):
-                    keyConentCount[keyWord] =  keyConentCount[keyWord] +1
-                    searchCount = searchCount + 1
-                    spaceContent = lineContent.split(" ")
-                    dateStr = spaceContent[1] +" "+spaceContent[2]
-                    contents = re.findall(e_i,lineContent,re.A)
-                    ishasValue = False
-                    for contentIndex in range(len(contents)):
-                        if "value" in contents[contentIndex]:
-                            contentNextIndex = contentIndex + 1
-                            value = contents[contentNextIndex]
-                            self.searchContentChanged(dateStr,value,lineContent,series)
-                            keyValueConentCount[keyWord] =  keyValueConentCount[keyWord] +1
-                            ishasValue = True
+        for filePath,filelineContents in self.lineContents.items():
+            for lineContent in filelineContents:
+                if self.stop : return
+                assert isinstance(lineContent,str)
+                for keyWord,series in self.keyWordSeries.items():
+                    if re.search(keyWord,lineContent,re.A):
+                        keyConentCount[keyWord] =  keyConentCount[keyWord] +1
+                        searchCount = searchCount + 1
+                        spaceContent = lineContent.split(" ")
+                        dateStr = spaceContent[1] +" "+spaceContent[2]
+                        contents = re.findall(e_i,lineContent,re.A)
+                        ishasValue = False
+                        for contentIndex in range(len(contents)):
+                            if self.splitField in contents[contentIndex]:
+                                contentNextIndex = contentIndex + 1
+                                value = contents[contentNextIndex]
+                                self.searchContentChanged(dateStr,value,lineContent,series)
+                                keyValueConentCount[keyWord] =  keyValueConentCount[keyWord] +1
+                                ishasValue = True
 
-                    if not ishasValue:
-                        if isFirstPrint:
-                            isFirstPrint = False
-                            self.sendMsg(f'不符合规则的解析规则:')
-                        self.sendMsg(f'{lineContent}')
-            lineContentIndex = lineContentIndex+1
-            self.currentSearchLineChanged(lineContentIndex,self.getLoglineCount())
+                        if not ishasValue:
+                            if isFirstPrint:
+                                isFirstPrint = False
+                                self.sendMsg(f'不符合规则的解析规则:')
+                            self.sendMsg(f'{lineContent}')
+                lineContentIndex = lineContentIndex+1
+                self.currentSearchLineChanged(lineContentIndex,self.getLoglineCount())
         self.searchStatusChange(SearchStatus.FINISH)
         for keyWord in self.keyWordSeries:
             self.sendMsg(f'搜索 {keyWord} 共 {keyConentCount[keyWord]}')
@@ -170,14 +175,15 @@ class dltLogBase(logBase):
         return None
 
     def dltToTxt(self,logPath,filePath,logFile):
-        filePath = os.path.basename(filePath)
-        logFile = os.path.basename(logFile)
-        os.system(f'cd {logPath} && {self.dltExe} -c {filePath} {logFile}')
+        # filePath = os.path.basename(filePath)
+        # logFile = os.path.basename(logFile)
+        os.system(f'{self.dltExe} -c {filePath} {logFile}')
 
     def loadLogFile(self,filePath):
         assert isinstance(filePath,str)
         logFileDir = os.path.dirname(filePath)
         logFile = self.getConverTxt(filePath)
+        print(self.dltExe,filePath)
         if logFile == None and len(self.dltExe) != 0:
             if getSuffix(filePath) == '.gz':
                 filePath = dltLogBase.gunZip(filePath)
@@ -185,8 +191,36 @@ class dltLogBase(logBase):
                     return False
             logFile = filePath.replace('.dlt','.txt')
             self.dltToTxt(logFileDir,filePath,logFile)
-        self.lineContents.extend(readFileLines(logFile))
+        self.lineContents[filePath] = readFileLines(logFile)
+        self.totalLineCount = len(self.lineContents[filePath]) + self.totalLineCount
         return True
+
+class dltLog1(dltLogBase):
+    def __init__(self) -> None:
+        super().__init__()
+    
+    def startAnalyze(self):
+        self.searchStatusChange(SearchStatus.START)
+        lineContentIndex = 0
+        searchCount = 0
+        for filePath,filelineContents in self.lineContents.items():
+            for lineContent in filelineContents:
+                if self.stop : return
+                assert isinstance(lineContent,str)
+                for keyWord,series in self.keyWordSeries.items():
+                    if re.search(keyWord,lineContent,re.A):
+                        searchCount = searchCount + 1
+                        contents = re.split(keyWord,lineContent,re.A)
+                        date = contents[0]
+                        value = ''
+                        if len(contents) > 1 : value = contents[1]
+                        self.searchContentChanged(date,value,lineContent,filePath)
+                        
+
+                lineContentIndex = lineContentIndex+1
+                self.currentSearchLineChanged(lineContentIndex,self.getLoglineCount())
+        self.sendMsg(f"搜索完成,共 {searchCount}\n")
+        self.searchStatusChange(SearchStatus.FINISH)
 
 if __name__ == '__main__':
     logObj = dltLogBase()

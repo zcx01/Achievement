@@ -1,6 +1,5 @@
 from commonfun import *
 from Ui_toolMainWindow import *
-from customWidget.lableLineEdit import *
 from PyQt5 import *
 jsContent = None
 UiKey= {}
@@ -31,14 +30,19 @@ def addGeneratedFiles(filePath):
 def getGeneratedFiles():
     return getJsValue('generatedFiles',[])
 
-def removeGeneratedFiles():
+def removeGeneratedFiles(disPlayMsg):
     generatedFiles = getGeneratedFiles()
     for generatedFile in generatedFiles:
-        os.rename(generatedFile)
+        try:
+            os.remove(generatedFile)
+            disPlayMsg(f"删除                                                                                                                                                                                                                                                                                                                                                                                                                                          {generatedFile}")
+        except:
+            pass
     jsContent['generatedFiles'] = []
     saveConfigKey('generatedFiles')
+    disPlayMsg(f"删除完成")
 
-def initUI(ui,configPath,projectNameLayout,projectBtnLayout,projectBtnFun,projecGroup):
+def initUI(ui,configPath,projectBtnLayout,projectBtnFun,projecGroup):
     assert isinstance(ui,Ui_MainWindow)
     global jsContent
     global UiKey
@@ -60,23 +64,39 @@ def initUI(ui,configPath,projectNameLayout,projectBtnLayout,projectBtnFun,projec
         le.setText(getJsValue(keyValue))
     projectNames = getJsValue('projectNames')
     currentProjectName = getJsValue('currentProjectName')
+    tsPaths = getJsValue('tsPaths',{})
+    warnTextPaths = getJsValue('warnTextPaths',{})
     for prjectName,projectPath in projectNames.items():
-        leE,projectBtn = createProject(projectNameLayout,projectBtnLayout,projectBtnFun,projecGroup)
-        leE.setText(prjectName,projectPath)
-        projectBtn.setText(prjectName)
+        projectBtn = createProject(projectBtnLayout,projectBtnFun,projecGroup)
+        setBtnProject(projectBtn,prjectName,projectPath,tsPaths.get(prjectName,""),warnTextPaths.get(prjectName,""))
         if prjectName == currentProjectName:
             projectBtn.setChecked(True)
 
-def createProject(projectNameLayout,projectBtnLayout,projectBtnFun,projecGroup):
-    leE = lableLineEdit()
-    projectNameLayout.insertWidget(projectNameLayout.count()-1,leE)
-    projectUis.append(leE)
+def createProject(projectBtnLayout,projectBtnFun,projecGroup):
+    global projectUis
     projectBtn = QtWidgets.QRadioButton()
     projectBtn.clicked.connect(projectBtnFun)
     projecGroup.addButton(projectBtn)
     projectBtnLayout.insertWidget(projectBtnLayout.count()-1,projectBtn)
-    leE.dependentWidget = projectBtn
-    return leE,projectBtn
+    projectUis.append(projectBtn)
+    return projectBtn
+
+def setBtnProject(projectBtn,prjectName,projectPath,ts,warnText):
+    assert isinstance(projectBtn,QtWidgets.QRadioButton)
+    projectBtn.setText(prjectName)
+    projectBtn.setProperty(prjectName,projectPath)
+    projectBtn.setProperty("ts",ts)
+    projectBtn.setProperty("warnText",warnText)
+
+def getProjectInfo(prjectName):
+    for projectBtn in projectUis:
+        assert isinstance(projectBtn,QtWidgets.QRadioButton)
+        if projectBtn.text() == prjectName:
+            return getBtnInfo(projectBtn)
+    return None,"",""
+
+def getBtnInfo(projectBtn):
+    return projectBtn.property(projectBtn.text()),projectBtn.property("ts"),projectBtn.property("warnText")
 
 def setCurrentProjectName(projectName):
     setJsaValue('currentProjectName',projectName)
@@ -91,20 +111,18 @@ def getCurrentProjectPath():
             return projectNames.keys()[0]
     return ''
 
-def getCheckBtn():
+def getCheckBtn(disPlayMsg):
     for projectUi in projectUis:
-        if projectUi.dependentWidget.isChecked():
-            return projectUi.dependentWidget
+        if projectUi.isChecked():
+            return projectUi
+    disPlayMsg("请选择项目")
     return None
 
-def removePrject(projectNameLayout,projectBtnLayout,btn):
+def removePrject(projectBtnLayout,btn):
     index = 0
     for projectUi in projectUis:
-        assert isinstance(projectUi,lableLineEdit)
-        assert isinstance(projectNameLayout,QtWidgets.QBoxLayout)
-        if projectUi.dependentWidget == btn:
+        if projectUi == btn:
             projectBtnLayout.removeWidget(btn)
-            projectNameLayout.removeWidget(projectUi)
             del projectUis[index]
             return
         index = index + 1
@@ -116,10 +134,18 @@ def saveUI(ui,configPath):
     for le,keyValue in UiKey.items():
         setJsaValue(keyValue,le.text())
     projectNames = {}
+    tsPaths = {}
+    warnTextPaths ={}
     for prjectUI in projectUis:
-        labeText,lineEeditText = prjectUI.getText()
-        projectNames[labeText] = lineEeditText
+        labeText = prjectUI.text()
+        projectPath,ts,warnText = getBtnInfo(prjectUI)
+        projectNames[labeText] = projectPath
+        tsPaths[labeText] = ts
+        warnTextPaths[labeText] = warnText
+
     setJsaValue('projectNames',projectNames)
+    setJsaValue('tsPaths',tsPaths)
+    setJsaValue('warnTextPaths',warnTextPaths)
     writeJs(configPath,jsContent)
 
 def saveConfigKey(key):

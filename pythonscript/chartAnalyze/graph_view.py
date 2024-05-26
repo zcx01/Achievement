@@ -10,6 +10,7 @@ from PyQt5.QtCore import QRect,Qt, QDateTime,QObject,QMargins,pyqtSignal,QPointF
 from PyQt5.QtWidgets import QGraphicsTextItem,QGraphicsScene,QGraphicsView
 from loganalyze.baseAnalyze import *
 from loganalyze.commonfun import *
+from loganalyze.staXls import *
 
 QDATETIMEMSF='yyyy/MM/dd hh:mm:ss.zzz'
 QDATEF='yyyy/MM/dd'
@@ -402,4 +403,62 @@ class CustomGraphManage(QObject):
         return series
 
  
+class CustomAnalyzehManage(QObject):
+    update_Progress = pyqtSignal(int) 
+    send_msg = pyqtSignal(str) 
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
+        self.logAnalyze = dltLog1()
+        self.logAnalyze.resCallFun = self.analyzesCallBack
+        self.logAnalyze.currentSearchLine = self.updataProgress
+        self.logAnalyze.searchStatusChangeFun = self.statusChanged
+        self.logAnalyze.sendMsgFun = self.send_msg.emit
+        self.analyzeRes = {}
+        self.savePath = r'C:/Users/chengxiong.zhu/Downloads/'
 
+    def setConfig(self,configPath):
+        self.configPath = configPath
+        try:
+            self.logAnalyze.setDltExe(self.getConfigValue(DLTEXEPATH))
+        except:
+            return False
+        return True
+    
+    def statusChanged(self,status):
+        if status == SearchStatus.FINISH:
+            coverXls(self.savePath,self.analyzeRes)
+            self.send_msg.emit("分析完成")
+
+    def getConfigValue(self,key,defaultValue = None):
+        configConent = getJScontent(self.configPath)
+        if defaultValue == None:
+            return configConent[key]
+        else:
+            if key not in configConent:
+                return defaultValue
+            else:
+                return configConent[key]
+            
+    def updataProgress(self,log,lineContentIndex):
+        assert isinstance(log,logBase)
+        self.update_Progress.emit(lineContentIndex)
+        
+    def analyzesCallBack(self,date,value,content,filePath):
+        if filePath not in self.analyzeRes:
+            self.analyzeRes[filePath] = {value:0}
+        if value not in self.analyzeRes[filePath]:
+            self.analyzeRes[filePath][value] = 0
+        self.analyzeRes[filePath][value] = self.analyzeRes[filePath][value] + 1
+        
+
+    def loadLog(self,logPaths):
+        self.logAnalyze.clear()
+        self.logAnalyze.load(logPaths)
+
+    def setkeyWords(self,keyWord):
+        pgSeries={keyWord:None}
+        self.logAnalyze.setKeyWords(pgSeries)
+
+    def searchkeyWords(self):
+        self.analyzeRes.clear()
+        self.logAnalyze.startSearchThread(self.logAnalyze.startAnalyze)

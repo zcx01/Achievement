@@ -15,7 +15,7 @@ from Ui_toolMainWindow import *
 from Handle.configFile import *
 from Handle.handle import *
 from dlg.addTextDlg import *
-from customWidget.lableLineEdit import *
+from dlg.projectDlg import *
 import threading
 import webbrowser
 
@@ -27,7 +27,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.projecGroup = QtWidgets.QButtonGroup()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        initUI(self.ui,self.configPath,self.ui.verticalLayout_7,self.ui.horizontalLayout_12,self.selecteProject,self.projecGroup)
+        initUI(self.ui,self.configPath,self.ui.horizontalLayout_12,self.selecteProject,self.projecGroup)
         defFileName=['ic_service','ic_chime']
         self.ui.pushCbx.addItems(defFileName)
         self.ui.pushCbx.addItems(getPushFiles())
@@ -42,12 +42,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.openTrCBtn.clicked.connect(self.openTrChangedFile)
         self.ui.openTrCPathBtn.clicked.connect(self.openTrChangedPath)
         self.ui.addProjectBtn.clicked.connect(self.addPrjectBtn)
+        self.ui.modifyProjectBtn.clicked.connect(self.modifyProjectBtn)
         self.ui.removePrjectBtn.clicked.connect(self.removePrject)
         self.ui.updateXlsBtn.clicked.connect(self.canHanleBtn)
         self.ui.addSigBtn.clicked.connect(self.canHanleBtn)
         self.ui.addWSigBtn.clicked.connect(self.canHanleBtn)
         self.ui.pushFileBtn.clicked.connect(self.pushFileHanleBtn)
         self.ui.pushFileEdit.textChanged.connect(self.pushFileEditChanged)
+        self.ui.clearFileBtn.clicked.connect(self.clearFileBtn)
         self.send_msg.connect(self.disPlayMsg)
         self.disPlayMsg(f"当前进程ID: {os.getpid()}")
 
@@ -117,23 +119,38 @@ class MainWindow(QtWidgets.QMainWindow):
         self.disPlayMsg(f'当前路径: {getCurrentProjectPath()}')
 
     def addPrjectBtn(self):
-        dlg = addTextDlg()
+        dlg = projectDlg()
         dlg.add_text.connect(self.addPrject)
         dlg.exec()
-        
-    def addPrject(self,text):
-        leE,projectBtn = createProject(self.ui.verticalLayout_7,self.ui.horizontalLayout_12,self.selecteProject,self.projecGroup)
-        leE.setText(text,getProjectPath(text))
 
+    def addPrject(self,projectName,projectText,tsText,warnText):
+        projectBtn = createProject(self.ui.horizontalLayout_12,self.selecteProject,self.projecGroup)
+        setBtnProject(projectBtn,projectName,projectText,tsText,warnText)
+        
+    def modifyProjectBtn(self):
+        dlg = projectDlg()
+        projectBtn = getCheckBtn(self.disPlayMsg)
+        if projectBtn == None: return
+        projectPath,ts,warnText  = getProjectInfo(projectBtn.text())
+        dlg.ui.prjectNameLE.setText(projectBtn.text())
+        dlg.ui.projectPathLE.setText(projectPath)
+        dlg.ui.tsPathLE.setText(ts)
+        dlg.ui.wanTextLE.setText(warnText)
+        dlg.add_text.connect(self.modifyPrject)
+        dlg.exec()        
+
+    def modifyPrject(self,projectName,projectText,tsText,warnText):
+        projectBtn = getCheckBtn(self.disPlayMsg)
+        if projectBtn == None: return
+        setBtnProject(projectBtn,projectName,projectText,tsText,warnText)
 
     def removePrject(self):
-        btn = getCheckBtn()
+        btn = getCheckBtn(self.disPlayMsg)
         if btn == None:
-            self.disPlayMsg('请选中项目')
             return
         if not self.informationDlg(f'是否删除{btn.text()}项目'):
             return
-        removePrject(self.ui.verticalLayout_7,self.ui.horizontalLayout_12,btn)
+        removePrject(self.ui.horizontalLayout_12,btn)
         setCurrentProjectName('')
     
     def getSelectLineText(self,textEdit):
@@ -171,6 +188,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.pushCbx.setCurrentIndex(index)
                 return
             
+    def clearFileBtn(self):
+        removeGeneratedFiles(self.disPlayMsg)
+
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
