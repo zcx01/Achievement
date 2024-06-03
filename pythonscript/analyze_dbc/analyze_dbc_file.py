@@ -50,6 +50,7 @@ class SigInfo(object):
         self.useBit=[]
         self.subNet=''
         self.sendType = SigSendType.Normal #发送的类型是事件还是周期 1表示事件 2 表示三帧反转
+        self.channel=''
         #-------message--------
         self.Recevier=""
         self.Sender=""
@@ -250,6 +251,21 @@ class SigInfo(object):
             receviers.append("Vector__XXX")
         if local_machine_Sender[0] != self.Sender and local_machine_Sender[0] not in receviers:
             receviers.append(local_machine_Sender[0])
+        
+        isAddSend = False
+        try:
+            if self.getMessage_Name() in RECEVIER_NO_ADD_LOCAL_MACHINE_ID:
+                if RECEVIER_NO_ADD_LOCAL_MACHINE_ID[self.getMessage_Name()] == 1:
+                    isAddSend = True
+            elif RECEVIER_ADD_LOCAL_MACHINE_CAN[self.channel] == 1:
+                isAddSend = True
+        except:
+            pass
+
+        if isAddSend:
+            if local_machine_Sender[0] not in receviers:
+                receviers.append(local_machine_Sender[0])
+                
         self.Recevier = ",".join(receviers)
 
 class MessageInfo(object):
@@ -264,6 +280,7 @@ class MessageInfo(object):
         self.Recevier=''
         self.lenght=0
         self.sendType=0
+        self.channel = 0
         #---------dbc专有
         self.message_Name=''
         self.sigs=[]
@@ -273,7 +290,6 @@ class MessageInfo(object):
         self.sendTypeRow=-1
         self.sigMaxRow=-1
         self.threeCycleRow=-1
-        self.channel = 0
 
     def getMessage_Id(self):
         if len(self.message_Name) !=0:
@@ -369,6 +385,7 @@ class AnalyzeFile(object):
                     ds.Sender = currentdbcMessage.sender
                     ds.messgae_Name = currentdbcMessage.message_Name
                     ds.messageId = currentdbcMessage.messageId
+                    ds.channel = self.channel
                     ds.Row=rowIndex
                     self.dbcSigs[str(ds.getMId())+ds.name] = ds
                     self.maxSigRow = rowIndex
@@ -683,6 +700,7 @@ class AnalyzeFile(object):
                 
         if cover_count == len(sigUsrIndexs):
             if  not (isRepalceSig and sig.name == user_sigName):
+                printYellow(f"{sig.name} 与 {user_sigName} 字节冲突")
                 return WriteDBCResult.SignalCoverage,dm,insertRowIndex
         elif cover_count != 0:
             if len(user_sigName) ==1:

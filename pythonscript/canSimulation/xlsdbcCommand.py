@@ -47,7 +47,7 @@ def getSigInfo(sheel, row):
     else:
         sig.name = "_".join(temps)
     sig.chineseName = str(getValue(sheel, row, sig_line_chineseName))
-    sig.messageId = str(getValue(sheel, row, sig_line_messageId)).split(".")[0].replace('0x', '')
+    sig.messageId = str(getValue(sheel, row, sig_line_messageId)).split(".")[0].replace('0x', '').lstrip('0')
     sig.cycle = getValueInt(sheel, row, sig_line_cycle)
     if sig.cycle == 0:  # 没有周期，就解析为0
         sig.sendType = SigSendType.Event
@@ -76,6 +76,7 @@ def getSigInfo(sheel, row):
         pass
     sig.invalidValue = getValue(sheel, row, sig_line_invalidValue)
     sig.Recevier = getValue(sheel, row, sig_line_Recevier)
+    sig.channel = SubNet_Channel.get(sig.subNet,SubNet_Channel.get("Other"))
     if sig.endBit != -1:
         sig.getStartBit()
     else:
@@ -91,7 +92,7 @@ def getMessageInfo(sheel):
             msg.subNet = str(getValue(sheel, row, msg_line_subNet)).upper()
             msg.sender = str(getValue(sheel, row, msg_line_sender)).upper()
             sendingMode = str(getValue(sheel, row, msg_line_sendingMode))
-            msg.messageId = getNoOx16(str(getValue(sheel,row, msg_line_messageId)))
+            msg.messageId = getNoOx16(str(getValue(sheel,row, msg_line_messageId))).lstrip('0')
             if 'event' in sendingMode.lower():
                 msg.sendType = 8
             msg.cycle = getValueInt(sheel, row, msg_line_cycle)
@@ -116,6 +117,7 @@ def getMessageInfo(sheel):
                 frame = SubNet_Frame.get(msg.subNet, 0)
 
             msg.frame = frame
+            msg.channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
             if msg.messageId not in msgs:
                 msgs[msg.getMessage_SubNet()] = msg
             else:
@@ -135,7 +137,7 @@ def printNoInXlsMgsId(xlsMsgs,dbc):
     msgInfos = dbc.getAllMessage()
     for msgsSubId,msg in xlsMsgs.items():
         assert isinstance(msg,MessageInfo)
-        can_Channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
+        can_Channel = msg.channel
         dbcMsgInfos = msgInfos[can_Channel]
         if msg.messageId in dbcMsgInfos:
             del msgInfos[can_Channel][msg.messageId]
@@ -211,10 +213,15 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
         return
 
     threeFrames = getThreeFrame(jsConfig)
+    m_PreBarValue = -1
     for row in range(sheel.nrows):
-        continue
         # xf = book.xf_list[getValue(sheel, row, 2).xf_index]
         # print(type(xf))
+        if isAllAdd:
+            m_currenBarValue = row*100 // sheel.nrows 
+            if m_currenBarValue != m_PreBarValue:
+                print(f"当前导入进度{m_currenBarValue}%")
+                m_PreBarValue = m_currenBarValue
 
         if row == 0:
             continue
@@ -241,9 +248,9 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                     printRed(f'{sig.name} 表中最大物理值为{sig.max}，能达到的最大物理值为{phy_max}')
                     continue
 
-            if sig.min == sig.max and sig.max !=0:
-                printRed(f"{sig.name} 最大值和最小值相等值为{sig.min}")
-                continue
+            # if sig.min == sig.max and sig.max !=0:
+            #     printRed(f"{sig.name} 最大值和最小值相等值为{sig.min}")
+            #     continue
 
             isFind = True
             dbc = Analyze(dbcfile)
@@ -274,13 +281,13 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                     WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
     dbc = Analyze(dbcfile)
     try:
-        if RENAMEMSG:
+        if RENAMEMSG and isAllAdd:
             dbc.reNameMsg()
     except:
         printRed(f"重命名失败，请配置 RENAMEMSG 变量")
 
-    if isAllAdd:
-        printNoInXlsMgsId(msgs,dbc)   
+    # if isAllAdd:
+    #     printNoInXlsMgsId(msgs,dbc)   
 
     if not isFind:
         printRed(f"{wirteSigName} 在CAN矩阵中不存在")
@@ -322,6 +329,32 @@ def conversionByOtherdbc(configPath, wirteSigNames, dbcfilPath=""):
 
     if len(wirteSigNames):
         print('没有找到的信号-------', wirteSigNames)
+'''
+把 odbcfilPath 信号移到 adbcfilPath
+'''
+def conversionTwodbc(odbcfilPath,adbcfilPath,msgIds,configPath):
+    assert isinstance(msgIds, list)
+    ori_dbc = AnalyzeFile(odbcfilPath)
+    print(odbcfilPath)
+    for messageId in ori_dbc.dbcMessage:
+        if messageId in msgIds:
+            ori_sigs = ori_dbc.getSigsByMessageId(messageId)
+            for ori_sig in ori_sigs:
+                assert isinstance(ori_sig,SigInfo)
+                msg = ori_dbc.dbcMessage.get(ori_sig.messageId, None)
+                if msg == None:
+                    print(f' {ori_sig.name} 对应的 {ori_sig.messageId} message不存在')
+                    continue
+                aim_dbc = AnalyzeFile(adbcfilPath)
+                aim_dbc.writeSig(ori_sig, msg)
+            msgIds.pop(msgIds.index(messageId))
+
+    if len(msgIds):
+        print('没有找到的信号-------', msgIds)
+
+    if len(configPath) !=0:
+        reNameMsg(configPath)
+
 
 def conversionMsgByOtherdbc(configPath,msgIds,dbcfilPath,isWriteSig):
     assert isinstance(msgIds,list)
@@ -423,7 +456,7 @@ def canMatrixNoMsg(configPath,canmatrix):
     msgInfos = dbc.getAllMessage()
     for msgsSubId,msg in msgs.items():
         assert isinstance(msg,MessageInfo)
-        can_Channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
+        can_Channel = msg.channel
         dbcMsgInfos = msgInfos[can_Channel]
         if msg.messageId in dbcMsgInfos:
             del msgInfos[can_Channel][msg.messageId]
@@ -838,6 +871,26 @@ def addCan_parse_whitelist(sigs,isPrint=False):
         can_parse_whitelistPath = getKeyPath("can_parse_whitelist", jsConfig)
         WriteCan_parse_whitelist(can_parse_whitelistPath,message,messagesig,False)
         if isPrint: print(f'{sig} 添加成功')
+
+
+def recevierRemoveSend(configPath,isRemove):
+    jsConfig = getJScontent(configPath)
+    dbcfile = getKeyPath("dbcfile", jsConfig)
+    dbc = Analyze(dbcfile)
+    try:
+        global RECEVIER_ADD_LOCAL_MACHINE_CAN
+        global RECEVIER_NO_ADD_LOCAL_MACHINE_ID
+        tmp1 = RECEVIER_ADD_LOCAL_MACHINE_CAN
+        tmp2 = RECEVIER_NO_ADD_LOCAL_MACHINE_ID
+        if isRemove == 1:
+            RECEVIER_ADD_LOCAL_MACHINE_CAN = None
+            RECEVIER_NO_ADD_LOCAL_MACHINE_ID =None
+        dbc.repalceAllSig()
+        RECEVIER_ADD_LOCAL_MACHINE_CAN = tmp1
+        RECEVIER_NO_ADD_LOCAL_MACHINE_ID = tmp2
+    except:
+        print('请配置 RECEVIER_ADD_LOCAL_MACHINE_CAN RECEVIER_NO_ADD_LOCAL_MACHINE_ID 变量')
+
 '''
 获取信号名称对应的中文名称
 stype：输入的类型

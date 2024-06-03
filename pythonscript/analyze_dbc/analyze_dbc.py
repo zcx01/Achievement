@@ -48,7 +48,7 @@ class Analyze(object):
 
     def getAnalyzeSingleBySigInfo(self,sig):
         assert isinstance(sig,SigInfo)
-        can_Channel = SubNet_Channel.get(sig.subNet,SubNet_Channel.get("Other"))
+        can_Channel = sig.channel
         dbc =  self.AnalyzeDict.get(can_Channel,None)
         if dbc == None:
             printYellow(f"{sig.name}没有对应的dbc,can_Channel为{can_Channel} {self.AnalyzeDictlist}")
@@ -85,7 +85,7 @@ class Analyze(object):
 
     def getAnalyzeSingleByMsgInfo(self,msg):
         assert isinstance(msg,MessageInfo)
-        can_Channel = SubNet_Channel.get(msg.subNet,SubNet_Channel.get("Other"))
+        can_Channel = msg.channel
         dbc =  self.AnalyzeDict.get(can_Channel,None)
         assert isinstance(dbc,AnalyzeFile)
         return dbc
@@ -250,6 +250,12 @@ class Analyze(object):
             if dbc != None:
                 assert isinstance(dbc,AnalyzeFile)
                 dbc.repalceSig(channelSig[dbc],msg,isCheckByteConflict)
+
+    def repalceAllSig(self):
+        for can_Channel in self.AnalyzeDict:
+            dbc = self.AnalyzeDict[can_Channel]
+            assert isinstance(dbc,AnalyzeFile)
+            dbc.repalceSig(dbc.dbcSigs.values(),None,False)
 
     def removeSig(self,*sigs):
         channelSig= self.GetChannelSig(sigs)
