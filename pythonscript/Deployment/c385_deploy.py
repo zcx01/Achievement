@@ -14,6 +14,8 @@ jsConfig=getJScontent(qnxConfigPath)
 androidQnx=AndroidQnx()
 projectType=''
 
+BINARYSYSTEM = "binarySystem"
+
 def setProjectType(defultDir,execName,prjectDir):
     global projectType
     execbin = getExecBin(defultDir,execName,prjectDir)
@@ -59,21 +61,29 @@ def printPCFile():
     for pcFile in pcFiles:
         print(pcFile)
 
+def getBinarySystem(proceesName):
+    binarySystems = jsConfig.get(BINARYSYSTEM,"")
+    if type(binarySystems) == dict:
+        return binarySystems.get(proceesName,"")
+    return ""
+
 def adbPush(proceesNames,excess,argv):
     keyStr("telnet cdc-qnx",1)
     keyStr("root")
     fileDict={}
+    fileBinarySystem = {}
     if '-a' not in argv:
         for proceesName in proceesNames:
             if proceesName not in jsConfig:
                 fileDict[proceesName] = "/usr/bin/"
             else:
                 fileDict[proceesName] = getPusPath(proceesName)
-        androidQnx.qnx_cp(fileDict,True)
+            fileBinarySystem[proceesName] = getBinarySystem(proceesName)
+        androidQnx.qnx_cp(fileDict,True,fileBinarySystem)
     else:
         for proceesName in proceesNames:
             fileDict[proceesName] = getPusPath(proceesName)
-        androidQnx.qnx_cp(fileDict,False)
+        androidQnx.qnx_cp(fileDict,False,fileBinarySystem)
     for cmd in excess:
         keyStr(cmd,0)
 
@@ -220,8 +230,9 @@ if __name__ == "__main__":
     
     PrjectDir = args.PrjectDir
     home_dir = os.path.expanduser("~").replace('\\','/')
-    PrjectDir = PrjectDir.replace(home_dir,"~")
-    printYellow(PrjectDir)
+    PrjectDir = os.path.abspath(PrjectDir.replace(home_dir,"~"))
+    printYellow(f'项目目录: {PrjectDir}')
+    printYellow(f'配置文件: {os.path.abspath(qnxConfigPath)}')
     
     if '-u' in argv:
         updateConfig(PrjectDir,args.updateConfig)
