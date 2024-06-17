@@ -138,6 +138,7 @@ void TcpClient::addCallFun(RecDataFun fun)
 
 void TcpClient::sendMsg(uint8_t *data, int msgLenght)
 {
+    std::unique_lock<std::mutex> lk(m_mutex);
     if(sockfd == 0)
     {
         IC_LOG_INFO("sockfd error: %d", sockfd);
@@ -145,11 +146,10 @@ void TcpClient::sendMsg(uint8_t *data, int msgLenght)
     }
     //TD::printHex("send msg:", data, msgLenght);
     setSendStatus(TD::Sending);
-    std::unique_lock<std::mutex> lk(m_mutex);
     if (send(sockfd, data, msgLenght, 0) < 0)
     {
         setSendStatus(TD::SendFail);
-        IC_LOG_INFO("send msg error: %s(errno: %d)", strerror(errno), errno);
+        IC_LOG_INFO("send msg error: %s(errno: %d)", strerror(errno), errno);   
     }
     setSendStatus(TD::SendFinish);
 }
@@ -167,7 +167,8 @@ int TcpClient::receiveMsg()
         }
         if(n <= 0)
         {
-            IC_LOG_INFO("TcpClient accept socket error: %s(errno: %d) lenght: %d", strerror(errno), errno,n);
+            std::unique_lock<std::mutex> lk(m_mutex);
+            IC_LOG_INFO("TcpClient accept socket error: %s(errno: %d) lenght: %d:sockfd:%d ", strerror(errno), errno,n,sockfd);
             if (sockfd != 0)
             {
                 closeConnect();
@@ -178,6 +179,8 @@ int TcpClient::receiveMsg()
             }
             else
             {
+                closeConnect();
+                m_mutex.unlock();
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             }
             continue;

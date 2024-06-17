@@ -878,16 +878,8 @@ def recevierRemoveSend(configPath,isRemove):
     dbcfile = getKeyPath("dbcfile", jsConfig)
     dbc = Analyze(dbcfile)
     try:
-        global RECEVIER_ADD_LOCAL_MACHINE_CAN
-        global RECEVIER_NO_ADD_LOCAL_MACHINE_ID
-        tmp1 = RECEVIER_ADD_LOCAL_MACHINE_CAN
-        tmp2 = RECEVIER_NO_ADD_LOCAL_MACHINE_ID
-        if isRemove == 1:
-            RECEVIER_ADD_LOCAL_MACHINE_CAN = None
-            RECEVIER_NO_ADD_LOCAL_MACHINE_ID =None
-        dbc.repalceAllSig()
-        RECEVIER_ADD_LOCAL_MACHINE_CAN = tmp1
-        RECEVIER_NO_ADD_LOCAL_MACHINE_ID = tmp2
+        global RECEVIERREMOVESEND
+        dbc.repalceAllSig(isRemove == 1)
     except:
         print('请配置 RECEVIER_ADD_LOCAL_MACHINE_CAN RECEVIER_NO_ADD_LOCAL_MACHINE_ID 变量')
 

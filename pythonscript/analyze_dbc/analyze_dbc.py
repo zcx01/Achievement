@@ -251,11 +251,11 @@ class Analyze(object):
                 assert isinstance(dbc,AnalyzeFile)
                 dbc.repalceSig(channelSig[dbc],msg,isCheckByteConflict)
 
-    def repalceAllSig(self):
+    def repalceAllSig(self,recevierRemoveSend=False):
         for can_Channel in self.AnalyzeDict:
             dbc = self.AnalyzeDict[can_Channel]
             assert isinstance(dbc,AnalyzeFile)
-            dbc.repalceSig(dbc.dbcSigs.values(),None,False)
+            dbc.repalceSig(dbc.dbcSigs.values(),None,False,recevierRemoveSend)
 
     def removeSig(self,*sigs):
         channelSig= self.GetChannelSig(sigs)
