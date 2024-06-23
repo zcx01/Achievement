@@ -230,8 +230,8 @@ if __name__ == "__main__":
     
     PrjectDir = args.PrjectDir
     home_dir = os.path.expanduser("~").replace('\\','/')
-    PrjectDir = os.path.abspath(PrjectDir.replace(home_dir,"~"))
-    printYellow(f'项目目录: {PrjectDir}')
+    PrjectDir = PrjectDir.replace(home_dir,"~")
+    printYellow(f'项目目录: {os.path.abspath(PrjectDir)}')
     printYellow(f'配置文件: {os.path.abspath(qnxConfigPath)}')
     
     if '-u' in argv:
