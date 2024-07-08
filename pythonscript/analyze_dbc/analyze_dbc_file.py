@@ -282,7 +282,7 @@ class MessageInfo(object):
         self.Recevier=''
         self.lenght=0
         self.sendType=0
-        self.channel = 0
+        self.channel = ""
         #---------dbc专有
         self.message_Name=''
         self.sigs=[]

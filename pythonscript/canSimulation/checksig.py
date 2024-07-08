@@ -151,15 +151,24 @@ def configConverdbc(sig,dbc,isPrint=True):
     assert isinstance(sig,str)
     sigs = splitSig(sig)
     dbcSig = None
-    if len(sigs) >= 3 :
+    messageReplace = True
+    try:
+        messageReplace = MESSAGEREPLACE
+    except:
+        pass
+
+    if len(sigs) >= 3:
         try:
             sig16= str(int(sigs[1],16))+"_".join(sigs[2:])
             prefix= f"{sigs[0]}_{sigs[1]}"
             dbcSig = dbc.getSig(sig16,sigs[0])
             if dbcSig != None and dbcSig.getMessage_Name() != prefix:
-                if isPrint:
-                    printYellow(f' {sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
-                return sig.replace(prefix,dbcSig.getMessage_Name()),dbcSig.Sender,True
+                if messageReplace:
+                    if isPrint:
+                        printYellow(f' {sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
+                    return sig.replace(prefix,dbcSig.getMessage_Name()),dbcSig.Sender,True,dbcSig.messageId
+                else:
+                    dbcSig=None
         except:
             pass
     if dbcSig==None:

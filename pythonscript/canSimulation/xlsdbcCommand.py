@@ -106,6 +106,7 @@ def getMessageInfo(sheel):
                     except:
                         pass
             msg.lenght = getValueInt(sheel, row, msg_line_lenght)
+            if msg.lenght == 0: msg.lenght = 8
             msg.Recevier = str(getValue(sheel,row, msg_line_Recevier))
             frame = str(getValue(sheel,row, msg_line_frame))
             try:
@@ -280,6 +281,8 @@ def conversion(configPath, wirteSigName, canmatrix="",isMsg = False):
                 if os.path.isfile(can_parse_whitelistPath):
                     WriteCan_parse_whitelist(can_parse_whitelistPath,sig.getMessage_Name(),sig.getMessage_Sig(),False)
     dbc = Analyze(dbcfile)
+    print("替换msg...")
+    dbc.repalceMessage(msgs)
     try:
         if RENAMEMSG and isAllAdd:
             dbc.reNameMsg()

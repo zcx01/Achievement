@@ -43,3 +43,4 @@ void response(uint8_t status, uint16_t type, uint8_t sid, uint8_t mid, const std
 void parse_tlv(const std::vector<uint8_t> &input, std::map<int, std::vector<uint8_t>> &output);
 void parse_tlv(uint8_t *data, int msgLenght);
 void print_app_data(const std::string topic, const TD::AppData& appData);
+std::string getDnsHost();

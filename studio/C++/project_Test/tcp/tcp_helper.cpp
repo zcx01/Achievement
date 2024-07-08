@@ -4,6 +4,7 @@
 #include "tcp_data_analy.hpp"
 #include "ic_log.h"
 #include "zlib.h"
+#include "data_store_fetch.hpp"
 
 #include <sstream>
 #include <iomanip>
@@ -164,4 +165,25 @@ void print_app_data(const std::string topic, const TD::AppData &appData)
     IC_LOG_INFO("topic: %s send to tsp, sid %u, mid %u, len %lu, datas %s", topic.c_str(), appData.body.sid, appData.body.mid, len, buff);
 
     delete[] buff;
+}
+
+std::string getDnsHost()
+{
+    float value = 0;
+    if (DataStoreFetch::instance().getValue("Settings/Env/Set", value, false))
+    {
+        IC_LOG_INFO("load Settings/Env/Set val %f", value);
+    }
+    else
+    {
+        IC_LOG_ERROR("load Settings/Env/Set error, val %f", value);
+    }
+
+
+    if (value == 0)
+    {
+        return "https://incall.changan.com.cn";
+    }
+
+    return "https://pre-incall.changan.com.cn";
 }
