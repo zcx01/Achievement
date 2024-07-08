@@ -16,7 +16,6 @@ QDATETIMEMSF='yyyy/MM/dd hh:mm:ss.zzz'
 QDATEF='yyyy/MM/dd'
 QTIMEF='hh:mm:ss'
 QDATETIMEMSSPANEF='yyyy/MM/dd\nhh:mm:ss.zzz'
-DLTEXEPATH = 'dltExePath'
 LableWidth = 60
 class DateAxis(pg.AxisItem):
     def __init__(self, orientation, pen=None, textPen=None, tickPen=None, linkView=None, parent=None, maxTickLength=-5, showValues=True, text='', units='', unitPrefix='', **args):
@@ -163,7 +162,6 @@ class CustomGraphManage(QObject):
         self.pgFirstPlotItem = None
         self.lines = []
         self.currentline = None
-        self.configPath = None
         self.currentlineVisibleCount = 0
         self.initPg()
         self.logAnalyzes = [logBase(),dltLogBase()]
@@ -195,32 +193,8 @@ class CustomGraphManage(QObject):
     def analyzesCallBack(self,date,value,content,series):
         self.update_data.emit(date,value,content,series)
 
-    def setConfig(self,configPath):
-        self.configPath = configPath
-        try:
-            self.logAnalyzes[1].setDltExe(self.getConfigValue(DLTEXEPATH))
-        except:
-            return False
-        return True
-
     def setDltExe(self,dltExePath):
-        self.modifyConfig(DLTEXEPATH,dltExePath)
-        self.setConfig(self.configPath)
-
-    def modifyConfig(self,key,value):
-        configConent = getJScontent(self.configPath)
-        configConent[key] = value
-        writeJs(self.configPath,configConent)
-
-    def getConfigValue(self,key,defaultValue = None):
-        configConent = getJScontent(self.configPath)
-        if defaultValue == None:
-            return configConent[key]
-        else:
-            if key not in configConent:
-                return defaultValue
-            else:
-                return configConent[key]
+        self.logAnalyzes[1].setDltExe(dltExePath)
 
     def clearLog(self):
         for serie in self.pgSeries.values():
@@ -415,29 +389,17 @@ class CustomAnalyzehManage(QObject):
         self.logAnalyze.sendMsgFun = self.send_msg.emit
         self.analyzeRes = {}
         self.savePath = r'C:/Users/chengxiong.zhu/Downloads/'
-
-    def setConfig(self,configPath):
-        self.configPath = configPath
-        try:
-            self.logAnalyze.setDltExe(self.getConfigValue(DLTEXEPATH))
-        except:
-            return False
-        return True
+    
+    def setDltExe(self,dltExePath):
+        self.logAnalyze.setDltExe(dltExePath)
     
     def statusChanged(self,status):
         if status == SearchStatus.FINISH:
-            coverXls(self.savePath,self.analyzeRes)
-            self.send_msg.emit("分析完成")
-
-    def getConfigValue(self,key,defaultValue = None):
-        configConent = getJScontent(self.configPath)
-        if defaultValue == None:
-            return configConent[key]
-        else:
-            if key not in configConent:
-                return defaultValue
-            else:
-                return configConent[key]
+            if len(self.savePath) == 0:
+                self.send_msg.emit(f"请输入保存路径")
+                return
+            xlsPath = coverXls(self.savePath,self.analyzeRes)
+            self.send_msg.emit(f"分析完成 文件在: {xlsPath}")
             
     def updataProgress(self,log,lineContentIndex):
         assert isinstance(log,logBase)

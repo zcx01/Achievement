@@ -39,5 +39,6 @@ def coverXls(savaPath,conents):
                     otherConent[field] = 0
                 startIndex = startIndex + 1
             sh.append(lineContens)
-    xlsPathFileName = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.xlsx'
-    book.save(savaPath+xlsPathFileName)
+    xlsPathFilePath = savaPath +'/'+ datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.xlsx'
+    book.save(xlsPathFilePath)
+    return xlsPathFilePath

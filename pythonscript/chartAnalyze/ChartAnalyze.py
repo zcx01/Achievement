@@ -14,6 +14,8 @@ from Ui_charMainWiget import *
 from PyQt5 import *
 from dlg.addTextDlg import *
 
+DLTEXEPATH = 'dltExePath'
+DEFAULTDIR = 'defaultDir'
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -23,7 +25,10 @@ class MainWindow(QMainWindow):
         self.ui = ui
         self.mouseClick = False
         self.startPos = None
-
+        self.UiKey={}
+        self.configPath = pyFileDir+"/loganalyze/logConfig.json"
+        self.configConent = getJScontent(self.configPath)
+        self.initUI()
 
         # 创建菜单栏
         menubar = self.menuBar()
@@ -57,6 +62,8 @@ class MainWindow(QMainWindow):
 
         ui.openFileBtn_sta.clicked.connect(self.openFileSta)
         ui.statisticsBtn.clicked.connect(self.searchkeyWordsStatistics)
+        ui.saveBtn_sta.clicked.connect(self.modifySaveSta)
+        save_action.triggered.connect(self.saveUI)
         self.ui.progressBar.setRange(0,100)
 
         
@@ -69,8 +76,9 @@ class MainWindow(QMainWindow):
         self.analyzeManage = CustomAnalyzehManage()
         self.analyzeManage.update_Progress.connect(self.updataProgress)
         self.analyzeManage.send_msg.connect(self.disPlayMsgSta)
+        self.analyzeManage.savePath = self.ui.save_lE.text()
 
-        self.defaultDir = r'C:/Users/chengxiong.zhu/Downloads/log分析/'
+        self.defaultDir = self.getConfigValue(DEFAULTDIR,'')
         # self.chartManage.loadLog([r"C:/Users/chengxiong.zhu/Downloads/log分析/2023-09-13/log_000268_20230912-095121.dlt"])
         self.add_key("DrivingInfo/PowerStatus")
         self.add_key("DrivingInfo/Speed")
@@ -78,26 +86,83 @@ class MainWindow(QMainWindow):
 
         self.resize(1000,800)
         self.show()
-        if not self.chartManage.setConfig(pyFileDir+"/loganalyze/logConfig.json"):
-            isTipSetDltExe = self.chartManage.getConfigValue('isTipSetDltExe',True)
+        dltExePath = self.getConfigValue(DLTEXEPATH,'')
+        if dltExePath == '':
+            isTipSetDltExe = self.getConfigValue('isTipSetDltExe',True)
             if isTipSetDltExe:
                 if self.informationDlg("是否设置dltexe的路径"):
-                    file_dialog = QtWidgets.QFileDialog(self,'设置dltexe的路径')
-                    if file_dialog.exec_() == QtWidgets.QDialog.Accepted:
-                        selected_files = file_dialog.selectedFiles()
-                        if len(selected_files) != 0:
-                            print(selected_files[0])
-                            self.chartManage.setDltExe(selected_files[0])
+                    self.modifyDltExe()
                 else:
-                    self.chartManage.modifyConfig('isTipSetDltExe',False)
+                    self.modifyConfig('isTipSetDltExe',False)
+        else:
+            self.setDltExe(dltExePath)
 
-        self.analyzeManage.setConfig(self.chartManage.configPath)
+    def modifyDltExe(self):
+        file_dialog = QtWidgets.QFileDialog(self,'设置dltexe的路径')
+        if file_dialog.exec_() == QtWidgets.QDialog.Accepted:
+            selected_files = file_dialog.selectedFiles()
+            if len(selected_files) != 0:
+                dltExePath = selected_files[0]
+                self.modifyConfig(DLTEXEPATH,dltExePath)
+                self.setDltExe(dltExePath)
+
+    def modifySaveSta(self):
+        file_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Save Dir",self.defaultDir)
+        if len(file_path) != 0:
+            self.ui.save_lE.setText(file_path)
+            self.analyzeManage.savePath = self.ui.save_lE.text()
+
+    def setDltExe(self,dltExePath):
+        self.chartManage.setDltExe(dltExePath)
+        self.analyzeManage.setDltExe(dltExePath)
+
+    def modifyConfig(self,key,value):
+        self.configConent[key] = value
+        writeJs(self.configPath,self.configConent)
+
+    def defaultDirChanged(self,dir):
+        self.defaultDir = dir
+        self.modifyConfig(DEFAULTDIR,self.defaultDir)
+
+    def getConfigValue(self,key,defaultValue = None):
+        if defaultValue == None:
+            return self.configConent[key]
+        else:
+            if key not in self.configConent:
+                return defaultValue
+            else:
+                return self.configConent[key]
+            
+    def initUI(self):
+        self.UiKey[self.ui.keyWords_sta] = 'keyWords_sta'
+        self.UiKey[self.ui.save_lE] = 'save_lE'
+        for le,keyValue in self.UiKey.items():
+            le.setText(self.getConfigValue(keyValue,''))
+
+    def saveUI(self):
+        self.configConent[DEFAULTDIR] = self.defaultDir
+        for le,keyValue in self.UiKey.items():
+            self.configConent[keyValue] = le.text()
+        writeJs(self.configPath,self.configConent)
+        self.informationTipDlg('保存成功')
 
     def informationDlg(self,content):
         return QtWidgets.QMessageBox.information(self,'提示',content,
                                              QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.Cancel) == QtWidgets.QMessageBox.Ok
              
-    
+    def informationTipDlg(self,content):
+        QtWidgets.QMessageBox.information(self,'提示',content, QtWidgets.QMessageBox.Ok)
+
+    def keyPressEvent(self, event):
+        # 如果按下了Ctrl + S
+        if event.modifiers() & Qt.ControlModifier and event.key() == Qt.Key_S:
+            event.accept()  # 接受事件，防止其他对象继续处理该事件
+
+            # 执行保存文件的操作
+            self.saveUI()
+        else:
+            super().keyPressEvent(event)
+
     def mousePressEvent(self, a0: QMouseEvent):
         if a0.button() == Qt.LeftButton and self.cursor() == Qt.SplitHCursor:
             self.mouseClick = True
@@ -141,7 +206,7 @@ class MainWindow(QMainWindow):
         self.ui.textEdit.clear()
         self.chartManage.loadLog(selected_files)
         for selected_file in selected_files:
-            self.defaultDir = os.path.dirname(selected_file)
+            self.defaultDirChanged(os.path.dirname(selected_file))
             self.ui.textEdit.append(os.path.basename(selected_file))
 
     def onAddKeyTriggered(self):
@@ -222,7 +287,7 @@ class MainWindow(QMainWindow):
         self.ui.textEdit_sta.clear()
         self.analyzeManage.loadLog(selected_files)
         for selected_file in selected_files:
-            self.defaultDir = os.path.dirname(selected_file)
+            self.defaultDirChanged(os.path.dirname(selected_file))
             self.disPlayMsgSta(os.path.basename(selected_file))
 
     def searchkeyWordsStatistics(self):

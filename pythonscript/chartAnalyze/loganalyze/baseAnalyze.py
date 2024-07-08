@@ -109,12 +109,12 @@ class logBase():
                 if self.stop : return
                 assert isinstance(lineContent,str)
                 for keyWord,series in self.keyWordSeries.items():
-                    if re.search(keyWord,lineContent,re.A):
+                    if re.search(keyWord,lineContent,re.A|re.IGNORECASE):
                         keyConentCount[keyWord] =  keyConentCount[keyWord] +1
                         searchCount = searchCount + 1
                         spaceContent = lineContent.split(" ")
                         dateStr = spaceContent[1] +" "+spaceContent[2]
-                        contents = re.findall(e_i,lineContent,re.A)
+                        contents = re.findall(e_i,lineContent,re.A|re.IGNORECASE)
                         ishasValue = False
                         for contentIndex in range(len(contents)):
                             if self.splitField in contents[contentIndex]:
@@ -182,15 +182,17 @@ class dltLogBase(logBase):
     def loadLogFile(self,filePath):
         assert isinstance(filePath,str)
         logFileDir = os.path.dirname(filePath)
-        logFile = self.getConverTxt(filePath)
-        print(self.dltExe,filePath)
-        if logFile == None and len(self.dltExe) != 0:
-            if getSuffix(filePath) == '.gz':
-                filePath = dltLogBase.gunZip(filePath)
-                if filePath == None:
-                    return False
-            logFile = filePath.replace('.dlt','.txt')
-            self.dltToTxt(logFileDir,filePath,logFile)
+        suffix = getSuffix(os.path.basename(filePath))
+        if suffix == '.gz' or suffix == '.dlt':
+            logFile = self.getConverTxt(filePath)
+            print(self.dltExe,filePath)
+            if logFile == None and len(self.dltExe) != 0:
+                if getSuffix(filePath) == '.gz':
+                    filePath = dltLogBase.gunZip(filePath)
+                    if filePath == None:
+                        return False
+                logFile = filePath.replace('.dlt','.txt')
+                self.dltToTxt(logFileDir,filePath,logFile)
         self.lineContents[filePath] = readFileLines(logFile)
         self.totalLineCount = len(self.lineContents[filePath]) + self.totalLineCount
         return True
@@ -208,12 +210,16 @@ class dltLog1(dltLogBase):
                 if self.stop : return
                 assert isinstance(lineContent,str)
                 for keyWord,series in self.keyWordSeries.items():
-                    if re.search(keyWord,lineContent,re.A):
+                    if re.search(keyWord,lineContent,re.A|re.IGNORECASE):
                         searchCount = searchCount + 1
-                        contents = re.split(keyWord,lineContent,re.A)
+                        contents = re.split(keyWord,lineContent,re.A|re.IGNORECASE)
                         date = contents[0]
                         value = ''
-                        if len(contents) > 1 : value = contents[1]
+                        if len(contents) > 1 : 
+                            value = contents[1]
+                            values = value.split(" ")
+                            if len(values) > 0:
+                                value = values[0]
                         self.searchContentChanged(date,value,lineContent,filePath)
                         
 

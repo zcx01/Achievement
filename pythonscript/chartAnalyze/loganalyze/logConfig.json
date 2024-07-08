@@ -1,11 +1,14 @@
 {
-    "logPath":"",
-    "dltExePath":"D:/Soft/DltViewerSDK/dlt-viewer.exe",
-    "valueMap":{
-        "keyWord" :{
-            "a":1,
-            "b":2,
-            "c":3
+    "logPath": "",
+    "valueMap": {
+        "keyWord": {
+            "a": 1,
+            "b": 2,
+            "c": 3
         }
-    }
+    },
+    "dltExePath": "D:/Soft/DltViewerSDK/dlt-viewer.exe",
+    "keyWords_sta": "ic_service.*topic: ",
+    "save_lE": "C:/Users/chengxiong.zhu/Downloads",
+    "defaultDir": "C:/Users/chengxiong.zhu/Desktop/性能原始数据/j90a/报文"
 }
