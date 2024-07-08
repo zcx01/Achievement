@@ -1,6 +1,11 @@
 #!/bin/bash
 
-if [ $1 == "can" ];then
+if [ $1 == "-h" ];then
+    echo 'can qnx linux'
+elif [ $1 == "linux" ];then 
+    echo "查看实际使用空间                          df -h"
+    echo "ubuntu 查看当前目录下的各文件的大小       sudo du --max-depth=1 -h"
+elif [ $1 == "can" ];then
     echo 'cd  /sys/class/net/can0 && echo 4096 > tx_queue_len'
 elif [ $1 == "qnx" ]; then
     echo "查看aps_ic里面的线程: pidin sched | grep aps_ic"

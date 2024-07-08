@@ -7,7 +7,7 @@ import subprocess
 from commonfun import *
 
 
-APSSUFFIX="aps_ic" 
+APSSUFFIX="aps_i" 
 THREADPROPORTION=3
 def aps_exist(aps):
     cmd = keyStr('aps')
@@ -15,9 +15,17 @@ def aps_exist(aps):
     for apsInfo in cmds:
         if 'aps' in apsInfo:
             if apsInfo == aps:
-
                 return True
     return False
+
+def aps_can_create_num():
+    cmd = keyStr('aps')
+    cmds = re.findall(e_i,cmd,re.A)
+    count = 1
+    for apsInfo in cmds:
+        if 'aps' in apsInfo:
+            count =count+1
+    return 32-count
 
 def getApsName(name):
     apsName =  APSSUFFIX+'_'+name
@@ -50,22 +58,37 @@ def process_cpu_aps(processName):
     if not aps_exist(aps_pr):
         createAps(aps_pr,1)
     apsInfo = cpu_aps(processName)
+    next(apsInfo)
     for pid,tid,threadName in apsInfo:
         modifyThreadAps(pid,tid,aps_pr)
     printpPidinSched(aps_pr)
 
-def thread_cpu_aps(processName,tid):
+def thread_cpu_aps(processName,tid,extraRutrun,ranged=[]):
     apsInfo = cpu_aps(processName)
-    apsCount = next(apsInfo)
+    next(apsInfo)
     apsProportion = 0.01
+    can_create_num = aps_can_create_num()
+    aps_prs=[]
+    current_index = 0
     for pid,tid,threadName in apsInfo:
+        if len(ranged) != 0 and tid not in ranged:
+            continue
         aps_pr = getApsName(threadName)
         if tid:
             aps_pr = getApsName(tid)
-        if not aps_exist(aps_pr):
+        if len(aps_prs) > can_create_num:
+            if extraRutrun:
+                return
+            if not aps_exist(aps_pr):
+                if current_index > len(aps_prs):
+                    current_index = 0
+                aps_pr = aps_prs[current_index]
+                current_index = current_index + 1
+        elif not aps_exist(aps_pr):
             createAps(aps_pr,apsProportion)
         modifyThreadAps(pid,tid,aps_pr)
         printpPidinSched(aps_pr)
+        aps_prs.append(aps_pr)
 
 def statistics_cpu_aps(apsName):
 
@@ -89,8 +112,8 @@ if __name__ == "__main__":
     parser.add_argument('-d','--device',help='adb的device',default='',type=str)
     parser.add_argument('-q','--qnxPassword',help='user版本qnx的密码',type=int,nargs='*')
     parser.add_argument('-paps','--processAps',help='创建aps查看一个进程的cpu', nargs='?',type=str)
-    parser.add_argument('-tnaps','--threadNameAps',help='创建aps查看一个进程中所有线程的cpu', nargs='?',type=str)
-    parser.add_argument('-taps','--threadAps',help='创建aps查看一个进程中所有线程的cpu', nargs='?',type=str)
+    parser.add_argument('-tnaps','--threadNameAps',help='根据名称创建aps查看一个进程中所有线程的cpu', nargs='?',type=str)
+    parser.add_argument('-taps','--threadAps',help='根据tid创建aps查看一个进程中所有线程的cpu', nargs='?',type=str)
     parser.add_argument('-saps','--statisticsAps',help='统计制度的aps,统计的文件在当前目录', nargs='?',type=str,default='')
     args = parser.parse_args()
 
@@ -116,7 +139,7 @@ if __name__ == "__main__":
 
     isExit = (args.interact == 0)
 
-    if "-caps" in sys.argv:
+    if "-paps" in sys.argv:
         process_cpu_aps(args.processAps)
 
     if "-taps" in sys.argv:
