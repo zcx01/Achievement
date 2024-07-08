@@ -18,25 +18,17 @@
     "chime_config": "../../../../../src/ic_chime/config/chime_config.json",
     "chime_id_script": "../../../../../src/ic_chime/config/generate_chime_id.py",
     "icwarning_config": "../../../../../src/ic_service/vendor/config/icwarning_config.json",
-    "WarningPopup": "../../../../../qt/ic_apps/ic_dashboard/content/",
+    "WarningPopup": "../../../../../qt/ic_apps/ic_dashboard/content_Classic/",
     "warning_toast": "../../../../../qt/ic_apps/ic_dashboard/app/ipc/warning_toast.json",
     "gitStoreInfos": {
-        "../../../../../qt/ic_apps/ic_dashboard/content/": [
-            "Dark",
-            "Light",
-            "j90a_bev",
-            "j90a_rev"
-        ],
-        "../../../../../qt/ic_apps/ic_dashboard/": [
-            "assets_Light",
-            "assets_Dark"
+        "../../../../../qt/ic_apps/ic_dashboard/content_Classic/": [
+            "assets_0",
+            "assets_1"
         ]
     },
     "gitnore": [],
     "qrcPaths": [
-        "../../../../../qt/ic_apps/ic_dashboard/content_Dark_j90a_rev/content_Dark_j90a_rev.qrc",
-        "../../../../../qt/ic_apps/ic_dashboard/content_Dark_j90a_bev/content_Dark_j90a_bev.qrc",
-        "../../../../../qt/ic_apps/ic_dashboard/content_Light_j90a_rev/content_Light_j90a_rev.qrc",
-        "../../../../../qt/ic_apps/ic_dashboard/content_Light_j90a_bev/content_Light_j90a_bev.qrc"
+        "../../../../../qt/ic_apps/ic_dashboard/content_Classic_j90a_bev/content_Classic.qrc",
+        "../../../../../qt/ic_apps/ic_dashboard/content_Classic_j90a_rev/content_Classic.qrc"
     ]
 }

@@ -24,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('-v','--value', help='值', nargs='?',default=1,type=int)
     parser.add_argument('-d','--device',help='adb的device',default='',type=str)
     parser.add_argument('-q','--qnxPassword',help='user版本qnx的密码',type=int,nargs='*')
+    parser.add_argument('-dlt','--dltlogs',help='拉取dltlogs',nargs='?')
     args = parser.parse_args()
 
     device = ""
@@ -40,10 +41,11 @@ if __name__ == "__main__":
     setDevice(device)
     keyStr(f'adb{device} root')
     keyStr(f"adb{device} shell")
+    keyStr('init.mount_qlog.sh',0,"#")
     keyStr(f"telnet cdc-qnx",0,"login:")
     keyStr(f"root",0,rootOut)
     if rootOut == "Password":
-        keyStr(f"@mega#cdc!",0,"#")
+        keyStr(f"*6342@232A#!",0,"#")
 
     isExit = (args.interact == 0)
     value = args.value
@@ -96,6 +98,12 @@ if __name__ == "__main__":
         keyStr("enter_fastoot_mode.sh")
         time.sleep(1)
         isExit=True
+
+    if "-dlt" in sys.argv:
+        SetCloseSpawn(True)
+        keyStr('rm -rf dltlogs')
+        keyStr('adb pull /qlog/dltlogs/ ./')
+        isExit=False
 
     if '-k' in sys.argv:
         slays = args.slay

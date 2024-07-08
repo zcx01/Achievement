@@ -22,5 +22,9 @@
         <file>MyBehavior.qml</file>
         <file>MyFlickable.qml</file>
         <file>MyCanvas.qml</file>
+        <file>../../../Works/Repos/changan_c385/qt/ic_qt/resources/fonts/Roboto-Medium.ttf</file>
+        <file>../../../Works/Repos/changan_c385/qt/ic_qt/resources/fonts/Roboto-Regular.ttf</file>
+        <file>../../../Works/Repos/changan_c385/qt/ic_qt/resources/fonts/SourceHanSansCN-Medium-2.otf</file>
+        <file>../../../Works/Repos/changan_c385/qt/ic_qt/resources/fonts/SourceHanSansCN-Normal-2.otf</file>
     </qresource>
 </RCC>

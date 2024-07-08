@@ -151,15 +151,24 @@ def configConverdbc(sig,dbc,isPrint=True):
     assert isinstance(sig,str)
     sigs = splitSig(sig)
     dbcSig = None
-    if len(sigs) >= 3 :
+    messageReplace = True
+    try:
+        messageReplace = MESSAGEREPLACE
+    except:
+        pass
+
+    if len(sigs) >= 3:
         try:
             sig16= str(int(sigs[1],16))+"_".join(sigs[2:])
             prefix= f"{sigs[0]}_{sigs[1]}"
             dbcSig = dbc.getSig(sig16,sigs[0])
             if dbcSig != None and dbcSig.getMessage_Name() != prefix:
-                if isPrint:
-                    printYellow(f' {sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
-                return sig.replace(prefix,dbcSig.getMessage_Name()),dbcSig.Sender,True
+                if messageReplace:
+                    if isPrint:
+                        printYellow(f' {sig:<50} {prefix} {dbcSig.getMessage_Name()} message名称错误，即将替换')
+                    return sig.replace(prefix,dbcSig.getMessage_Name()),dbcSig.Sender,True,dbcSig.messageId
+                else:
+                    dbcSig=None
         except:
             pass
     if dbcSig==None:
@@ -262,17 +271,19 @@ class ConfigXls():
         self.valueMap = {}
         self.defaultValueType = ""
         self.sender = ""
+        self.log = 1
         self.sigNameType = 0 #0是带msg,1只是信号名称
 
-    def addToConfig(self,jsConfig,isDown):
+    def addToConfig(self,jsConfig,isDown,noChangedTopic):
         contentJson = {}
         if self.topic == '':
             self.topic = self.dbcSigName
 
-        if isDown:
-            if not self.topic.endswith(SETSTR): self.topic = self.topic +SETSTR
-        else:
-            if self.topic.endswith(SETSTR): self.topic = self.topic.rstrip(SETSTR)
+        if not noChangedTopic:
+            if isDown:
+                if not self.topic.endswith(SETSTR): self.topic = self.topic +SETSTR
+            else:
+                if self.topic.endswith(SETSTR): self.topic = self.topic.rstrip(SETSTR)
         if len(self.valueMap) != 0:
             contentJson['valueMap'] = self.valueMap
         if len(self.defaultValueType) != 0:
@@ -301,7 +312,8 @@ class ConfigXls():
                     del jsConfig[self.dbcSigName]
                     jsConfig[self.dbcSigName]={exTopic:{}}
             if self.dbcSigName not in jsConfig:
-                jsConfig[self.dbcSigName] = {LOGSTR:1}
+                jsConfig[self.dbcSigName] = {}
+            jsConfig[self.dbcSigName][LOGSTR] = self.log
             jsConfig[self.dbcSigName][self.topic] = contentJson
 
     def getList(self):
@@ -460,7 +472,33 @@ def getThreeSig(sheel,rowCount,getSheelValue,rowRange=[],configPath=""):
         except:
             pass
 
-# def remove
+def getValueRange(valueMap,row):
+    assert isinstance(valueMap,str)
+    valueMapStrs = valueMap.splitlines()
+    valueMapValue=[]
+    for valueMapStr in valueMapStrs:
+        if valueMapStr.startswith('(') or valueMapStr.startswith('['):
+            valueMapStrs = re.findall(e_i,valueMapStr,re.A)
+            try:
+                minValue = eval(valueMapStrs[0])
+                maxValue = eval(valueMapStrs[1]) + 1
+                if valueMapStr.startswith('('):
+                    minValue = minValue - 1
+                if ')' in valueMapStr:
+                    maxValue = maxValue - 1
+                valueStrs = []
+                trValue = valueMapStrs[2]
+                print(minValue,maxValue)
+                for valueStr in range(minValue,maxValue):
+                    valueStrs.append(f'{valueStr}:{trValue}')
+                valueMapValue.append("\n".join(valueStrs))
+                valueMap = valueMap.replace(valueMapStr,'')
+            except :
+                printYellow(f'{row+1} 值范围错误')
+    if len(valueMapValue) != 0:
+        return "\n".join(valueMapValue) + valueMap
+    return valueMap
+
 def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,configPath=""): 
     jsDown, jsUp, dbc, jsConfig,down_config,up_config = getJsConfig(configPath)
     preComments = ""
@@ -495,15 +533,17 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
             continue
         if 1:
         # try:
-
+            noChangedTopic = False
             try:
-                customFds = int(getSheelValue(sheel,i,xls_ignore))
-                if customFds == 1:
+                customField = int(getSheelValue(sheel,i,xls_ignore))
+                if customField == 1:
                     printGreen(f'{i+1:<10}无须导入,有自定义的fds')
                     continue
+                noChangedTopic = (customField == 2)
             except:
                 pass
-
+            
+           
             try:
                 #strip()方法用于删除字符串左右两边的空格、特殊字符
                 #如果没有指定字符，则默认删除空格以及制表符、回车符、换行符等特殊字符
@@ -519,6 +559,12 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 if value_type == "STRING" or value_type == "MAP": configXls.sigNameType = 1
             except:
                 pass
+
+            try:
+                configXls.log = int(getSheelValue(sheel,i,xls_log).strip())
+            except:
+                pass
+
             configXls.topic = getSheelValue(sheel,i,xls_topic_name).strip()
             if configXls.getBindSigNames(sigName,dbc,whitelistdbcSigNames,jsUp):
                 printGreen(f"{i+1:<10} 写入完成")
@@ -554,6 +600,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
             whitelistdbcSigNames.append(configXls.dbcSigName.replace('/','__'))
             try:
                 valueMapStr = getSheelValue(sheel,i,xls_value_mapstr)
+                valueMapStr = getValueRange(valueMapStr,i)
                 valueMapStrs = re.findall(e_i,valueMapStr,re.A)
                 for valueMapStrIndex in range(len(valueMapStrs)):
                     if valueMapStrIndex % 2 != 0 : continue
@@ -563,7 +610,7 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                     if tIndex >= len(valueMapStrs):
                         printYellow(f"{i+1:<10} {tIndex} {len(valueMapStrs)}值映射错误")
                         continue
-                    tValue = int(valueMapStrs[tIndex])
+                    tValue = eval(valueMapStrs[tIndex])
                     configXls.valueMap[fValue] = tValue
 
                 defaultValueTypeStr = re.findall(f'defaultValueType:{i_i}',valueMapStr,re.A)[0]
@@ -574,9 +621,9 @@ def addConfigTopicCan(sheel,rowCount,getSheelValue,rowRange=[],isAll=False,confi
                 pass
 
             if configXls.sender not in local_machine_Sender: 
-                configXls.addToConfig(jsUp,False)         
+                configXls.addToConfig(jsUp,False,noChangedTopic)         
             if configXls.sender in local_machine_Sender:
-                configXls.addToConfig(jsDown,True) 
+                configXls.addToConfig(jsDown,True,noChangedTopic) 
 
             newSheel = configXls.getList()
             sh.cell(row=i, column=1).value = newSheel[0]

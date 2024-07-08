@@ -14,6 +14,7 @@ SOURCES += \
         MessageBody.cpp \
         MyWidget.cpp \
         calenum.cpp \
+        loadfont_helper.cpp \
         main.cpp
 
 RESOURCES += qml.qrc
@@ -35,5 +36,6 @@ HEADERS += \
     MessageBoard.h \
     MessageBody.h \
     MyWidget.h \
-    calenum.h
+    calenum.h \
+    loadfont_helper.h
 

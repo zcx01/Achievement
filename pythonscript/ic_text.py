@@ -60,16 +60,19 @@ class translateConent(object):
         self.content=""
         self.exisTranslatesList=[]
         self.translateContent=""
+        self.fileName=""
         self.changedCount = EXISTRANSLATESTARTCOL
         for i in range(EXISTRANSLATESTARTCOL,EXISTRANSLATEMAXCOLS+1):
             self.exisTranslatesList.append('')
 
-    def getList(self):
+    def getList(self,isGeFileName):
         xlsContent = []
         xlsContent.append(self.sourceKey)
         xlsContent.append(self.content)
         for exisTranslate in self.exisTranslatesList:
             xlsContent.append(exisTranslate)
+        if isGeFileName:
+            xlsContent.append(self.fileName)
         return xlsContent
     
     def appendExis(self,key,exisTranslate):
@@ -77,11 +80,11 @@ class translateConent(object):
             self.exisTranslatesList[XlsCharToInt(ORILANGUAGESUFFIXS[key])-EXISTRANSLATESTARTCOL] = exisTranslate
             self.changedCount = self.changedCount+1
 
-    def appendSh(self,sh,isCheckChange):
+    def appendSh(self,sh,isCheckChange,isGeFileName):
         if not isCheckChange:
-            sh.append(self.getList())
+            sh.append(self.getList(isGeFileName))
         elif self.changedCount <= EXISTRANSLATEMAXCOLS and len(self.content) != 0:
-            sh.append(self.getList())
+            sh.append(self.getList(isGeFileName))
             
     
 def getTextCout(fileName):
@@ -131,6 +134,7 @@ def translatesByTs(dirpath,oriName,translateConents,repeatTranslateConents,isSou
             xlsContent = translateConent()
             xlsContent.sourceKey = source
             xlsContent.content = content
+            xlsContent.fileName = contentFile
 
             if repeatTranslateConents == None:
                 translateConents[source] = xlsContent
@@ -139,7 +143,7 @@ def translatesByTs(dirpath,oriName,translateConents,repeatTranslateConents,isSou
                 repeatTranslateConents[source] = xlsContent
     return True            
 
-def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
+def coverXls(translatePath,jsonPath,outPath,isCheckChange=False,geFileName=False):
     # 创建一个Excel workbook 对象
     # if os.path.isfile(outPath):
     #     book = openpyxl.load_workbook(outPath)
@@ -150,8 +154,13 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
     sh.title = SHELLNAME
     sh['A1'] = '源key'
     sh['B1'] = '内容'
+    lastCol = 'C'
     for exisTranslate,col in ORILANGUAGESUFFIXS.items():
         sh[f'{col}1'] = ORILANGUAGENAME[exisTranslate]
+        lastCol = col
+    lastCol = XlsIntToChar(XlsCharToInt(lastCol)+1)
+    if geFileName:
+        sh[f'{lastCol}1'] = '文件'
 
     exisTranslates = ORILANGUAGESUFFIXS.keys()
 
@@ -181,7 +190,7 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
                         except:
                             # printYellow(f"{xlsContent.sourceKey} 不存在 {removeSuffix(exisTranslate)}")
                             pass
-                    xlsContent.appendSh(sh,isCheckChange)
+                    xlsContent.appendSh(sh,isCheckChange,geFileName)
                     count+=1
                 print(f"检测完 {dirpath}/{oriName} 文件 一共有 {count}")
     
@@ -193,6 +202,7 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
             for grade in jsContents[top]:
                 if isNumber(grade) :
                     xlsContent = translateConent()
+                    xlsContent.fileName = os.path.basename(jsonPath)
                     xlsContent.sourceKey = joint(top,grade)          
                     xlsContent.content = jsContents[top][grade][removeSuffix(SOUCRELANGUAGESUFFIX)]
                     for exisTranslate in exisTranslates:
@@ -200,7 +210,7 @@ def coverXls(translatePath,jsonPath,outPath,isCheckChange=False):
                             xlsContent.appendExis(exisTranslate,jsContents[top][grade][removeSuffix(exisTranslate)])
                         except:
                             printYellow(f"{top} {grade}不存在 {removeSuffix(exisTranslate)}")
-                    xlsContent.appendSh(sh,isCheckChange)
+                    xlsContent.appendSh(sh,isCheckChange,geFileName)
                     count+=1
         print(f"检测完 {jsonPath} 文件 一共有{count}")
     except:
@@ -333,6 +343,7 @@ def buildScript():
 
 #./ic_text.py -t /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/translate -j /home/chengxiongzhu/Works/Repos/changan_c385/qt/ic_qt/resources/config/icwarning_config.json -o ic-out.xlsx
 if __name__ == "__main__":
+
     aparse = argparse.ArgumentParser(description='python的脚本模板')
     aparse.add_argument('-t','--translatePath',help='翻译文件所在目录',type=str,nargs="?",default="")
     aparse.add_argument('-j','--json',help='报警文字配置文件',type=str,nargs="?",default="")
@@ -340,12 +351,13 @@ if __name__ == "__main__":
     aparse.add_argument('-i','--input',help='输入xls文件路径',type=str)
     aparse.add_argument('-c','--checkChange',help='检测修改的文本',type=str,nargs="?")
     aparse.add_argument('-b','--buildScript',help='生成部署命令',nargs="?")
+    aparse.add_argument('-f','--geFileName',help='生成的xls带有文件名',nargs="?")
     arg = aparse.parse_args()
 
     if len(sys.argv) == 1:
         getTextCout(arg.fileName)
     elif "-o" in sys.argv:
-        coverXls(arg.translatePath,arg.json,arg.outPath)
+        coverXls(arg.translatePath,arg.json,arg.outPath,False,'-f' in sys.argv)
     elif "-i" in sys.argv:
         xlsCover(arg.translatePath,arg.json,arg.input)
     elif '-c' in sys.argv:

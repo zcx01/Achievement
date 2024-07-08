@@ -40,7 +40,7 @@ if __name__ == "__main__":
     parse.add_argument('-rm','--rmmsgs', help='删除message,是一个集合,是一个16进制',nargs='+')
     parse.add_argument('-u', '--isfilterNoUser',
                        help='是否过滤掉没有使用过的信号,用于比较can矩阵', nargs='*')
-    parse.add_argument('-w', '--WhitelistPath', help='和-a组合是白名单路径，单独是信号名称',default=[], nargs='+', type=str) 
+    parse.add_argument('-w', '--WhitelistPath', help='和-a组合是白名单路径，单独是信号名称',default=[], nargs='*', type=str) 
     parse.add_argument('-ch', '--channal', help='删除message指定通道',nargs='?',default="") 
     parse.add_argument('-sc', '--SigNameChinese', help='获取信号的中文描述',default=[], nargs='+') 
     parse.add_argument('-fc', '--fileChinese', help='获取文件中信号的中文描述',default=[], nargs='+')
@@ -49,7 +49,8 @@ if __name__ == "__main__":
     parse.add_argument('-fm', '--filterateMsg', help='过滤出来在CAN矩阵没有但是dbc中有的msg', nargs='?') 
     parse.add_argument('-mv', '--mvMsg', help='重命名message避免解析重复', nargs='?')                   
     parse.add_argument('-ss', '--srcSig', help='获取源码中使用的信号，后接的是路径', nargs='?',default='./')
-    parse.add_argument('-cw', '--clearCanParseWhitelist', help='CAN的白名单不在dbc中的报文和信号', nargs='?',default='')                 
+    parse.add_argument('-cw', '--clearCanParseWhitelist', help='CAN的白名单不在dbc中的报文和信号', nargs='?',default='')  
+    parse.add_argument('-rrs', '--recevierRemoveSend', help='移除发送信号的本机节点', nargs='?',default=1,type=int)               
     arg = parse.parse_args()
 
     initWarnFile()
@@ -69,6 +70,11 @@ if __name__ == "__main__":
         conversionMsgByOtherdbc(arg.config, arg.messages, arg.dbcPath,'-s' in sys.argv)
     elif '-d' in sys.argv and '-s' in sys.argv:
         conversionByOtherdbc(arg.config, arg.sigNames, arg.dbcPath)
+    elif "-f" in sys.argv and "-t" and "-m" in sys.argv:
+        configFilePath = ""
+        if '-mv' in sys.argv:
+            configFilePath = arg.config
+        conversionTwodbc(arg.twoMatrix,arg.fristMatrix,arg.messages,configFilePath)
     elif '-rs' in sys.argv:
         RemoveSigs(arg.config, arg.rmsigs)
     elif '-rm' in sys.argv:
@@ -117,3 +123,5 @@ if __name__ == "__main__":
         getSrcSig(arg.srcSig)
     elif '-cw' in sys.argv:
         clearCan_parse_whitelist(arg.config)
+    elif '-rrs' in sys.argv:
+        recevierRemoveSend(arg.config,arg.recevierRemoveSend)

@@ -38,6 +38,7 @@ xls_ignore = 'N'
 xls_prd_name = 'K'
 xls_functional_module = 'L'
 xls_value_type= 'D'
+xls_log = 'P'
 GOOGLESIGTOPICID="1v4y6DCyc3wnzaY8AdIi51jg4hQnV1Ip8J051WbIGUcc"
 
 def getStartBit(sheel,row,getValueInt):
@@ -63,6 +64,8 @@ SubNet_Channel={'INFOCAN':"CAN1",'RCAN':'CAN0','CDC私CAN':'CAN0','DATACAN':'CAN
 File_SubNet={"1DATACAN":"DATACAN","2CDC私CAN":"CDC私CAN","3INFOCAN":"INFOCAN",'CAN1':"INFOCAN",'CAN0':"CDC私CAN"} #用于dbc导入
 Sig_Matrix='4_Matrix'
 Message_Matrix='3_OverView'
+RECEVIER_ADD_LOCAL_MACHINE_CAN = {'CAN0':0,'CAN1':1,'CAN2':0} #是否接收发送的信号 0不接收 1 接收 默认不接收 "0"表示CAN0
+RECEVIER_NO_ADD_LOCAL_MACHINE_ID = {} #优先级高于 RECEVIER_ADD_LOCAL_MACHINE_CAN
 MSB=False
 ISUSEDBCENUM=False
 Jira_Project = "HUR"

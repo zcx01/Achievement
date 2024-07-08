@@ -83,12 +83,16 @@ namespace TD
 
     static void printHex(const std::string &topic, uint8_t *data, uint8_t len)
     {
-        char buff[512] = {0};
+        char *buff = new char[len * 3 + 1];
+        ::memset(buff, 0, len * 3 + 1);
+
         for (int i = 0; i < len; i++)
         {
             sprintf(buff + i * 3, "%02x ", data[i]);
         }
         IC_LOG_INFO("topic: %s %s\n", topic.c_str(), buff);
+
+        delete[] buff;
     }
 
     static void printVectorHex(std::string topic, const std::vector<uint8_t> &values)
