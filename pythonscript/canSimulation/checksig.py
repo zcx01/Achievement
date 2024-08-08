@@ -127,10 +127,10 @@ def splitSig(sig):
     assert isinstance(sig,str)
     sigs = []
     sigs.append(sig)
-    if "__" in sig:
-        tempSigs =  sig.split("__")
-    elif "/" in sig:
+    if "/" in sig:
         tempSigs =  sig.split("/")
+    elif "__" in sig:
+        tempSigs =  sig.split("__")
     else:
         return sigs
 
@@ -146,6 +146,15 @@ def splitSig(sig):
     return sigs
         
 
+def set_highest_bit_to_one(num):
+    # 确保 num 是一个 32 位整数
+    assert isinstance(num, int)
+
+    if num > 0x7FF:
+        # 使用按位或操作符将最高位置为 1
+        num |= 0x80000000
+    return num
+
 def configConverdbc(sig,dbc,isPrint=True):
     assert isinstance(dbc,Analyze)
     assert isinstance(sig,str)
@@ -156,10 +165,9 @@ def configConverdbc(sig,dbc,isPrint=True):
         messageReplace = MESSAGEREPLACE
     except:
         pass
-
     if len(sigs) >= 3:
         try:
-            sig16= str(int(sigs[1],16))+"_".join(sigs[2:])
+            sig16= str(set_highest_bit_to_one(int(sigs[1],16)))+"_".join(sigs[2:])
             prefix= f"{sigs[0]}_{sigs[1]}"
             dbcSig = dbc.getSig(sig16,sigs[0])
             if dbcSig != None and dbcSig.getMessage_Name() != prefix:
@@ -336,6 +344,7 @@ class ConfigXls():
                 whitelistdbcSigNames.append(dbcSig.name)
             if self.topic not in jsConfig:
                 jsConfig[self.topic] = {}
+            jsConfig[self.topic][LOGSTR] = self.log
             jsConfig[self.topic]['bindSigNames'] = bindSigNames
             return True
         return False

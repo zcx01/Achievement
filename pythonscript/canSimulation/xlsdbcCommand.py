@@ -36,10 +36,18 @@ def getValueInt(src, row, col, lenght=-1):
             return 0
         return pow(2, lenght)-1
 
+def getSender(oriSender):
+    try:
+        sender = SENDERTRANSFORM.get(oriSender, oriSender)
+    except:
+        pass
+    sender =  sender.replace("_", "/")
+    return sender.upper()
+
 def getSigInfo(sheel, row):
     sig = SigInfo()
     sig.subNet = str(getValue(sheel, row, sig_line_subNet)).upper()
-    sig.Sender = str(getValue(sheel, row, sig_line_Sender)).upper()
+    sig.Sender = getSender(str(getValue(sheel, row, sig_line_Sender)))
     temp = str(getValue(sheel, row, sig_line_name))
     temps = re.findall(e_i, temp, re.A)
     if "_" in temp:
@@ -65,7 +73,7 @@ def getSigInfo(sheel, row):
     sig.Offset = getValueInt(sheel, row, sig_line_Offset)
     sig.min = getValueInt(sheel, row, sig_line_min)
     sig.max = getValueInt(sheel, row, sig_line_max, sig.length)
-    if getValue(sheel, row, sig_line_dataType) == "Signed":
+    if str(getValue(sheel, row, sig_line_dataType)).upper() == "SIGNED":
         sig.dataType = "-"
     sig.SetUnit(str(getValue(sheel, row, sig_line_unit)))
     if ISUSEDBCENUM: sig.enum = str(getValue(sheel, row, sig_line_enum))
@@ -90,7 +98,7 @@ def getMessageInfo(sheel):
         try:
             msg = MessageInfo()
             msg.subNet = str(getValue(sheel, row, msg_line_subNet)).upper()
-            msg.sender = str(getValue(sheel, row, msg_line_sender)).upper()
+            msg.sender = getSender(str(getValue(sheel, row, msg_line_sender)))
             sendingMode = str(getValue(sheel, row, msg_line_sendingMode))
             msg.messageId = getNoOx16(str(getValue(sheel,row, msg_line_messageId))).lstrip('0')
             if 'event' in sendingMode.lower():
